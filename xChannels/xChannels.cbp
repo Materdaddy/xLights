@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="xChannels" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="DebugWindows">
+				<Option output="../bin/xChannels" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-g" />
+					<Add option="-D__WXDEBUG__" />
+					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx)\include" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-mthreads" />
+					<Add library="libwxmsw28ud.a" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseWindows">
+				<Option output="../bin/xChannels" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-O2" />
+					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx)\include" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-mthreads" />
+					<Add option="-s" />
+					<Add library="libwxmsw28u.a" />
+				</Linker>
+			</Target>
+			<Target title="DebugLinux">
+				<Option output="../bin/xChannels" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="`wx-config --cflags`" />
+					<Add option="-g" />
+					<Add option="-Winvalid-pch" />
+					<Add option="-include wx_pch.h" />
+					<Add option="-DWX_PRECOMP" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs`" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseLinux">
+				<Option output="../bin/xChannels" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="`wx-config --cflags`" />
+					<Add option="-O2" />
+					<Add option="-Winvalid-pch" />
+					<Add option="-include wx_pch.h" />
+					<Add option="-DWX_PRECOMP" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs`" />
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-DwxUSE_UNICODE" />
+		</Compiler>
+		<Unit filename="AddControllersDialog.cpp" />
+		<Unit filename="AddControllersDialog.h" />
+		<Unit filename="ChannelCountDialog.cpp" />
+		<Unit filename="ChannelCountDialog.h" />
+		<Unit filename="DeleteControllerDialog.cpp" />
+		<Unit filename="DeleteControllerDialog.h" />
+		<Unit filename="NewNetworkDialog.cpp" />
+		<Unit filename="NewNetworkDialog.h" />
+		<Unit filename="wx_pch.h">
+		</Unit>
+		<Unit filename="wxsmith/xChannelsframe.wxs" />
+		<Unit filename="xChannelsApp.cpp" />
+		<Unit filename="xChannelsApp.h" />
+		<Unit filename="xChannelsMain.cpp" />
+		<Unit filename="xChannelsMain.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="xChannelsApp.cpp" main="xChannelsFrame" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxFrame wxs="wxsmith/xChannelsframe.wxs" src="xChannelsMain.cpp" hdr="xChannelsMain.h" name="xChannelsFrame" language="CPP" />
+					<wxDialog wxs="wxsmith/ChannelCountDialog.wxs" src="ChannelCountDialog.cpp" hdr="ChannelCountDialog.h" name="ChannelCountDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/AddControllersDialog.wxs" src="AddControllersDialog.cpp" hdr="AddControllersDialog.h" name="AddControllersDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/NewNetworkDialog.wxs" src="NewNetworkDialog.cpp" hdr="NewNetworkDialog.h" name="NewNetworkDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/DeleteControllerDialog.wxs" src="DeleteControllerDialog.cpp" hdr="DeleteControllerDialog.h" name="DeleteControllerDialog" language="CPP" />
+				</resources>
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

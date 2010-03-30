@@ -1,0 +1,102 @@
+# depslib dependency file v1.0
+1267496512 source:c:\xlights\xchannels\wx_pch.h
+	<wx/wxprec.h>
+	<wx/wx.h>
+
+1268199924 source:c:\xlights\xchannels\deletecontrollerdialog.cpp
+	"wx_pch.h"
+	"DeleteControllerDialog.h"
+	<wx/intl.h>
+	<wx/string.h>
+
+1267496512 c:\xlights\xchannels\wx_pch.h
+	<wx/wxprec.h>
+	<wx/wx.h>
+
+1268199923 c:\xlights\xchannels\deletecontrollerdialog.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/choice.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1268200911 source:c:\xlights\xchannels\newnetworkdialog.cpp
+	"wx_pch.h"
+	"NewNetworkDialog.h"
+	<wx/intl.h>
+	<wx/string.h>
+
+1268200911 c:\xlights\xchannels\newnetworkdialog.h
+	<wx/sizer.h>
+	<wx/choice.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1268187701 source:c:\xlights\xchannels\channelcountdialog.cpp
+	"wx_pch.h"
+	"ChannelCountDialog.h"
+	<wx/intl.h>
+	<wx/string.h>
+
+1267918253 c:\xlights\xchannels\channelcountdialog.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/spinctrl.h>
+
+1267496512 source:c:\xlights\xchannels\xchannelsapp.cpp
+	"wx_pch.h"
+	"xChannelsApp.h"
+	"xChannelsMain.h"
+	<wx/image.h>
+
+1267496512 c:\xlights\xchannels\xchannelsapp.h
+	<wx/app.h>
+
+1268193717 c:\xlights\xchannels\xchannelsmain.h
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/menu.h>
+	<wx/frame.h>
+	<wx/statusbr.h>
+	<wx/grid.h>
+	<wx/panel.h>
+	<wx/filename.h>
+	"AddControllersDialog.h"
+	"ChannelCountDialog.h"
+	"NewNetworkDialog.h"
+	"DeleteControllerDialog.h"
+	"../include/globals.h"
+	"../include/tinyxml.h"
+
+1267918252 c:\xlights\xchannels\addcontrollersdialog.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/spinctrl.h>
+
+1268280459 c:\xlights\include\globals.h
+
+1268095075 c:\xlights\include\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"tinystr.h"
+
+1178487683 c:\xlights\include\tinystr.h
+	<assert.h>
+	<string.h>
+
+1267918146 source:c:\xlights\xchannels\addcontrollersdialog.cpp
+	"wx_pch.h"
+	"AddControllersDialog.h"
+	<wx/intl.h>
+	<wx/string.h>
+

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="xChannels" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../bin/xChannels" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../bin/xChannels" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="`wx-config --cflags`" />
+			<Add option="-Winvalid-pch" />
+			<Add option="-include wx_pch.h" />
+			<Add option="-DWX_PRECOMP" />
+			<Add option="-Wall" />
+		</Compiler>
+		<Linker>
+			<Add option="`wx-config --libs`" />
+		</Linker>
+		<Unit filename="AddControllersDialog.cpp" />
+		<Unit filename="AddControllersDialog.h" />
+		<Unit filename="ChannelCountDialog.cpp" />
+		<Unit filename="ChannelCountDialog.h" />
+		<Unit filename="DeleteControllerDialog.cpp" />
+		<Unit filename="DeleteControllerDialog.h" />
+		<Unit filename="NewNetworkDialog.cpp" />
+		<Unit filename="NewNetworkDialog.h" />
+		<Unit filename="wx_pch.h">
+			<Option compile="1" />
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="wxsmith/xChannelsframe.wxs" />
+		<Unit filename="xChannelsApp.cpp" />
+		<Unit filename="xChannelsApp.h" />
+		<Unit filename="xChannelsMain.cpp" />
+		<Unit filename="xChannelsMain.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="xChannelsApp.cpp" main="xChannelsFrame" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxFrame wxs="wxsmith/xChannelsframe.wxs" src="xChannelsMain.cpp" hdr="xChannelsMain.h" name="xChannelsFrame" language="CPP" />
+					<wxDialog wxs="wxsmith/ChannelCountDialog.wxs" src="ChannelCountDialog.cpp" hdr="ChannelCountDialog.h" name="ChannelCountDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/AddControllersDialog.wxs" src="AddControllersDialog.cpp" hdr="AddControllersDialog.h" name="AddControllersDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/NewNetworkDialog.wxs" src="NewNetworkDialog.cpp" hdr="NewNetworkDialog.h" name="NewNetworkDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/DeleteControllerDialog.wxs" src="DeleteControllerDialog.cpp" hdr="DeleteControllerDialog.h" name="DeleteControllerDialog" language="CPP" />
+				</resources>
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

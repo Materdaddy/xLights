@@ -1,0 +1,43 @@
+xLights can be built and run on Linux, Mac OS/X, or Windows.
+This document describes how to set up your tool chain to build xLights.
+
+
+
+LINUX
+
+You will need (use either package manager or "sudo apt-get install xxx")
+  a) build-essential package
+  b) gdb package
+  c) libwxgtk2.xx package
+  d) libwxgtk2.xx-dev wx2.xx-headers wx-common packages
+  e) wx2.xx-doc package
+  f) codeblocks and codeblocks-contrib packages
+
+
+
+OS/X
+
+You will need:
+  a) instructions for installing code::blocks are here:
+     http://wiki.codeblocks.org/index.php?title=Installing_Code::Blocks_from_source_on_Mac_OS_X
+	 
+
+
+
+WINDOWS
+
+You will need:
+  a) MinGW compiler (a nice distro is here: http://nuwen.net/mingw.html)
+  b) Code::Blocks for Windows
+  c) wxWidgets for Windows
+  d) In Code::Blocks:
+     i)   select Settings > Compiler & Debugger
+	 ii)  click Search Directories tab
+	 iii) Under Compiler sub-tab should be:
+	      $(#wx)\include
+		  $(#wx)\contrib\include
+     iv)  Under Linker sub-tab should be:
+	      $(#wx)\lib\gcc_dll
+     v)   Make sure "wx" is defined under Settings > Global Variables
+	      as described in the Code::Blocks documentation
+		

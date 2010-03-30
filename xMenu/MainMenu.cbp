@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="MainMenu" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
+		<Option type="0" />
+		<Option projectLinkerOptionsRelation="2" />
+		<Build>
+			<Target title="DebugWindows">
+				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-g" />
+					<Add option="-D__WXDEBUG__" />
+					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx)\include" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-mthreads" />
+					<Add library="libwxmsw28ud.a" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseWindows">
+				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-O2" />
+					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx)\include" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-mthreads" />
+					<Add option="-s" />
+					<Add library="libwxmsw28u.a" />
+				</Linker>
+			</Target>
+			<Target title="DebugLinux">
+				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="`wx-config --cflags`" />
+					<Add option="-g" />
+					<Add option="-Winvalid-pch" />
+					<Add option="-include wx_pch.h" />
+					<Add option="-DWX_PRECOMP" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs`" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseLinux">
+				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="`wx-config --cflags`" />
+					<Add option="-O2" />
+					<Add option="-Winvalid-pch" />
+					<Add option="-include wx_pch.h" />
+					<Add option="-DWX_PRECOMP" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs`" />
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-DwxUSE_UNICODE" />
+		</Compiler>
+		<Unit filename="MainMenuApp.cpp" />
+		<Unit filename="MainMenuApp.h" />
+		<Unit filename="MainMenuMain.cpp" />
+		<Unit filename="MainMenuMain.h" />
+		<Unit filename="wx_pch.h">
+		</Unit>
+		<Unit filename="wxsmith\MainMenuframe.wxs" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="MainMenuApp.cpp" main="MainMenuFrame" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxFrame wxs="wxsmith/MainMenuframe.wxs" src="MainMenuMain.cpp" hdr="MainMenuMain.h" name="MainMenuFrame" language="CPP" />
+				</resources>
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
