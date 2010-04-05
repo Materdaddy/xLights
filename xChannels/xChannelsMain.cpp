@@ -17,7 +17,10 @@
 #include "../include/tinyxmlparser.cpp"
 
 //(*InternalHeaders(xChannelsFrame)
+#include <wx/bitmap.h>
+#include <wx/icon.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 
@@ -75,8 +78,13 @@ xChannelsFrame::xChannelsFrame(wxWindow* parent,wxWindowID id)
     wxBoxSizer* BoxSizer1;
     wxMenuBar* MenuBar1;
     wxMenu* Menu2;
-    
+
     Create(parent, wxID_ANY, _("xChannels"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
+    {
+    	wxIcon FrameIcon;
+    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("..\\include\\xlights.ico"))));
+    	SetIcon(FrameIcon);
+    }
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
     Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(750,400), 0, _T("ID_NOTEBOOK1"));
     BoxSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 0);
@@ -115,7 +123,7 @@ xChannelsFrame::xChannelsFrame(wxWindow* parent,wxWindowID id)
     SetStatusBar(StatusBar1);
     BoxSizer1->Fit(this);
     BoxSizer1->SetSizeHints(this);
-    
+
     Connect(idMenuImport,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuImportSelected);
     Connect(idMenuExport,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuExportSelected);
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuItemSaveSelected);
@@ -127,9 +135,9 @@ xChannelsFrame::xChannelsFrame(wxWindow* parent,wxWindowID id)
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnAbout);
     //*)
 
-    // TO DO:
-    // CurrentDir should be passed via ARGV
     Connect(wxEVT_GRID_EDITOR_SHOWN,(wxObjectEventFunction)&xChannelsFrame::GridEdit);
+
+    // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
     wxString CurrentDir;
     if ( !config->Read(_("LastDir"), &CurrentDir) ) {

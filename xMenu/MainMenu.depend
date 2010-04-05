@@ -1563,3 +1563,34 @@
 
 1250033142 /usr/include/wx-2.8/wx/unix/stdpaths.h
 
+1270407146 source:c:\xlights\xmenu\resource.rc
+	"wx/msw/wx.rc"
+
+1269923872 source:c:\xlights\xmenu\mainmenuapp.cpp
+	"wx_pch.h"
+	"MainMenuApp.h"
+	"MainMenuMain.h"
+	<wx/image.h>
+
+1269923872 c:\xlights\xmenu\wx_pch.h
+	<wx/wxprec.h>
+	<wx/wx.h>
+
+1269923872 c:\xlights\xmenu\mainmenuapp.h
+	<wx/app.h>
+
+1269923872 c:\xlights\xmenu\mainmenumain.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/menu.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dirdlg.h>
+	<wx/frame.h>
+	<wx/statusbr.h>
+	<wx/config.h>
+	<wx/stdpaths.h>
+	"../include/globals.h"
+
+1269923870 c:\xlights\include\globals.h
+

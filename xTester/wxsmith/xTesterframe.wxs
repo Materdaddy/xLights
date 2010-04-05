@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="xTesterFrame">
+		<title>xTester</title>
+		<icon>..\include\xlights.ico</icon>
+		<id_arg>0</id_arg>
+		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
+			<object class="sizeritem">
+				<object class="wxPanel" name="ID_PANEL4" variable="Panel3" member="yes">
+					<style>wxFULL_REPAINT_ON_RESIZE</style>
+					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+						<cols>2</cols>
+						<rows>2</rows>
+						<growablecols>0</growablecols>
+						<growablerows>1</growablerows>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+								<label>1. Select channels</label>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+								<label>2. Select test</label>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxCheckListBox" name="ID_CHECKLISTBOX1" variable="CheckListBox_Channels" member="yes" />
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
+								<size>219,161</size>
+								<object class="notebookpage">
+									<object class="wxPanel" name="ID_PANEL1" variable="Panel_Dim" member="yes">
+										<pos>29,39</pos>
+										<size>211,136</size>
+										<object class="wxSlider" name="ID_SLIDER1" variable="SliderMasterDimmer" member="yes">
+											<max>255</max>
+											<pos>16,40</pos>
+											<size>184,48</size>
+											<style>wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS|wxSTATIC_BORDER</style>
+											<handler function="OnSliderMasterDimmerCmdScroll" entry="EVT_COMMAND_SCROLL" />
+											<handler function="OnSliderMasterDimmerCmdScroll" entry="EVT_COMMAND_SLIDER_UPDATED" />
+										</object>
+										<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+											<label>Dim selected channels</label>
+											<pos>16,16</pos>
+										</object>
+										<object class="wxButton" name="ID_BUTTON1" variable="Button1" member="yes">
+											<label>All Lights Off</label>
+											<pos>70,100</pos>
+										</object>
+									</object>
+									<label>Dim</label>
+								</object>
+								<object class="notebookpage">
+									<object class="wxPanel" name="ID_PANEL2" variable="Panel_Seq" member="yes">
+										<pos>71,15</pos>
+										<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBox1" member="yes">
+											<label>Run selected lights in sequence</label>
+											<pos>8,16</pos>
+										</object>
+										<object class="wxSlider" name="ID_SLIDER2" variable="Slider1" member="yes">
+											<pos>16,72</pos>
+											<size>184,24</size>
+											<style>wxSTATIC_BORDER</style>
+										</object>
+										<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+											<label>Speed</label>
+											<pos>88,48</pos>
+											<font>
+												<size>10</size>
+												<style>normal</style>
+												<weight>bold</weight>
+												<underlined>0</underlined>
+												<family>swiss</family>
+											</font>
+										</object>
+										<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+											<label>Slow</label>
+											<pos>16,96</pos>
+										</object>
+										<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
+											<label>Fast</label>
+											<pos>176,96</pos>
+										</object>
+									</object>
+									<label>Sequence</label>
+								</object>
+								<object class="notebookpage">
+									<object class="wxPanel" name="ID_PANEL3" variable="Panel_Alt" member="yes">
+										<pos>114,11</pos>
+										<size>188,117</size>
+										<object class="wxCheckBox" name="ID_CHECKBOX2" variable="CheckBox2" member="yes">
+											<label>Alternate selected lights (even/odd)</label>
+											<pos>8,16</pos>
+										</object>
+										<object class="wxSlider" name="ID_SLIDER3" variable="Slider3" member="yes">
+											<pos>16,72</pos>
+											<size>184,24</size>
+											<style>wxSTATIC_BORDER</style>
+										</object>
+										<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
+											<label>Speed</label>
+											<pos>88,48</pos>
+											<font>
+												<size>10</size>
+												<style>normal</style>
+												<weight>bold</weight>
+												<underlined>0</underlined>
+												<family>swiss</family>
+											</font>
+										</object>
+										<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
+											<label>Slow</label>
+											<pos>16,96</pos>
+										</object>
+										<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText9" member="yes">
+											<label>Fast</label>
+											<pos>176,96</pos>
+										</object>
+									</object>
+									<label>Alternate</label>
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<flag>wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenuBar" variable="MenuBar1" member="no">
+			<object class="wxMenu" variable="Menu1" member="no">
+				<label>&amp;File</label>
+				<object class="wxMenuItem" name="idMenuQuit" variable="MenuItem1" member="no">
+					<label>Quit</label>
+					<accel>Alt-F4</accel>
+					<help>Quit the application</help>
+					<handler function="OnQuit" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" variable="Menu2" member="no">
+				<label>Help</label>
+				<object class="wxMenuItem" name="idMenuAbout" variable="MenuItem2" member="no">
+					<label>About</label>
+					<accel>F1</accel>
+					<help>Show info about this application</help>
+					<handler function="OnAbout" entry="EVT_MENU" />
+				</object>
+			</object>
+		</object>
+		<object class="wxStatusBar" name="ID_STATUSBAR1" variable="StatusBar1" member="yes">
+			<fields>1</fields>
+			<widths>-1</widths>
+			<styles>wxSB_NORMAL</styles>
+		</object>
+	</object>
+</wxsmith>

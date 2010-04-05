@@ -91,6 +91,9 @@
 		<Compiler>
 			<Add option="-DwxUSE_UNICODE" />
 		</Compiler>
+		<Unit filename="resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="AddControllersDialog.cpp" />
 		<Unit filename="AddControllersDialog.h" />
 		<Unit filename="ChannelCountDialog.cpp" />
