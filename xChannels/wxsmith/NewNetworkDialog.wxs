@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="NewNetworkDialog">
-		<title>Add Network</title>
+		<title>Network Settings</title>
 		<pos_arg>1</pos_arg>
 		<size_arg>1</size_arg>
 		<object class="wxGridSizer" variable="GridSizer1" member="no">
@@ -13,7 +13,7 @@
 						<object class="wxChoice" name="ID_CHOICE_NETWORK" variable="ChoiceNetwork" member="yes">
 							<content>
 								<item>Network Type...</item>
-								<item>DMX</item>
+								<item>DMX-Entec Pro/Lynx</item>
 								<item>Renard</item>
 								<item>LOR/d-Light</item>
 							</content>

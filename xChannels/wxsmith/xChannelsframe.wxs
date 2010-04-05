@@ -35,12 +35,23 @@
 					<handler function="OnQuit" entry="EVT_MENU" />
 				</object>
 			</object>
-			<object class="wxMenu" variable="Menu3" member="yes">
-				<label>&amp;Channels</label>
-				<object class="wxMenuItem" name="ID_MENUITEM_ADDNETWORK" variable="MenuAddNetwork" member="yes">
+			<object class="wxMenu" variable="Menu4" member="no">
+				<label>&amp;Networks</label>
+				<object class="wxMenuItem" name="ID_MENUITEM_ADDNETWORK" variable="Menu5" member="no">
 					<label>Add Network</label>
 					<handler function="OnMenuAddNetworkSelected" entry="EVT_MENU" />
 				</object>
+				<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem3" member="yes">
+					<label>Change Network Settings</label>
+					<handler function="OnMenuChangeNetwork" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem4" member="no">
+					<label>Delete Network</label>
+					<handler function="OnMenuDeleteNetwork" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" variable="Menu3" member="yes">
+				<label>&amp;Channels</label>
 				<object class="wxMenuItem" name="ID_MENUITEM_SETLASTCHANNEL" variable="MenuSetLastChannel" member="yes">
 					<label>Set Last Channel</label>
 					<handler function="OnMenuSetLastChannelSelected" entry="EVT_MENU" />

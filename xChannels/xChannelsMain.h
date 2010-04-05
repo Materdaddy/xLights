@@ -28,6 +28,30 @@
 #include "../include/globals.h"
 #include "../include/tinyxml.h"
 
+class NetworkInfo
+{
+    public:
+
+    wxPanel* Panel;
+    wxGrid* Grid;
+    wxStaticText* DescField;
+    wxString NetworkType;
+    wxString ComPort;
+    wxString BaudRate;
+
+    void SetDescField() {
+        if (NetworkType.IsEmpty()) {
+            DescField->SetLabel(_(""));
+        } else {
+            DescField->SetLabel(NetworkType+_(" on ")+ComPort+_(" at ")+BaudRate+_(" baud"));
+        }
+    }
+
+    bool IsDMX() {
+        return NetworkType.Left(3)==_("DMX");
+    }
+};
+
 class xChannelsFrame: public wxFrame
 {
     public:
@@ -47,6 +71,8 @@ class xChannelsFrame: public wxFrame
         void OnMenuImportSelected(wxCommandEvent& event);
         void OnMenuExportSelected(wxCommandEvent& event);
         void OnMenuDeleteControllerSelected(wxCommandEvent& event);
+        void OnMenuChangeNetwork(wxCommandEvent& event);
+        void OnMenuDeleteNetwork(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xChannelsFrame)
@@ -56,6 +82,8 @@ class xChannelsFrame: public wxFrame
         static const long idMenuSave;
         static const long idMenuQuit;
         static const long ID_MENUITEM_ADDNETWORK;
+        static const long ID_MENUITEM1;
+        static const long ID_MENUITEM2;
         static const long ID_MENUITEM_SETLASTCHANNEL;
         static const long ID_MENUITEM_ADDCONTROLLERS;
         static const long idMenuDelete;
@@ -64,28 +92,26 @@ class xChannelsFrame: public wxFrame
         //*)
 
         //(*Declarations(xChannelsFrame)
-        wxMenuItem* MenuAddNetwork;
         wxMenuItem* MenuItemSave;
         wxMenuItem* MenuDeleteController;
         wxNotebook* Notebook1;
         wxMenuItem* MenuImport;
         wxMenu* Menu3;
         wxMenuItem* MenuExport;
+        wxMenuItem* MenuItem3;
         wxMenuItem* MenuSetLastChannel;
         wxStatusBar* StatusBar1;
         wxMenuItem* MenuAddControllers;
         //*)
 
     wxFileName channelFile;
-    wxPanel *Panels[XLIGHTS_MAX_NETWORKS];
-    wxGrid *Grids[XLIGHTS_MAX_NETWORKS];
-    wxStaticText *NetworkTypes[XLIGHTS_MAX_NETWORKS];
-    wxStaticText *ComPorts[XLIGHTS_MAX_NETWORKS];
+    WX_DEFINE_ARRAY(NetworkInfo*, NetworkArray);
+    NetworkArray Networks;
     bool UnsavedChanges;
 
     void SetGridHeadings(wxGrid *grid);
     void AddNetworkWithPrompt();
-    int AddNetwork(wxString NetworkType, wxString ComPort);
+    NetworkInfo* AddNetwork(wxString NetworkType, wxString ComPort, wxString BaudRate);
     int MaxController(wxGrid *grid);
     void GridEdit(wxGridEvent& event);
 

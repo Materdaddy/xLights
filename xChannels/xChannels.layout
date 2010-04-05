@@ -14,18 +14,18 @@
 		<Cursor position="311" topLine="4" />
 	</File>
 	<File name="NewNetworkDialog.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="3142" topLine="74" />
+		<Cursor position="4526" topLine="0" />
 	</File>
 	<File name="NewNetworkDialog.h" open="1" top="0" tabpos="6">
-		<Cursor position="936" topLine="14" />
+		<Cursor position="990" topLine="14" />
 	</File>
 	<File name="xChannelsApp.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="8" />
 	</File>
-	<File name="xChannelsMain.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="13974" topLine="377" />
+	<File name="xChannelsMain.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="21169" topLine="564" />
 	</File>
 	<File name="xChannelsMain.h" open="1" top="0" tabpos="2">
-		<Cursor position="2666" topLine="5" />
+		<Cursor position="1247" topLine="28" />
 	</File>
 </CodeBlocks_layout_file>

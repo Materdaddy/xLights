@@ -39,6 +39,7 @@ class NewNetworkDialog: public wxDialog
 
 		//(*Handlers(NewNetworkDialog)
 		void OnButtonOKClick(wxCommandEvent& event);
+		void OnChoiceBaudRateSelect(wxCommandEvent& event);
 		//*)
 
 		void PopulatePortChooser(wxChoice *chooser);

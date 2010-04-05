@@ -28,14 +28,14 @@ NewNetworkDialog::NewNetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint&
 	wxGridSizer* GridSizer1;
 	wxBoxSizer* BoxSizer1;
 
-	Create(parent, id, _("Add Network"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
+	Create(parent, id, _("Network Settings"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
 	SetClientSize(wxDefaultSize);
 	Move(wxDefaultPosition);
 	GridSizer1 = new wxGridSizer(2, 1, 0, 0);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	ChoiceNetwork = new wxChoice(this, ID_CHOICE_NETWORK, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_NETWORK"));
 	ChoiceNetwork->SetSelection( ChoiceNetwork->Append(_("Network Type...")) );
-	ChoiceNetwork->Append(_("DMX"));
+	ChoiceNetwork->Append(_("DMX-Entec Pro/Lynx"));
 	ChoiceNetwork->Append(_("Renard"));
 	ChoiceNetwork->Append(_("LOR/d-Light"));
 	BoxSizer1->Add(ChoiceNetwork, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -81,6 +81,8 @@ void NewNetworkDialog::OnButtonOKClick(wxCommandEvent& event)
         wxMessageBox(_("Please select the type of lighting network (protocol)."),_("An entry is required"));
     } else if (ChoicePort->GetSelection() == 0) {
         wxMessageBox(_("Please select a serial port (you can always change it later)."),_("An entry is required"));
+    } else if (ChoiceBaudRate->GetSelection() == 0) {
+        wxMessageBox(_("Please select a baud rate (you can always change it later)."),_("An entry is required"));
     } else {
         EndModal(wxID_OK);
     }

@@ -57,6 +57,8 @@ const long xChannelsFrame::idMenuExport = wxNewId();
 const long xChannelsFrame::idMenuSave = wxNewId();
 const long xChannelsFrame::idMenuQuit = wxNewId();
 const long xChannelsFrame::ID_MENUITEM_ADDNETWORK = wxNewId();
+const long xChannelsFrame::ID_MENUITEM1 = wxNewId();
+const long xChannelsFrame::ID_MENUITEM2 = wxNewId();
 const long xChannelsFrame::ID_MENUITEM_SETLASTCHANNEL = wxNewId();
 const long xChannelsFrame::ID_MENUITEM_ADDCONTROLLERS = wxNewId();
 const long xChannelsFrame::idMenuDelete = wxNewId();
@@ -74,10 +76,13 @@ xChannelsFrame::xChannelsFrame(wxWindow* parent,wxWindowID id)
     //(*Initialize(xChannelsFrame)
     wxMenuItem* MenuItem2;
     wxMenuItem* MenuItem1;
+    wxMenuItem* MenuItem4;
     wxMenu* Menu1;
+    wxMenuItem* Menu5;
     wxBoxSizer* BoxSizer1;
     wxMenuBar* MenuBar1;
     wxMenu* Menu2;
+    wxMenu* Menu4;
 
     Create(parent, wxID_ANY, _("xChannels"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     {
@@ -100,9 +105,15 @@ xChannelsFrame::xChannelsFrame(wxWindow* parent,wxWindowID id)
     MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));
+    Menu4 = new wxMenu();
+    Menu5 = new wxMenuItem(Menu4, ID_MENUITEM_ADDNETWORK, _("Add Network"), wxEmptyString, wxITEM_NORMAL);
+    Menu4->Append(Menu5);
+    MenuItem3 = new wxMenuItem(Menu4, ID_MENUITEM1, _("Change Network Settings"), wxEmptyString, wxITEM_NORMAL);
+    Menu4->Append(MenuItem3);
+    MenuItem4 = new wxMenuItem(Menu4, ID_MENUITEM2, _("Delete Network"), wxEmptyString, wxITEM_NORMAL);
+    Menu4->Append(MenuItem4);
+    MenuBar1->Append(Menu4, _("&Networks"));
     Menu3 = new wxMenu();
-    MenuAddNetwork = new wxMenuItem(Menu3, ID_MENUITEM_ADDNETWORK, _("Add Network"), wxEmptyString, wxITEM_NORMAL);
-    Menu3->Append(MenuAddNetwork);
     MenuSetLastChannel = new wxMenuItem(Menu3, ID_MENUITEM_SETLASTCHANNEL, _("Set Last Channel"), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(MenuSetLastChannel);
     MenuAddControllers = new wxMenuItem(Menu3, ID_MENUITEM_ADDCONTROLLERS, _("Add Controllers"), wxEmptyString, wxITEM_NORMAL);
@@ -129,6 +140,8 @@ xChannelsFrame::xChannelsFrame(wxWindow* parent,wxWindowID id)
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuItemSaveSelected);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnQuit);
     Connect(ID_MENUITEM_ADDNETWORK,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuAddNetworkSelected);
+    Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuChangeNetwork);
+    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuDeleteNetwork);
     Connect(ID_MENUITEM_SETLASTCHANNEL,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuSetLastChannelSelected);
     Connect(ID_MENUITEM_ADDCONTROLLERS,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuAddControllersSelected);
     Connect(idMenuDelete,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xChannelsFrame::OnMenuDeleteControllerSelected);
@@ -206,9 +219,9 @@ void xChannelsFrame::LoadNetwork(TiXmlElement* n)
 {
     wxString NetworkType(n->Attribute("NetworkType"), wxConvUTF8);
     wxString ComPort(n->Attribute("ComPort"), wxConvUTF8);
-    int pagenum=AddNetwork(NetworkType, ComPort);
-    wxGrid *grid;
-    grid=Grids[pagenum];
+    wxString BaudRate(n->Attribute("BaudRate"), wxConvUTF8);
+    NetworkInfo *info=AddNetwork(NetworkType, ComPort, BaudRate);
+    wxGrid* grid=info->Grid;
     int r=0;
     for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
         if (e->ValueStr() == "channel") {
@@ -238,42 +251,45 @@ void xChannelsFrame::AddNetworkWithPrompt()
         return;
     }
 
-    wxString NetworkType, ComPort;
+    wxString NetworkType, ComPort, BaudRate;
     NewNetworkDialog NetDialog(this);
     if (NetDialog.ShowModal() == wxID_OK) {
         UnsavedChanges=true;
         NetworkType=NetDialog.ChoiceNetwork->GetStringSelection();
         ComPort=NetDialog.ChoicePort->GetStringSelection();
-        AddNetwork(NetworkType, ComPort);
+        BaudRate=NetDialog.ChoiceBaudRate->GetStringSelection();
+        AddNetwork(NetworkType, ComPort, BaudRate);
     }
 }
 
-int xChannelsFrame::AddNetwork(wxString NetworkType, wxString ComPort)
+NetworkInfo* xChannelsFrame::AddNetwork(wxString NetworkType, wxString ComPort, wxString BaudRate)
 {
-    wxBoxSizer* BoxSizer;
-    wxFlexGridSizer* FlexSizer;
-
-    int cnt=Notebook1->GetPageCount();
+    int cnt=Networks.Count();
     wxString sid = wxString::Format(_T("%d"), cnt+1);
     wxString gridID = _("Grid ")+sid;
-    Panels[cnt] = new wxPanel(Notebook1, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL")+sid);
-    FlexSizer = new wxFlexGridSizer(0, 1, 0, 0);
+    wxPanel* Panel = new wxPanel(Notebook1, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL")+sid);
+    wxFlexGridSizer* FlexSizer = new wxFlexGridSizer(0, 1, 0, 0);
     FlexSizer->AddGrowableRow(1);
-    BoxSizer = new wxBoxSizer(wxHORIZONTAL);
-    NetworkTypes[cnt] = new wxStaticText(Panels[cnt], -1, NetworkType);
-    BoxSizer->Add(NetworkTypes[cnt], 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ComPorts[cnt] = new wxStaticText(Panels[cnt], -1, ComPort);
-    BoxSizer->Add(ComPorts[cnt], 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexSizer->Add(BoxSizer, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Grids[cnt] = new wxGrid(Panels[cnt], -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL|wxHSCROLL, _T("ID_GRID"+sid));
-    Grids[cnt]->CreateGrid(0,6);
-    SetGridHeadings(Grids[cnt]);
-    FlexSizer->Add(Grids[cnt], 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Panels[cnt]->SetSizer(FlexSizer);
-    FlexSizer->Fit(Panels[cnt]);
-    FlexSizer->SetSizeHints(Panels[cnt]);
-    Notebook1->AddPage(Panels[cnt], _("Network ")+sid, true);
-    return cnt;
+    wxStaticText* stNetDesc = new wxStaticText(Panel, -1, NetworkType);
+    FlexSizer->Add(stNetDesc, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    wxGrid* Grid = new wxGrid(Panel, -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL|wxHSCROLL, _T("ID_GRID"+sid));
+    Grid->CreateGrid(0,6);
+    SetGridHeadings(Grid);
+    FlexSizer->Add(Grid, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Panel->SetSizer(FlexSizer);
+    FlexSizer->Fit(Panel);
+    FlexSizer->SetSizeHints(Panel);
+    Notebook1->AddPage(Panel, _("Network ")+sid, true);
+    NetworkInfo* NetInfo=new NetworkInfo();
+    NetInfo->Panel=Panel;
+    NetInfo->Grid=Grid;
+    NetInfo->DescField=stNetDesc;
+    NetInfo->NetworkType=NetworkType;
+    NetInfo->ComPort=ComPort;
+    NetInfo->BaudRate=BaudRate;
+    NetInfo->SetDescField();
+    Networks.Add(NetInfo);
+    return NetInfo;
 }
 
 void xChannelsFrame::SetGridHeadings(wxGrid *grid)
@@ -285,7 +301,7 @@ void xChannelsFrame::SetGridHeadings(wxGrid *grid)
     grid->SetColAttr(0,col01);
     grid->SetColLabelValue(1,_("Channel"));
     grid->SetColAttr(1,col01);
-    grid->SetColLabelValue(2,_("Name"));
+    grid->SetColLabelValue(2,_("Unique Name"));
     grid->SetColLabelValue(3,_("Description"));
     grid->SetColSize(3,200);
 
@@ -326,15 +342,13 @@ void xChannelsFrame::OnMenuSetLastChannelSelected(wxCommandEvent& event)
         wxMessageBox(_("You must add a network first"),_("Error"));
         return;
     }
-    wxString net = NetworkTypes[pagenum]->GetLabelText();
-
-    if (net != _("DMX")) {
+    NetworkInfo* info=Networks[pagenum];
+    wxGrid *grid=info->Grid;
+    if (info->NetworkType.Left(3) != _("DMX")) {
         wxMessageBox(_("You can only set the last channel on DMX networks"),_("Error"));
         return;
     }
 
-    wxGrid *grid;
-    grid=Grids[pagenum];
     int OldRowCount=grid->GetNumberRows();
     ChannelCountDialog dialog(this);
     if (dialog.ShowModal() == wxID_OK)
@@ -348,6 +362,10 @@ void xChannelsFrame::OnMenuSetLastChannelSelected(wxCommandEvent& event)
                 wxString rStr = wxString::Format(_T("%d"), r+1);
                 grid->SetCellValue(r,0,_("0"));
                 grid->SetCellValue(r,1,rStr);
+                wxString idStr = wxString::Format(_T("N%dCH%d"), r+1);
+                grid->SetCellValue(r,1,idStr);
+                wxString descStr = wxString::Format(_T("Channel #%d"), r+1);
+                grid->SetCellValue(r,1,descStr);
                 grid->SetCellValue(r,4,_("dimmer"));
             }
         } else if (diff < 0) {
@@ -370,19 +388,19 @@ void xChannelsFrame::OnMenuAddControllersSelected(wxCommandEvent& event)
         wxMessageBox(_("You must add a network first"),_("Error"));
         return;
     }
+    NetworkInfo* info=Networks[pagenum];
+    wxGrid *grid=info->Grid;
+    bool IsDMX=info->IsDMX();
 
-    wxString net = NetworkTypes[pagenum]->GetLabelText();
-    wxGrid *grid;
-    grid=Grids[pagenum];
     int r=grid->GetNumberRows();
     AddControllersDialog dialog(this);
-    if (net == _("Renard")) {
+    if (info->NetworkType == _("Renard")) {
         dialog.SpinChannelsPerController->SetValue(8);
     } else {
         dialog.SpinChannelsPerController->SetValue(16);
     }
     int fc=MaxController(grid)+1;
-    if (net.Left(3) == _("LOR") && fc==0) fc=1;
+    if (info->NetworkType.Left(3) == _("LOR") && fc==0) fc=1;
     dialog.SpinFirstController->SetValue(fc);
 
     if (dialog.ShowModal() == wxID_OK)
@@ -395,7 +413,7 @@ void xChannelsFrame::OnMenuAddControllersSelected(wxCommandEvent& event)
         for (cont=0; cont < NumControllers; cont++) {
             wxString scont = wxString::Format(_T("%d"), cont+FirstController);
             for (ch=1; ch <= ChannelsPerController; ch++) {
-                wxString sch = wxString::Format(_T("%d"), net==_("DMX") ? r+1 : ch);
+                wxString sch = wxString::Format(_T("%d"), IsDMX ? r+1 : ch);
                 grid->SetCellValue(r,0,scont);
                 grid->SetCellValue(r,1,sch);
                 grid->SetCellValue(r,4,_("dimmer"));
@@ -421,6 +439,7 @@ int xChannelsFrame::MaxController(wxGrid *grid)
 
 void xChannelsFrame::SaveFile()
 {
+    NetworkInfo* info;
     wxGrid *grid;
     int RowCount;
 	TiXmlElement* net;
@@ -435,10 +454,12 @@ void xChannelsFrame::SaveFile()
 
     int cnt=Notebook1->GetPageCount();
     for (int pagenum=0; pagenum < cnt; pagenum++) {
-        grid=Grids[pagenum];
+        info=Networks[pagenum];
+        grid=info->Grid;
         net = new TiXmlElement( "network" );
-        net->SetAttribute("NetworkType", NetworkTypes[pagenum]->GetLabelText().mb_str());
-        net->SetAttribute("ComPort", ComPorts[pagenum]->GetLabelText().mb_str());
+        net->SetAttribute("NetworkType", info->NetworkType.mb_str());
+        net->SetAttribute("ComPort", info->ComPort.mb_str());
+        net->SetAttribute("BaudRate", info->BaudRate.mb_str());
         root->LinkEndChild( net );
         RowCount=grid->GetNumberRows();
         for (int r=0; r < RowCount; r++ ) {
@@ -492,15 +513,14 @@ void xChannelsFrame::OnMenuDeleteControllerSelected(wxCommandEvent& event)
         wxMessageBox(_("You must add a network first"),_("Error"));
         return;
     }
-    wxGrid *grid;
-    grid=Grids[pagenum];
+    NetworkInfo* info=Networks[pagenum];
+    wxGrid *grid=info->Grid;
     int RowCount=grid->GetNumberRows();
     if (RowCount == 0) {
         wxMessageBox(_("Nothing to delete"),_("Error"));
         return;
     }
-    wxString net = NetworkTypes[pagenum]->GetLabelText();
-    if (net == _("DMX")) {
+    if (info->IsDMX()) {
         wxMessageBox(_("For DMX networks, use 'Set Last Channel' to reduce the number of channels, or for unused channels set channel function to disabled"),_("Error"));
         return;
     }
@@ -531,4 +551,37 @@ void xChannelsFrame::OnMenuDeleteControllerSelected(wxCommandEvent& event)
         }
         UnsavedChanges=true;
     }
+}
+
+void xChannelsFrame::OnMenuChangeNetwork(wxCommandEvent& event)
+{
+    int pagenum=Notebook1->GetSelection();
+    if (pagenum == wxNOT_FOUND) {
+        wxMessageBox(_("You must add a network first"),_("Error"));
+        return;
+    }
+    NetworkInfo* info=Networks[pagenum];
+    NewNetworkDialog NetDialog(this);
+    NetDialog.ChoiceNetwork->SetStringSelection(info->NetworkType);
+    NetDialog.ChoicePort->SetStringSelection(info->ComPort);
+    NetDialog.ChoiceBaudRate->SetStringSelection(info->BaudRate);
+    if (NetDialog.ShowModal() == wxID_OK) {
+        UnsavedChanges=true;
+        info->NetworkType=NetDialog.ChoiceNetwork->GetStringSelection();
+        info->ComPort=NetDialog.ChoicePort->GetStringSelection();
+        info->BaudRate=NetDialog.ChoiceBaudRate->GetStringSelection();
+        info->SetDescField();
+    }
+}
+
+void xChannelsFrame::OnMenuDeleteNetwork(wxCommandEvent& event)
+{
+    int pagenum=Notebook1->GetSelection();
+    if (pagenum == wxNOT_FOUND) {
+        wxMessageBox(_("You must add a network first"),_("Error"));
+        return;
+    }
+    Notebook1->DeletePage(pagenum);
+    Networks.RemoveAt(pagenum);
+    UnsavedChanges=true;
 }
