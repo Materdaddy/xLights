@@ -1,0 +1,1 @@
+g++ -o basic.exe basic.cpp
