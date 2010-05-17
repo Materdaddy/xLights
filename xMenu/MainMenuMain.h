@@ -45,6 +45,7 @@ class MainMenuFrame: public wxFrame
         void OnButtonImportClick(wxCommandEvent& event);
         void OnButtonExportClick(wxCommandEvent& event);
         void OnButtonAnimationClick(wxCommandEvent& event);
+        void OnButtonNetworkSetupClick(wxCommandEvent& event);
         //*)
 
         void SetDir(const wxString& dirname);
@@ -53,12 +54,9 @@ class MainMenuFrame: public wxFrame
         static const long ID_STATICTEXT1;
         static const long ID_STATICTEXT2;
         static const long ID_BUTTON5;
-        static const long ID_BUTTON_CHANNEL_SETUP;
-        static const long ID_BUTTON_ANIMATION;
+        static const long ID_BUTTON_NETWORK_SETUP;
         static const long ID_BUTTON_SEQUENCE;
         static const long ID_BUTTON_SCHEDULE;
-        static const long ID_BUTTON_IMPORT;
-        static const long ID_BUTTON_EXPORT;
         static const long ID_BUTTON_TEST;
         static const long ID_PANEL1;
         static const long idMenuOpen;
@@ -68,20 +66,17 @@ class MainMenuFrame: public wxFrame
         //*)
 
         //(*Declarations(MainMenuFrame)
-        wxButton* ButtonExport;
         wxButton* ButtonSequence;
-        wxButton* ButtonImport;
         wxPanel* Panel1;
         wxStaticText* StaticText1;
         wxButton* ButtonChangeDir;
         wxStaticText* StaticTextDirName;
+        wxButton* ButtonNetworkSetup;
         wxMenuItem* MenuItem3;
         wxStatusBar* StatusBar1;
         wxDirDialog* DirDialog1;
         wxButton* ButtonSchedule;
         wxButton* ButtonTest;
-        wxButton* ButtonAnimation;
-        wxButton* ButtonChannelSetup;
         //*)
 
         wxString CurrentDir;

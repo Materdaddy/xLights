@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="xNetworks" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="DebugWindows">
+				<Option output="../bin/xNetworks" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-g" />
+					<Add option="-D__WXDEBUG__" />
+					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx)\include" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-mthreads" />
+					<Add library="libwxmsw28ud.a" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseWindows">
+				<Option output="../bin/xNetworks" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-O2" />
+					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx)\include" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-mthreads" />
+					<Add option="-s" />
+					<Add library="libwxmsw28u.a" />
+				</Linker>
+			</Target>
+			<Target title="DebugLinux">
+				<Option output="../bin/xNetworks" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="`wx-config --cflags`" />
+					<Add option="-g" />
+					<Add option="-Winvalid-pch" />
+					<Add option="-include wx_pch.h" />
+					<Add option="-DWX_PRECOMP" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs`" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseLinux">
+				<Option output="../bin/xNetworks" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="`wx-config --cflags`" />
+					<Add option="-O2" />
+					<Add option="-Winvalid-pch" />
+					<Add option="-include wx_pch.h" />
+					<Add option="-DWX_PRECOMP" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs`" />
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-DwxUSE_UNICODE" />
+		</Compiler>
+		<ResourceCompiler>
+			<Add directory="$(#wx)\include" />
+		</ResourceCompiler>
+		<Unit filename="resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="wxsmith\xNetworksframe.wxs" />
+		<Unit filename="xNetworksApp.cpp" />
+		<Unit filename="xNetworksApp.h" />
+		<Unit filename="xNetworksMain.cpp" />
+		<Unit filename="xNetworksMain.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="xNetworksApp.cpp" main="xNetworksFrame" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxFrame wxs="wxsmith/xNetworksframe.wxs" src="xNetworksMain.cpp" hdr="xNetworksMain.h" name="xNetworksFrame" language="CPP" />
+				</resources>
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

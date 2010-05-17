@@ -174,8 +174,8 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id)
         wxMessageBox(_("No directory specified"), _("ERROR"));
         Close();
     }
-    channelFile.AssignDir( CurrentDir );
-    channelFile.SetFullName(_(XLIGHTS_CHANNEL_FILE));
+    networkFile.AssignDir( CurrentDir );
+    networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     LoadFile();
 }
 
@@ -213,6 +213,31 @@ wxString xTesterFrame::GetAttribute(TiXmlElement* e, const char *attr)
 
 void xTesterFrame::LoadFile()
 {
+    wxString FileName=networkFile.GetFullPath();
+    TiXmlDocument doc( FileName.mb_str() );
+    if (doc.LoadFile()) {
+        int r=0;
+        for( TiXmlElement* e=doc.RootElement()->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+            if (e->ValueStr() == "network") {
+                /*
+                GridNetwork->AppendRows(1);
+                GridNetwork->SetCellValue(r,0,GetAttribute(e,"NetworkType"));
+                GridNetwork->SetCellValue(r,1,GetAttribute(e,"ComPort"));
+                GridNetwork->SetCellValue(r,2,GetAttribute(e,"BaudRate"));
+                GridNetwork->SetCellValue(r,3,GetAttribute(e,"MaxChannels"));
+                */
+                r++;
+            }
+        }
+    } else {
+        wxString msg(doc.ErrorDesc(), wxConvUTF8);
+        wxMessageBox(msg, _("Error Loading Network File"));
+    }
+}
+
+/*
+void xTesterFrame::LoadFile()
+{
 	wxArrayString chNames;
 	wxString chDesc, chFunc;
 	wxString FileName=channelFile.GetFullPath();
@@ -248,3 +273,4 @@ void xTesterFrame::LoadFile()
     }
     CheckListBox_Channels->Set(chNames);
 }
+*/

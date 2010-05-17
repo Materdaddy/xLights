@@ -53,12 +53,9 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 const long MainMenuFrame::ID_STATICTEXT1 = wxNewId();
 const long MainMenuFrame::ID_STATICTEXT2 = wxNewId();
 const long MainMenuFrame::ID_BUTTON5 = wxNewId();
-const long MainMenuFrame::ID_BUTTON_CHANNEL_SETUP = wxNewId();
-const long MainMenuFrame::ID_BUTTON_ANIMATION = wxNewId();
+const long MainMenuFrame::ID_BUTTON_NETWORK_SETUP = wxNewId();
 const long MainMenuFrame::ID_BUTTON_SEQUENCE = wxNewId();
 const long MainMenuFrame::ID_BUTTON_SCHEDULE = wxNewId();
-const long MainMenuFrame::ID_BUTTON_IMPORT = wxNewId();
-const long MainMenuFrame::ID_BUTTON_EXPORT = wxNewId();
 const long MainMenuFrame::ID_BUTTON_TEST = wxNewId();
 const long MainMenuFrame::ID_PANEL1 = wxNewId();
 const long MainMenuFrame::idMenuOpen = wxNewId();
@@ -86,7 +83,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     wxMenu* Menu2;
 
     Create(parent, wxID_ANY, _("xLights"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
-    SetClientSize(wxSize(269,502));
+    SetClientSize(wxSize(204,368));
     {
     	wxIcon FrameIcon;
     	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("..\\include\\xlights.ico"))));
@@ -102,30 +99,21 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer1->Add(StaticText1, 0, wxALIGN_LEFT|wxALIGN_TOP, 0);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel1, _("Show Directory"));
     StaticTextDirName = new wxStaticText(Panel1, ID_STATICTEXT2, _("<No directory selected>"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-    StaticTextDirName->SetMinSize(wxSize(250,0));
-    StaticBoxSizer1->Add(StaticTextDirName, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticTextDirName->SetMinSize(wxSize(300,0));
+    StaticBoxSizer1->Add(StaticTextDirName, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonChangeDir = new wxButton(Panel1, ID_BUTTON5, _("Change"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     StaticBoxSizer1->Add(ButtonChangeDir, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer3 = new wxBoxSizer(wxVERTICAL);
-    ButtonChannelSetup = new wxButton(Panel1, ID_BUTTON_CHANNEL_SETUP, _("Channel Setup"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CHANNEL_SETUP"));
-    ButtonChannelSetup->Disable();
-    BoxSizer3->Add(ButtonChannelSetup, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonAnimation = new wxButton(Panel1, ID_BUTTON_ANIMATION, _("Create Animation"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ANIMATION"));
-    ButtonAnimation->Disable();
-    BoxSizer3->Add(ButtonAnimation, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonNetworkSetup = new wxButton(Panel1, ID_BUTTON_NETWORK_SETUP, _("Network Setup"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_NETWORK_SETUP"));
+    ButtonNetworkSetup->Disable();
+    BoxSizer3->Add(ButtonNetworkSetup, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonSequence = new wxButton(Panel1, ID_BUTTON_SEQUENCE, _("Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SEQUENCE"));
     ButtonSequence->Disable();
     BoxSizer3->Add(ButtonSequence, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonSchedule = new wxButton(Panel1, ID_BUTTON_SCHEDULE, _("Schedule"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SCHEDULE"));
     ButtonSchedule->Disable();
     BoxSizer3->Add(ButtonSchedule, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonImport = new wxButton(Panel1, ID_BUTTON_IMPORT, _("Import"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_IMPORT"));
-    ButtonImport->Disable();
-    BoxSizer3->Add(ButtonImport, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonExport = new wxButton(Panel1, ID_BUTTON_EXPORT, _("Export"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_EXPORT"));
-    ButtonExport->Disable();
-    BoxSizer3->Add(ButtonExport, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonTest = new wxButton(Panel1, ID_BUTTON_TEST, _("Lighting Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEST"));
     ButtonTest->Disable();
     BoxSizer3->Add(ButtonTest, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -157,12 +145,9 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     BoxSizer1->SetSizeHints(this);
 
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
-    Connect(ID_BUTTON_CHANNEL_SETUP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonChannelSetupClick);
-    Connect(ID_BUTTON_ANIMATION,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonAnimationClick);
+    Connect(ID_BUTTON_NETWORK_SETUP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonNetworkSetupClick);
     Connect(ID_BUTTON_SEQUENCE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonSequenceClick);
     Connect(ID_BUTTON_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonScheduleClick);
-    Connect(ID_BUTTON_IMPORT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonImportClick);
-    Connect(ID_BUTTON_EXPORT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonExportClick);
     Connect(ID_BUTTON_TEST,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonTestClick);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnQuit);
@@ -204,15 +189,12 @@ void MainMenuFrame::SetDir(const wxString& dirname)
 
     CurrentDir=dirname;
     StaticTextDirName->SetLabel(CurrentDir);
-    ButtonChannelSetup->Enable();
-    ButtonImport->Enable();
+    ButtonNetworkSetup->Enable();
     channelFile.AssignDir( CurrentDir );
-    channelFile.SetFullName(_(XLIGHTS_CHANNEL_FILE));
+    channelFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     FileExists = channelFile.FileExists();
-    ButtonAnimation->Enable(FileExists);
-    ButtonSequence->Enable(FileExists);
+    //ButtonSequence->Enable(FileExists);
     ButtonSchedule->Enable(FileExists);
-    ButtonExport->Enable(FileExists);
     ButtonTest->Enable(FileExists);
 }
 
@@ -239,9 +221,9 @@ void MainMenuFrame::Exec(wxString program)
     }
 }
 
-void MainMenuFrame::OnButtonChannelSetupClick(wxCommandEvent& event)
+void MainMenuFrame::OnButtonNetworkSetupClick(wxCommandEvent& event)
 {
-    Exec(_("xChannels"));
+    Exec(_("xNetworks"));
 }
 
 void MainMenuFrame::OnButtonSequenceClick(wxCommandEvent& event)
@@ -259,17 +241,3 @@ void MainMenuFrame::OnButtonTestClick(wxCommandEvent& event)
     Exec(_("xTester"));
 }
 
-void MainMenuFrame::OnButtonImportClick(wxCommandEvent& event)
-{
-    Exec(_("xImport"));
-}
-
-void MainMenuFrame::OnButtonExportClick(wxCommandEvent& event)
-{
-    Exec(_("xExport"));
-}
-
-void MainMenuFrame::OnButtonAnimationClick(wxCommandEvent& event)
-{
-    Exec(_("xAnimate"));
-}

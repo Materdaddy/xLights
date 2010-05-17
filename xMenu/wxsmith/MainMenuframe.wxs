@@ -3,7 +3,7 @@
 	<object class="wxFrame" name="MainMenuFrame">
 		<title>xLights</title>
 		<icon>..\include\xlights.ico</icon>
-		<size>269,502</size>
+		<size>204,368</size>
 		<id_arg>0</id_arg>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 			<object class="sizeritem">
@@ -30,9 +30,9 @@
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticTextDirName" member="yes">
 										<label>&lt;No directory selected&gt;</label>
-										<minsize>250,0</minsize>
+										<minsize>300,0</minsize>
 									</object>
-									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -54,20 +54,10 @@
 							<object class="wxBoxSizer" variable="BoxSizer3" member="no">
 								<orient>wxVERTICAL</orient>
 								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON_CHANNEL_SETUP" variable="ButtonChannelSetup" member="yes">
-										<label>Channel Setup</label>
+									<object class="wxButton" name="ID_BUTTON_NETWORK_SETUP" variable="ButtonNetworkSetup" member="yes">
+										<label>Network Setup</label>
 										<enabled>0</enabled>
-										<handler function="OnButtonChannelSetupClick" entry="EVT_BUTTON" />
-									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON_ANIMATION" variable="ButtonAnimation" member="yes">
-										<label>Create Animation</label>
-										<enabled>0</enabled>
-										<handler function="OnButtonAnimationClick" entry="EVT_BUTTON" />
+										<handler function="OnButtonNetworkSetupClick" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -88,26 +78,6 @@
 										<label>Schedule</label>
 										<enabled>0</enabled>
 										<handler function="OnButtonScheduleClick" entry="EVT_BUTTON" />
-									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON_IMPORT" variable="ButtonImport" member="yes">
-										<label>Import</label>
-										<enabled>0</enabled>
-										<handler function="OnButtonImportClick" entry="EVT_BUTTON" />
-									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON_EXPORT" variable="ButtonExport" member="yes">
-										<label>Export</label>
-										<enabled>0</enabled>
-										<handler function="OnButtonExportClick" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>

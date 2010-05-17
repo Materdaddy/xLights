@@ -100,7 +100,7 @@ class xTesterFrame: public wxFrame
         wxPanel* Panel_Alt;
         //*)
 
-        wxFileName channelFile;
+        wxFileName networkFile;
 
         DECLARE_EVENT_TABLE()
 };

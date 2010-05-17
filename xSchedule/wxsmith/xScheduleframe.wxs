@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="xScheduleFrame">
+		<title>xSchedule</title>
+		<icon>C:\xlights\include\xlights.ico</icon>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<rows>1</rows>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
+			<object class="sizeritem">
+				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+					<style>wxNO_BORDER</style>
+					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+						<cols>1</cols>
+						<rows>1</rows>
+						<growablecols>0</growablecols>
+						<growablerows>0</growablerows>
+						<object class="sizeritem">
+							<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
+								<size>602,275</size>
+								<object class="notebookpage">
+									<object class="wxPanel" name="ID_PANEL_PLAYLIST" variable="PanelPlayList" member="yes">
+										<pos>89,157</pos>
+										<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+											<cols>1</cols>
+											<rows>2</rows>
+											<growablecols>0</growablecols>
+											<growablerows>1</growablerows>
+											<object class="sizeritem">
+												<object class="wxBoxSizer" variable="BoxSizer1" member="no">
+													<object class="sizeritem">
+														<object class="wxToggleButton" name="ID_TOGGLEBUTTON1" variable="ToggleButton1" member="yes">
+															<label>Save List</label>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxToggleButton" name="ID_TOGGLEBUTTON2" variable="ToggleButton2" member="yes">
+															<label>Play Item</label>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxToggleButton" name="ID_TOGGLEBUTTON3" variable="ToggleButton3" member="yes">
+															<label>Delete Item</label>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxToggleButton" name="ID_TOGGLEBUTTON4" variable="ToggleButton4" member="yes">
+															<label>Add Item</label>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxGridSizer" variable="GridSizer1" member="no">
+													<cols>2</cols>
+													<rows>2</rows>
+													<object class="sizeritem">
+														<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+															<cols>1</cols>
+															<rows>2</rows>
+															<growablecols>0</growablecols>
+															<growablerows>1</growablerows>
+															<object class="sizeritem">
+																<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+																	<label>Play List</label>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+															<object class="sizeritem">
+																<object class="wxListBox" name="ID_LISTBOX_PLAY" variable="ListBoxPlay" member="yes">
+																	<default>-1</default>
+																</object>
+																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+														</object>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+															<cols>1</cols>
+															<rows>2</rows>
+															<growablecols>0</growablecols>
+															<growablerows>1</growablerows>
+															<object class="sizeritem">
+																<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+																	<label>Sequences</label>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+															<object class="sizeritem">
+																<object class="wxListBox" name="ID_LISTBOX_SEQ" variable="ListBoxSeq" member="yes">
+																	<default>-1</default>
+																</object>
+																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+														</object>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+															<cols>1</cols>
+															<rows>2</rows>
+															<growablecols>0</growablecols>
+															<growablerows>1</growablerows>
+															<object class="sizeritem">
+																<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+																	<label>Player Logic</label>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+															<object class="sizeritem">
+																<object class="wxTextCtrl" name="ID_TEXTCTRL_LOGIC" variable="TextCtrlLogic" member="yes" />
+																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+														</object>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+															<cols>1</cols>
+															<rows>2</rows>
+															<growablecols>0</growablecols>
+															<growablerows>1</growablerows>
+															<object class="sizeritem">
+																<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+																	<label>Audio/Video Files</label>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+															<object class="sizeritem">
+																<object class="wxListBox" name="ID_LISTBOX_AV" variable="ListBoxAV" member="yes">
+																	<default>-1</default>
+																</object>
+																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+														</object>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+										</object>
+									</object>
+									<label>Play List</label>
+								</object>
+								<object class="notebookpage">
+									<object class="wxPanel" name="ID_PANEL_CAL" variable="PanelCal" member="yes">
+										<pos>49,10</pos>
+										<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+											<cols>1</cols>
+											<rows>2</rows>
+											<growablecols>0</growablecols>
+											<growablerows>1</growablerows>
+											<object class="sizeritem">
+												<object class="wxBoxSizer" variable="BoxSizer2" member="no">
+													<object class="sizeritem">
+														<object class="wxChoice" name="ID_CHOICE1" variable="Choice1" member="yes">
+															<size>113,21</size>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
+															<cols>3</cols>
+															<object class="sizeritem">
+																<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+																	<label>Start</label>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+															<object class="sizeritem">
+																<object class="wxChoice" name="ID_CHOICE2" variable="Choice2" member="yes">
+																	<size>64,21</size>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxFlexGridSizer" variable="FlexGridSizer10" member="no">
+															<cols>3</cols>
+															<object class="sizeritem">
+																<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
+																	<label>End</label>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+															<object class="sizeritem">
+																<object class="wxChoice" name="ID_CHOICE3" variable="Choice3" member="yes">
+																	<size>59,21</size>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
+															<cols>3</cols>
+															<object class="sizeritem">
+																<object class="wxToggleButton" name="ID_TOGGLEBUTTON5" variable="ToggleButton5" member="yes">
+																	<label>Set</label>
+																	<size>53,23</size>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+															<object class="sizeritem">
+																<object class="wxToggleButton" name="ID_TOGGLEBUTTON6" variable="ToggleButton6" member="yes">
+																	<label>Delete</label>
+																	<size>59,23</size>
+																</object>
+																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<border>5</border>
+																<option>1</option>
+															</object>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxBoxSizer" variable="BoxSizer3" member="no">
+													<object class="sizeritem">
+														<object class="wxGrid" name="ID_GRID1" variable="Grid1" member="yes">
+															<cols>7</cols>
+															<rows>26</rows>
+															<defaultrowsize>40</defaultrowsize>
+															<collabels>
+																<item>Sun</item>
+																<item>Mon</item>
+																<item>Tue</item>
+																<item>Wed</item>
+																<item>Thu</item>
+																<item>Fri</item>
+																<item>Sat</item>
+															</collabels>
+															<size>374,178</size>
+														</object>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+										</object>
+									</object>
+									<label>Calendar</label>
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<flag>wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenuBar" variable="MenuBar1" member="no">
+			<object class="wxMenu" variable="Menu1" member="no">
+				<label>&amp;File</label>
+				<object class="wxMenuItem" name="idMenuQuit" variable="MenuItem1" member="no">
+					<label>Quit</label>
+					<accel>Alt-F4</accel>
+					<help>Quit the application</help>
+					<handler function="OnQuit" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" variable="Menu2" member="no">
+				<label>Help</label>
+				<object class="wxMenuItem" name="idMenuAbout" variable="MenuItem2" member="no">
+					<label>About</label>
+					<accel>F1</accel>
+					<help>Show info about this application</help>
+					<handler function="OnAbout" entry="EVT_MENU" />
+				</object>
+			</object>
+		</object>
+		<object class="wxStatusBar" name="ID_STATUSBAR1" variable="StatusBar1" member="yes">
+			<fields>1</fields>
+			<widths>-1</widths>
+			<styles>wxSB_NORMAL</styles>
+		</object>
+	</object>
+</wxsmith>

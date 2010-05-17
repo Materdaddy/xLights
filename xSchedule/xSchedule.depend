@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1270311663 source:c:\xlights\xtester\xtester\xtesterapp.cpp
-	"xTesterApp.h"
-	"xTesterMain.h"
+1273955419 source:c:\xlights\xschedule\xschedule\xscheduleapp.cpp
+	"xScheduleApp.h"
+	"xScheduleMain.h"
 	<wx/image.h>
 
-1270311663 c:\xlights\xtester\xtester\xtesterapp.h
+1273955419 c:\xlights\xschedule\xschedule\xscheduleapp.h
 	<wx/app.h>
 
 1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\app.h
@@ -1736,14 +1736,10 @@
 1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\theme.h
 	"wx/string.h"
 
-1270317520 c:\xlights\xtester\xtester\xtestermain.h
+1273956103 c:\xlights\xschedule\xschedule\xschedulemain.h
 	<wx/notebook.h>
 	<wx/sizer.h>
-	<wx/stattext.h>
 	<wx/menu.h>
-	<wx/checkbox.h>
-	<wx/listbox.h>
-	<wx/slider.h>
 	<wx/panel.h>
 	<wx/frame.h>
 	<wx/statusbr.h>
@@ -2018,49 +2014,6 @@
 	"wx/defs.h"
 	"wx/window.h"
 
-1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\stattext.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/stattext.h"
-	"wx/msw/stattext.h"
-	"wx/motif/stattext.h"
-	"wx/gtk/stattext.h"
-	"wx/gtk1/stattext.h"
-	"wx/mac/stattext.h"
-	"wx/cocoa/stattext.h"
-	"wx/os2/stattext.h"
-	"wx/palmos/stattext.h"
-
-1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\stattext.h
-
-1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\stattext.h
-
-1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\motif\stattext.h
-
-1263093214 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk\stattext.h
-
-1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk1\stattext.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/list.h"
-	"wx/control.h"
-
-1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\stattext.h
-	"wx/mac/classic/stattext.h"
-	"wx/mac/carbon/stattext.h"
-
-1263093196 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\classic\stattext.h
-
-1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\stattext.h
-
-1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\stattext.h
-	"wx/cocoa/NSTextField.h"
-
-1263093210 c:\sourcecode\libraries\wxwidgets2.8\include\wx\os2\stattext.h
-	"wx/control.h"
-
-1263093200 c:\sourcecode\libraries\wxwidgets2.8\include\wx\palmos\stattext.h
-
 1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\menu.h
 	"wx/defs.h"
 	"wx/list.h"
@@ -2174,99 +2127,6 @@
 	"wx/list.h"
 	"wx/dynarray.h"
 
-1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\checkbox.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/checkbox.h"
-	"wx/msw/checkbox.h"
-	"wx/motif/checkbox.h"
-	"wx/gtk/checkbox.h"
-	"wx/gtk1/checkbox.h"
-	"wx/mac/checkbox.h"
-	"wx/cocoa/checkbox.h"
-	"wx/os2/checkbox.h"
-	"wx/palmos/checkbox.h"
-
-1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\checkbox.h
-	"wx/button.h"
-
-1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\checkbox.h
-
-1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\motif\checkbox.h
-
-1263093214 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk\checkbox.h
-
-1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk1\checkbox.h
-
-1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\checkbox.h
-	"wx/mac/classic/checkbox.h"
-	"wx/mac/carbon/checkbox.h"
-
-1263093196 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\classic\checkbox.h
-
-1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\checkbox.h
-
-1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\checkbox.h
-	"wx/cocoa/NSButton.h"
-
-1263093210 c:\sourcecode\libraries\wxwidgets2.8\include\wx\os2\checkbox.h
-	"wx/control.h"
-
-1263093200 c:\sourcecode\libraries\wxwidgets2.8\include\wx\palmos\checkbox.h
-
-1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\listbox.h
-	"wx/defs.h"
-	"wx/ctrlsub.h"
-	"wx/univ/listbox.h"
-	"wx/msw/listbox.h"
-	"wx/motif/listbox.h"
-	"wx/gtk/listbox.h"
-	"wx/gtk1/listbox.h"
-	"wx/mac/listbox.h"
-	"wx/os2/listbox.h"
-	"wx/cocoa/listbox.h"
-
-1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\listbox.h
-	"wx/scrolwin.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\listbox.h
-	"wx/dynarray.h"
-
-1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\motif\listbox.h
-	"wx/ctrlsub.h"
-	"wx/clntdata.h"
-
-1263093214 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk\listbox.h
-
-1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk1\listbox.h
-	"wx/list.h"
-
-1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\listbox.h
-	"wx/mac/classic/listbox.h"
-	"wx/mac/carbon/listbox.h"
-
-1263093196 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\classic\listbox.h
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-	"wx/dynarray.h"
-
-1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\listbox.h
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1263093210 c:\sourcecode\libraries\wxwidgets2.8\include\wx\os2\listbox.h
-	"wx/dynarray.h"
-
-1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\listbox.h
-	"wx/cocoa/NSTableView.h"
-	"wx/dynarray.h"
-
-1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\nstableview.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-
 1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\statusbr.h
 	"wx/defs.h"
 	"wx/window.h"
@@ -2300,7 +2160,7 @@
 
 1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\statusbr.h
 
-1211204446 source:c:\xlights\xtester\xtester\resource.rc
+1211204446 source:c:\xlights\xschedule\xschedule\resource.rc
 	"wx/msw/wx.rc"
 
 1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\wx.rc
@@ -2321,65 +2181,37 @@
 
 1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\rcdefs.h
 
-1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\slider.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/slider.h"
-	"wx/msw/slider95.h"
-	"wx/motif/slider.h"
-	"wx/gtk/slider.h"
-	"wx/gtk1/slider.h"
-	"wx/mac/slider.h"
-	"wx/cocoa/slider.h"
-	"wx/os2/slider.h"
-	"wx/palmos/slider.h"
+1273955419 source:c:\xlights\xschedule\xscheduleapp.cpp
+	"xScheduleApp.h"
+	"xScheduleMain.h"
+	<wx/image.h>
 
-1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\slider.h
-	"wx/univ/scrthumb.h"
+1273955419 c:\xlights\xschedule\xscheduleapp.h
+	<wx/app.h>
 
-1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\scrthumb.h
-	"wx/timer.h"
+1274028187 c:\xlights\xschedule\xschedulemain.h
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/menu.h>
+	<wx/textctrl.h>
+	<wx/listbox.h>
+	<wx/tglbtn.h>
+	<wx/panel.h>
+	<wx/grid.h>
+	<wx/choice.h>
+	<wx/frame.h>
+	<wx/statusbr.h>
+	<wx/config.h>
+	<wx/stdpaths.h>
+	"../include/globals.h"
 
-1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\slider95.h
+1274021459 source:c:\xlights\xschedule\resource.rc
+	"wx/msw/wx.rc"
 
-1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\motif\slider.h
-	"wx/control.h"
-
-1263093214 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk\slider.h
-
-1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk1\slider.h
-
-1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\slider.h
-	"wx/mac/classic/slider.h"
-	"wx/mac/carbon/slider.h"
-
-1263093196 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\classic\slider.h
-	"wx/control.h"
-	"wx/slider.h"
-	"wx/stattext.h"
-
-1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\slider.h
-	"wx/control.h"
-	"wx/slider.h"
-	"wx/stattext.h"
-
-1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\slider.h
-	"wx/cocoa/NSSlider.h"
-
-1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\nsslider.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-	"wx/cocoa/ObjcRef.h"
-
-1263093212 c:\sourcecode\libraries\wxwidgets2.8\include\wx\os2\slider.h
-	"wx/control.h"
-
-1263093202 c:\sourcecode\libraries\wxwidgets2.8\include\wx\palmos\slider.h
-
-1270317959 source:c:\xlights\xtester\xtester\xtestermain.cpp
-	"xTesterMain.h"
+1273957002 source:c:\xlights\xschedule\xschedulemain.cpp
+	"xScheduleMain.h"
 	<wx/msgdlg.h>
-	<wx/font.h>
 	<wx/intl.h>
 	<wx/string.h>
 
@@ -2489,54 +2321,187 @@
 	"wx/defs.h"
 	"wx/dialog.h"
 
-1270311663 source:c:\xlights\xtester\xtesterapp.cpp
-	"xTesterApp.h"
-	"xTesterMain.h"
-	<wx/image.h>
+1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\stattext.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/stattext.h"
+	"wx/msw/stattext.h"
+	"wx/motif/stattext.h"
+	"wx/gtk/stattext.h"
+	"wx/gtk1/stattext.h"
+	"wx/mac/stattext.h"
+	"wx/cocoa/stattext.h"
+	"wx/os2/stattext.h"
+	"wx/palmos/stattext.h"
 
-1270311663 c:\xlights\xtester\xtesterapp.h
-	<wx/app.h>
+1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\stattext.h
 
-1274069458 c:\xlights\xtester\xtestermain.h
-	<wx/notebook.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/menu.h>
-	<wx/checklst.h>
-	<wx/checkbox.h>
-	<wx/slider.h>
-	<wx/panel.h>
-	<wx/button.h>
-	<wx/frame.h>
-	<wx/statusbr.h>
-	<wx/filename.h>
-	"../include/globals.h"
-	"../include/tinyxml.h"
+1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\stattext.h
 
-1270317959 source:c:\xlights\xtester\xtestermain.cpp
-	"xTesterMain.h"
-	<wx/msgdlg.h>
-	<wx/font.h>
-	<wx/intl.h>
-	<wx/string.h>
+1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\motif\stattext.h
 
-1270407146 source:c:\xlights\xtester\resource.rc
-	"wx/msw/wx.rc"
+1263093214 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk\stattext.h
 
-1274040441 c:\xlights\include\globals.h
+1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk1\stattext.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/list.h"
+	"wx/control.h"
 
-1269923870 c:\xlights\include\tinyxml.h
-	<ctype.h>
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<assert.h>
-	<string>
-	<iostream>
-	<sstream>
-	"tinystr.h"
+1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\stattext.h
+	"wx/mac/classic/stattext.h"
+	"wx/mac/carbon/stattext.h"
 
-1269923870 c:\xlights\include\tinystr.h
-	<assert.h>
-	<string.h>
+1263093196 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\classic\stattext.h
+
+1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\stattext.h
+
+1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\stattext.h
+	"wx/cocoa/NSTextField.h"
+
+1263093210 c:\sourcecode\libraries\wxwidgets2.8\include\wx\os2\stattext.h
+	"wx/control.h"
+
+1263093200 c:\sourcecode\libraries\wxwidgets2.8\include\wx\palmos\stattext.h
+
+1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\listbox.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/univ/listbox.h"
+	"wx/msw/listbox.h"
+	"wx/motif/listbox.h"
+	"wx/gtk/listbox.h"
+	"wx/gtk1/listbox.h"
+	"wx/mac/listbox.h"
+	"wx/os2/listbox.h"
+	"wx/cocoa/listbox.h"
+
+1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\listbox.h
+	"wx/scrolwin.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\listbox.h
+	"wx/dynarray.h"
+
+1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\motif\listbox.h
+	"wx/ctrlsub.h"
+	"wx/clntdata.h"
+
+1263093214 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk\listbox.h
+
+1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk1\listbox.h
+	"wx/list.h"
+
+1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\listbox.h
+	"wx/mac/classic/listbox.h"
+	"wx/mac/carbon/listbox.h"
+
+1263093196 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\classic\listbox.h
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+	"wx/dynarray.h"
+
+1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\listbox.h
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1263093210 c:\sourcecode\libraries\wxwidgets2.8\include\wx\os2\listbox.h
+	"wx/dynarray.h"
+
+1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\listbox.h
+	"wx/cocoa/NSTableView.h"
+	"wx/dynarray.h"
+
+1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\nstableview.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\tglbtn.h
+	"wx/defs.h"
+	"wx/event.h"
+	"wx/control.h"
+	"wx/univ/tglbtn.h"
+	"wx/msw/tglbtn.h"
+	"wx/gtk/tglbtn.h"
+	"wx/gtk1/tglbtn.h"
+	"wx/motif/tglbtn.h"
+	"wx/mac/tglbtn.h"
+	"wx/palmos/tglbtn.h"
+	"wx/os2/tglbtn.h"
+
+1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\tglbtn.h
+	"wx/button.h"
+
+1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\tglbtn.h
+
+1263093214 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk\tglbtn.h
+	"wx/bitmap.h"
+
+1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk1\tglbtn.h
+	"wx/bitmap.h"
+
+1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\motif\tglbtn.h
+	"wx/checkbox.h"
+
+1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\checkbox.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/checkbox.h"
+	"wx/msw/checkbox.h"
+	"wx/motif/checkbox.h"
+	"wx/gtk/checkbox.h"
+	"wx/gtk1/checkbox.h"
+	"wx/mac/checkbox.h"
+	"wx/cocoa/checkbox.h"
+	"wx/os2/checkbox.h"
+	"wx/palmos/checkbox.h"
+
+1263093190 c:\sourcecode\libraries\wxwidgets2.8\include\wx\univ\checkbox.h
+	"wx/button.h"
+
+1263093206 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msw\checkbox.h
+
+1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\motif\checkbox.h
+
+1263093214 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk\checkbox.h
+
+1263093192 c:\sourcecode\libraries\wxwidgets2.8\include\wx\gtk1\checkbox.h
+
+1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\checkbox.h
+	"wx/mac/classic/checkbox.h"
+	"wx/mac/carbon/checkbox.h"
+
+1263093196 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\classic\checkbox.h
+
+1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\checkbox.h
+
+1263093218 c:\sourcecode\libraries\wxwidgets2.8\include\wx\cocoa\checkbox.h
+	"wx/cocoa/NSButton.h"
+
+1263093210 c:\sourcecode\libraries\wxwidgets2.8\include\wx\os2\checkbox.h
+	"wx/control.h"
+
+1263093200 c:\sourcecode\libraries\wxwidgets2.8\include\wx\palmos\checkbox.h
+
+1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\tglbtn.h
+	"wx/mac/classic/tglbtn.h"
+	"wx/mac/carbon/tglbtn.h"
+
+1263093196 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\classic\tglbtn.h
+
+1263093198 c:\sourcecode\libraries\wxwidgets2.8\include\wx\mac\carbon\tglbtn.h
+
+1263093200 c:\sourcecode\libraries\wxwidgets2.8\include\wx\palmos\tglbtn.h
+
+1263093210 c:\sourcecode\libraries\wxwidgets2.8\include\wx\os2\tglbtn.h
+
+1263093222 c:\sourcecode\libraries\wxwidgets2.8\include\wx\grid.h
+	"wx/generic/grid.h"
+
+1263093216 c:\sourcecode\libraries\wxwidgets2.8\include\wx\generic\grid.h
+	"wx/defs.h"
+	"wx/scrolwin.h"
+
+1269923870 c:\xlights\include\globals.h
 

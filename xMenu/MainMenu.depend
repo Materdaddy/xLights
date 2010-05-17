@@ -1579,7 +1579,7 @@
 1269923872 c:\xlights\xmenu\mainmenuapp.h
 	<wx/app.h>
 
-1269923872 c:\xlights\xmenu\mainmenumain.h
+1274055108 c:\xlights\xmenu\mainmenumain.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>
@@ -1592,5 +1592,5 @@
 	<wx/stdpaths.h>
 	"../include/globals.h"
 
-1269923870 c:\xlights\include\globals.h
+1274040441 c:\xlights\include\globals.h
 
