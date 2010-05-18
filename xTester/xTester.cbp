@@ -7,8 +7,9 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="DebugWindows">
-				<Option output="../bin/xTester" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xTester" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-pipe" />
@@ -31,8 +32,9 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseWindows">
-				<Option output="../bin/xTester" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xTester" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-pipe" />
@@ -55,8 +57,9 @@
 				</Linker>
 			</Target>
 			<Target title="DebugLinux">
-				<Option output="../bin/xTester" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xTester" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="`wx-config --cflags`" />
@@ -71,8 +74,9 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseLinux">
-				<Option output="../bin/xTester" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xTester" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="`wx-config --cflags`" />
@@ -91,6 +95,9 @@
 		<Compiler>
 			<Add option="-DwxUSE_UNICODE" />
 		</Compiler>
+		<Linker>
+			<Add library="..\bin\libctb.a" />
+		</Linker>
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>

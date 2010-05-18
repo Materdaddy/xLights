@@ -1,1 +1,1 @@
-g++ -o out_test.exe out_test.cpp ..\..\lib\libctb.a
+g++ -o out_test.exe out_test.cpp ..\..\bin\libctb.a

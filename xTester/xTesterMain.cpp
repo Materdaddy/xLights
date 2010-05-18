@@ -23,6 +23,14 @@
 #include "../include/tinyxml.cpp"
 #include "../include/tinyxmlerror.cpp"
 #include "../include/tinyxmlparser.cpp"
+#include "../include/xlights_out.cpp"
+
+
+#define MAXINTENSITY 255
+#define XTIMER_INTERVAL 100
+
+xOutput xout;
+
 
 //helper functions
 enum wxbuildinfoformat {
@@ -53,7 +61,7 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 //(*IdInit(xTesterFrame)
 const long xTesterFrame::ID_STATICTEXT1 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT3 = wxNewId();
-const long xTesterFrame::ID_CHECKLISTBOX1 = wxNewId();
+const long xTesterFrame::ID_NOTEBOOK2 = wxNewId();
 const long xTesterFrame::ID_SLIDER1 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT2 = wxNewId();
 const long xTesterFrame::ID_BUTTON1 = wxNewId();
@@ -76,13 +84,15 @@ const long xTesterFrame::idMenuQuit = wxNewId();
 const long xTesterFrame::idMenuAbout = wxNewId();
 const long xTesterFrame::ID_STATUSBAR1 = wxNewId();
 //*)
+const long xTesterFrame::ID_TIMER = wxNewId();
 
 BEGIN_EVENT_TABLE(xTesterFrame,wxFrame)
     //(*EventTable(xTesterFrame)
     //*)
+    EVT_TIMER(ID_TIMER, xTesterFrame::OnTimer)
 END_EVENT_TABLE()
 
-xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id)
+xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIMER)
 {
     //(*Initialize(xTesterFrame)
     wxMenuItem* MenuItem2;
@@ -108,8 +118,8 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("2. Select test"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    CheckListBox_Channels = new wxCheckListBox(Panel3, ID_CHECKLISTBOX1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHECKLISTBOX1"));
-    FlexGridSizer2->Add(CheckListBox_Channels, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Notebook2 = new wxNotebook(Panel3, ID_NOTEBOOK2, wxDefaultPosition, wxSize(191,181), 0, _T("ID_NOTEBOOK2"));
+    FlexGridSizer2->Add(Notebook2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Notebook1 = new wxNotebook(Panel3, ID_NOTEBOOK1, wxDefaultPosition, wxSize(219,161), 0, _T("ID_NOTEBOOK1"));
     Panel_Dim = new wxPanel(Notebook1, ID_PANEL1, wxPoint(29,39), wxSize(211,136), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     SliderMasterDimmer = new wxSlider(Panel_Dim, ID_SLIDER1, 0, 0, 255, wxPoint(16,40), wxSize(184,48), wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS|wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER1"));
@@ -161,8 +171,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id)
     BoxSizer1->Fit(this);
     BoxSizer1->SetSizeHints(this);
 
-    Connect(ID_SLIDER1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&xTesterFrame::OnSliderMasterDimmerCmdScroll);
-    Connect(ID_SLIDER1,wxEVT_COMMAND_SLIDER_UPDATED,(wxObjectEventFunction)&xTesterFrame::OnSliderMasterDimmerCmdScroll);
+    Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xTesterFrame::OnButton1Click);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnAbout);
     //*)
@@ -177,10 +186,16 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id)
     networkFile.AssignDir( CurrentDir );
     networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     LoadFile();
+    starttime = wxDateTime::UNow();
+
+    if (Networks.Count() > 0) {
+        timer.Start(XTIMER_INTERVAL, wxTIMER_CONTINUOUS);
+    }
 }
 
 xTesterFrame::~xTesterFrame()
 {
+    if (timer.IsRunning()) timer.Stop();
     //(*Destroy(xTesterFrame)
     //*)
 }
@@ -197,12 +212,39 @@ void xTesterFrame::OnAbout(wxCommandEvent& event)
     wxMessageBox(msg, hdg);
 }
 
-void xTesterFrame::OnCheckBoxRunClick(wxCommandEvent& event)
-{
-}
-
-void xTesterFrame::OnSliderMasterDimmerCmdScroll(wxScrollEvent& event)
-{
+void xTesterFrame::OnTimer(wxTimerEvent& event) {
+    static int LastMasterDimValue;
+    int v,n,maxch,ch;
+    wxCheckListBox* lb;
+    int netidx = Notebook2->GetSelection(); // which network
+    lb = Networks[netidx]->ListBox;
+    maxch = Networks[netidx]->MaxChannels;
+    wxTimeSpan ts = wxDateTime::UNow() - starttime;
+    xout.TimerStart(ts.GetMilliseconds().ToLong());
+    switch (Notebook1->GetSelection()) {
+        case 0:
+            // dimmer
+            v=SliderMasterDimmer->GetValue();
+            if (v != LastMasterDimValue) {
+                for (ch=0,n=0; ch < maxch; ch++) {
+                    if (lb->IsChecked(ch)) {
+                        xout.SetIntensity(netidx, ch, v);
+                        n++;
+                    }
+                }
+                LastMasterDimValue = v;
+                StatusBar1->SetStatusText(wxString::Format(_("# checked=%d Int=%d"),n,v));
+            }
+            break;
+        case 1:
+            // turn on in sequence
+            break;
+        case 2:
+            // alternate odd/even
+            break;
+    }
+    xout.TimerEnd();
+    //StatusBar1->SetStatusText(ts.Format(_("%S.%l")));
 }
 
 wxString xTesterFrame::GetAttribute(TiXmlElement* e, const char *attr)
@@ -219,13 +261,10 @@ void xTesterFrame::LoadFile()
         int r=0;
         for( TiXmlElement* e=doc.RootElement()->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
             if (e->ValueStr() == "network") {
-                /*
-                GridNetwork->AppendRows(1);
-                GridNetwork->SetCellValue(r,0,GetAttribute(e,"NetworkType"));
-                GridNetwork->SetCellValue(r,1,GetAttribute(e,"ComPort"));
-                GridNetwork->SetCellValue(r,2,GetAttribute(e,"BaudRate"));
-                GridNetwork->SetCellValue(r,3,GetAttribute(e,"MaxChannels"));
-                */
+                AddNetwork(GetAttribute(e,"NetworkType"),
+                           GetAttribute(e,"ComPort"),
+                           GetAttribute(e,"BaudRate"),
+                           atoi(GetAttribute(e,"MaxChannels").mb_str(wxConvUTF8)));
                 r++;
             }
         }
@@ -235,42 +274,73 @@ void xTesterFrame::LoadFile()
     }
 }
 
-/*
-void xTesterFrame::LoadFile()
+NetworkInfo* xTesterFrame::AddNetwork(wxString NetworkType, wxString ComPort, wxString BaudRate, int MaxChannels)
 {
-	wxArrayString chNames;
-	wxString chDesc, chFunc;
-	wxString FileName=channelFile.GetFullPath();
-    TiXmlDocument doc( FileName.mb_str() );
-    if (!doc.LoadFile()) {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Loading File"));
-        return;
-    }
+    NetworkInfo* NetInfo=new NetworkInfo();
+    NetInfo->NetworkType=NetworkType;
+    NetInfo->ComPort=ComPort;
+    NetInfo->BaudRate=BaudRate;
+    NetInfo->MaxChannels=MaxChannels;
 
-    TiXmlElement* root=doc.RootElement();
-    for( TiXmlElement* n=root->FirstChildElement(); n!=NULL; n=n->NextSiblingElement() ) {
-        if (n->ValueStr() == "network") {
-            //wxString NetworkType(n->Attribute("NetworkType"), wxConvUTF8);
-            //wxString ComPort(n->Attribute("ComPort"), wxConvUTF8);
-            int r=0;
-            for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-                if (e->ValueStr() == "channel") {
-                    chDesc=GetAttribute(e,"desc");
-                    chFunc=GetAttribute(e,"func");
-                    if (!chDesc.IsEmpty() && chFunc!=_("disabled")) {
-                        chNames.Add(chDesc);
-                    }
-                    //grid->SetCellValue(r,0,GetAttribute(e,"cont"));
-                    //grid->SetCellValue(r,1,GetAttribute(e,"chan"));
-                    //grid->SetCellValue(r,2,GetAttribute(e,"id"));
-                    //grid->SetCellValue(r,4,GetAttribute(e,"func"));
-                    //grid->SetCellValue(r,5,GetAttribute(e,"color"));
-                    r++;
-                }
-            }
+    int cnt=Networks.Count();
+    wxString sid = wxString::Format(_T("%d"), cnt+1);
+    wxPanel* Panel = new wxPanel(Notebook2, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL")+sid);
+    wxFlexGridSizer* FlexSizer = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexSizer->AddGrowableRow(1);
+    wxStaticText* stNetDesc = new wxStaticText(Panel, -1, NetInfo->Description());
+    FlexSizer->Add(stNetDesc, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    wxCheckListBox* ListBox = new wxCheckListBox(Panel, -1);
+    FlexSizer->Add(ListBox, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Panel->SetSizer(FlexSizer);
+    FlexSizer->Fit(Panel);
+    FlexSizer->SetSizeHints(Panel);
+    Notebook2->AddPage(Panel, _("Network ")+sid, true);
+
+    NetInfo->Panel=Panel;
+    NetInfo->ListBox=ListBox;
+    NetInfo->DescField=stNetDesc;
+    Networks.Add(NetInfo);
+
+    wxString net3 = NetInfo->net3();
+    wxArrayString chNames;
+    if (net3 == _("LOR")) {
+        for (int i=0; i < MaxChannels; i++) {
+            chNames.Add( wxString::Format(_T("Unit %d.%02d"), (i >> 4)+1, (i % 4)+1 ));
+        }
+    } else {
+        for (int i=1; i <= MaxChannels; i++) {
+            chNames.Add( wxString::Format(_T("Channel %d"), i) );
         }
     }
-    CheckListBox_Channels->Set(chNames);
+    ListBox->Set(chNames);
+
+    int baud = atoi(BaudRate.mb_str(wxConvUTF8));
+    char port[20];
+    strcpy( port, (const char*)ComPort.mb_str(wxConvUTF8) );
+    try {
+        if (net3 == _("LOR")) {
+            xout.addnetwork(new xNetwork_LOR(),cnt,MaxChannels,MAXINTENSITY,port,baud);
+        } else if (net3 == _("Ren")) {
+            xout.addnetwork(new xNetwork_Renard(),cnt,MaxChannels,MAXINTENSITY,port,baud);
+        } else if (net3 == _("DMX")) {
+            xout.addnetwork(new xNetwork_DMXentec(),cnt,MaxChannels,MAXINTENSITY,port,baud);
+        }
+    }
+    catch (const char *str) {
+        wxString msg(str, wxConvUTF8);
+        wxMessageBox(msg, _("Exception Raised"));
+    }
+    catch (char *str) {
+        wxString msg(str, wxConvUTF8);
+        wxMessageBox(msg, _("Exception Raised"));
+    }
+
+    return NetInfo;
 }
-*/
+
+
+void xTesterFrame::OnButton1Click(wxCommandEvent& event)
+{
+    SliderMasterDimmer->SetValue(0);
+    xout.alloff();
+}

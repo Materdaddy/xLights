@@ -90,8 +90,8 @@ all: $(OUTPUT)\ctbtest.exe
 clean: 
 	-if exist $(OUTPUT)\ctbtest.exe del $(OUTPUT)\ctbtest.exe
 
-$(OUTPUT)\ctbtest.exe: $(CTBTEST_OBJECTS) ..\..\lib\libctb$(LIBFLAG).a
-	g++ -o $@ $(CTBTEST_OBJECTS)  $(____DEBUG_1) -mthreads -L..\lib $(LDFLAGS)  ..\..\lib\libctb$(LIBFLAG).a -lwinmm $(__SYSLIB2_p)
+$(OUTPUT)\ctbtest.exe: $(CTBTEST_OBJECTS) ..\..\bin\libctb$(LIBFLAG).a
+	g++ -o $@ $(CTBTEST_OBJECTS)  $(____DEBUG_1) -mthreads -L..\bin $(LDFLAGS)  ..\..\bin\libctb$(LIBFLAG).a -lwinmm $(__SYSLIB2_p)
 
 
 $(OUTPUT)\ctbtest_ctbtest.o: .\ctbtest.cpp

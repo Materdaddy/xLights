@@ -84,32 +84,22 @@ $(OUTPUT):
 
 ### Targets: ###
 
-all: ..\lib\libctb$(LIBFLAG).a ..\lib\ctb$(LIBFLAG).dll
+all: ..\bin\libctb$(LIBFLAG).a ..\bin\ctb$(LIBFLAG).dll
 
 clean: 
 	-if exist $(OUTPUT)\*.o del $(OUTPUT)\*.o
 	-if exist $(OUTPUT)\*.d del $(OUTPUT)\*.d
-	-if exist ..\lib\libctb$(LIBFLAG).a del ..\lib\libctb$(LIBFLAG).a
-	-if exist ..\lib\ctb$(LIBFLAG).dll del ..\lib\ctb$(LIBFLAG).dll
-	-if exist ..\lib\libctb$(LIBFLAG).a del ..\lib\libctb$(LIBFLAG).a
+	-if exist ..\bin\libctb$(LIBFLAG).a del ..\bin\libctb$(LIBFLAG).a
+	-if exist ..\bin\ctb$(LIBFLAG).dll del ..\bin\ctb$(LIBFLAG).dll
+	-if exist ..\bin\libctb$(LIBFLAG).a del ..\bin\libctb$(LIBFLAG).a
 
-..\lib\libctb$(LIBFLAG).a: $(CTB_LIB_OBJECTS)
+..\bin\libctb$(LIBFLAG).a: $(CTB_LIB_OBJECTS)
 	if exist $@ del $@
 	ar rcu $@ $(CTB_LIB_OBJECTS)
 	ranlib $@
 
-..\lib\ctb$(LIBFLAG).dll: $(CTB_DLL_OBJECTS)
-	g++ $(LINK_DLL_FLAGS) -fPIC -o $@ $(CTB_DLL_OBJECTS)  $(____DEBUG_1) -mthreads -Wl,--out-implib=..\lib\libctb$(LIBFLAG).a -L..\lib $(LDFLAGS)  -lwinmm $(__SYSLIB2_p)
-
-tip-win32: 
-	@echo "                                                  "
-	@echo "=================================================="
-	@echo " The building of ctb is finished.                 "
-	@echo "                                                  "
-	@echo " ctb comes with no guarantees and doesn't claim   "
-	@echo " to be suitable for any purpose.                  "
-	@echo "=================================================="
-	@echo "                                                  "
+..\bin\ctb$(LIBFLAG).dll: $(CTB_DLL_OBJECTS)
+	g++ $(LINK_DLL_FLAGS) -fPIC -o $@ $(CTB_DLL_OBJECTS)  $(____DEBUG_1) -mthreads -Wl,--out-implib=..\bin\libctb$(LIBFLAG).a -L..\bin $(LDFLAGS)  -lwinmm $(__SYSLIB2_p)
 
 $(OUTPUT)\ctb_lib_fifo.o: ./fifo.cpp
 	g++ -c -o $@ $(CTB_LIB_CXXFLAGS) $(CPPDEPS) $<

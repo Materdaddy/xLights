@@ -15,7 +15,6 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
-#include <wx/checklst.h>
 #include <wx/checkbox.h>
 #include <wx/slider.h>
 #include <wx/panel.h>
@@ -25,9 +24,41 @@
 //*)
 
 #include <wx/filename.h>
+#include <wx/checklst.h>
+#include <wx/timer.h>
+#include <wx/datetime.h>
 
 #include "../include/globals.h"
 #include "../include/tinyxml.h"
+
+class NetworkInfo
+{
+    public:
+
+    wxPanel* Panel;
+    wxCheckListBox* ListBox;
+    wxStaticText* DescField;
+    wxString NetworkType;
+    wxString ComPort;
+    wxString BaudRate;
+    int MaxChannels;
+
+    const wxString Description() {
+        if (NetworkType.IsEmpty()) {
+            return _("");
+        } else {
+            return NetworkType+_("\n")+ComPort+_(" at ")+BaudRate+_(" baud");
+        }
+    }
+
+    wxString net3() {
+        return NetworkType.Left(3);
+    }
+
+    bool IsDMX() {
+        return net3() ==_("DMX");
+    }
+};
 
 class xTesterFrame: public wxFrame
 {
@@ -35,14 +66,14 @@ class xTesterFrame: public wxFrame
 
         xTesterFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~xTesterFrame();
+        void OnTimer(wxTimerEvent& event);
 
     private:
 
         //(*Handlers(xTesterFrame)
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
-        void OnCheckBoxRunClick(wxCommandEvent& event);
-        void OnSliderMasterDimmerCmdScroll(wxScrollEvent& event);
+        void OnButton1Click(wxCommandEvent& event);
         //*)
 
         void LoadFile();
@@ -51,7 +82,7 @@ class xTesterFrame: public wxFrame
         //(*Identifiers(xTesterFrame)
         static const long ID_STATICTEXT1;
         static const long ID_STATICTEXT3;
-        static const long ID_CHECKLISTBOX1;
+        static const long ID_NOTEBOOK2;
         static const long ID_SLIDER1;
         static const long ID_STATICTEXT2;
         static const long ID_BUTTON1;
@@ -74,6 +105,7 @@ class xTesterFrame: public wxFrame
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         //*)
+        static const long ID_TIMER;
 
         //(*Declarations(xTesterFrame)
         wxSlider* Slider1;
@@ -93,14 +125,19 @@ class xTesterFrame: public wxFrame
         wxStaticText* StaticText5;
         wxStaticText* StaticText7;
         wxStatusBar* StatusBar1;
-        wxCheckListBox* CheckListBox_Channels;
         wxPanel* Panel_Seq;
         wxSlider* SliderMasterDimmer;
+        wxNotebook* Notebook2;
         wxStaticText* StaticText4;
         wxPanel* Panel_Alt;
         //*)
 
         wxFileName networkFile;
+        WX_DEFINE_ARRAY(NetworkInfo*, NetworkArray);
+        NetworkArray Networks;
+        NetworkInfo* AddNetwork(wxString NetworkType, wxString ComPort, wxString BaudRate, int MaxChannels);
+        wxTimer timer;
+        wxDateTime starttime;
 
         DECLARE_EVENT_TABLE()
 };

@@ -2497,12 +2497,11 @@
 1270311663 c:\xlights\xtester\xtesterapp.h
 	<wx/app.h>
 
-1274069458 c:\xlights\xtester\xtestermain.h
+1274190425 c:\xlights\xtester\xtestermain.h
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>
-	<wx/checklst.h>
 	<wx/checkbox.h>
 	<wx/slider.h>
 	<wx/panel.h>
@@ -2510,15 +2509,27 @@
 	<wx/frame.h>
 	<wx/statusbr.h>
 	<wx/filename.h>
+	<wx/checklst.h>
+	<wx/timer.h>
+	<wx/datetime.h>
 	"../include/globals.h"
 	"../include/tinyxml.h"
 
-1270317959 source:c:\xlights\xtester\xtestermain.cpp
+1274148949 source:c:\xlights\xtester\xtestermain.cpp
 	"xTesterMain.h"
 	<wx/msgdlg.h>
+	<wx/config.h>
+	<wx/timer.h>
+	<wx/bitmap.h>
+	<wx/icon.h>
 	<wx/font.h>
 	<wx/intl.h>
+	<wx/image.h>
 	<wx/string.h>
+	"../include/tinyxml.cpp"
+	"../include/tinyxmlerror.cpp"
+	"../include/tinyxmlparser.cpp"
+	"../include/xlights_out.cpp"
 
 1270407146 source:c:\xlights\xtester\resource.rc
 	"wx/msw/wx.rc"
@@ -2539,4 +2550,51 @@
 1269923870 c:\xlights\include\tinystr.h
 	<assert.h>
 	<string.h>
+
+1269923870 c:\xlights\include\tinyxml.cpp
+	<ctype.h>
+	<sstream>
+	<iostream>
+	"tinyxml.h"
+
+1269923870 c:\xlights\include\tinyxmlerror.cpp
+	"tinyxml.h"
+
+1269923870 c:\xlights\include\tinyxmlparser.cpp
+	<ctype.h>
+	<stddef.h>
+	"tinyxml.h"
+	<windows.h>
+
+1274144239 c:\xlights\include\xlights_out.cpp
+	"../serial/ctb.h"
+	<vector>
+	<list>
+	<time.h>
+
+1269923870 c:\xlights\serial\ctb.h
+	"fifo.h"
+	"serport.h"
+	"serportx.h"
+
+1269923870 c:\xlights\serial\fifo.h
+	<sys/types.h>
+
+1269923870 c:\xlights\serial\serport.h
+	"win32/serport.h"
+	"linux/serport.h"
+
+1269923870 c:\xlights\serial\win32\serport.h
+	"../serportx.h"
+	<windows.h>
+
+1269923870 c:\xlights\serial\serportx.h
+	"fifo.h"
+	<stdio.h>
+	<string.h>
+
+1269923870 c:\xlights\serial\linux\serport.h
+	"../serportx.h"
+	<linux/serial.h>
+	<termios.h>
 

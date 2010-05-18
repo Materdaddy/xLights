@@ -30,7 +30,9 @@
 							<option>1</option>
 						</object>
 						<object class="sizeritem">
-							<object class="wxCheckListBox" name="ID_CHECKLISTBOX1" variable="CheckListBox_Channels" member="yes" />
+							<object class="wxNotebook" name="ID_NOTEBOOK2" variable="Notebook2" member="yes">
+								<size>191,181</size>
+							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
 							<option>1</option>
@@ -47,8 +49,6 @@
 											<pos>16,40</pos>
 											<size>184,48</size>
 											<style>wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS|wxSTATIC_BORDER</style>
-											<handler function="OnSliderMasterDimmerCmdScroll" entry="EVT_COMMAND_SCROLL" />
-											<handler function="OnSliderMasterDimmerCmdScroll" entry="EVT_COMMAND_SLIDER_UPDATED" />
 										</object>
 										<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
 											<label>Dim selected channels</label>
@@ -57,6 +57,7 @@
 										<object class="wxButton" name="ID_BUTTON1" variable="Button1" member="yes">
 											<label>All Lights Off</label>
 											<pos>70,100</pos>
+											<handler function="OnButton1Click" entry="EVT_BUTTON" />
 										</object>
 									</object>
 									<label>Dim</label>

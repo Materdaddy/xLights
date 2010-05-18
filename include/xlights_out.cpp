@@ -23,7 +23,7 @@ class xNetwork {
 protected:
   ctb::SerialPort* serptr;
   unsigned char IntensityMap[256];
-  int timer_msec;
+  long timer_msec;
 
 public:
   xNetwork() {
@@ -53,11 +53,11 @@ public:
     }
   };
 
-  virtual int TimerStart(int msec) {
+  virtual int TimerStart(long msec) {
     timer_msec=msec;
   };
 
-  int GetTimer() {
+  long GetTimer() {
     return timer_msec;
   };
 
@@ -84,9 +84,9 @@ public:
 class xChannel_Dimmer {
 protected:
   xNetwork* mynet;
-  int myindex;
+  int myindex, twinklestate, effectperiod;
   char optype;
-  int optimestart, optimeend, twinklestate, periodend, effectperiod;
+  long optimestart, optimeend, periodend;
   unsigned char rampstart,rampend;
   double opduration, rampdiff;
 
@@ -148,7 +148,7 @@ public:
   };
 
   // returns true if the current timed operation is finished, false otherwise
-  int ChannelCallback(int curtime) {
+  int ChannelCallback(long curtime) {
     //printf("xChannel_Dimmer::ChannelCallback curtime=%d optype=%c\n",curtime,optype);
     switch (optype) {
       case 'R':
@@ -156,7 +156,7 @@ public:
           mynet->SetMappedIntensity(myindex, rampend);
           optype=' ';
         } else {
-          mynet->SetMappedIntensity(myindex, (curtime - optimestart) / opduration * rampdiff + rampstart);
+          mynet->SetMappedIntensity(myindex, (int)((double)(curtime - optimestart) / opduration * rampdiff + rampstart));
           return 0;
         }
         break;
@@ -219,7 +219,7 @@ public:
   };
 
   // callbacks return true if they are finished, false if they will continue to run
-  virtual int TimerStart(int msec) {
+  virtual int TimerStart(long msec) {
     timer_msec=msec;
     // process list of channels needing callbacks
     std::list<int>::iterator temp,it = timerCallbackList.begin();
@@ -366,7 +366,7 @@ public:
 
 class xNetwork_LOR: public xNetwork {
 protected:
-  int lastheartbeat;
+  long lastheartbeat;
 
 public:
   void SendHeartbeat () {
@@ -529,7 +529,7 @@ public:
     }
   };
 
-  void TimerStart(int msec) {
+  void TimerStart(long msec) {
     for(int i=0; i < MAXNETWORKS; ++i) {
       if (networks[i]) networks[i]->TimerStart(msec);
     }
