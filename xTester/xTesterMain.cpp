@@ -27,7 +27,7 @@
 
 
 #define MAXINTENSITY 255
-#define XTIMER_INTERVAL 100
+#define XTIMER_INTERVAL 50
 
 xOutput xout;
 
@@ -214,13 +214,18 @@ void xTesterFrame::OnAbout(wxCommandEvent& event)
 
 void xTesterFrame::OnTimer(wxTimerEvent& event) {
     static int LastMasterDimValue;
-    int v,n,maxch,ch;
+    static int LastSequenceSpeed;
+    static long NextSequenceStart = -1;
+    static wxArrayInt chArray;
+    static int interval,seqidx=9999,alt=0;
+    int v,n,maxch,ch,i;
     wxCheckListBox* lb;
     int netidx = Notebook2->GetSelection(); // which network
     lb = Networks[netidx]->ListBox;
     maxch = Networks[netidx]->MaxChannels;
     wxTimeSpan ts = wxDateTime::UNow() - starttime;
-    xout.TimerStart(ts.GetMilliseconds().ToLong());
+    long curtime = ts.GetMilliseconds().ToLong();
+    xout.TimerStart(curtime);
     switch (Notebook1->GetSelection()) {
         case 0:
             // dimmer
@@ -233,14 +238,73 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
                     }
                 }
                 LastMasterDimValue = v;
-                StatusBar1->SetStatusText(wxString::Format(_("# checked=%d Int=%d"),n,v));
+                StatusBar1->SetStatusText(wxString::Format(_("Dimming %d channels to %d"),n,v));
             }
             break;
         case 1:
             // turn on in sequence
+            if (CheckBox1->IsChecked()) {
+                if (LastSequenceSpeed == -1) {
+                    // get list of checked channels
+                    chArray.Clear();
+                    for (ch=0; ch < maxch; ch++) {
+                        if (lb->IsChecked(ch)) {
+                            chArray.Add(ch);
+                        }
+                    }
+                }
+                v=Slider1->GetValue();  // 0-100
+                if (v != LastSequenceSpeed) {
+                    interval = 1600 - v*15;
+                    if (seqidx < chArray.Count()) {
+                        NextSequenceStart = curtime + interval;
+                    }
+                    LastSequenceSpeed = v;
+                    StatusBar1->SetStatusText(wxString::Format(_("Turning on %d channels in sequence, speed=%d"),chArray.Count(),interval));
+                }
+                if (curtime >= NextSequenceStart && chArray.Count() > 0) {
+                    if (seqidx < chArray.Count()) xout.off(netidx, chArray[seqidx]);
+                    NextSequenceStart = curtime + interval;
+                    seqidx++;
+                    if (seqidx >= chArray.Count()) seqidx=0;
+                    xout.SetIntensity(netidx, chArray[seqidx], MAXINTENSITY);
+                }
+            } else {
+                LastSequenceSpeed=-1;
+            }
             break;
         case 2:
             // alternate odd/even
+            if (CheckBox2->IsChecked()) {
+                if (LastSequenceSpeed == -1) {
+                    // get list of checked channels
+                    chArray.Clear();
+                    for (ch=0; ch < maxch; ch++) {
+                        if (lb->IsChecked(ch)) {
+                            chArray.Add(ch);
+                        }
+                    }
+                }
+                v=Slider3->GetValue();  // 0-100
+                if (v != LastSequenceSpeed) {
+                    interval = 1600 - v*15;
+                    if (seqidx < chArray.Count()) {
+                        NextSequenceStart = curtime + interval;
+                    }
+                    LastSequenceSpeed = v;
+                    StatusBar1->SetStatusText(wxString::Format(_("Alternating %d channels, speed=%d"),chArray.Count(),interval));
+                }
+                if (curtime >= NextSequenceStart) {
+                    for (i=0; i < chArray.Count(); i++) {
+                        v=(i % 2) ^ alt;
+                        xout.SetIntensity(netidx, chArray[i], v * MAXINTENSITY);
+                    }
+                    NextSequenceStart = curtime + interval;
+                    alt=1-alt;
+                }
+            } else {
+                LastSequenceSpeed=-1;
+            }
             break;
     }
     xout.TimerEnd();
