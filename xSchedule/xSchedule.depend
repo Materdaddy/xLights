@@ -2189,31 +2189,45 @@
 1273955419 c:\xlights\xschedule\xscheduleapp.h
 	<wx/app.h>
 
-1274028187 c:\xlights\xschedule\xschedulemain.h
+1274570232 c:\xlights\xschedule\xschedulemain.h
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>
 	<wx/textctrl.h>
-	<wx/listbox.h>
+	<wx/checklst.h>
+	<wx/checkbox.h>
 	<wx/tglbtn.h>
 	<wx/panel.h>
 	<wx/grid.h>
 	<wx/choice.h>
+	<wx/button.h>
 	<wx/frame.h>
 	<wx/statusbr.h>
 	<wx/config.h>
 	<wx/stdpaths.h>
+	<wx/filename.h>
+	"PlayerDialog.h"
 	"../include/globals.h"
+	"../include/tinyxml.h"
 
 1274021459 source:c:\xlights\xschedule\resource.rc
 	"wx/msw/wx.rc"
 
-1273957002 source:c:\xlights\xschedule\xschedulemain.cpp
+1274571543 source:c:\xlights\xschedule\xschedulemain.cpp
 	"xScheduleMain.h"
 	<wx/msgdlg.h>
+	<wx/dir.h>
+	<wx/filename.h>
+	<wx/bitmap.h>
+	<wx/icon.h>
+	<wx/font.h>
 	<wx/intl.h>
+	<wx/image.h>
 	<wx/string.h>
+	"../include/tinyxml.cpp"
+	"../include/tinyxmlerror.cpp"
+	"../include/tinyxmlparser.cpp"
 
 1263093220 c:\sourcecode\libraries\wxwidgets2.8\include\wx\msgdlg.h
 	"wx/defs.h"
@@ -2503,5 +2517,47 @@
 	"wx/defs.h"
 	"wx/scrolwin.h"
 
-1269923870 c:\xlights\include\globals.h
+1274553365 c:\xlights\include\globals.h
+
+1269923870 c:\xlights\include\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"tinystr.h"
+
+1269923870 c:\xlights\include\tinystr.h
+	<assert.h>
+	<string.h>
+
+1274568411 c:\xlights\xschedule\playerdialog.h
+	<wx/dialog.h>
+	"wx/timer.h"
+	"wx/mediactrl.h"
+
+1274569358 source:c:\xlights\xschedule\playerdialog.cpp
+	"PlayerDialog.h"
+	<wx/intl.h>
+	<wx/string.h>
+	"wx/sizer.h"
+	<wx/msgdlg.h>
+
+1269923870 c:\xlights\include\tinyxml.cpp
+	<ctype.h>
+	<sstream>
+	<iostream>
+	"tinyxml.h"
+
+1269923870 c:\xlights\include\tinyxmlerror.cpp
+	"tinyxml.h"
+
+1269923870 c:\xlights\include\tinyxmlparser.cpp
+	<ctype.h>
+	<stddef.h>
+	"tinyxml.h"
+	<windows.h>
 

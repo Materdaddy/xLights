@@ -7,7 +7,7 @@
 
 #define XLIGHTS_ANIMATION_FILE "xlights_animation.xml"
 #define XLIGHTS_NETWORK_FILE   "xlights_networks.xml"
-#define XLIGHTS_CHANNEL_FILE   "xlights_channels.xml"
+#define XLIGHTS_CHANNEL_FILE   "xlights_channels.csv"
 #define XLIGHTS_SCHEDULE_FILE  "xlights_schedule.xml"
 #define XLIGHTS_SEQUENCE_EXT   "xseq"
 

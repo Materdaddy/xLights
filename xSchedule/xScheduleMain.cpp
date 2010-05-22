@@ -15,10 +15,16 @@
 //(*InternalHeaders(xScheduleFrame)
 #include <wx/bitmap.h>
 #include <wx/icon.h>
+#include <wx/font.h>
 #include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+
+#include "../include/tinyxml.cpp"
+#include "../include/tinyxmlerror.cpp"
+#include "../include/tinyxmlparser.cpp"
+
 
 //helper functions
 enum wxbuildinfoformat {
@@ -47,18 +53,21 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 }
 
 //(*IdInit(xScheduleFrame)
-const long xScheduleFrame::ID_TOGGLEBUTTON1 = wxNewId();
-const long xScheduleFrame::ID_TOGGLEBUTTON2 = wxNewId();
-const long xScheduleFrame::ID_TOGGLEBUTTON3 = wxNewId();
-const long xScheduleFrame::ID_TOGGLEBUTTON4 = wxNewId();
+const long xScheduleFrame::ID_CHOICE_PLAYLIST = wxNewId();
+const long xScheduleFrame::ID_BUTTON_SAVE = wxNewId();
 const long xScheduleFrame::ID_STATICTEXT1 = wxNewId();
-const long xScheduleFrame::ID_LISTBOX_PLAY = wxNewId();
+const long xScheduleFrame::ID_BUTTON_UP = wxNewId();
+const long xScheduleFrame::ID_BUTTON_DOWN = wxNewId();
+const long xScheduleFrame::ID_BUTTON_PLAY = wxNewId();
 const long xScheduleFrame::ID_STATICTEXT2 = wxNewId();
-const long xScheduleFrame::ID_LISTBOX_SEQ = wxNewId();
+const long xScheduleFrame::ID_CHECKBOX_AUDIO = wxNewId();
+const long xScheduleFrame::ID_CHECKBOX_VIDEO = wxNewId();
+const long xScheduleFrame::ID_CHECKBOX_LOR = wxNewId();
+const long xScheduleFrame::ID_CHECKBOX_VIXEN = wxNewId();
+const long xScheduleFrame::ID_CHECKLISTBOX_PLAY = wxNewId();
 const long xScheduleFrame::ID_STATICTEXT3 = wxNewId();
+const long xScheduleFrame::ID_CHOICE_LOGIC = wxNewId();
 const long xScheduleFrame::ID_TEXTCTRL_LOGIC = wxNewId();
-const long xScheduleFrame::ID_STATICTEXT4 = wxNewId();
-const long xScheduleFrame::ID_LISTBOX_AV = wxNewId();
 const long xScheduleFrame::ID_PANEL_PLAYLIST = wxNewId();
 const long xScheduleFrame::ID_CHOICE1 = wxNewId();
 const long xScheduleFrame::ID_STATICTEXT5 = wxNewId();
@@ -84,6 +93,7 @@ END_EVENT_TABLE()
 xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
 {
     //(*Initialize(xScheduleFrame)
+    wxBoxSizer* BoxSizer4;
     wxFlexGridSizer* FlexGridSizer4;
     wxMenuItem* MenuItem2;
     wxFlexGridSizer* FlexGridSizer10;
@@ -106,6 +116,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     wxMenu* Menu2;
 
     Create(parent, id, _("xSchedule"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
+    SetClientSize(wxSize(612,327));
     {
     	wxIcon FrameIcon;
     	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("C:\\xlights\\include\\xlights.ico"))));
@@ -124,48 +135,66 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer3->AddGrowableCol(0);
     FlexGridSizer3->AddGrowableRow(1);
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-    ToggleButton1 = new wxToggleButton(PanelPlayList, ID_TOGGLEBUTTON1, _("Save List"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON1"));
-    BoxSizer1->Add(ToggleButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ToggleButton2 = new wxToggleButton(PanelPlayList, ID_TOGGLEBUTTON2, _("Play Item"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON2"));
-    BoxSizer1->Add(ToggleButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ToggleButton3 = new wxToggleButton(PanelPlayList, ID_TOGGLEBUTTON3, _("Delete Item"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON3"));
-    BoxSizer1->Add(ToggleButton3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ToggleButton4 = new wxToggleButton(PanelPlayList, ID_TOGGLEBUTTON4, _("Add Item"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON4"));
-    BoxSizer1->Add(ToggleButton4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ChoicePlayList = new wxChoice(PanelPlayList, ID_CHOICE_PLAYLIST, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_PLAYLIST"));
+    ChoicePlayList->SetSelection( ChoicePlayList->Append(_("Select play list...")) );
+    ChoicePlayList->Append(_("<new>"));
+    BoxSizer1->Add(ChoicePlayList, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonSave = new wxButton(PanelPlayList, ID_BUTTON_SAVE, _("Save"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SAVE"));
+    BoxSizer1->Add(ButtonSave, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer3->Add(BoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     GridSizer1 = new wxGridSizer(2, 2, 0, 0);
-    FlexGridSizer4 = new wxFlexGridSizer(2, 1, 0, 0);
+    FlexGridSizer4 = new wxFlexGridSizer(3, 1, 0, 0);
     FlexGridSizer4->AddGrowableCol(0);
-    FlexGridSizer4->AddGrowableRow(1);
-    StaticText1 = new wxStaticText(PanelPlayList, ID_STATICTEXT1, _("Play List"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-    FlexGridSizer4->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ListBoxPlay = new wxListBox(PanelPlayList, ID_LISTBOX_PLAY, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_LISTBOX_PLAY"));
-    FlexGridSizer4->Add(ListBoxPlay, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    GridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer5 = new wxFlexGridSizer(2, 1, 0, 0);
+    FlexGridSizer4->AddGrowableRow(2);
+    FlexGridSizer5 = new wxFlexGridSizer(0, 4, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
-    FlexGridSizer5->AddGrowableRow(1);
-    StaticText2 = new wxStaticText(PanelPlayList, ID_STATICTEXT2, _("Sequences"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-    FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ListBoxSeq = new wxListBox(PanelPlayList, ID_LISTBOX_SEQ, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_LISTBOX_SEQ"));
-    FlexGridSizer5->Add(ListBoxSeq, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    GridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer6 = new wxFlexGridSizer(2, 1, 0, 0);
+    StaticText1 = new wxStaticText(PanelPlayList, ID_STATICTEXT1, _("Play List"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    wxFont StaticText1Font(10,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    StaticText1->SetFont(StaticText1Font);
+    FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonUp = new wxButton(PanelPlayList, ID_BUTTON_UP, _("Move Up"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_UP"));
+    FlexGridSizer5->Add(ButtonUp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonDown = new wxButton(PanelPlayList, ID_BUTTON_DOWN, _("Move Down"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_DOWN"));
+    FlexGridSizer5->Add(ButtonDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonPlay = new wxButton(PanelPlayList, ID_BUTTON_PLAY, _(">"), wxDefaultPosition, wxSize(29,23), 0, wxDefaultValidator, _T("ID_BUTTON_PLAY"));
+    ButtonPlay->SetToolTip(_("Play"));
+    ButtonPlay->SetHelpText(_("Plays the currently selected item in the play list"));
+    FlexGridSizer5->Add(ButtonPlay, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer4->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
+    StaticText2 = new wxStaticText(PanelPlayList, ID_STATICTEXT2, _("Files:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    BoxSizer4->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    CheckBoxAudio = new wxCheckBox(PanelPlayList, ID_CHECKBOX_AUDIO, _("Audio"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_AUDIO"));
+    CheckBoxAudio->SetValue(false);
+    BoxSizer4->Add(CheckBoxAudio, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    CheckBoxVideo = new wxCheckBox(PanelPlayList, ID_CHECKBOX_VIDEO, _("Video"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_VIDEO"));
+    CheckBoxVideo->SetValue(false);
+    BoxSizer4->Add(CheckBoxVideo, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    CheckBoxLOR = new wxCheckBox(PanelPlayList, ID_CHECKBOX_LOR, _("LOR"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_LOR"));
+    CheckBoxLOR->SetValue(false);
+    BoxSizer4->Add(CheckBoxLOR, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    CheckBoxVixen = new wxCheckBox(PanelPlayList, ID_CHECKBOX_VIXEN, _("Vixen"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_VIXEN"));
+    CheckBoxVixen->SetValue(false);
+    BoxSizer4->Add(CheckBoxVixen, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer4->Add(BoxSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    CheckListBoxPlay = new wxCheckListBox(PanelPlayList, ID_CHECKLISTBOX_PLAY, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHECKLISTBOX_PLAY"));
+    FlexGridSizer4->Add(CheckListBoxPlay, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    GridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer6 = new wxFlexGridSizer(3, 1, 0, 0);
     FlexGridSizer6->AddGrowableCol(0);
     FlexGridSizer6->AddGrowableRow(1);
+    FlexGridSizer7 = new wxFlexGridSizer(0, 2, 0, 0);
+    FlexGridSizer7->AddGrowableCol(1);
     StaticText3 = new wxStaticText(PanelPlayList, ID_STATICTEXT3, _("Player Logic"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-    FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    wxFont StaticText3Font(10,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    StaticText3->SetFont(StaticText3Font);
+    FlexGridSizer7->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    ChoiceLogic = new wxChoice(PanelPlayList, ID_CHOICE_LOGIC, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_LOGIC"));
+    FlexGridSizer7->Add(ChoiceLogic, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer6->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     TextCtrlLogic = new wxTextCtrl(PanelPlayList, ID_TEXTCTRL_LOGIC, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL_LOGIC"));
     FlexGridSizer6->Add(TextCtrlLogic, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     GridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer7 = new wxFlexGridSizer(2, 1, 0, 0);
-    FlexGridSizer7->AddGrowableCol(0);
-    FlexGridSizer7->AddGrowableRow(1);
-    StaticText4 = new wxStaticText(PanelPlayList, ID_STATICTEXT4, _("Audio/Video Files"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-    FlexGridSizer7->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ListBoxAV = new wxListBox(PanelPlayList, ID_LISTBOX_AV, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_LISTBOX_AV"));
-    FlexGridSizer7->Add(ListBoxAV, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    GridSizer1->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer3->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     PanelPlayList->SetSizer(FlexGridSizer3);
     FlexGridSizer3->Fit(PanelPlayList);
@@ -240,12 +269,22 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     StatusBar1->SetFieldsCount(1,__wxStatusBarWidths_1);
     StatusBar1->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(StatusBar1);
-    FlexGridSizer1->Fit(this);
     FlexGridSizer1->SetSizeHints(this);
 
+    Connect(ID_CHOICE_PLAYLIST,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnChoicePlayListSelect);
+    Connect(ID_BUTTON_SAVE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonSaveClick);
+    Connect(ID_BUTTON_UP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonUpClick);
+    Connect(ID_BUTTON_DOWN,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonDownClick);
+    Connect(ID_BUTTON_PLAY,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonPlayClick);
+    Connect(ID_CHECKBOX_AUDIO,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnCheckBoxAudioClick);
+    Connect(ID_CHECKBOX_VIDEO,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnCheckBoxVideoClick);
+    Connect(ID_CHECKBOX_LOR,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnCheckBoxLORClick);
+    Connect(ID_CHECKBOX_VIXEN,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnCheckBoxVixenClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAbout);
     //*)
+
+    PlayerDlg=new PlayerDialog(this);
 
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
@@ -253,7 +292,12 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
         wxMessageBox(_("No directory specified"), _("ERROR"));
         Close();
     }
-    LoadFilesToLists();
+    scheduleFile.AssignDir( CurrentDir );
+    scheduleFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
+    UnsavedChanges=false;
+    if (scheduleFile.FileExists()) {
+        LoadFile();
+    }
 }
 
 xScheduleFrame::~xScheduleFrame()
@@ -274,25 +318,122 @@ void xScheduleFrame::OnAbout(wxCommandEvent& event)
     wxMessageBox(msg, hdg);
 }
 
-void xScheduleFrame::LoadFilesToLists()
+void xScheduleFrame::LoadFile()
 {
-    wxString filename,ext;
+
+}
+
+void xScheduleFrame::ScanForFiles()
+{
+    wxString filename;
+    bool ok;
+    int i;
     wxFileName* oName=new wxFileName();
-    wxDir* d=new wxDir(CurrentDir);
     oName->AssignDir( CurrentDir );
+
+    // if user unchecked a box, remove matching entries
+    wxArrayString s=CheckListBoxPlay->GetStrings();
+    for (i=s.GetCount()-1; i >= 0; i--) {
+        oName->SetFullName(s[i]);
+        ok=false;
+        switch (ExtType(oName->GetExt())) {
+            case 'a': ok=CheckBoxAudio->IsChecked(); break;
+            case 'v': ok=CheckBoxVideo->IsChecked(); break;
+            case 'L': ok=CheckBoxLOR->IsChecked(); break;
+            case 'V': ok=CheckBoxVixen->IsChecked(); break;
+        }
+        if (!ok) CheckListBoxPlay->Delete(i);
+    }
+
+    // scan directory for matches
+    wxDir* d=new wxDir(CurrentDir);
     if (d->GetFirst(&filename)) {
         do {
+            if (CheckListBoxPlay->FindString(filename) != wxNOT_FOUND) continue;
             oName->SetFullName(filename);
-            ext=oName->GetExt();
-            if (ext == _("vix") || ext == _("lms")) {
-                ListBoxSeq->AppendString(filename);
-            } else if (ext == _("wav") || ext == _("mp3") || ext == _("mp4") ||
-                       ext == _("mov") || ext == _("wma") || ext == _("wmv") ||
-                       ext == _("aac")) {
-                ListBoxAV->AppendString(filename);
+            ok=false;
+            switch (ExtType(oName->GetExt())) {
+                case 'a': ok=CheckBoxAudio->IsChecked(); break;
+                case 'v': ok=CheckBoxVideo->IsChecked(); break;
+                case 'L': ok=CheckBoxLOR->IsChecked(); break;
+                case 'V': ok=CheckBoxVixen->IsChecked(); break;
+            }
+            if (ok) {
+                i=CheckListBoxPlay->Append(filename);
+                CheckListBoxPlay->Check(i);
             }
         } while (d->GetNext(&filename));
     }
     delete oName;
     delete d;
+}
+
+// returns V for vixen, L for LOR, a for audio, v for video
+char xScheduleFrame::ExtType(wxString ext) {
+    if (ext == _("vix")) {
+        return 'V';
+    } else if (ext == _("lms")) {
+        return 'L';
+    } else if (CheckBoxAudio->IsChecked() &&
+               (ext == _("wav") || ext == _("mp3") ||
+                ext == _("wma") || ext == _("aac"))) {
+        return 'a';
+    } else if (CheckBoxAudio->IsChecked() &&
+               (ext == _("avi") || ext == _("mp4") ||
+                ext == _("wmv") || ext == _("mov"))) {
+        return 'v';
+    }
+    return ' ';
+}
+
+void xScheduleFrame::OnButtonSaveClick(wxCommandEvent& event)
+{
+}
+
+void xScheduleFrame::OnButtonPlayClick(wxCommandEvent& event)
+{
+    wxString filename = CheckListBoxPlay->GetStringSelection();
+    if (filename.IsEmpty()) {
+        wxMessageBox(_("Nothing selected!"), _("ERROR"));
+    } else {
+        wxFileName* oName=new wxFileName(CurrentDir, filename);
+        PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
+        if (PlayerDlg->MediaCtrl->Load(oName->GetFullPath())) {
+            PlayerDlg->Show();
+        } else {
+            wxMessageBox(_("Unable to play file!"), _("ERROR"));
+        }
+    }
+}
+
+void xScheduleFrame::OnCheckBoxAudioClick(wxCommandEvent& event)
+{
+    ScanForFiles();
+}
+
+void xScheduleFrame::OnCheckBoxVideoClick(wxCommandEvent& event)
+{
+    ScanForFiles();
+}
+
+void xScheduleFrame::OnCheckBoxLORClick(wxCommandEvent& event)
+{
+    ScanForFiles();
+}
+
+void xScheduleFrame::OnCheckBoxVixenClick(wxCommandEvent& event)
+{
+    ScanForFiles();
+}
+
+void xScheduleFrame::OnChoicePlayListSelect(wxCommandEvent& event)
+{
+}
+
+void xScheduleFrame::OnButtonUpClick(wxCommandEvent& event)
+{
+}
+
+void xScheduleFrame::OnButtonDownClick(wxCommandEvent& event)
+{
 }

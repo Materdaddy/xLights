@@ -164,7 +164,7 @@ xNetworksFrame::xNetworksFrame(wxWindow* parent,wxWindowID id)
     GridNetwork->SetColAttr(0,col0);
 
     wxArrayString ports;
-  PopulatePortChooser(&ports);
+    PopulatePortChooser(&ports);
     wxGridCellAttr* col1=new wxGridCellAttr();
     col1->SetEditor(new wxGridCellChoiceEditor(ports));
     GridNetwork->SetColAttr(1,col1);

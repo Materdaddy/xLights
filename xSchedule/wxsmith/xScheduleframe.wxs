@@ -3,6 +3,7 @@
 	<object class="wxFrame" name="xScheduleFrame">
 		<title>xSchedule</title>
 		<icon>C:\xlights\include\xlights.ico</icon>
+		<size>612,327</size>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<rows>1</rows>
@@ -30,32 +31,22 @@
 											<object class="sizeritem">
 												<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 													<object class="sizeritem">
-														<object class="wxToggleButton" name="ID_TOGGLEBUTTON1" variable="ToggleButton1" member="yes">
-															<label>Save List</label>
+														<object class="wxChoice" name="ID_CHOICE_PLAYLIST" variable="ChoicePlayList" member="yes">
+															<content>
+																<item>Select play list...</item>
+																<item>&lt;new&gt;</item>
+															</content>
+															<selection>0</selection>
+															<handler function="OnChoicePlayListSelect" entry="EVT_CHOICE" />
 														</object>
 														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 														<border>5</border>
 														<option>1</option>
 													</object>
 													<object class="sizeritem">
-														<object class="wxToggleButton" name="ID_TOGGLEBUTTON2" variable="ToggleButton2" member="yes">
-															<label>Play Item</label>
-														</object>
-														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-														<border>5</border>
-														<option>1</option>
-													</object>
-													<object class="sizeritem">
-														<object class="wxToggleButton" name="ID_TOGGLEBUTTON3" variable="ToggleButton3" member="yes">
-															<label>Delete Item</label>
-														</object>
-														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-														<border>5</border>
-														<option>1</option>
-													</object>
-													<object class="sizeritem">
-														<object class="wxToggleButton" name="ID_TOGGLEBUTTON4" variable="ToggleButton4" member="yes">
-															<label>Add Item</label>
+														<object class="wxButton" name="ID_BUTTON_SAVE" variable="ButtonSave" member="yes">
+															<label>Save</label>
+															<handler function="OnButtonSaveClick" entry="EVT_BUTTON" />
 														</object>
 														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 														<border>5</border>
@@ -73,48 +64,113 @@
 													<object class="sizeritem">
 														<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 															<cols>1</cols>
-															<rows>2</rows>
+															<rows>3</rows>
 															<growablecols>0</growablecols>
-															<growablerows>1</growablerows>
+															<growablerows>2</growablerows>
 															<object class="sizeritem">
-																<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-																	<label>Play List</label>
-																</object>
-																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																<border>5</border>
-																<option>1</option>
-															</object>
-															<object class="sizeritem">
-																<object class="wxListBox" name="ID_LISTBOX_PLAY" variable="ListBoxPlay" member="yes">
-																	<default>-1</default>
+																<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+																	<cols>4</cols>
+																	<growablecols>0</growablecols>
+																	<object class="sizeritem">
+																		<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+																			<label>Play List</label>
+																			<font>
+																				<size>10</size>
+																				<weight>bold</weight>
+																			</font>
+																		</object>
+																		<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxButton" name="ID_BUTTON_UP" variable="ButtonUp" member="yes">
+																			<label>Move Up</label>
+																			<handler function="OnButtonUpClick" entry="EVT_BUTTON" />
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxButton" name="ID_BUTTON_DOWN" variable="ButtonDown" member="yes">
+																			<label>Move Down</label>
+																			<handler function="OnButtonDownClick" entry="EVT_BUTTON" />
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxButton" name="ID_BUTTON_PLAY" variable="ButtonPlay" member="yes">
+																			<label>&gt;</label>
+																			<size>29,23</size>
+																			<tooltip>Play</tooltip>
+																			<help>Plays the currently selected item in the play list</help>
+																			<handler function="OnButtonPlayClick" entry="EVT_BUTTON" />
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
 																</object>
 																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
 																<option>1</option>
 															</object>
-														</object>
-														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-														<border>5</border>
-														<option>1</option>
-													</object>
-													<object class="sizeritem">
-														<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
-															<cols>1</cols>
-															<rows>2</rows>
-															<growablecols>0</growablecols>
-															<growablerows>1</growablerows>
 															<object class="sizeritem">
-																<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-																	<label>Sequences</label>
+																<object class="wxBoxSizer" variable="BoxSizer4" member="no">
+																	<object class="sizeritem">
+																		<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+																			<label>Files:</label>
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxCheckBox" name="ID_CHECKBOX_AUDIO" variable="CheckBoxAudio" member="yes">
+																			<label>Audio</label>
+																			<handler function="OnCheckBoxAudioClick" entry="EVT_CHECKBOX" />
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxCheckBox" name="ID_CHECKBOX_VIDEO" variable="CheckBoxVideo" member="yes">
+																			<label>Video</label>
+																			<handler function="OnCheckBoxVideoClick" entry="EVT_CHECKBOX" />
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxCheckBox" name="ID_CHECKBOX_LOR" variable="CheckBoxLOR" member="yes">
+																			<label>LOR</label>
+																			<handler function="OnCheckBoxLORClick" entry="EVT_CHECKBOX" />
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxCheckBox" name="ID_CHECKBOX_VIXEN" variable="CheckBoxVixen" member="yes">
+																			<label>Vixen</label>
+																			<handler function="OnCheckBoxVixenClick" entry="EVT_CHECKBOX" />
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
 																<option>1</option>
 															</object>
 															<object class="sizeritem">
-																<object class="wxListBox" name="ID_LISTBOX_SEQ" variable="ListBoxSeq" member="yes">
-																	<default>-1</default>
-																</object>
+																<object class="wxCheckListBox" name="ID_CHECKLISTBOX_PLAY" variable="CheckListBoxPlay" member="yes" />
 																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
 																<option>1</option>
@@ -127,46 +183,38 @@
 													<object class="sizeritem">
 														<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 															<cols>1</cols>
-															<rows>2</rows>
+															<rows>3</rows>
 															<growablecols>0</growablecols>
 															<growablerows>1</growablerows>
 															<object class="sizeritem">
-																<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-																	<label>Player Logic</label>
+																<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+																	<cols>2</cols>
+																	<growablecols>1</growablecols>
+																	<object class="sizeritem">
+																		<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+																			<label>Player Logic</label>
+																			<font>
+																				<size>10</size>
+																				<weight>bold</weight>
+																			</font>
+																		</object>
+																		<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxChoice" name="ID_CHOICE_LOGIC" variable="ChoiceLogic" member="yes" />
+																		<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
 																</object>
-																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
 																<option>1</option>
 															</object>
 															<object class="sizeritem">
 																<object class="wxTextCtrl" name="ID_TEXTCTRL_LOGIC" variable="TextCtrlLogic" member="yes" />
-																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																<border>5</border>
-																<option>1</option>
-															</object>
-														</object>
-														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-														<border>5</border>
-														<option>1</option>
-													</object>
-													<object class="sizeritem">
-														<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
-															<cols>1</cols>
-															<rows>2</rows>
-															<growablecols>0</growablecols>
-															<growablerows>1</growablerows>
-															<object class="sizeritem">
-																<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-																	<label>Audio/Video Files</label>
-																</object>
-																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																<border>5</border>
-																<option>1</option>
-															</object>
-															<object class="sizeritem">
-																<object class="wxListBox" name="ID_LISTBOX_AV" variable="ListBoxAV" member="yes">
-																	<default>-1</default>
-																</object>
 																<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
 																<option>1</option>
