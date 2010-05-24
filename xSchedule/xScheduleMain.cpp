@@ -119,7 +119,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     SetClientSize(wxSize(612,327));
     {
     	wxIcon FrameIcon;
-    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("C:\\xlights\\include\\xlights.ico"))));
+    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("..\\include\\xlights.ico"))));
     	SetIcon(FrameIcon);
     }
     FlexGridSizer1 = new wxFlexGridSizer(1, 1, 0, 0);

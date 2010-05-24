@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="DebugWindows" />
-	<File name="PlayerDialog.cpp" open="1" top="0" tabpos="5">
+	<File name="PlayerDialog.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="3262" topLine="101" />
 	</File>
-	<File name="PlayerDialog.h" open="1" top="0" tabpos="6">
+	<File name="PlayerDialog.h" open="1" top="0" tabpos="4">
 		<Cursor position="1103" topLine="0" />
 	</File>
-	<File name="xScheduleMain.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="19536" topLine="350" />
+	<File name="xScheduleMain.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="19527" topLine="350" />
 	</File>
 	<File name="xScheduleMain.h" open="1" top="0" tabpos="1">
 		<Cursor position="4362" topLine="112" />

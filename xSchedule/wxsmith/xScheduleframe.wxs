@@ -2,7 +2,7 @@
 <wxsmith>
 	<object class="wxFrame" name="xScheduleFrame">
 		<title>xSchedule</title>
-		<icon>C:\xlights\include\xlights.ico</icon>
+		<icon>..\include\xlights.ico</icon>
 		<size>612,327</size>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>

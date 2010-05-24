@@ -1579,7 +1579,7 @@
 1269923872 c:\xlights\xmenu\mainmenuapp.h
 	<wx/app.h>
 
-1274055108 c:\xlights\xmenu\mainmenumain.h
+1274723551 c:\xlights\xmenu\mainmenumain.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>
@@ -1590,7 +1590,73 @@
 	<wx/statusbr.h>
 	<wx/config.h>
 	<wx/stdpaths.h>
+	"NetworkDialog.h"
 	"../include/globals.h"
 
-1274040441 c:\xlights\include\globals.h
+1274553365 c:\xlights\include\globals.h
+
+1274722834 c:\xlights\xmenu\networkdialog.h
+	<wx/sizer.h>
+	<wx/panel.h>
+	<wx/grid.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/config.h>
+	<wx/stdpaths.h>
+	<wx/filename.h>
+	"../include/globals.h"
+	"../include/tinyxml.h"
+
+1274723617 source:c:\xlights\xmenu\mainmenumain.cpp
+	"wx_pch.h"
+	"MainMenuMain.h"
+	<wx/msgdlg.h>
+	<wx/filename.h>
+	<wx/config.h>
+	<wx/utils.h>
+	<wx/bitmap.h>
+	<wx/icon.h>
+	<wx/font.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+
+1269923870 c:\xlights\include\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"tinystr.h"
+
+1269923870 c:\xlights\include\tinystr.h
+	<assert.h>
+	<string.h>
+
+1274723826 source:c:\xlights\xmenu\networkdialog.cpp
+	"NetworkDialog.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/msgdlg.h>
+	"../include/tinyxml.cpp"
+	"../include/tinyxmlerror.cpp"
+	"../include/tinyxmlparser.cpp"
+
+1269923870 c:\xlights\include\tinyxml.cpp
+	<ctype.h>
+	<sstream>
+	<iostream>
+	"tinyxml.h"
+
+1269923870 c:\xlights\include\tinyxmlerror.cpp
+	"tinyxml.h"
+
+1269923870 c:\xlights\include\tinyxmlparser.cpp
+	<ctype.h>
+	<stddef.h>
+	"tinyxml.h"
+	<windows.h>
 

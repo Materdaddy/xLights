@@ -23,6 +23,7 @@
 
 #include <wx/config.h>
 #include <wx/stdpaths.h>
+#include "NetworkDialog.h"
 #include "../include/globals.h"
 
 class MainMenuFrame: public wxFrame
@@ -82,6 +83,7 @@ class MainMenuFrame: public wxFrame
         wxString CurrentDir;
         wxString ThisExe;
         void Exec(wxString program);
+        void SetButtonEnable();
 
         DECLARE_EVENT_TABLE()
 };

@@ -5,13 +5,11 @@
 		<Option title="MainMenu" />
 		<Option pch_mode="0" />
 		<Option compiler="gcc" />
-		<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
-		<Option type="0" />
-		<Option projectLinkerOptionsRelation="2" />
 		<Build>
 			<Target title="DebugWindows">
-				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-pipe" />
@@ -34,8 +32,9 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseWindows">
-				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-pipe" />
@@ -58,8 +57,9 @@
 				</Linker>
 			</Target>
 			<Target title="DebugLinux">
-				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="`wx-config --cflags`" />
@@ -74,8 +74,9 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseLinux">
-				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="`wx-config --cflags`" />
@@ -94,15 +95,16 @@
 		<Compiler>
 			<Add option="-DwxUSE_UNICODE" />
 		</Compiler>
-		<Unit filename="resource.rc">
-			<Option compilerVar="WINDRES" />
-		</Unit>
 		<Unit filename="MainMenuApp.cpp" />
 		<Unit filename="MainMenuApp.h" />
 		<Unit filename="MainMenuMain.cpp" />
 		<Unit filename="MainMenuMain.h" />
-		<Unit filename="wx_pch.h">
+		<Unit filename="NetworkDialog.cpp" />
+		<Unit filename="NetworkDialog.h" />
+		<Unit filename="resource.rc">
+			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="wx_pch.h" />
 		<Unit filename="wxsmith\MainMenuframe.wxs" />
 		<Extensions>
 			<code_completion />
@@ -112,6 +114,7 @@
 				<gui name="wxWidgets" src="MainMenuApp.cpp" main="MainMenuFrame" init_handlers="necessary" language="CPP" />
 				<resources>
 					<wxFrame wxs="wxsmith/MainMenuframe.wxs" src="MainMenuMain.cpp" hdr="MainMenuMain.h" name="MainMenuFrame" language="CPP" />
+					<wxDialog wxs="wxsmith/NetworkDialog.wxs" src="NetworkDialog.cpp" hdr="NetworkDialog.h" name="NetworkDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

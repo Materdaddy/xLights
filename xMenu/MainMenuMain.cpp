@@ -184,15 +184,19 @@ void MainMenuFrame::OnAbout(wxCommandEvent& event)
 
 void MainMenuFrame::SetDir(const wxString& dirname)
 {
-    bool FileExists;
-    wxFileName channelFile;
-
     CurrentDir=dirname;
     StaticTextDirName->SetLabel(CurrentDir);
     ButtonNetworkSetup->Enable();
-    channelFile.AssignDir( CurrentDir );
-    channelFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
-    FileExists = channelFile.FileExists();
+    SetButtonEnable();
+}
+
+void MainMenuFrame::SetButtonEnable() {
+    bool FileExists;
+    wxFileName netFile;
+
+    netFile.AssignDir( CurrentDir );
+    netFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
+    FileExists = netFile.FileExists();
     //ButtonSequence->Enable(FileExists);
     ButtonSchedule->Enable(FileExists);
     ButtonTest->Enable(FileExists);
@@ -223,7 +227,9 @@ void MainMenuFrame::Exec(wxString program)
 
 void MainMenuFrame::OnButtonNetworkSetupClick(wxCommandEvent& event)
 {
-    Exec(_("xNetworks"));
+	NetworkDialog NetDlg(this);
+    NetDlg.ShowModal();
+    SetButtonEnable();
 }
 
 void MainMenuFrame::OnButtonSequenceClick(wxCommandEvent& event)
