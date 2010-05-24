@@ -321,6 +321,7 @@ void xTesterFrame::LoadFile()
 {
     wxString FileName=networkFile.GetFullPath();
     TiXmlDocument doc( FileName.mb_str() );
+    char* s;
     if (doc.LoadFile()) {
         int r=0;
         for( TiXmlElement* e=doc.RootElement()->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
@@ -338,7 +339,7 @@ void xTesterFrame::LoadFile()
     }
 }
 
-NetworkInfo* xTesterFrame::AddNetwork(wxString NetworkType, wxString ComPort, wxString BaudRate, int MaxChannels)
+NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels)
 {
     NetworkInfo* NetInfo=new NetworkInfo();
     NetInfo->NetworkType=NetworkType;
@@ -369,7 +370,7 @@ NetworkInfo* xTesterFrame::AddNetwork(wxString NetworkType, wxString ComPort, wx
     wxArrayString chNames;
     if (net3 == _("LOR")) {
         for (int i=0; i < MaxChannels; i++) {
-            chNames.Add( wxString::Format(_T("Unit %d.%02d"), (i >> 4)+1, (i % 4)+1 ));
+            chNames.Add( wxString::Format(_T("Unit %d.%02d"), (i >> 4)+1, (i & 0x0F)+1 ));
         }
     } else {
         for (int i=1; i <= MaxChannels; i++) {
@@ -391,12 +392,12 @@ NetworkInfo* xTesterFrame::AddNetwork(wxString NetworkType, wxString ComPort, wx
         }
     }
     catch (const char *str) {
-        wxString msg(str, wxConvUTF8);
-        wxMessageBox(msg, _("Exception Raised"));
+        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s"),NetworkType.c_str(),ComPort.c_str());
+        wxMessageBox(msg, _("Communication Error"));
     }
     catch (char *str) {
-        wxString msg(str, wxConvUTF8);
-        wxMessageBox(msg, _("Exception Raised"));
+        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s"),NetworkType.c_str(),ComPort.c_str());
+        wxMessageBox(msg, _("Communication Error"));
     }
 
     return NetInfo;

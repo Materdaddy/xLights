@@ -135,7 +135,7 @@ class xTesterFrame: public wxFrame
         wxFileName networkFile;
         WX_DEFINE_ARRAY(NetworkInfo*, NetworkArray);
         NetworkArray Networks;
-        NetworkInfo* AddNetwork(wxString NetworkType, wxString ComPort, wxString BaudRate, int MaxChannels);
+        NetworkInfo* AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         wxTimer timer;
         wxDateTime starttime;
 

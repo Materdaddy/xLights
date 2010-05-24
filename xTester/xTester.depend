@@ -2497,7 +2497,7 @@
 1270311663 c:\xlights\xtester\xtesterapp.h
 	<wx/app.h>
 
-1274190425 c:\xlights\xtester\xtestermain.h
+1274669846 c:\xlights\xtester\xtestermain.h
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -2534,7 +2534,7 @@
 1270407146 source:c:\xlights\xtester\resource.rc
 	"wx/msw/wx.rc"
 
-1274040441 c:\xlights\include\globals.h
+1274553365 c:\xlights\include\globals.h
 
 1269923870 c:\xlights\include\tinyxml.h
 	<ctype.h>
