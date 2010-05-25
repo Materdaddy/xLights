@@ -102,11 +102,11 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     wxBoxSizer* BoxSizer1;
     wxMenuBar* MenuBar1;
     wxMenu* Menu2;
-
+    
     Create(parent, wxID_ANY, _("xTester"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     {
     	wxIcon FrameIcon;
-    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("..\\include\\xlights.ico"))));
+    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("../include/xlights.ico"))));
     	SetIcon(FrameIcon);
     }
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
@@ -118,7 +118,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("2. Select test"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Notebook2 = new wxNotebook(Panel3, ID_NOTEBOOK2, wxDefaultPosition, wxSize(191,181), 0, _T("ID_NOTEBOOK2"));
+    Notebook2 = new wxNotebook(Panel3, ID_NOTEBOOK2, wxDefaultPosition, wxSize(191,220), 0, _T("ID_NOTEBOOK2"));
     FlexGridSizer2->Add(Notebook2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Notebook1 = new wxNotebook(Panel3, ID_NOTEBOOK1, wxDefaultPosition, wxSize(219,161), 0, _T("ID_NOTEBOOK1"));
     Panel_Dim = new wxPanel(Notebook1, ID_PANEL1, wxPoint(29,39), wxSize(211,136), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
@@ -170,7 +170,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     SetStatusBar(StatusBar1);
     BoxSizer1->Fit(this);
     BoxSizer1->SetSizeHints(this);
-
+    
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xTesterFrame::OnButton1Click);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnAbout);
@@ -217,8 +217,10 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
     static int LastSequenceSpeed;
     static long NextSequenceStart = -1;
     static wxArrayInt chArray;
-    static int interval,seqidx=9999,alt=0;
-    int v,n,maxch,ch,i;
+    static int interval;
+    static unsigned int seqidx=9999,alt=0;
+    int v,n,maxch,ch;
+    unsigned int i;
     wxCheckListBox* lb;
     int netidx = Notebook2->GetSelection(); // which network
     lb = Networks[netidx]->ListBox;
@@ -288,9 +290,7 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
                 v=Slider3->GetValue();  // 0-100
                 if (v != LastSequenceSpeed) {
                     interval = 1600 - v*15;
-                    if (seqidx < chArray.Count()) {
-                        NextSequenceStart = curtime + interval;
-                    }
+                    NextSequenceStart = curtime + interval;
                     LastSequenceSpeed = v;
                     StatusBar1->SetStatusText(wxString::Format(_("Alternating %d channels, speed=%d"),chArray.Count(),interval));
                 }
@@ -321,7 +321,6 @@ void xTesterFrame::LoadFile()
 {
     wxString FileName=networkFile.GetFullPath();
     TiXmlDocument doc( FileName.mb_str() );
-    char* s;
     if (doc.LoadFile()) {
         int r=0;
         for( TiXmlElement* e=doc.RootElement()->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
@@ -392,12 +391,14 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
         }
     }
     catch (const char *str) {
-        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s"),NetworkType.c_str(),ComPort.c_str());
-        wxMessageBox(msg, _("Communication Error"));
+        wxString errmsg(str,wxConvUTF8);
+        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
+        wxMessageBox(msg+errmsg, _("Communication Error"));
     }
     catch (char *str) {
-        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s"),NetworkType.c_str(),ComPort.c_str());
-        wxMessageBox(msg, _("Communication Error"));
+        wxString errmsg(str,wxConvUTF8);
+        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
+        wxMessageBox(msg+errmsg, _("Communication Error"));
     }
 
     return NetInfo;

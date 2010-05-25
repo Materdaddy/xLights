@@ -2,7 +2,7 @@
 <wxsmith>
 	<object class="wxFrame" name="xTesterFrame">
 		<title>xTester</title>
-		<icon>..\include\xlights.ico</icon>
+		<icon>../include/xlights.ico</icon>
 		<id_arg>0</id_arg>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 			<object class="sizeritem">
@@ -31,7 +31,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxNotebook" name="ID_NOTEBOOK2" variable="Notebook2" member="yes">
-								<size>191,181</size>
+								<size>191,220</size>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>

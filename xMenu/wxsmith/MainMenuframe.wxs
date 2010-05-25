@@ -2,7 +2,7 @@
 <wxsmith>
 	<object class="wxFrame" name="MainMenuFrame">
 		<title>xLights</title>
-		<icon>..\include\xlights.ico</icon>
+		<icon>../include/xlights.ico</icon>
 		<size>204,368</size>
 		<id_arg>0</id_arg>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">

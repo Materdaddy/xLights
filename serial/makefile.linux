@@ -34,21 +34,21 @@ DEBUG ?= 0
 
 CPPDEPS = -MT$@ -MF`echo $@ | sed -e 's,\.o$$,.d,'` -MD -MP
 CTB_LIB_CXXFLAGS = $(____DEBUG) $(____DEBUG_1) -D_THREAD_SAFE -pthread \
-	$(__OPTIMIZE_FLAG) -I./include $(CPPFLAGS) $(CXXFLAGS)
+	$(__OPTIMIZE_FLAG) -I../include $(CPPFLAGS) $(CXXFLAGS)
 CTB_LIB_OBJECTS =  \
-	$(LIB)/ctb_lib_fifo.o \
-	$(LIB)/ctb_lib_serportx.o \
-	$(LIB)/ctb_lib_serport.o 
+	./ctb_lib_fifo.o \
+	./ctb_lib_serportx.o \
+	./ctb_lib_serport.o 
 CTB_DLL_CXXFLAGS = $(____DEBUG) $(____DEBUG_1) -D_THREAD_SAFE -pthread \
-	$(__OPTIMIZE_FLAG) -I./include -fPIC -DPIC $(CPPFLAGS) $(CXXFLAGS)
+	$(__OPTIMIZE_FLAG) -I../include -fPIC -DPIC $(CPPFLAGS) $(CXXFLAGS)
 CTB_DLL_OBJECTS =  \
-	$(LIB)/ctb_dll_fifo.o \
-	$(LIB)/ctb_dll_serportx.o \
-	$(LIB)/ctb_dll_serport.o 
+	./ctb_dll_fifo.o \
+	./ctb_dll_serportx.o \
+	./ctb_dll_serport.o 
 
 ### Conditionally set variables: ###
 
-LIB = ./lib
+LIB = ../bin
 ifeq ($(DEBUG),1)
 LIBFLAG = d
 endif
@@ -77,8 +77,8 @@ endif
 all: $(LIB)/libctb.a $(LIB)/libctb.so
 
 clean: 
-	rm -f $(LIB)/*.o
-	rm -f $(LIB)/*.d
+	rm -f ./*.o
+	rm -f ./*.d
 	rm -f $(LIB)/libctb.a
 	rm -f $(LIB)/libctb.so
 
@@ -90,22 +90,22 @@ $(LIB)/libctb.a: $(CTB_LIB_OBJECTS)
 $(LIB)/libctb.so: $(CTB_DLL_OBJECTS)
 	./g++.sh $(LINK_DLL_FLAGS) -fPIC -o $@ $(CTB_DLL_OBJECTS)  $(____DEBUG_1) -pthread -L./lib $(LDFLAGS)  -lpthread
 
-$(LIB)/ctb_lib_fifo.o: ./fifo.cpp ./fifo.h
+./ctb_lib_fifo.o: ./fifo.cpp ./fifo.h
 	./g++.sh -c -o $@ $(CTB_LIB_CXXFLAGS) $(CPPDEPS) $<
 
-$(LIB)/ctb_lib_serportx.o: ./serportx.cpp ./serportx.h ./fifo.h
+./ctb_lib_serportx.o: ./serportx.cpp ./serportx.h ./fifo.h
 	./g++.sh -c -o $@ $(CTB_LIB_CXXFLAGS) $(CPPDEPS) $<
 
-$(LIB)/ctb_lib_serport.o: ./linux/serport.cpp ./linux/serport.h
+./ctb_lib_serport.o: ./linux/serport.cpp ./linux/serport.h
 	./g++.sh -c -o $@ $(CTB_LIB_CXXFLAGS) $(CPPDEPS) $<
 
-$(LIB)/ctb_dll_fifo.o: ./fifo.cpp ./fifo.h
+./ctb_dll_fifo.o: ./fifo.cpp ./fifo.h
 	./g++.sh -c -o $@ $(CTB_DLL_CXXFLAGS) $(CPPDEPS) $<
 
-$(LIB)/ctb_dll_serportx.o: ./serportx.cpp ./serportx.h
+./ctb_dll_serportx.o: ./serportx.cpp ./serportx.h
 	./g++.sh -c -o $@ $(CTB_DLL_CXXFLAGS) $(CPPDEPS) $<
 
-$(LIB)/ctb_dll_serport.o: ./linux/serport.cpp ./linux/serport.h
+./ctb_dll_serport.o: ./linux/serport.cpp ./linux/serport.h
 	./g++.sh -c -o $@ $(CTB_DLL_CXXFLAGS) $(CPPDEPS) $<
 
 .PHONY: all clean 

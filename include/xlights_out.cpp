@@ -26,6 +26,7 @@ protected:
   long timer_msec;
 
 public:
+
   xNetwork() {
     serptr=0;
     timer_msec=0;
@@ -44,16 +45,16 @@ public:
   virtual void Initialize(int numchannels, int maxintensity) = 0;
 
   virtual void InitSerialPort(const char* portname, int baudrate) {
+    static char errmsg[100];
     serptr=new ctb::SerialPort();
     int errcode=serptr->Open(portname, baudrate, "8N1");
-    if (errcode) {
-      char msg[100];
-      sprintf(msg,"unable to open serial port, error code=%d",errcode);
-      throw msg;
+    if (errcode < 0) {
+      sprintf(errmsg,"unable to open serial port, error code=%d",errcode);
+      throw errmsg;
     }
   };
 
-  virtual int TimerStart(long msec) {
+  virtual void TimerStart(long msec) {
     timer_msec=msec;
   };
 
@@ -212,14 +213,14 @@ public:
   };
 
   ~xNetwork_Dimmer() {
-    for(int i=0; i < channels.size(); ++i) {
+    for(unsigned int i=0; i < channels.size(); ++i) {
       delete channels[i];
     }
     if (serptr) delete serptr;
   };
 
   // callbacks return true if they are finished, false if they will continue to run
-  virtual int TimerStart(long msec) {
+  virtual void TimerStart(long msec) {
     timer_msec=msec;
     // process list of channels needing callbacks
     std::list<int>::iterator temp,it = timerCallbackList.begin();
@@ -260,7 +261,7 @@ public:
   };
 
   virtual void alloff () {
-    for(int i=0; i < channels.size(); ++i) {
+    for(unsigned int i=0; i < channels.size(); ++i) {
       off(i);
     }
   };
@@ -278,7 +279,9 @@ protected:
 
 public:
   void Initialize(int numchannels, int maxintensity) {
-    if (numchannels > 512) throw "max channels on DMX is 512";
+    if (numchannels > 512) {
+      throw "max channels on DMX is 512";
+    }
     int len=513;   // entec supports this, but lynx does not: len=numchannels < 24 ? 25 : numchannels+1;
     datalen=len+5;
     data[0]=0x7E;               // start of message
@@ -319,8 +322,12 @@ protected:
 
 public:
   void Initialize(int numchannels, int maxintensity) {
-    if (numchannels > 1016) throw "max channels on a Renard network is 1016";
-    if (numchannels % 8 != 0) throw "Number of Renard channels must be a multiple of 8";
+    if (numchannels > 1016) {
+      throw "max channels on a Renard network is 1016";
+    }
+    if (numchannels % 8 != 0) {
+      throw "Number of Renard channels must be a multiple of 8";
+    }
     datalen=numchannels+2;
     data[0]=0x7E;               // start of message
     data[1]=0x80;               // start address
