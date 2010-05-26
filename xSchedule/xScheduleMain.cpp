@@ -13,6 +13,7 @@
 #include <wx/filename.h>
 
 //(*InternalHeaders(xScheduleFrame)
+#include <wx/artprov.h>
 #include <wx/bitmap.h>
 #include <wx/icon.h>
 #include <wx/font.h>
@@ -56,8 +57,8 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 const long xScheduleFrame::ID_CHOICE_PLAYLIST = wxNewId();
 const long xScheduleFrame::ID_BUTTON_SAVE = wxNewId();
 const long xScheduleFrame::ID_STATICTEXT1 = wxNewId();
-const long xScheduleFrame::ID_BUTTON_UP = wxNewId();
-const long xScheduleFrame::ID_BUTTON_DOWN = wxNewId();
+const long xScheduleFrame::ID_BITMAPBUTTON_UP = wxNewId();
+const long xScheduleFrame::ID_BITMAPBUTTON_DOWN = wxNewId();
 const long xScheduleFrame::ID_BUTTON_PLAY = wxNewId();
 const long xScheduleFrame::ID_STATICTEXT2 = wxNewId();
 const long xScheduleFrame::ID_CHECKBOX_AUDIO = wxNewId();
@@ -152,10 +153,14 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     wxFont StaticText1Font(10,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText1->SetFont(StaticText1Font);
     FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonUp = new wxButton(PanelPlayList, ID_BUTTON_UP, _("Move Up"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_UP"));
-    FlexGridSizer5->Add(ButtonUp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonDown = new wxButton(PanelPlayList, ID_BUTTON_DOWN, _("Move Down"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_DOWN"));
-    FlexGridSizer5->Add(ButtonDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BitmapButtonUp = new wxBitmapButton(PanelPlayList, ID_BITMAPBUTTON_UP, wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_GO_UP")),wxART_BUTTON), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON_UP"));
+    BitmapButtonUp->SetDefault();
+    BitmapButtonUp->SetToolTip(_("Move Up"));
+    FlexGridSizer5->Add(BitmapButtonUp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BitmapButtonDown = new wxBitmapButton(PanelPlayList, ID_BITMAPBUTTON_DOWN, wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_GO_DOWN")),wxART_BUTTON), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON_DOWN"));
+    BitmapButtonDown->SetDefault();
+    BitmapButtonDown->SetToolTip(_("Move Down"));
+    FlexGridSizer5->Add(BitmapButtonDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonPlay = new wxButton(PanelPlayList, ID_BUTTON_PLAY, _(">"), wxDefaultPosition, wxSize(29,23), 0, wxDefaultValidator, _T("ID_BUTTON_PLAY"));
     ButtonPlay->SetToolTip(_("Play"));
     ButtonPlay->SetHelpText(_("Plays the currently selected item in the play list"));
@@ -273,8 +278,8 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
 
     Connect(ID_CHOICE_PLAYLIST,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnChoicePlayListSelect);
     Connect(ID_BUTTON_SAVE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonSaveClick);
-    Connect(ID_BUTTON_UP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonUpClick);
-    Connect(ID_BUTTON_DOWN,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonDownClick);
+    Connect(ID_BITMAPBUTTON_UP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonUpClick);
+    Connect(ID_BITMAPBUTTON_DOWN,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonDownClick);
     Connect(ID_BUTTON_PLAY,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonPlayClick);
     Connect(ID_CHECKBOX_AUDIO,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnCheckBoxAudioClick);
     Connect(ID_CHECKBOX_VIDEO,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnCheckBoxVideoClick);
@@ -432,8 +437,28 @@ void xScheduleFrame::OnChoicePlayListSelect(wxCommandEvent& event)
 
 void xScheduleFrame::OnButtonUpClick(wxCommandEvent& event)
 {
+    int idx = CheckListBoxPlay->GetSelection();
+    if (idx == wxNOT_FOUND) return;
+    if (idx == 0) return;
+    wxString s = CheckListBoxPlay->GetString((unsigned int)idx);
+    bool c = CheckListBoxPlay->IsChecked((unsigned int)idx);
+    CheckListBoxPlay->Delete((unsigned int)idx);
+    idx--;
+    CheckListBoxPlay->Insert(s, (unsigned int)idx);
+    CheckListBoxPlay->Check((unsigned int)idx, c);
+    CheckListBoxPlay->Select(idx);
 }
 
 void xScheduleFrame::OnButtonDownClick(wxCommandEvent& event)
 {
+    int idx = CheckListBoxPlay->GetSelection();
+    if (idx == wxNOT_FOUND) return;
+    if (idx == CheckListBoxPlay->GetCount()-1) return;
+    wxString s = CheckListBoxPlay->GetString((unsigned int)idx);
+    bool c = CheckListBoxPlay->IsChecked((unsigned int)idx);
+    CheckListBoxPlay->Delete((unsigned int)idx);
+    idx++;
+    CheckListBoxPlay->Insert(s, (unsigned int)idx);
+    CheckListBoxPlay->Check((unsigned int)idx, c);
+    CheckListBoxPlay->Select(idx);
 }

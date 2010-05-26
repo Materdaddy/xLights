@@ -84,8 +84,10 @@
 																		<option>1</option>
 																	</object>
 																	<object class="sizeritem">
-																		<object class="wxButton" name="ID_BUTTON_UP" variable="ButtonUp" member="yes">
-																			<label>Move Up</label>
+																		<object class="wxBitmapButton" name="ID_BITMAPBUTTON_UP" variable="BitmapButtonUp" member="yes">
+																			<bitmap stock_id="wxART_GO_UP" stock_client="wxART_BUTTON" />
+																			<default>1</default>
+																			<tooltip>Move Up</tooltip>
 																			<handler function="OnButtonUpClick" entry="EVT_BUTTON" />
 																		</object>
 																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -93,8 +95,10 @@
 																		<option>1</option>
 																	</object>
 																	<object class="sizeritem">
-																		<object class="wxButton" name="ID_BUTTON_DOWN" variable="ButtonDown" member="yes">
-																			<label>Move Down</label>
+																		<object class="wxBitmapButton" name="ID_BITMAPBUTTON_DOWN" variable="BitmapButtonDown" member="yes">
+																			<bitmap stock_id="wxART_GO_DOWN" stock_client="wxART_BUTTON" />
+																			<default>1</default>
+																			<tooltip>Move Down</tooltip>
 																			<handler function="OnButtonDownClick" entry="EVT_BUTTON" />
 																		</object>
 																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

@@ -22,6 +22,7 @@
 #include <wx/panel.h>
 #include <wx/grid.h>
 #include <wx/choice.h>
+#include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
@@ -63,8 +64,8 @@ class xScheduleFrame: public wxFrame
         static const long ID_CHOICE_PLAYLIST;
         static const long ID_BUTTON_SAVE;
         static const long ID_STATICTEXT1;
-        static const long ID_BUTTON_UP;
-        static const long ID_BUTTON_DOWN;
+        static const long ID_BITMAPBUTTON_UP;
+        static const long ID_BITMAPBUTTON_DOWN;
         static const long ID_BUTTON_PLAY;
         static const long ID_STATICTEXT2;
         static const long ID_CHECKBOX_AUDIO;
@@ -95,6 +96,7 @@ class xScheduleFrame: public wxFrame
         //(*Declarations(xScheduleFrame)
         wxPanel* PanelPlayList;
         wxCheckBox* CheckBoxVideo;
+        wxBitmapButton* BitmapButtonDown;
         wxNotebook* Notebook1;
         wxStaticText* StaticText2;
         wxChoice* Choice3;
@@ -107,12 +109,11 @@ class xScheduleFrame: public wxFrame
         wxGrid* Grid1;
         wxToggleButton* ToggleButton6;
         wxToggleButton* ToggleButton5;
-        wxButton* ButtonUp;
         wxStaticText* StaticText5;
         wxButton* ButtonSave;
         wxPanel* PanelCal;
         wxStatusBar* StatusBar1;
-        wxButton* ButtonDown;
+        wxBitmapButton* BitmapButtonUp;
         wxCheckBox* CheckBoxLOR;
         wxChoice* ChoiceLogic;
         wxButton* ButtonPlay;
