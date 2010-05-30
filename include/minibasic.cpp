@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <limits.h>
@@ -816,6 +817,127 @@ double do_pi(void) {
   return acos(0.0) * 2.0;
 }
 
+// return # of days since 1/1/1900
+// note that vbscript incorrectly treats the year 1900 as a leap year
+// this function treats 1900 correctly - so it matches vbscript values starting with 3/1/1900
+double dateserial(int y, int m, int d) {
+  int jd=d+1461*(y+4800+(m-14)/12)/4+367*(m-2-(m-14)/12*12)/12-3*((y+4900+(m-14)/12)/100)/4 - 2447094;
+  return (double)jd;
+}
+
+double timeserial(int h, int m, double s) {
+  return (double)h/24.0 + (double)m/24.0/60.0 + s/24.0/60.0/60.0;
+}
+
+double do_dateserial(void) {
+  match(OPAREN);
+  int y = integer( expr() );
+  match(COMMA);
+  int m = integer( expr() );
+  match(COMMA);
+  int d = integer( expr() );
+  match(CPAREN);
+  return dateserial(y,m,d);
+}
+
+double do_timeserial(void) {
+  match(OPAREN);
+  int h = integer( expr() );
+  match(COMMA);
+  int m = integer( expr() );
+  match(COMMA);
+  double s = expr();
+  match(CPAREN);
+  return timeserial(h,m,s);
+}
+
+double do_now(void) {
+  time_t rawtime;
+  struct tm* timeinfo;
+  rawtime=time(NULL);
+  timeinfo = localtime ( &rawtime );
+  return dateserial(1900+timeinfo->tm_year, 1+timeinfo->tm_mon, timeinfo->tm_mday) + 
+         timeserial(timeinfo->tm_hour, timeinfo->tm_min, (double)timeinfo->tm_sec);
+}
+
+double do_date(void) {
+  time_t rawtime;
+  struct tm* timeinfo;
+  rawtime=time(NULL);
+  timeinfo = localtime ( &rawtime );
+  return dateserial(1900+timeinfo->tm_year, 1+timeinfo->tm_mon, timeinfo->tm_mday);
+}
+
+void dateparts(double datetime, int* year, int* month, int* day) {
+  int L= floor(datetime)+68569+2415019;
+  int N= 4*L/146097;
+  L= L-(146097*N+3)/4;
+  int I= 4000*(L+1)/1461001;
+  L= L-1461*I/4+31;
+  int J= 80*L/2447;
+  *day= L-2447*J/80;
+  L= J/11;
+  *month= J+2-12*L;
+  *year= 100*(N-49)+I+L;
+}
+
+double do_year(void) {
+  match(OPAREN);
+  double answer = expr();
+  match(CPAREN);
+  int y,m,d;
+  dateparts(answer,&y,&m,&d);
+  return (double)y;
+}
+
+double do_month(void) {
+  match(OPAREN);
+  double answer = expr();
+  match(CPAREN);
+  int y,m,d;
+  dateparts(answer,&y,&m,&d);
+  return (double)m;
+}
+
+double do_day(void) {
+  match(OPAREN);
+  double answer = expr();
+  match(CPAREN);
+  int y,m,d;
+  dateparts(answer,&y,&m,&d);
+  return (double)d;
+}
+
+double do_hour(void) {
+  match(OPAREN);
+  double answer = expr();
+  match(CPAREN);
+  double intpart, fraction;
+  fraction=modf(answer, &intpart);
+  return floor(fraction*24.0);
+}
+
+double do_minute(void) {
+  match(OPAREN);
+  double answer = expr();
+  match(CPAREN);
+  double intpart, fraction;
+  fraction=modf(answer, &intpart);
+  int t=floor(fraction*24.0*60.0);
+  return (double)(t % 60);
+}
+
+double do_second(void) {
+  match(OPAREN);
+  double answer = expr();
+  match(CPAREN);
+  double intpart, fraction;
+  fraction=modf(answer, &intpart);
+  int t=floor(fraction*24.0*60.0*60.0);
+  return (double)(t % 60);
+}
+
+
 double do_sin(void) {
   match(OPAREN);
   double answer = expr();
@@ -1120,6 +1242,47 @@ char *do_str(void) {
   match(CPAREN);
 
   sprintf(buff, "%g", x);
+  answer = mystrdup(buff);
+  if(!answer) seterror(ERR_OUTOFMEMORY);
+  return answer;
+}
+
+/*
+  parse the FORMATDATETIME$ token
+*/
+char *do_format(void) {
+  char buff[100];
+  char *answer;
+  struct tm* timeinfo;
+
+  match(OPAREN);
+  double d = expr();
+  match(COMMA);
+  int fmtidx = integer( expr() );
+  match(CPAREN);
+  
+  time_t utime = floor((d-25569.0)*86400.0);
+  timeinfo = gmtime(&utime);
+  switch (fmtidx) {
+    case 1:
+    case 2:
+      // format as date
+      strftime(buff, 100, "%x", timeinfo);
+      break;
+    case 3:
+      // format as long time
+      strftime(buff, 100, "%X", timeinfo);
+      break;
+    case 4:
+      // format as short time
+      strftime(buff, 100, "%H:%M", timeinfo);
+      break;
+    default:
+      // format as date/time
+      strftime(buff, 100, "%c", timeinfo);
+      break;
+  }
+
   answer = mystrdup(buff);
   if(!answer) seterror(ERR_OUTOFMEMORY);
   return answer;
@@ -2427,6 +2590,16 @@ MiniBasicClass()
   AddNumericFunction("VAL",   &MiniBasicClass::do_val);
   AddNumericFunction("VALLEN",&MiniBasicClass::do_vallen);
   AddNumericFunction("INSTR", &MiniBasicClass::do_instr);
+  AddNumericFunction("NOW",   &MiniBasicClass::do_now);
+  AddNumericFunction("DATE",  &MiniBasicClass::do_date);
+  AddNumericFunction("DATESERIAL", &MiniBasicClass::do_dateserial);
+  AddNumericFunction("TIMESERIAL", &MiniBasicClass::do_timeserial);
+  AddNumericFunction("YEAR",   &MiniBasicClass::do_year);
+  AddNumericFunction("MONTH",  &MiniBasicClass::do_month);
+  AddNumericFunction("DAY",    &MiniBasicClass::do_day);
+  AddNumericFunction("HOUR",   &MiniBasicClass::do_hour);
+  AddNumericFunction("MINUTE", &MiniBasicClass::do_minute);
+  AddNumericFunction("SECOND", &MiniBasicClass::do_second);
 
   AddStringFunction("CHR$",    &MiniBasicClass::do_chr);
   AddStringFunction("STR$",    &MiniBasicClass::do_str);
@@ -2434,6 +2607,7 @@ MiniBasicClass()
   AddStringFunction("RIGHT$",  &MiniBasicClass::do_right);
   AddStringFunction("MID$",    &MiniBasicClass::do_mid);
   AddStringFunction("STRING$", &MiniBasicClass::do_string);
+  AddStringFunction("FORMATDATETIME$", &MiniBasicClass::do_format);
 
   AddCommand("PRINT", &MiniBasicClass::do_print); 
   AddCommand("LET",   &MiniBasicClass::do_let);
