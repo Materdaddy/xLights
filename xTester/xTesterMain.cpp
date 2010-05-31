@@ -61,20 +61,22 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 //(*IdInit(xTesterFrame)
 const long xTesterFrame::ID_STATICTEXT1 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT3 = wxNewId();
-const long xTesterFrame::ID_NOTEBOOK2 = wxNewId();
-const long xTesterFrame::ID_SLIDER1 = wxNewId();
-const long xTesterFrame::ID_STATICTEXT2 = wxNewId();
 const long xTesterFrame::ID_BUTTON1 = wxNewId();
-const long xTesterFrame::ID_PANEL1 = wxNewId();
-const long xTesterFrame::ID_CHECKBOX1 = wxNewId();
-const long xTesterFrame::ID_SLIDER2 = wxNewId();
-const long xTesterFrame::ID_STATICTEXT4 = wxNewId();
-const long xTesterFrame::ID_STATICTEXT5 = wxNewId();
+const long xTesterFrame::ID_NOTEBOOK2 = wxNewId();
+const long xTesterFrame::ID_STATICTEXT2 = wxNewId();
+const long xTesterFrame::ID_SLIDER1 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT6 = wxNewId();
+const long xTesterFrame::ID_STATICTEXT11 = wxNewId();
+const long xTesterFrame::ID_PANEL1 = wxNewId();
+const long xTesterFrame::ID_CHECKBOX_RUNSEQ = wxNewId();
+const long xTesterFrame::ID_STATICTEXT4 = wxNewId();
+const long xTesterFrame::ID_SLIDER2 = wxNewId();
+const long xTesterFrame::ID_STATICTEXT5 = wxNewId();
+const long xTesterFrame::ID_STATICTEXT10 = wxNewId();
 const long xTesterFrame::ID_PANEL2 = wxNewId();
-const long xTesterFrame::ID_CHECKBOX2 = wxNewId();
-const long xTesterFrame::ID_SLIDER3 = wxNewId();
+const long xTesterFrame::ID_CHECKBOX_RUNALT = wxNewId();
 const long xTesterFrame::ID_STATICTEXT7 = wxNewId();
+const long xTesterFrame::ID_SLIDER3 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT8 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT9 = wxNewId();
 const long xTesterFrame::ID_PANEL3 = wxNewId();
@@ -95,14 +97,21 @@ END_EVENT_TABLE()
 xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIMER)
 {
     //(*Initialize(xTesterFrame)
+    wxBoxSizer* BoxSizer4;
+    wxFlexGridSizer* FlexGridSizer4;
+    wxBoxSizer* BoxSizer5;
     wxMenuItem* MenuItem2;
+    wxFlexGridSizer* FlexGridSizer3;
     wxMenuItem* MenuItem1;
     wxFlexGridSizer* FlexGridSizer2;
+    wxBoxSizer* BoxSizer2;
     wxMenu* Menu1;
     wxBoxSizer* BoxSizer1;
     wxMenuBar* MenuBar1;
+    wxFlexGridSizer* FlexGridSizer1;
+    wxBoxSizer* BoxSizer3;
     wxMenu* Menu2;
-    
+
     Create(parent, wxID_ANY, _("xTester"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     {
     	wxIcon FrameIcon;
@@ -113,36 +122,75 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     Panel3 = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, _T("ID_PANEL4"));
     FlexGridSizer2 = new wxFlexGridSizer(2, 2, 0, 0);
     FlexGridSizer2->AddGrowableCol(0);
+    FlexGridSizer2->AddGrowableCol(1);
     FlexGridSizer2->AddGrowableRow(1);
     StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("1. Select channels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-    FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
     StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("2. Select test"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-    FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Button1 = new wxButton(Panel3, ID_BUTTON1, _("All Lights Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    BoxSizer2->Add(Button1, 0, wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer2->Add(BoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Notebook2 = new wxNotebook(Panel3, ID_NOTEBOOK2, wxDefaultPosition, wxSize(191,220), 0, _T("ID_NOTEBOOK2"));
     FlexGridSizer2->Add(Notebook2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Notebook1 = new wxNotebook(Panel3, ID_NOTEBOOK1, wxDefaultPosition, wxSize(219,161), 0, _T("ID_NOTEBOOK1"));
     Panel_Dim = new wxPanel(Notebook1, ID_PANEL1, wxPoint(29,39), wxSize(211,136), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-    SliderMasterDimmer = new wxSlider(Panel_Dim, ID_SLIDER1, 0, 0, 255, wxPoint(16,40), wxSize(184,48), wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS|wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER1"));
-    StaticText2 = new wxStaticText(Panel_Dim, ID_STATICTEXT2, _("Dim selected channels"), wxPoint(16,16), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-    Button1 = new wxButton(Panel_Dim, ID_BUTTON1, _("All Lights Off"), wxPoint(70,100), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer1->AddGrowableCol(0);
+    StaticText2 = new wxStaticText(Panel_Dim, ID_STATICTEXT2, _("Dim selected channels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    FlexGridSizer1->Add(StaticText2, 0, wxTOP|wxLEFT|wxALIGN_LEFT|wxALIGN_TOP, 10);
+    SliderMasterDimmer = new wxSlider(Panel_Dim, ID_SLIDER1, 0, 0, 255, wxDefaultPosition, wxSize(184,48), wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS|wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER1"));
+    FlexGridSizer1->Add(SliderMasterDimmer, 0, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
+    BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
+    StaticText6 = new wxStaticText(Panel_Dim, ID_STATICTEXT6, _("Off"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    BoxSizer4->Add(StaticText6, 1, wxALL|wxSHAPED|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText11 = new wxStaticText(Panel_Dim, ID_STATICTEXT11, _("On"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
+    BoxSizer4->Add(StaticText11, 1, wxALL|wxSHAPED|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer1->Add(BoxSizer4, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
+    Panel_Dim->SetSizer(FlexGridSizer1);
+    FlexGridSizer1->SetSizeHints(Panel_Dim);
     Panel_Seq = new wxPanel(Notebook1, ID_PANEL2, wxPoint(71,15), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
-    CheckBox1 = new wxCheckBox(Panel_Seq, ID_CHECKBOX1, _("Run selected lights in sequence"), wxPoint(8,16), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
-    CheckBox1->SetValue(false);
-    Slider1 = new wxSlider(Panel_Seq, ID_SLIDER2, 0, 0, 100, wxPoint(16,72), wxSize(184,24), wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER2"));
-    StaticText4 = new wxStaticText(Panel_Seq, ID_STATICTEXT4, _("Speed"), wxPoint(88,48), wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer3->AddGrowableCol(0);
+    CheckBoxRunSeq = new wxCheckBox(Panel_Seq, ID_CHECKBOX_RUNSEQ, _("Run selected lights in sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RUNSEQ"));
+    CheckBoxRunSeq->SetValue(false);
+    FlexGridSizer3->Add(CheckBoxRunSeq, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_LEFT|wxALIGN_TOP, 10);
+    StaticText4 = new wxStaticText(Panel_Seq, ID_STATICTEXT4, _("Speed"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     wxFont StaticText4Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText4->SetFont(StaticText4Font);
-    StaticText5 = new wxStaticText(Panel_Seq, ID_STATICTEXT5, _("Slow"), wxPoint(16,96), wxDefaultSize, 0, _T("ID_STATICTEXT5"));
-    StaticText6 = new wxStaticText(Panel_Seq, ID_STATICTEXT6, _("Fast"), wxPoint(176,96), wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    FlexGridSizer3->Add(StaticText4, 0, wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 10);
+    Slider1 = new wxSlider(Panel_Seq, ID_SLIDER2, 0, 0, 100, wxDefaultPosition, wxSize(184,24), wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER2"));
+    FlexGridSizer3->Add(Slider1, 0, wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 10);
+    BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
+    StaticText5 = new wxStaticText(Panel_Seq, ID_STATICTEXT5, _("Slow"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+    BoxSizer3->Add(StaticText5, 1, wxALL|wxSHAPED|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText10 = new wxStaticText(Panel_Seq, ID_STATICTEXT10, _("Fast"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+    BoxSizer3->Add(StaticText10, 1, wxALL|wxSHAPED|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer3->Add(BoxSizer3, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
+    Panel_Seq->SetSizer(FlexGridSizer3);
+    FlexGridSizer3->Fit(Panel_Seq);
+    FlexGridSizer3->SetSizeHints(Panel_Seq);
     Panel_Alt = new wxPanel(Notebook1, ID_PANEL3, wxPoint(114,11), wxSize(188,117), wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-    CheckBox2 = new wxCheckBox(Panel_Alt, ID_CHECKBOX2, _("Alternate selected lights (even/odd)"), wxPoint(8,16), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
-    CheckBox2->SetValue(false);
-    Slider3 = new wxSlider(Panel_Alt, ID_SLIDER3, 0, 0, 100, wxPoint(16,72), wxSize(184,24), wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER3"));
-    StaticText7 = new wxStaticText(Panel_Alt, ID_STATICTEXT7, _("Speed"), wxPoint(88,48), wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+    FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer4->AddGrowableCol(0);
+    CheckBoxRunAlt = new wxCheckBox(Panel_Alt, ID_CHECKBOX_RUNALT, _("Alternate selected lights (even/odd)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RUNALT"));
+    CheckBoxRunAlt->SetValue(false);
+    FlexGridSizer4->Add(CheckBoxRunAlt, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_LEFT|wxALIGN_TOP, 10);
+    StaticText7 = new wxStaticText(Panel_Alt, ID_STATICTEXT7, _("Speed"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
     wxFont StaticText7Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText7->SetFont(StaticText7Font);
-    StaticText8 = new wxStaticText(Panel_Alt, ID_STATICTEXT8, _("Slow"), wxPoint(16,96), wxDefaultSize, 0, _T("ID_STATICTEXT8"));
-    StaticText9 = new wxStaticText(Panel_Alt, ID_STATICTEXT9, _("Fast"), wxPoint(176,96), wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+    FlexGridSizer4->Add(StaticText7, 0, wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 10);
+    Slider3 = new wxSlider(Panel_Alt, ID_SLIDER3, 0, 0, 100, wxDefaultPosition, wxSize(184,24), wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER3"));
+    FlexGridSizer4->Add(Slider3, 0, wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 10);
+    BoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
+    StaticText8 = new wxStaticText(Panel_Alt, ID_STATICTEXT8, _("Slow"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    BoxSizer5->Add(StaticText8, 1, wxALL|wxSHAPED|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText9 = new wxStaticText(Panel_Alt, ID_STATICTEXT9, _("Fast"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+    BoxSizer5->Add(StaticText9, 1, wxALL|wxSHAPED|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer4->Add(BoxSizer5, 1, wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
+    Panel_Alt->SetSizer(FlexGridSizer4);
+    FlexGridSizer4->SetSizeHints(Panel_Alt);
     Notebook1->AddPage(Panel_Dim, _("Dim"), false);
     Notebook1->AddPage(Panel_Seq, _("Sequence"), false);
     Notebook1->AddPage(Panel_Alt, _("Alternate"), false);
@@ -170,7 +218,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     SetStatusBar(StatusBar1);
     BoxSizer1->Fit(this);
     BoxSizer1->SetSizeHints(this);
-    
+
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xTesterFrame::OnButton1Click);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnAbout);
@@ -224,7 +272,7 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
     wxCheckListBox* lb;
     int netidx = Notebook2->GetSelection(); // which network
     lb = Networks[netidx]->ListBox;
-    maxch = Networks[netidx]->MaxChannels;
+    maxch = lb->GetCount();
     wxTimeSpan ts = wxDateTime::UNow() - starttime;
     long curtime = ts.GetMilliseconds().ToLong();
     xout.TimerStart(curtime);
@@ -245,7 +293,7 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
             break;
         case 1:
             // turn on in sequence
-            if (CheckBox1->IsChecked()) {
+            if (CheckBoxRunSeq->IsChecked()) {
                 if (LastSequenceSpeed == -1) {
                     // get list of checked channels
                     chArray.Clear();
@@ -277,7 +325,7 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
             break;
         case 2:
             // alternate odd/even
-            if (CheckBox2->IsChecked()) {
+            if (CheckBoxRunAlt->IsChecked()) {
                 if (LastSequenceSpeed == -1) {
                     // get list of checked channels
                     chArray.Clear();
@@ -351,6 +399,7 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
     wxPanel* Panel = new wxPanel(Notebook2, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL")+sid);
     wxFlexGridSizer* FlexSizer = new wxFlexGridSizer(0, 1, 0, 0);
     FlexSizer->AddGrowableRow(1);
+    FlexSizer->AddGrowableCol(0);
     wxStaticText* stNetDesc = new wxStaticText(Panel, -1, NetInfo->Description());
     FlexSizer->Add(stNetDesc, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     wxCheckListBox* ListBox = new wxCheckListBox(Panel, -1);
@@ -366,6 +415,31 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
     Networks.Add(NetInfo);
 
     wxString net3 = NetInfo->net3();
+    int baud = atoi(BaudRate.mb_str(wxConvUTF8));
+    char port[20];
+    strcpy( port, (const char*)ComPort.mb_str(wxConvUTF8) );
+    try {
+        if (net3 == _("LOR")) {
+            xout.setnetwork(new xNetwork_LOR(),cnt,MaxChannels,port,baud,MAXINTENSITY);
+        } else if (net3 == _("Ren")) {
+            xout.setnetwork(new xNetwork_Renard(),cnt,MaxChannels,port,baud,MAXINTENSITY);
+        } else if (net3 == _("DMX")) {
+            xout.setnetwork(new xNetwork_DMXentec(),cnt,MaxChannels,port,baud,MAXINTENSITY);
+        }
+    }
+    catch (const char *str) {
+        wxString errmsg(str,wxConvUTF8);
+        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
+        wxMessageBox(msg+errmsg, _("Communication Error"));
+        return NetInfo;
+    }
+    catch (char *str) {
+        wxString errmsg(str,wxConvUTF8);
+        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
+        wxMessageBox(msg+errmsg, _("Communication Error"));
+        return NetInfo;
+    }
+
     wxArrayString chNames;
     if (net3 == _("LOR")) {
         for (int i=0; i < MaxChannels; i++) {
@@ -378,29 +452,6 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
     }
     ListBox->Set(chNames);
 
-    int baud = atoi(BaudRate.mb_str(wxConvUTF8));
-    char port[20];
-    strcpy( port, (const char*)ComPort.mb_str(wxConvUTF8) );
-    try {
-        if (net3 == _("LOR")) {
-            xout.addnetwork(new xNetwork_LOR(),cnt,MaxChannels,MAXINTENSITY,port,baud);
-        } else if (net3 == _("Ren")) {
-            xout.addnetwork(new xNetwork_Renard(),cnt,MaxChannels,MAXINTENSITY,port,baud);
-        } else if (net3 == _("DMX")) {
-            xout.addnetwork(new xNetwork_DMXentec(),cnt,MaxChannels,MAXINTENSITY,port,baud);
-        }
-    }
-    catch (const char *str) {
-        wxString errmsg(str,wxConvUTF8);
-        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
-        wxMessageBox(msg+errmsg, _("Communication Error"));
-    }
-    catch (char *str) {
-        wxString errmsg(str,wxConvUTF8);
-        wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
-        wxMessageBox(msg+errmsg, _("Communication Error"));
-    }
-
     return NetInfo;
 }
 
@@ -408,5 +459,8 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
 void xTesterFrame::OnButton1Click(wxCommandEvent& event)
 {
     SliderMasterDimmer->SetValue(0);
+    CheckBoxRunSeq->SetValue(false);
+    CheckBoxRunAlt->SetValue(false);
     xout.alloff();
+    StatusBar1->SetStatusText(_("All lights off"));
 }

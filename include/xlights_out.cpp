@@ -24,6 +24,9 @@ protected:
   ctb::SerialPort* serptr;
   unsigned char IntensityMap[256];
   long timer_msec;
+  friend class xChannel_Dimmer;
+
+  virtual void SetMappedIntensity (int chindex, unsigned char intensity) =0;
 
 public:
 
@@ -31,8 +34,6 @@ public:
     serptr=0;
     timer_msec=0;
   };
-
-  virtual void SetMappedIntensity (int chindex, unsigned char intensity) =0;
 
   void SetIntensity (int chindex, unsigned char intensity) {
     SetMappedIntensity(chindex, IntensityMap[intensity]);
@@ -43,6 +44,8 @@ public:
   };
 
   virtual void Initialize(int numchannels, int maxintensity) = 0;
+
+  virtual void SetMaxIntensity(int maxintensity) = 0;
 
   virtual void InitSerialPort(const char* portname, int baudrate) {
     static char errmsg[100];
@@ -277,6 +280,12 @@ class xNetwork_DMXentec: public xNetwork_Dimmer {
 protected:
   unsigned char data[518];
 
+  void SetMappedIntensity(int chindex, unsigned char mappedintensity) {
+    data[chindex+5]=mappedintensity;
+    //printf("DMXentec::SetMappedIntensity channel=%d mapped-value=%d\n",chindex,(int)mappedintensity);
+    changed=1;
+  };
+
 public:
   void Initialize(int numchannels, int maxintensity) {
     if (numchannels > 512) {
@@ -292,16 +301,14 @@ public:
     data[datalen-1]=0xE7;       // end of message
     changed=0;
     CreateChannels(numchannels);
+    if (maxintensity > 0) SetMaxIntensity(maxintensity);
+    //printf("DMXentec::Initialize numchannels=%d len=%d datalen=%d\n",numchannels,len,datalen);
+  };
+  
+  void SetMaxIntensity(int maxintensity) {
     for (int i=0; i<=maxintensity; i++) {
       IntensityMap[i]=(int)(255.0*(double)i/(double)maxintensity+0.5);
     }
-    //printf("DMXentec::Initialize numchannels=%d len=%d datalen=%d\n",numchannels,len,datalen);
-  };
-
-  void SetMappedIntensity(int chindex, unsigned char mappedintensity) {
-    data[chindex+5]=mappedintensity;
-    //printf("DMXentec::SetMappedIntensity channel=%d mapped-value=%d\n",chindex,(int)mappedintensity);
-    changed=1;
   };
 
   void TimerEnd() {
@@ -320,6 +327,11 @@ class xNetwork_Renard: public xNetwork_Dimmer {
 protected:
   unsigned char data[1024];
 
+  void SetMappedIntensity (int chindex, unsigned char intensity) {
+    data[chindex+2]=intensity;
+    changed=1;
+  };
+
 public:
   void Initialize(int numchannels, int maxintensity) {
     if (numchannels > 1016) {
@@ -333,6 +345,10 @@ public:
     data[1]=0x80;               // start address
     changed=0;
     CreateChannels(numchannels);
+    if (maxintensity > 0) SetMaxIntensity(maxintensity);
+  };
+  
+  void SetMaxIntensity(int maxintensity) {
     for (int temp,i=0; i<=maxintensity; i++) {
       temp=(int)(255.0*(double)i/(double)maxintensity+0.5);
       switch (temp) {
@@ -342,11 +358,6 @@ public:
       }
       IntensityMap[i]=temp;
     }
-  };
-
-  void SetMappedIntensity (int chindex, unsigned char intensity) {
-    data[chindex+2]=intensity;
-    changed=1;
   };
 
   void InitSerialPort(const char* portname, int baudrate) {
@@ -375,6 +386,20 @@ class xNetwork_LOR: public xNetwork {
 protected:
   long lastheartbeat;
 
+  // set intensity to a value that has already been mapped
+  void SetMappedIntensity (int chindex, unsigned char intensity) {
+    unsigned char d[6];
+    d[0]=0;
+    d[1]=chindex >> 4;
+    if (d[1] < 0xF0) d[1]++;
+    d[2]=3;
+    d[3]=intensity;
+    d[4]=0x80 | (chindex % 16);
+    d[5]=0;
+    //printf("LOR SetMappedIntensity 1=%02X 2=%02X 3=%02X 4=%02X\n",d[1],d[2],d[3],d[4]);
+    serptr->Write((char *)d,6);
+  };
+
 public:
   void SendHeartbeat () {
     unsigned char d[5];
@@ -396,8 +421,12 @@ public:
 
   // should be called with maxintensity of 100 or 255
   void Initialize(int numchannels, int maxintensity) {
-    int temp;
     lastheartbeat=-1;
+    if (maxintensity > 0) SetMaxIntensity(maxintensity);
+  };
+  
+  void SetMaxIntensity(int maxintensity) {
+    int temp;
     for (int i=0; i<=maxintensity; i++) {
       temp=(int)(100.0*(double)i/(double)maxintensity+0.5);
       switch (temp) {
@@ -406,19 +435,6 @@ public:
         default:  IntensityMap[i]=228-temp*2; break;
       }
     }
-  };
-
-  void SetMappedIntensity (int chindex, unsigned char intensity) {
-    unsigned char d[6];
-    d[0]=0;
-    d[1]=chindex >> 4;
-    if (d[1] < 0xF0) d[1]++;
-    d[2]=3;
-    d[3]=intensity;
-    d[4]=0x80 | (chindex % 16);
-    d[5]=0;
-    //printf("LOR SetMappedIntensity 1=%02X 2=%02X 3=%02X 4=%02X\n",d[1],d[2],d[3],d[4]);
-    serptr->Write((char *)d,6);
   };
 
   void ramp (int chindex, int duration, int startintensity, int endintensity) {
@@ -503,11 +519,19 @@ public:
     }
   };
 
-  void addnetwork (xNetwork* netobj, int netnum, int chcount, int maxintensity, const char* portname, int baudrate) {
+  void setnetwork (xNetwork* netobj, int netnum, int chcount, const char* portname, int baudrate, int maxintensity=-1) {
     if (networks[netnum]) throw "duplicate network defined";
     networks[netnum] = netobj;
     netobj->Initialize(chcount, maxintensity);
     netobj->InitSerialPort(portname, baudrate);
+  };
+
+  void addnetwork (xNetwork* netobj, int chcount, const char* portname, int baudrate, int maxintensity=-1) {
+    for (int i=0; i<MAXNETWORKS; i++) {
+      if (networks[i] == 0) {
+        setnetwork(netobj, i, chcount, portname, baudrate, maxintensity);
+      }
+    }
   };
 
   void ramp (int netnum, int chindex, int duration, int startintensity, int endintensity) {

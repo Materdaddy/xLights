@@ -26,7 +26,7 @@ PlayerDialog::PlayerDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	Create(parent, id, _("xPlayer"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("id"));
 	SetClientSize(wxDefaultSize);
 	Move(wxDefaultPosition);
-
+	
 	Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&PlayerDialog::OnClose);
 	//*)
 

@@ -82,20 +82,22 @@ class xTesterFrame: public wxFrame
         //(*Identifiers(xTesterFrame)
         static const long ID_STATICTEXT1;
         static const long ID_STATICTEXT3;
-        static const long ID_NOTEBOOK2;
-        static const long ID_SLIDER1;
-        static const long ID_STATICTEXT2;
         static const long ID_BUTTON1;
-        static const long ID_PANEL1;
-        static const long ID_CHECKBOX1;
-        static const long ID_SLIDER2;
-        static const long ID_STATICTEXT4;
-        static const long ID_STATICTEXT5;
+        static const long ID_NOTEBOOK2;
+        static const long ID_STATICTEXT2;
+        static const long ID_SLIDER1;
         static const long ID_STATICTEXT6;
+        static const long ID_STATICTEXT11;
+        static const long ID_PANEL1;
+        static const long ID_CHECKBOX_RUNSEQ;
+        static const long ID_STATICTEXT4;
+        static const long ID_SLIDER2;
+        static const long ID_STATICTEXT5;
+        static const long ID_STATICTEXT10;
         static const long ID_PANEL2;
-        static const long ID_CHECKBOX2;
-        static const long ID_SLIDER3;
+        static const long ID_CHECKBOX_RUNALT;
         static const long ID_STATICTEXT7;
+        static const long ID_SLIDER3;
         static const long ID_STATICTEXT8;
         static const long ID_STATICTEXT9;
         static const long ID_PANEL3;
@@ -108,6 +110,7 @@ class xTesterFrame: public wxFrame
         static const long ID_TIMER;
 
         //(*Declarations(xTesterFrame)
+        wxStaticText* StaticText10;
         wxSlider* Slider1;
         wxPanel* Panel_Dim;
         wxStaticText* StaticText9;
@@ -117,11 +120,11 @@ class xTesterFrame: public wxFrame
         wxStaticText* StaticText6;
         wxSlider* Slider3;
         wxStaticText* StaticText8;
-        wxCheckBox* CheckBox2;
+        wxStaticText* StaticText11;
         wxStaticText* StaticText1;
         wxStaticText* StaticText3;
         wxPanel* Panel3;
-        wxCheckBox* CheckBox1;
+        wxCheckBox* CheckBoxRunAlt;
         wxStaticText* StaticText5;
         wxStaticText* StaticText7;
         wxStatusBar* StatusBar1;
@@ -130,6 +133,7 @@ class xTesterFrame: public wxFrame
         wxNotebook* Notebook2;
         wxStaticText* StaticText4;
         wxPanel* Panel_Alt;
+        wxCheckBox* CheckBoxRunSeq;
         //*)
 
         wxFileName networkFile;

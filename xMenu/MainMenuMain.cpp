@@ -92,11 +92,13 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, _T("ID_PANEL1"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer1->AddGrowableCol(0);
+    FlexGridSizer1->AddGrowableRow(1);
     StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("xLights"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     StaticText1->SetForegroundColour(wxColour(255,0,0));
     wxFont StaticText1Font(18,wxDEFAULT,wxFONTSTYLE_ITALIC,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText1->SetFont(StaticText1Font);
-    FlexGridSizer1->Add(StaticText1, 0, wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer1->Add(StaticText1, 0, wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 0);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel1, _("Show Directory"));
     StaticTextDirName = new wxStaticText(Panel1, ID_STATICTEXT2, _("<No directory selected>"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     StaticTextDirName->SetMinSize(wxSize(300,0));

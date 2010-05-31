@@ -11,6 +11,8 @@
 					<style>wxFULL_REPAINT_ON_RESIZE</style>
 					<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 						<cols>1</cols>
+						<growablecols>0</growablecols>
+						<growablerows>1</growablerows>
 						<object class="sizeritem">
 							<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 								<label>xLights</label>
@@ -21,7 +23,7 @@
 									<weight>bold</weight>
 								</font>
 							</object>
-							<flag>wxALIGN_LEFT|wxALIGN_TOP</flag>
+							<flag>wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL</flag>
 						</object>
 						<object class="sizeritem">
 							<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">

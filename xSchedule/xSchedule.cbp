@@ -98,6 +98,11 @@
 		<ResourceCompiler>
 			<Add directory="$(#wx)\include" />
 		</ResourceCompiler>
+		<Linker>
+			<Add library="..\bin\libctb.a" />
+		</Linker>
+		<Unit filename="NewListDialog.cpp" />
+		<Unit filename="NewListDialog.h" />
 		<Unit filename="PlayerDialog.cpp" />
 		<Unit filename="PlayerDialog.h" />
 		<Unit filename="resource.rc">
@@ -117,6 +122,7 @@
 				<resources>
 					<wxFrame wxs="wxsmith/xScheduleframe.wxs" src="xScheduleMain.cpp" hdr="xScheduleMain.h" name="xScheduleFrame" language="CPP" />
 					<wxDialog wxs="wxsmith/PlayerDialog.wxs" src="PlayerDialog.cpp" hdr="PlayerDialog.h" name="PlayerDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/NewListDialog.wxs" src="NewListDialog.cpp" hdr="NewListDialog.h" name="NewListDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>
