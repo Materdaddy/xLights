@@ -71,7 +71,12 @@ const long xScheduleFrame::ID_GRID1 = wxNewId();
 const long xScheduleFrame::ID_PANEL_CAL = wxNewId();
 const long xScheduleFrame::ID_NOTEBOOK1 = wxNewId();
 const long xScheduleFrame::ID_PANEL1 = wxNewId();
+const long xScheduleFrame::idMenuSave = wxNewId();
 const long xScheduleFrame::idMenuQuit = wxNewId();
+const long xScheduleFrame::idMenuAddList = wxNewId();
+const long xScheduleFrame::idMenuRenameList = wxNewId();
+const long xScheduleFrame::idMenuDelList = wxNewId();
+const long xScheduleFrame::idMenuHelpContent = wxNewId();
 const long xScheduleFrame::idMenuAbout = wxNewId();
 const long xScheduleFrame::ID_STATUSBAR1 = wxNewId();
 //*)
@@ -85,13 +90,19 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
 {
     //(*Initialize(xScheduleFrame)
     wxMenuItem* MenuItem2;
+    wxMenuItem* MenuItemAddList;
     wxFlexGridSizer* FlexGridSizer10;
+    wxMenu* Menu3;
     wxMenuItem* MenuItem1;
+    wxMenuItem* MenuItem4;
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
     wxMenu* Menu1;
+    wxMenuItem* MenuItemDelList;
+    wxMenuItem* MenuItem3;
     wxFlexGridSizer* FlexGridSizer8;
+    wxMenuItem* MenuItemRenameList;
     wxMenuBar* MenuBar1;
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer11;
@@ -179,10 +190,22 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     SetSizer(FlexGridSizer1);
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
+    MenuItem3 = new wxMenuItem(Menu1, idMenuSave, _("Save\tCtrl-S"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem3);
     MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));
+    Menu3 = new wxMenu();
+    MenuItemAddList = new wxMenuItem(Menu3, idMenuAddList, _("Add"), wxEmptyString, wxITEM_NORMAL);
+    Menu3->Append(MenuItemAddList);
+    MenuItemRenameList = new wxMenuItem(Menu3, idMenuRenameList, _("Rename"), wxEmptyString, wxITEM_NORMAL);
+    Menu3->Append(MenuItemRenameList);
+    MenuItemDelList = new wxMenuItem(Menu3, idMenuDelList, _("Delete"), wxEmptyString, wxITEM_NORMAL);
+    Menu3->Append(MenuItemDelList);
+    MenuBar1->Append(Menu3, _("Playlist"));
     Menu2 = new wxMenu();
+    MenuItem4 = new wxMenuItem(Menu2, idMenuHelpContent, _("Content"), wxEmptyString, wxITEM_NORMAL);
+    Menu2->Append(MenuItem4);
     MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
     Menu2->Append(MenuItem2);
     MenuBar1->Append(Menu2, _("Help"));
@@ -197,7 +220,14 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
 
     Connect(ID_AUITOOLBARITEM_ADD,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemAddClick);
     Connect(ID_AUITOOLBARITEM_DEL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemDelClick);
+    Connect(ID_AUITOOLBARITEM_HELP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemHelpClick);
+    Connect(ID_AUITOOLBARITEM_SAVE,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemSaveClick);
+    Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemSaveClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnQuit);
+    Connect(idMenuAddList,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemAddClick);
+    Connect(idMenuRenameList,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnMenuItemRenameListSelected);
+    Connect(idMenuDelList,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemDelClick);
+    Connect(idMenuHelpContent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemHelpClick);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAbout);
     //*)
 
@@ -527,5 +557,43 @@ void xScheduleFrame::OnAuiToolBarItemAddClick(wxCommandEvent& event)
 }
 
 void xScheduleFrame::OnAuiToolBarItemDelClick(wxCommandEvent& event)
+{
+    DelListDialog dialog(this);
+    int idx=Notebook1->GetSelection();
+    if (idx == 0) {
+        wxMessageBox(_("Can't delete the calendar!"), _("Error"));
+        return;
+    }
+    dialog.StaticTextDelName->SetLabel(Notebook1->GetPageText(idx));
+    if (dialog.ShowModal() != wxID_OK) return;
+    Notebook1->DeletePage(idx);
+}
+
+void xScheduleFrame::OnMenuItemRenameListSelected(wxCommandEvent& event)
+{
+    RenListDialog dialog(this);
+    int idx=Notebook1->GetSelection();
+    if (idx == 0) {
+        wxMessageBox(_("Can't rename the calendar!"), _("Error"));
+        return;
+    }
+    if (dialog.ShowModal() != wxID_OK) return;
+    wxString name=dialog.TextCtrlRename->GetValue();
+    if (name.IsEmpty()) return;
+    int cnt=Notebook1->GetPageCount();
+    for (int i=0; i<cnt; i++) {
+        if (Notebook1->GetPageText(i) == name && i != idx) {
+            wxMessageBox(_("That name is already in use!"), _("Error"));
+            return;
+        }
+    }
+    Notebook1->SetPageText(idx,name);
+}
+
+void xScheduleFrame::OnAuiToolBarItemHelpClick(wxCommandEvent& event)
+{
+}
+
+void xScheduleFrame::OnAuiToolBarItemSaveClick(wxCommandEvent& event)
 {
 }

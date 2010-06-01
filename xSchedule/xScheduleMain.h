@@ -34,6 +34,8 @@
 
 #include "PlayerDialog.h"
 #include "NewListDialog.h"
+#include "DelListDialog.h"
+#include "RenListDialog.h"
 #include "../include/globals.h"
 #include "../include/tinyxml.h"
 
@@ -52,6 +54,11 @@ class xScheduleFrame: public wxFrame
         void OnAbout(wxCommandEvent& event);
         void OnAuiToolBarItemAddClick(wxCommandEvent& event);
         void OnAuiToolBarItemDelClick(wxCommandEvent& event);
+        void OnMenuItemAddListSelected(wxCommandEvent& event);
+        void OnMenuItemRenameListSelected(wxCommandEvent& event);
+        void OnMenuItemDelListSelected(wxCommandEvent& event);
+        void OnAuiToolBarItemHelpClick(wxCommandEvent& event);
+        void OnAuiToolBarItemSaveClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -72,7 +79,12 @@ class xScheduleFrame: public wxFrame
         static const long ID_PANEL_CAL;
         static const long ID_NOTEBOOK1;
         static const long ID_PANEL1;
+        static const long idMenuSave;
         static const long idMenuQuit;
+        static const long idMenuAddList;
+        static const long idMenuRenameList;
+        static const long idMenuDelList;
+        static const long idMenuHelpContent;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         //*)
