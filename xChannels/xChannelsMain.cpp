@@ -200,7 +200,7 @@ void xChannelsFrame::GridEdit(wxGridEvent& event)
 
 void xChannelsFrame::LoadFile()
 {
-	wxString FileName=channelFile.GetFullPath();
+    wxString FileName=channelFile.GetFullPath();
     TiXmlDocument doc( FileName.mb_str() );
     if (doc.LoadFile()) {
         TiXmlElement* root=doc.RootElement();
@@ -442,15 +442,15 @@ void xChannelsFrame::SaveFile()
     NetworkInfo* info;
     wxGrid *grid;
     int RowCount;
-	TiXmlElement* net;
-	TiXmlElement* ch;
-	wxString FileName=channelFile.GetFullPath();
+    TiXmlElement* net;
+    TiXmlElement* ch;
+    wxString FileName=channelFile.GetFullPath();
     TiXmlDocument doc( FileName.mb_str() );
- 	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-	doc.LinkEndChild( decl );
-	TiXmlElement* root = new TiXmlElement( "Networks" );
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
+    doc.LinkEndChild( decl );
+    TiXmlElement* root = new TiXmlElement( "Networks" );
     root->SetAttribute("computer", wxGetHostName().mb_str());
-	doc.LinkEndChild( root );
+    doc.LinkEndChild( root );
 
     int cnt=Notebook1->GetPageCount();
     for (int pagenum=0; pagenum < cnt; pagenum++) {

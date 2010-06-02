@@ -245,7 +245,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
         LoadNetworkFile();
     }
     scheduleFile.AssignDir( CurrentDir );
-    scheduleFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
+    scheduleFile.SetFullName(_(XLIGHTS_SCHEDULE_FILE));
     UnsavedChanges=false;
     if (scheduleFile.FileExists()) {
         LoadScheduleFile();
@@ -346,6 +346,12 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
 
 xScheduleFrame::~xScheduleFrame()
 {
+    if (UnsavedChanges) {
+        wxMessageDialog confirm(this, _("Save changes?"), _("Confirm"), wxYES|wxNO);
+        if (confirm.ShowModal() == wxID_YES) {
+            SaveFile();
+        }
+    }
     //(*Destroy(xScheduleFrame)
     //*)
 }
@@ -414,11 +420,6 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
         wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
         wxMessageBox(msg+errmsg, _("Communication Error"));
     }
-}
-
-void xScheduleFrame::LoadScheduleFile()
-{
-
 }
 
 void xScheduleFrame::ScanForFiles()
@@ -596,4 +597,100 @@ void xScheduleFrame::OnAuiToolBarItemHelpClick(wxCommandEvent& event)
 
 void xScheduleFrame::OnAuiToolBarItemSaveClick(wxCommandEvent& event)
 {
+    SaveFile();
+}
+
+void xScheduleFrame::SaveFile()
+{
+    int RowCount,baseid;
+    TiXmlElement* plist;
+    TiXmlElement* item;
+    wxCheckBox* chkbox;
+    wxString FileName=scheduleFile.GetFullPath();
+    TiXmlDocument doc( FileName.mb_str() );
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
+    doc.LinkEndChild( decl );
+    TiXmlElement* root = new TiXmlElement( "xSchedule" );
+    root->SetAttribute("computer", wxGetHostName().mb_str());
+    doc.LinkEndChild( root );
+    TiXmlElement* sched = new TiXmlElement( "schedule" );
+    root->LinkEndChild( sched );
+    TiXmlElement* lists = new TiXmlElement( "playlists" );
+    root->LinkEndChild( lists );
+
+    int cnt=Notebook1->GetPageCount();
+    for (int pagenum=1; pagenum < cnt; pagenum++) {
+        plist = new TiXmlElement( "playlist" );
+        plist->SetAttribute("name", Notebook1->GetPageText(pagenum).mb_str());
+        baseid=1000*pagenum;
+        wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
+        for (int i=CHKBOX_AUDIO; i<=CHKBOX_VIXEN; i++) {
+            chkbox=(wxCheckBox*)Notebook1->FindWindow(baseid+i);
+            plist->SetAttribute(chkbox->GetLabelText().mb_str(), chkbox->GetValue() ? "1" : "0");
+        }
+        lists->LinkEndChild( plist );
+        RowCount=CheckListBoxPlay->GetCount();
+        for (unsigned int r=0; r < RowCount; r++ ) {
+            item = new TiXmlElement( "listitem" );
+            item->SetAttribute("name",CheckListBoxPlay->GetString(r).mb_str());
+            item->SetAttribute("enabled",CheckListBoxPlay->IsChecked(r) ? "1" : "0");
+            plist->LinkEndChild( item );
+        }
+    }
+    if (doc.SaveFile()) {
+        UnsavedChanges=false;
+        StatusBar1->SetStatusText(_("File saved successfully"));
+    } else {
+        wxString msg(doc.ErrorDesc(), wxConvUTF8);
+        wxMessageBox(msg, _("Error Saving File"));
+    }
+}
+
+void xScheduleFrame::LoadScheduleFile()
+{
+    wxString FileName=scheduleFile.GetFullPath();
+    TiXmlDocument doc( FileName.mb_str() );
+    if (doc.LoadFile()) {
+        TiXmlElement* root=doc.RootElement();
+        for( TiXmlElement* e=root->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+            if (e->ValueStr() == "schedule") {
+                LoadSchedule(e);
+            } else if (e->ValueStr() == "playlists") {
+                LoadPlaylists(e);
+            }
+        }
+    } else {
+        wxString msg(doc.ErrorDesc(), wxConvUTF8);
+        wxMessageBox(msg, _("Error Loading File"));
+    }
+}
+
+void xScheduleFrame::LoadSchedule(TiXmlElement* n)
+{
+}
+
+void xScheduleFrame::LoadPlaylists(TiXmlElement* n)
+{
+    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+        if (e->ValueStr() == "playlist") {
+            LoadPlaylist(e);
+        }
+    }
+}
+
+void xScheduleFrame::LoadPlaylist(TiXmlElement* n)
+{
+    wxCheckBox* chkbox;
+    wxString name(n->Attribute("name"), wxConvUTF8);
+    int baseid=1000*Notebook1->GetPageCount();
+    AddPlaylist(name);
+    for (int i=CHKBOX_AUDIO; i<=CHKBOX_VIXEN; i++) {
+        chkbox=(wxCheckBox*)Notebook1->FindWindow(baseid+i);
+        chkbox->SetValue( strncmp(n->Attribute(chkbox->GetLabelText().mb_str()), "0", 1) );
+    }
+    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+        if (e->ValueStr() == "item") {
+
+        }
+    }
 }

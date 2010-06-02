@@ -117,6 +117,10 @@ class xScheduleFrame: public wxFrame
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         void LoadNetworkFile();
         void LoadScheduleFile();
+        void LoadSchedule(TiXmlElement* n);
+        void LoadPlaylists(TiXmlElement* n);
+        void LoadPlaylist(TiXmlElement* n);
+        void SaveFile();
         void ScanForFiles();
         char ExtType(const wxString& ext);
         void AddPlaylist(const wxString& name);
