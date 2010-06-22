@@ -60,13 +60,13 @@ const long xScheduleFrame::ID_AUITOOLBARITEM_HELP = wxNewId();
 const long xScheduleFrame::ID_AUITOOLBARITEM_SAVE = wxNewId();
 const long xScheduleFrame::ID_AUITOOLBAR1 = wxNewId();
 const long xScheduleFrame::ID_PANEL2 = wxNewId();
-const long xScheduleFrame::ID_CHOICE1 = wxNewId();
+const long xScheduleFrame::ID_CHOICE_PLAYLIST = wxNewId();
 const long xScheduleFrame::ID_STATICTEXT5 = wxNewId();
-const long xScheduleFrame::ID_CHOICE2 = wxNewId();
+const long xScheduleFrame::ID_CHOICE_STARTTIME = wxNewId();
 const long xScheduleFrame::ID_STATICTEXT6 = wxNewId();
-const long xScheduleFrame::ID_CHOICE3 = wxNewId();
-const long xScheduleFrame::ID_TOGGLEBUTTON5 = wxNewId();
-const long xScheduleFrame::ID_TOGGLEBUTTON6 = wxNewId();
+const long xScheduleFrame::ID_CHOICE_ENDTIME = wxNewId();
+const long xScheduleFrame::ID_BUTTON_SET = wxNewId();
+const long xScheduleFrame::ID_BUTTON_CLEAR = wxNewId();
 const long xScheduleFrame::ID_GRID1 = wxNewId();
 const long xScheduleFrame::ID_PANEL_CAL = wxNewId();
 const long xScheduleFrame::ID_NOTEBOOK1 = wxNewId();
@@ -127,9 +127,9 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     AuiManager1 = new wxAuiManager(Panel2, wxAUI_MGR_DEFAULT);
     AuiToolBar1 = new wxAuiToolBar(Panel2, ID_AUITOOLBAR1, wxPoint(6,10), wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
     AuiToolBar1->AddTool(ID_AUITOOLBARITEM_ADD, _("Add playlist"), wxBitmap(wxImage(_T("../bin/add.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add playlist"), wxEmptyString, NULL);
-    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_DEL, _("Delete playlist"), wxBitmap(wxImage(_T("../bin/remove.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
-    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_HELP, _("Help"), wxBitmap(wxImage(_T("../bin/help.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
-    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_SAVE, _("Save"), wxBitmap(wxImage(_T("../bin/floppy_disc.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
+    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_DEL, _("Delete playlist"), wxBitmap(wxImage(_T("../bin/remove.png"))), wxNullBitmap, wxITEM_NORMAL, _("Delete playlist"), wxEmptyString, NULL);
+    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_HELP, _("Help"), wxBitmap(wxImage(_T("../bin/help.png"))), wxNullBitmap, wxITEM_NORMAL, _("Help"), wxEmptyString, NULL);
+    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_SAVE, _("Save"), wxBitmap(wxImage(_T("../bin/floppy_disc.png"))), wxNullBitmap, wxITEM_NORMAL, _("Save schedule"), wxEmptyString, NULL);
     AuiToolBar1->Realize();
     AuiManager1->AddPane(AuiToolBar1, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper());
     AuiManager1->Update();
@@ -140,33 +140,35 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer8->AddGrowableCol(0);
     FlexGridSizer8->AddGrowableRow(1);
     BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
-    Choice1 = new wxChoice(PanelCal, ID_CHOICE1, wxDefaultPosition, wxSize(113,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
-    BoxSizer2->Add(Choice1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ChoicePlayList = new wxChoice(PanelCal, ID_CHOICE_PLAYLIST, wxDefaultPosition, wxSize(113,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_PLAYLIST"));
+    BoxSizer2->Add(ChoicePlayList, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText5 = new wxStaticText(PanelCal, ID_STATICTEXT5, _("Start"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     FlexGridSizer9->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Choice2 = new wxChoice(PanelCal, ID_CHOICE2, wxDefaultPosition, wxSize(64,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE2"));
-    FlexGridSizer9->Add(Choice2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ChoiceStartTime = new wxChoice(PanelCal, ID_CHOICE_STARTTIME, wxDefaultPosition, wxSize(80,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_STARTTIME"));
+    FlexGridSizer9->Add(ChoiceStartTime, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer2->Add(FlexGridSizer9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText6 = new wxStaticText(PanelCal, ID_STATICTEXT6, _("End"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     FlexGridSizer10->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Choice3 = new wxChoice(PanelCal, ID_CHOICE3, wxDefaultPosition, wxSize(59,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE3"));
-    FlexGridSizer10->Add(Choice3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ChoiceEndTime = new wxChoice(PanelCal, ID_CHOICE_ENDTIME, wxDefaultPosition, wxSize(80,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_ENDTIME"));
+    FlexGridSizer10->Add(ChoiceEndTime, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer2->Add(FlexGridSizer10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
-    ToggleButton5 = new wxToggleButton(PanelCal, ID_TOGGLEBUTTON5, _("Set"), wxDefaultPosition, wxSize(53,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON5"));
-    FlexGridSizer11->Add(ToggleButton5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ToggleButton6 = new wxToggleButton(PanelCal, ID_TOGGLEBUTTON6, _("Delete"), wxDefaultPosition, wxSize(59,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON6"));
-    FlexGridSizer11->Add(ToggleButton6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonSet = new wxButton(PanelCal, ID_BUTTON_SET, _("Set"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SET"));
+    FlexGridSizer11->Add(ButtonSet, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonClear = new wxButton(PanelCal, ID_BUTTON_CLEAR, _("Clear"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CLEAR"));
+    FlexGridSizer11->Add(ButtonClear, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer2->Add(FlexGridSizer11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(BoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
     Grid1 = new wxGrid(PanelCal, ID_GRID1, wxDefaultPosition, wxSize(636,176), 0, _T("ID_GRID1"));
     Grid1->CreateGrid(26,7);
-    Grid1->EnableEditing(true);
+    Grid1->EnableEditing(false);
     Grid1->EnableGridLines(true);
+    Grid1->SetRowLabelSize(25);
     Grid1->SetDefaultRowSize(40, true);
+    Grid1->SetDefaultColSize(87, true);
     Grid1->SetColLabelValue(0, _("Sun"));
     Grid1->SetColLabelValue(1, _("Mon"));
     Grid1->SetColLabelValue(2, _("Tue"));
@@ -222,6 +224,8 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_AUITOOLBARITEM_DEL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemDelClick);
     Connect(ID_AUITOOLBARITEM_HELP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemHelpClick);
     Connect(ID_AUITOOLBARITEM_SAVE,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemSaveClick);
+    Connect(ID_BUTTON_SET,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonSetClick);
+    Connect(ID_BUTTON_CLEAR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonClearClick);
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemSaveClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnQuit);
     Connect(idMenuAddList,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemAddClick);
@@ -249,6 +253,47 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     UnsavedChanges=false;
     if (scheduleFile.FileExists()) {
         LoadScheduleFile();
+    }
+
+    // populate dates on calendar
+
+    int country=wxDateTime::GetCountry();
+    wxDateTime CalStart=wxDateTime::Today();
+    wxString datefmt, timefmt;
+
+    if (country == wxDateTime::USA) {
+        CalStart.SetToWeekDayInSameWeek(wxDateTime::Sun,wxDateTime::Sunday_First);
+        datefmt=_("%b %d");
+        timefmt=_("%I:%M %p");
+    } else {
+        Grid1->SetColLabelValue(0, wxDateTime::GetWeekDayName(wxDateTime::Mon, wxDateTime::Name_Full));
+        Grid1->SetColLabelValue(1, wxDateTime::GetWeekDayName(wxDateTime::Tue, wxDateTime::Name_Full));
+        Grid1->SetColLabelValue(2, wxDateTime::GetWeekDayName(wxDateTime::Wed, wxDateTime::Name_Full));
+        Grid1->SetColLabelValue(3, wxDateTime::GetWeekDayName(wxDateTime::Thu, wxDateTime::Name_Full));
+        Grid1->SetColLabelValue(4, wxDateTime::GetWeekDayName(wxDateTime::Fri, wxDateTime::Name_Full));
+        Grid1->SetColLabelValue(5, wxDateTime::GetWeekDayName(wxDateTime::Sat, wxDateTime::Name_Full));
+        Grid1->SetColLabelValue(6, wxDateTime::GetWeekDayName(wxDateTime::Sun, wxDateTime::Name_Full));
+        CalStart.SetToWeekDayInSameWeek(wxDateTime::Mon,wxDateTime::Monday_First);
+        datefmt=_("%d %b");
+        timefmt=_("%X");
+    }
+
+    int nrows=Grid1->GetNumberRows();
+    wxDateTime d=CalStart;
+    for (int r=0; r<nrows; r++) {
+        for (int c=0; c<7; c++) {
+            Grid1->SetCellValue(r,c,d.Format(datefmt));
+            d+=wxDateSpan::Day();
+        }
+    }
+
+    // populate start & end times
+
+    d.Set(0,15,0,0);
+    for (int i=0; i<95; i++) {
+        ChoiceStartTime->AppendString(d.Format(timefmt));
+        ChoiceEndTime->AppendString(d.Format(timefmt));
+        d+=wxTimeSpan::Minutes(15);
     }
 }
 
@@ -342,6 +387,7 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     GridSizer1->Fit(PanelPlayList);
     GridSizer1->SetSizeHints(PanelPlayList);
     Notebook1->AddPage(PanelPlayList, name, true);
+    ChoicePlayList->AppendString(name);
 }
 
 xScheduleFrame::~xScheduleFrame()
@@ -523,6 +569,7 @@ void xScheduleFrame::OnButtonUpClick()
     CheckListBoxPlay->Insert(s, (unsigned int)idx);
     CheckListBoxPlay->Check((unsigned int)idx, c);
     CheckListBoxPlay->Select(idx);
+    UnsavedChanges=true;
 }
 
 void xScheduleFrame::OnButtonDownClick()
@@ -539,6 +586,7 @@ void xScheduleFrame::OnButtonDownClick()
     CheckListBoxPlay->Insert(s, (unsigned int)idx);
     CheckListBoxPlay->Check((unsigned int)idx, c);
     CheckListBoxPlay->Select(idx);
+    UnsavedChanges=true;
 }
 
 void xScheduleFrame::OnAuiToolBarItemAddClick(wxCommandEvent& event)
@@ -555,6 +603,7 @@ void xScheduleFrame::OnAuiToolBarItemAddClick(wxCommandEvent& event)
         }
     }
     AddPlaylist(name);
+    UnsavedChanges=true;
 }
 
 void xScheduleFrame::OnAuiToolBarItemDelClick(wxCommandEvent& event)
@@ -568,6 +617,8 @@ void xScheduleFrame::OnAuiToolBarItemDelClick(wxCommandEvent& event)
     dialog.StaticTextDelName->SetLabel(Notebook1->GetPageText(idx));
     if (dialog.ShowModal() != wxID_OK) return;
     Notebook1->DeletePage(idx);
+    ChoicePlayList->Delete(idx-1);
+    UnsavedChanges=true;
 }
 
 void xScheduleFrame::OnMenuItemRenameListSelected(wxCommandEvent& event)
@@ -589,6 +640,8 @@ void xScheduleFrame::OnMenuItemRenameListSelected(wxCommandEvent& event)
         }
     }
     Notebook1->SetPageText(idx,name);
+    ChoicePlayList->SetString(idx-1,name);
+    UnsavedChanges=true;
 }
 
 void xScheduleFrame::OnAuiToolBarItemHelpClick(wxCommandEvent& event)
@@ -688,9 +741,28 @@ void xScheduleFrame::LoadPlaylist(TiXmlElement* n)
         chkbox=(wxCheckBox*)Notebook1->FindWindow(baseid+i);
         chkbox->SetValue( strncmp(n->Attribute(chkbox->GetLabelText().mb_str()), "0", 1) );
     }
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
+    int cnt=0;
     for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-        if (e->ValueStr() == "item") {
-
+        if (e->ValueStr() == "listitem") {
+            wxString itemname(e->Attribute("name"), wxConvUTF8);
+            bool itemchecked=(strncmp(e->Attribute("enabled"),"1",1) == 0);
+            CheckListBoxPlay->AppendString(itemname);
+            CheckListBoxPlay->Check(cnt,itemchecked);
+            cnt++;
         }
     }
+}
+
+void xScheduleFrame::OnButtonSetClick(wxCommandEvent& event)
+{
+    wxString plist = ChoicePlayList->GetStringSelection();
+    if (plist.IsEmpty()) {
+        wxMessageBox(_("Select a play list first!"));
+        return;
+    }
+}
+
+void xScheduleFrame::OnButtonClearClick(wxCommandEvent& event)
+{
 }

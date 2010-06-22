@@ -15,11 +15,11 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
-#include <wx/tglbtn.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/grid.h>
 #include <wx/choice.h>
+#include <wx/button.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
 //*)
@@ -31,6 +31,7 @@
 #include <wx/artprov.h>
 #include <wx/checkbox.h>
 #include <wx/checklst.h>
+#include <wx/datetime.h>
 
 #include "PlayerDialog.h"
 #include "NewListDialog.h"
@@ -59,6 +60,8 @@ class xScheduleFrame: public wxFrame
         void OnMenuItemDelListSelected(wxCommandEvent& event);
         void OnAuiToolBarItemHelpClick(wxCommandEvent& event);
         void OnAuiToolBarItemSaveClick(wxCommandEvent& event);
+        void OnButtonSetClick(wxCommandEvent& event);
+        void OnButtonClearClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -68,13 +71,13 @@ class xScheduleFrame: public wxFrame
         static const long ID_AUITOOLBARITEM_SAVE;
         static const long ID_AUITOOLBAR1;
         static const long ID_PANEL2;
-        static const long ID_CHOICE1;
+        static const long ID_CHOICE_PLAYLIST;
         static const long ID_STATICTEXT5;
-        static const long ID_CHOICE2;
+        static const long ID_CHOICE_STARTTIME;
         static const long ID_STATICTEXT6;
-        static const long ID_CHOICE3;
-        static const long ID_TOGGLEBUTTON5;
-        static const long ID_TOGGLEBUTTON6;
+        static const long ID_CHOICE_ENDTIME;
+        static const long ID_BUTTON_SET;
+        static const long ID_BUTTON_CLEAR;
         static const long ID_GRID1;
         static const long ID_PANEL_CAL;
         static const long ID_NOTEBOOK1;
@@ -93,23 +96,24 @@ class xScheduleFrame: public wxFrame
         wxAuiManager* AuiManager1;
         wxAuiToolBar* AuiToolBar1;
         wxNotebook* Notebook1;
-        wxChoice* Choice3;
         wxStaticText* StaticText6;
+        wxButton* ButtonSet;
         wxPanel* Panel1;
+        wxButton* ButtonClear;
         wxGrid* Grid1;
-        wxToggleButton* ToggleButton6;
-        wxToggleButton* ToggleButton5;
+        wxChoice* ChoiceStartTime;
         wxStaticText* StaticText5;
         wxPanel* PanelCal;
         wxStatusBar* StatusBar1;
         wxPanel* Panel2;
-        wxChoice* Choice1;
-        wxChoice* Choice2;
+        wxChoice* ChoicePlayList;
+        wxChoice* ChoiceEndTime;
         //*)
 
         wxString CurrentDir;
         wxFileName networkFile;
         wxFileName scheduleFile;
+        wxDateTime CalStart;
         PlayerDialog* PlayerDlg;
         bool UnsavedChanges;
 

@@ -36,6 +36,7 @@
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_DEL" variable="AuiToolBarItemDel" member="yes">
 													<bitmap>../bin/remove.png</bitmap>
+													<shorthelp>Delete playlist</shorthelp>
 													<handler function="OnAuiToolBarItemDelClick" entry="EVT_TOOL" />
 												</object>
 												<label>Delete playlist</label>
@@ -43,6 +44,7 @@
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_HELP" variable="AuiToolBarItemHelp" member="yes">
 													<bitmap>../bin/help.png</bitmap>
+													<shorthelp>Help</shorthelp>
 													<handler function="OnAuiToolBarItemHelpClick" entry="EVT_TOOL" />
 												</object>
 												<label>Help</label>
@@ -50,6 +52,7 @@
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_SAVE" variable="AuiToolBarItemSave" member="yes">
 													<bitmap>../bin/floppy_disc.png</bitmap>
+													<shorthelp>Save schedule</shorthelp>
 													<handler function="OnAuiToolBarItemSaveClick" entry="EVT_TOOL" />
 												</object>
 												<label>Save</label>
@@ -89,7 +92,7 @@
 											<object class="sizeritem">
 												<object class="wxBoxSizer" variable="BoxSizer2" member="no">
 													<object class="sizeritem">
-														<object class="wxChoice" name="ID_CHOICE1" variable="Choice1" member="yes">
+														<object class="wxChoice" name="ID_CHOICE_PLAYLIST" variable="ChoicePlayList" member="yes">
 															<size>113,21</size>
 														</object>
 														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -108,8 +111,8 @@
 																<option>1</option>
 															</object>
 															<object class="sizeritem">
-																<object class="wxChoice" name="ID_CHOICE2" variable="Choice2" member="yes">
-																	<size>64,21</size>
+																<object class="wxChoice" name="ID_CHOICE_STARTTIME" variable="ChoiceStartTime" member="yes">
+																	<size>80,21</size>
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
@@ -132,8 +135,8 @@
 																<option>1</option>
 															</object>
 															<object class="sizeritem">
-																<object class="wxChoice" name="ID_CHOICE3" variable="Choice3" member="yes">
-																	<size>59,21</size>
+																<object class="wxChoice" name="ID_CHOICE_ENDTIME" variable="ChoiceEndTime" member="yes">
+																	<size>80,21</size>
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
@@ -148,18 +151,18 @@
 														<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
 															<cols>3</cols>
 															<object class="sizeritem">
-																<object class="wxToggleButton" name="ID_TOGGLEBUTTON5" variable="ToggleButton5" member="yes">
+																<object class="wxButton" name="ID_BUTTON_SET" variable="ButtonSet" member="yes">
 																	<label>Set</label>
-																	<size>53,23</size>
+																	<handler function="OnButtonSetClick" entry="EVT_BUTTON" />
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
 																<option>1</option>
 															</object>
 															<object class="sizeritem">
-																<object class="wxToggleButton" name="ID_TOGGLEBUTTON6" variable="ToggleButton6" member="yes">
-																	<label>Delete</label>
-																	<size>59,23</size>
+																<object class="wxButton" name="ID_BUTTON_CLEAR" variable="ButtonClear" member="yes">
+																	<label>Clear</label>
+																	<handler function="OnButtonClearClick" entry="EVT_BUTTON" />
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																<border>5</border>
@@ -181,7 +184,10 @@
 														<object class="wxGrid" name="ID_GRID1" variable="Grid1" member="yes">
 															<cols>7</cols>
 															<rows>26</rows>
+															<readonly>1</readonly>
+															<labelcolwidth>25</labelcolwidth>
 															<defaultrowsize>40</defaultrowsize>
+															<defaultcolsize>87</defaultcolsize>
 															<collabels>
 																<item>Sun</item>
 																<item>Mon</item>
