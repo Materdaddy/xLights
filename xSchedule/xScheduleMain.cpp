@@ -134,7 +134,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     AuiManager1->AddPane(AuiToolBar1, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper());
     AuiManager1->Update();
     FlexGridSizer2->Add(Panel2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Notebook1 = new wxNotebook(Panel1, ID_NOTEBOOK1, wxDefaultPosition, wxSize(694,275), 0, _T("ID_NOTEBOOK1"));
+    Notebook1 = new wxNotebook(Panel1, ID_NOTEBOOK1, wxDefaultPosition, wxSize(799,275), 0, _T("ID_NOTEBOOK1"));
     PanelCal = new wxPanel(Notebook1, ID_PANEL_CAL, wxPoint(49,10), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_CAL"));
     FlexGridSizer8 = new wxFlexGridSizer(2, 1, 0, 0);
     FlexGridSizer8->AddGrowableCol(0);
@@ -162,13 +162,13 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     BoxSizer2->Add(FlexGridSizer11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(BoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-    Grid1 = new wxGrid(PanelCal, ID_GRID1, wxDefaultPosition, wxSize(636,176), 0, _T("ID_GRID1"));
+    Grid1 = new wxGrid(PanelCal, ID_GRID1, wxDefaultPosition, wxSize(696,176), 0, _T("ID_GRID1"));
     Grid1->CreateGrid(26,7);
     Grid1->EnableEditing(false);
     Grid1->EnableGridLines(true);
     Grid1->SetRowLabelSize(25);
-    Grid1->SetDefaultRowSize(40, true);
-    Grid1->SetDefaultColSize(87, true);
+    Grid1->SetDefaultRowSize(45, true);
+    Grid1->SetDefaultColSize(102, true);
     Grid1->SetColLabelValue(0, _("Sun"));
     Grid1->SetColLabelValue(1, _("Mon"));
     Grid1->SetColLabelValue(2, _("Tue"));
@@ -761,8 +761,85 @@ void xScheduleFrame::OnButtonSetClick(wxCommandEvent& event)
         wxMessageBox(_("Select a play list first!"));
         return;
     }
+    int StartIdx = ChoiceStartTime->GetSelection();
+    if (StartIdx == wxNOT_FOUND) {
+        wxMessageBox(_("Select a start time!"));
+        return;
+    }
+    int EndIdx = ChoiceEndTime->GetSelection();
+    if (EndIdx == wxNOT_FOUND) {
+        wxMessageBox(_("Select a end time!"));
+        return;
+    }
+    if (StartIdx >= EndIdx) {
+        wxMessageBox(_("Start time must be before the end time!"));
+        return;
+    }
+    wxString StartStr = ChoiceStartTime->GetStringSelection();
+    wxString EndStr = ChoiceEndTime->GetStringSelection();
+    GridSelection selCells = this->getGridSelection(*Grid1);
+    GridSelection::iterator it;
+    for (it = selCells.begin(); it != selCells.end(); it++) {
+        this->SetGridCell(it->first,it->second,plist,StartStr,EndStr);
+    }
+}
+
+void xScheduleFrame::SetGridCell(const int& row, const int& col,
+                                 wxString& playlist,
+                                 wxString& timestart,
+                                 wxString& timeend)
+{
+    wxString s = Grid1->GetCellValue(row,col);
+    s = s.BeforeFirst('\n');
+    s.Append(_("\n")+playlist+_("\n")+timestart+_("-")+timeend);
+    Grid1->SetCellValue(row,col,s);
 }
 
 void xScheduleFrame::OnButtonClearClick(wxCommandEvent& event)
 {
+}
+
+// from http://aubedesheros.blogspot.com/2009/10/cellules-selectionnees-dune-wxgrid.html
+GridSelection xScheduleFrame::getGridSelection(wxGrid & grid)
+{
+  GridSelection selection;
+
+  wxGridCellCoordsArray topLeft = grid.GetSelectionBlockTopLeft();
+  wxGridCellCoordsArray bottomRight = grid.GetSelectionBlockBottomRight();
+  for(size_t i = 0; i < std::min(topLeft.GetCount(), bottomRight.GetCount()); i++)
+  {
+    for(int row = topLeft.Item(i).GetRow(); row <= bottomRight.Item(i).GetRow(); row++)
+    {
+      for(int col = topLeft.Item(i).GetCol(); col <= bottomRight.Item(i).GetCol(); col++)
+      {
+        selection.insert(std::make_pair(row, col));
+      }
+    }
+  }
+
+  wxGridCellCoordsArray cellSelection = grid.GetSelectedCells();
+  for(size_t i = 0; i < cellSelection.GetCount(); i++)
+  {
+    selection.insert(std::make_pair(cellSelection.Item(i).GetRow(), cellSelection.Item(i).GetCol()));
+  }
+
+  wxArrayInt selectedRows = grid.GetSelectedRows();
+  for(size_t i = 0; i < selectedRows.GetCount(); i++)
+  {
+    for(int col = 0; col < grid.GetNumberCols(); col++)
+    {
+      selection.insert(std::make_pair(selectedRows.Item(i), col));
+    }
+  }
+
+  wxArrayInt selectedCols = grid.GetSelectedCols();
+  for(size_t i = 0; i < selectedCols.GetCount(); i++)
+  {
+    for(int row = 0; row < grid.GetNumberRows(); row++)
+    {
+      selection.insert(std::make_pair(row, selectedCols.Item(i)));
+    }
+  }
+
+  return selection;
 }

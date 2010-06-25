@@ -80,7 +80,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
-								<size>694,275</size>
+								<size>799,275</size>
 								<object class="notebookpage">
 									<object class="wxPanel" name="ID_PANEL_CAL" variable="PanelCal" member="yes">
 										<pos>49,10</pos>
@@ -186,8 +186,8 @@
 															<rows>26</rows>
 															<readonly>1</readonly>
 															<labelcolwidth>25</labelcolwidth>
-															<defaultrowsize>40</defaultrowsize>
-															<defaultcolsize>87</defaultcolsize>
+															<defaultrowsize>45</defaultrowsize>
+															<defaultcolsize>102</defaultcolsize>
 															<collabels>
 																<item>Sun</item>
 																<item>Mon</item>
@@ -197,7 +197,7 @@
 																<item>Fri</item>
 																<item>Sat</item>
 															</collabels>
-															<size>636,176</size>
+															<size>696,176</size>
 														</object>
 														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 														<border>5</border>

@@ -33,6 +33,8 @@
 #include <wx/checklst.h>
 #include <wx/datetime.h>
 
+#include <set>
+
 #include "PlayerDialog.h"
 #include "NewListDialog.h"
 #include "DelListDialog.h"
@@ -40,6 +42,7 @@
 #include "../include/globals.h"
 #include "../include/tinyxml.h"
 
+typedef std::set<std::pair<int, int> > GridSelection;
 
 class xScheduleFrame: public wxFrame
 {
@@ -118,6 +121,7 @@ class xScheduleFrame: public wxFrame
         bool UnsavedChanges;
 
         wxString GetAttribute(TiXmlElement* e, const char *attr);
+        void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         void LoadNetworkFile();
         void LoadScheduleFile();
@@ -131,6 +135,7 @@ class xScheduleFrame: public wxFrame
         void OnButtonPlayClick();
         void OnButtonUpClick();
         void OnButtonDownClick();
+        GridSelection getGridSelection(wxGrid & grid);
 
         // these are added to 1000*pagenum to get the control id
         enum PlayListIds {
