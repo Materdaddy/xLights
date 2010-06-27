@@ -32,8 +32,10 @@
 #include <wx/checkbox.h>
 #include <wx/checklst.h>
 #include <wx/datetime.h>
+#include <wx/file.h>
 
 #include <set>
+#include <map>
 
 #include "PlayerDialog.h"
 #include "NewListDialog.h"
@@ -43,6 +45,8 @@
 #include "../include/tinyxml.h"
 
 typedef std::set<std::pair<int, int> > GridSelection;
+typedef std::multimap<int, TiXmlElement* > SeqEventMap;
+typedef std::pair<int, TiXmlElement* > EventPair;
 
 class xScheduleFrame: public wxFrame
 {
@@ -116,12 +120,16 @@ class xScheduleFrame: public wxFrame
         wxString CurrentDir;
         wxFileName networkFile;
         wxFileName scheduleFile;
-        wxDateTime CalStart;
+        wxDateTime CalStart,CalEnd;
+        wxString datefmt, timefmt;
         PlayerDialog* PlayerDlg;
         bool UnsavedChanges;
+        bool PortsOK;
+        SeqEventMap EventMap;
 
         wxString GetAttribute(TiXmlElement* e, const char *attr);
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
+        void ClearGridCell(const int& row, const int& col);
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         void LoadNetworkFile();
         void LoadScheduleFile();
@@ -136,6 +144,10 @@ class xScheduleFrame: public wxFrame
         void OnButtonUpClick();
         void OnButtonDownClick();
         GridSelection getGridSelection(wxGrid & grid);
+        void PlayLorFile(wxString& FileName);
+        void PlayVixenFile(wxString& FileName);
+        void LoadLorChannels(TiXmlElement* n);
+        void LoadLorChannel(TiXmlElement* n, int netnum, int chindex);
 
         // these are added to 1000*pagenum to get the control id
         enum PlayListIds {

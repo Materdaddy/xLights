@@ -237,29 +237,10 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
 
     PlayerDlg=new PlayerDialog(this);
 
-    // Get CurrentDir
-    wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
-    if ( !config->Read(_("LastDir"), &CurrentDir) ) {
-        wxMessageBox(_("No directory specified"), _("ERROR"));
-        Close();
-    }
-    networkFile.AssignDir( CurrentDir );
-    networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
-    if (networkFile.FileExists()) {
-        LoadNetworkFile();
-    }
-    scheduleFile.AssignDir( CurrentDir );
-    scheduleFile.SetFullName(_(XLIGHTS_SCHEDULE_FILE));
-    UnsavedChanges=false;
-    if (scheduleFile.FileExists()) {
-        LoadScheduleFile();
-    }
-
     // populate dates on calendar
 
     int country=wxDateTime::GetCountry();
-    wxDateTime CalStart=wxDateTime::Today();
-    wxString datefmt, timefmt;
+    CalStart=wxDateTime::Today();
 
     if (country == wxDateTime::USA) {
         CalStart.SetToWeekDayInSameWeek(wxDateTime::Sun,wxDateTime::Sunday_First);
@@ -279,21 +260,43 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     }
 
     int nrows=Grid1->GetNumberRows();
-    wxDateTime d=CalStart;
+    CalEnd=CalStart;
     for (int r=0; r<nrows; r++) {
         for (int c=0; c<7; c++) {
-            Grid1->SetCellValue(r,c,d.Format(datefmt));
-            d+=wxDateSpan::Day();
+            Grid1->SetCellValue(r,c,CalEnd.Format(datefmt));
+            CalEnd+=wxDateSpan::Day();
         }
     }
 
     // populate start & end times
 
-    d.Set(0,15,0,0);
+    wxDateTime t;
+    t.Set(0,15,0,0); // 15 minutes after midnight
     for (int i=0; i<95; i++) {
-        ChoiceStartTime->AppendString(d.Format(timefmt));
-        ChoiceEndTime->AppendString(d.Format(timefmt));
-        d+=wxTimeSpan::Minutes(15);
+        ChoiceStartTime->AppendString(t.Format(timefmt));
+        ChoiceEndTime->AppendString(t.Format(timefmt));
+        t+=wxTimeSpan::Minutes(15);
+    }
+
+    // Get CurrentDir
+    wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
+    if ( !config->Read(_("LastDir"), &CurrentDir) ) {
+        wxMessageBox(_("No directory specified"), _("Error"));
+        Close();
+    }
+
+    // Load files
+    PortsOK=true;
+    networkFile.AssignDir( CurrentDir );
+    networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
+    if (networkFile.FileExists()) {
+        LoadNetworkFile();
+    }
+    scheduleFile.AssignDir( CurrentDir );
+    scheduleFile.SetFullName(_(XLIGHTS_SCHEDULE_FILE));
+    UnsavedChanges=false;
+    if (scheduleFile.FileExists()) {
+        LoadScheduleFile();
     }
 }
 
@@ -460,11 +463,13 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
         wxString errmsg(str,wxConvUTF8);
         wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
         wxMessageBox(msg+errmsg, _("Communication Error"));
+        PortsOK=false;
     }
     catch (char *str) {
         wxString errmsg(str,wxConvUTF8);
         wxString msg = wxString::Format(_("Error occurred while connecting to %s network on %s\n\n"),NetworkType.c_str(),ComPort.c_str());
         wxMessageBox(msg+errmsg, _("Communication Error"));
+        PortsOK=false;
     }
 }
 
@@ -543,16 +548,88 @@ void xScheduleFrame::OnButtonPlayClick()
     wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
     wxString filename = CheckListBoxPlay->GetStringSelection();
     if (filename.IsEmpty()) {
-        wxMessageBox(_("Nothing selected!"), _("ERROR"));
+        wxMessageBox(_("Nothing selected!"), _("Error"));
     } else {
         wxFileName* oName=new wxFileName(CurrentDir, filename);
+        wxString fullpath=oName->GetFullPath();
         PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
-        if (PlayerDlg->MediaCtrl->Load(oName->GetFullPath())) {
-            PlayerDlg->Show();
-        } else {
-            wxMessageBox(_("Unable to play file!"), _("ERROR"));
+        switch (ExtType(oName->GetExt())) {
+            case 'a':
+            case 'v':
+                if (wxFile::Exists(fullpath) && PlayerDlg->MediaCtrl->Load(fullpath)) {
+                    PlayerDlg->Show();
+                } else {
+                    wxMessageBox(_("Unable to play file:\n")+fullpath, _("Error"));
+                }
+                break;
+            case 'L':
+                PlayLorFile(fullpath);
+                break;
+            case 'V':
+                PlayVixenFile(fullpath);
+                break;
         }
     }
+}
+
+void xScheduleFrame::PlayLorFile(wxString& FileName)
+{
+    if (!PortsOK) {
+        wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
+        return;
+    }
+    EventMap.clear();
+    TiXmlDocument doc( FileName.mb_str() );
+    if (doc.LoadFile()) {
+        TiXmlElement* root=doc.RootElement();
+        wxString musicFilename(root->Attribute("musicFilename"), wxConvUTF8);
+        for( TiXmlElement* e=root->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+            if (e->ValueStr() == "channels") {
+                LoadLorChannels(e);
+            }
+        }
+        if (wxFile::Exists(musicFilename) && PlayerDlg->MediaCtrl->Load(musicFilename)) {
+            PlayerDlg->Show();
+        } else {
+            wxMessageBox(_("Unable to play file:\n")+musicFilename, _("Error"));
+        }
+    } else {
+        wxString msg(doc.ErrorDesc(), wxConvUTF8);
+        wxMessageBox(msg, _("Error Loading File"));
+    }
+}
+
+void xScheduleFrame::LoadLorChannels(TiXmlElement* n)
+{
+    int netnum, chindex, unit, circuit;
+    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+        if (e->ValueStr() == "channel") {
+            if (e->QueryIntAttribute("unit",&unit) == TIXML_SUCCESS &&
+                e->QueryIntAttribute("circuit",&circuit) == TIXML_SUCCESS) {
+                if (e->QueryIntAttribute("network",&netnum) != TIXML_SUCCESS) {
+                    netnum=0;
+                }
+                LoadLorChannel(e,netnum,(unit-1)*16+circuit-1);
+            }
+        }
+    }
+}
+
+void xScheduleFrame::LoadLorChannel(TiXmlElement* n, int netnum, int chindex)
+{
+    int start;
+    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+        if (e->ValueStr() == "effect") {
+            if (e->QueryIntAttribute("startCentisecond",&start) == TIXML_SUCCESS) {
+                EventMap.insert(EventPair(start,e));
+            }
+        }
+    }
+}
+
+void xScheduleFrame::PlayVixenFile(wxString& FileName)
+{
+    wxMessageBox(_("Don't know how to play Vixen files yet!"), _("Error"));
 }
 
 void xScheduleFrame::OnButtonUpClick()
@@ -666,8 +743,34 @@ void xScheduleFrame::SaveFile()
     TiXmlElement* root = new TiXmlElement( "xSchedule" );
     root->SetAttribute("computer", wxGetHostName().mb_str());
     doc.LinkEndChild( root );
+
+    // save calendar
     TiXmlElement* sched = new TiXmlElement( "schedule" );
     root->LinkEndChild( sched );
+    int nrows=Grid1->GetNumberRows();
+    wxDateTime t1,t2,d=CalStart;
+    wxString v,v1,playlist,timerange;
+    for (int r=0; r<nrows; r++) {
+        for (int c=0; c<7; c++) {
+            v=Grid1->GetCellValue(r,c);
+            v1=v.AfterFirst('\n');
+            if (!v1.IsEmpty()) {
+                playlist=v1.BeforeFirst('\n');
+                timerange=v1.AfterFirst('\n');
+                t1.ParseTime(timerange.BeforeFirst('-'));
+                t2.ParseTime(timerange.AfterFirst('-'));
+                item = new TiXmlElement( "playdate" );
+                item->SetAttribute("playlist", playlist.mb_str());
+                item->SetAttribute("date", d.FormatISODate().mb_str());
+                item->SetAttribute("timestart", t1.FormatISOTime().mb_str());
+                item->SetAttribute("timeend", t2.FormatISOTime().mb_str());
+                sched->LinkEndChild( item );
+            }
+            d+=wxDateSpan::Day();
+        }
+    }
+
+    // save playlists
     TiXmlElement* lists = new TiXmlElement( "playlists" );
     root->LinkEndChild( lists );
 
@@ -690,6 +793,8 @@ void xScheduleFrame::SaveFile()
             plist->LinkEndChild( item );
         }
     }
+
+    // commit to disk
     if (doc.SaveFile()) {
         UnsavedChanges=false;
         StatusBar1->SetStatusText(_("File saved successfully"));
@@ -720,6 +825,30 @@ void xScheduleFrame::LoadScheduleFile()
 
 void xScheduleFrame::LoadSchedule(TiXmlElement* n)
 {
+    wxDateTime d,t1,t2;
+    int days,r,c;
+    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+        if (e->ValueStr() == "playdate") {
+            wxString playlist(e->Attribute("playlist"), wxConvUTF8);
+            wxString playdate(e->Attribute("date"), wxConvUTF8);
+            wxString time1(e->Attribute("timestart"), wxConvUTF8);
+            wxString time2(e->Attribute("timeend"), wxConvUTF8);
+            if (d.ParseFormat(playdate,_("%Y-%m-%d")) == NULL) {
+                wxMessageBox(_("Invalid date in schedule file!"));
+                return;
+            } else if (d.IsBetween(CalStart,CalEnd)) {
+                wxTimeSpan ts=d.Subtract(CalStart);
+                days=ts.GetDays();
+                r=days / 7;
+                c=days % 7;
+                t1.ParseFormat(time1,_("%H:%M:%S"));
+                t2.ParseFormat(time2,_("%H:%M:%S"));
+                time1=t1.Format(timefmt);
+                time2=t2.Format(timefmt);
+                SetGridCell(r,c,playlist,time1,time2);
+            }
+        }
+    }
 }
 
 void xScheduleFrame::LoadPlaylists(TiXmlElement* n)
@@ -795,8 +924,20 @@ void xScheduleFrame::SetGridCell(const int& row, const int& col,
     Grid1->SetCellValue(row,col,s);
 }
 
+void xScheduleFrame::ClearGridCell(const int& row, const int& col)
+{
+    wxString s = Grid1->GetCellValue(row,col);
+    s = s.BeforeFirst('\n');
+    Grid1->SetCellValue(row,col,s);
+}
+
 void xScheduleFrame::OnButtonClearClick(wxCommandEvent& event)
 {
+    GridSelection selCells = this->getGridSelection(*Grid1);
+    GridSelection::iterator it;
+    for (it = selCells.begin(); it != selCells.end(); it++) {
+        this->ClearGridCell(it->first,it->second);
+    }
 }
 
 // from http://aubedesheros.blogspot.com/2009/10/cellules-selectionnees-dune-wxgrid.html

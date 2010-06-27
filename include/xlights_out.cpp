@@ -23,7 +23,9 @@ class xNetwork {
 protected:
   ctb::SerialPort* serptr;
   unsigned char IntensityMap[256];
+  char SerialConfig[4];
   long timer_msec;
+  int max_intensity;
   friend class xChannel_Dimmer;
 
   virtual void SetMappedIntensity (int chindex, unsigned char intensity) =0;
@@ -33,6 +35,7 @@ public:
   xNetwork() {
     serptr=0;
     timer_msec=0;
+    strcpy(SerialConfig,"8N1");
   };
 
   void SetIntensity (int chindex, unsigned char intensity) {
@@ -47,10 +50,10 @@ public:
 
   virtual void SetMaxIntensity(int maxintensity) = 0;
 
-  virtual void InitSerialPort(const char* portname, int baudrate) {
+  void InitSerialPort(const char* portname, int baudrate) {
     static char errmsg[100];
     serptr=new ctb::SerialPort();
-    int errcode=serptr->Open(portname, baudrate, "8N1");
+    int errcode=serptr->Open(portname, baudrate, SerialConfig);
     if (errcode < 0) {
       sprintf(errmsg,"unable to open serial port, error code=%d",errcode);
       throw errmsg;
@@ -69,9 +72,9 @@ public:
 
   virtual void ramp (int chindex, int duration, int startintensity, int endintensity) =0;
 
-  virtual void twinkle (int chindex, int duration, int period) =0;
+  virtual void twinkle (int chindex, int duration, int period, int startintensity=-1, int endintensity=-1) =0;
 
-  virtual void shimmer (int chindex, int duration, int period) =0;
+  virtual void shimmer (int chindex, int duration, int period, int startintensity=-1, int endintensity=-1) =0;
 
   virtual void off (int chindex) =0;
 
@@ -124,27 +127,34 @@ public:
 
   // duration - total duration of the effect (msec)
   // period - sets the upper bound on an individual twinkle (msec)
-  void twinkle (int duration, int period) {
+  void twinkle (int duration, int period, unsigned char startintensity, unsigned char endintensity) {
     optype='T';
+    opduration=duration;
+    rampstart=mynet->MapIntensity(startintensity);
+    rampend=mynet->MapIntensity(endintensity);
+    rampdiff=rampend - rampstart;
     optimestart=mynet->GetTimer();
     optimeend=optimestart + duration;
     effectperiod=period;
     periodend=optimestart + NextTwinkleTime();
     twinklestate= rand01() < 0.5 ? 0 : 1;
-    mynet->SetMappedIntensity(myindex,twinklestate*255);
+    mynet->SetMappedIntensity(myindex,twinklestate*rampstart);
   };
 
   // duration - total duration of the effect (msec)
   // period - sets the length of each shimmer, typically 50-100 (msec)
-  void shimmer (int duration, int period) {
+  void shimmer (int duration, int period, unsigned char startintensity, unsigned char endintensity) {
     optype='S';
+    opduration=duration;
+    rampstart=mynet->MapIntensity(startintensity);
+    rampend=mynet->MapIntensity(endintensity);
+    rampdiff=rampend - rampstart;
     optimestart=mynet->GetTimer();
     optimeend=optimestart + duration;
-    //printf("xChannel_Dimmer::shimmer duration=%d period=%d start=%d end=%d\n",duration,period,optimestart,optimeend);
     effectperiod=period;
     periodend=optimestart + effectperiod;
     twinklestate=1;
-    mynet->SetMappedIntensity(myindex,255);
+    mynet->SetMappedIntensity(myindex,rampstart);
   };
 
   void off () {
@@ -154,13 +164,15 @@ public:
   // returns true if the current timed operation is finished, false otherwise
   int ChannelCallback(long curtime) {
     //printf("xChannel_Dimmer::ChannelCallback curtime=%d optype=%c\n",curtime,optype);
+    int intensity;
     switch (optype) {
       case 'R':
         if (curtime >= optimeend) {
           mynet->SetMappedIntensity(myindex, rampend);
           optype=' ';
         } else {
-          mynet->SetMappedIntensity(myindex, (int)((double)(curtime - optimestart) / opduration * rampdiff + rampstart));
+          intensity=(int)((double)(curtime - optimestart) / opduration * rampdiff + rampstart);
+          mynet->SetMappedIntensity(myindex, intensity);
           return 0;
         }
         break;
@@ -172,7 +184,8 @@ public:
           if (curtime > periodend) {
             periodend+=NextTwinkleTime();
             twinklestate=1 - twinklestate;
-            mynet->SetMappedIntensity(myindex,twinklestate*255);
+            intensity=(int)((double)(curtime - optimestart) / opduration * rampdiff + rampstart);
+            mynet->SetMappedIntensity(myindex, twinklestate*intensity);
           }
           return 0;
         }
@@ -185,7 +198,8 @@ public:
           if (curtime >= periodend) {
             periodend+=effectperiod;
             twinklestate=1 - twinklestate;
-            mynet->SetMappedIntensity(myindex,twinklestate*255);
+            intensity=(int)((double)(curtime - optimestart) / opduration * rampdiff + rampstart);
+            mynet->SetMappedIntensity(myindex, twinklestate*intensity);
           }
           return 0;
         }
@@ -207,7 +221,7 @@ protected:
   int datalen,changed;
 
   void AddChannelCallback (int channel) {
-    timerCallbackList.remove(channel);  // ensure no there are no lingering callbacks for this channel
+    timerCallbackList.remove(channel);  // ensure there are no lingering callbacks for this channel
     timerCallbackList.push_front(channel);
   };
 
@@ -249,13 +263,21 @@ public:
     AddChannelCallback(chindex);
   };
 
-  virtual void twinkle (int chindex, int duration, int period) {
-    channels.at(chindex)->twinkle(duration,period);
+  virtual void twinkle (int chindex, int duration, int period, int startintensity=-1, int endintensity=-1) {
+    if (startintensity < 0 || endintensity < 0) {
+      channels.at(chindex)->twinkle(duration,period,max_intensity,max_intensity);
+    } else {
+      channels.at(chindex)->twinkle(duration,period,startintensity,endintensity);
+    }
     AddChannelCallback(chindex);
   };
 
-  virtual void shimmer (int chindex, int duration, int period) {
-    channels.at(chindex)->shimmer(duration,period);
+  virtual void shimmer (int chindex, int duration, int period, int startintensity=-1, int endintensity=-1) {
+    if (startintensity < 0 || endintensity < 0) {
+      channels.at(chindex)->shimmer(duration,period,max_intensity,max_intensity);
+    } else {
+      channels.at(chindex)->shimmer(duration,period,startintensity,endintensity);
+    }
     AddChannelCallback(chindex);
   };
 
@@ -273,7 +295,7 @@ public:
 
 // ******************************************************
 // * This class represents a single DMX universe
-// * Compatible with Entec Pro and Lynx DMX dongles
+// * Compatible with Entec Pro, Lynx DMX, and DIYC RPM dongles
 // * Methods should be called with: 0 <= chindex <= 511
 // ******************************************************
 class xNetwork_DMXentec: public xNetwork_Dimmer {
@@ -295,7 +317,7 @@ public:
     datalen=len+5;
     data[0]=0x7E;               // start of message
     data[1]=6;                  // dmx send
-    data[2]=len & 0xFF;        // length LSB
+    data[2]=len & 0xFF;         // length LSB
     data[3]=(len >> 8) & 0xFF;  // length MSB
     data[4]=0;                  // DMX start
     data[datalen-1]=0xE7;       // end of message
@@ -306,6 +328,7 @@ public:
   };
   
   void SetMaxIntensity(int maxintensity) {
+    max_intensity=maxintensity;
     for (int i=0; i<=maxintensity; i++) {
       IntensityMap[i]=(int)(255.0*(double)i/(double)maxintensity+0.5);
     }
@@ -346,9 +369,11 @@ public:
     changed=0;
     CreateChannels(numchannels);
     if (maxintensity > 0) SetMaxIntensity(maxintensity);
+    SerialConfig[2]='2'; // use 2 stop bits so padding chars are not required
   };
   
   void SetMaxIntensity(int maxintensity) {
+    max_intensity=maxintensity;
     for (int temp,i=0; i<=maxintensity; i++) {
       temp=(int)(255.0*(double)i/(double)maxintensity+0.5);
       switch (temp) {
@@ -357,17 +382,6 @@ public:
         case 0x7F: temp=0x80; break;
       }
       IntensityMap[i]=temp;
-    }
-  };
-
-  void InitSerialPort(const char* portname, int baudrate) {
-    serptr=new ctb::SerialPort();
-    // use 2 stop bits so padding chars are not required
-    int errcode=serptr->Open(portname, baudrate, "8N2");
-    if (errcode) {
-      char msg[100];
-      sprintf(msg,"unable to open serial port, error code=%d",errcode);
-      throw msg;
     }
   };
 
@@ -382,6 +396,7 @@ public:
 
 
 
+// Should be called with: 0 <= chindex <= 3839 (max channels=240*16)
 class xNetwork_LOR: public xNetwork {
 protected:
   long lastheartbeat;
@@ -398,6 +413,50 @@ protected:
     d[5]=0;
     //printf("LOR SetMappedIntensity 1=%02X 2=%02X 3=%02X 4=%02X\n",d[1],d[2],d[3],d[4]);
     serptr->Write((char *)d,6);
+  };
+
+  // shimmer or twinkle at max intensity
+  void shimtwink (unsigned char cmd, int chindex, int duration, int period) {
+    unsigned char d[5];
+    d[0]=0;
+    d[1]=chindex >> 4;
+    if (d[1] < 0xF0) d[1]++;
+    d[2]=cmd;
+    d[3]=0x80 | (chindex % 16);
+    d[4]=0;
+    serptr->Write((char *)d,5);
+  };
+
+  // shimmer or twinkle while ramping intensity up or down
+  void shimtwinkRamp (unsigned char cmd, int chindex, int duration, int period, int startintensity, int endintensity) {
+    unsigned char d[11];
+    d[0]=0;
+    d[1]=chindex >> 4;
+    if (d[1] < 0xF0) d[1]++;
+    d[2]=cmd;
+    d[3]=0x80 | (chindex % 16);
+    d[4]=0x81;
+    d[6]=IntensityMap[startintensity];
+    d[7]=IntensityMap[endintensity];
+    if (d[6] == d[7]) {
+      d[5]=3;  // intensity command
+      d[7]=0;
+      serptr->Write((char *)d,8);
+    } else {
+      d[5]=4;  // ramp command
+      int deltaInt=abs((int)d[6] - (int)d[7]);
+      int ramp=(int)((double)deltaInt/239.0*510.0*1000.0/(double)duration+0.5);
+      d[8]=ramp >> 8;
+      d[9]=ramp & 0xFF;
+      if (d[9] == 0) {
+        d[9]=1;
+        d[8] |= 0x40;
+      } else if (d[8] == 0) {
+        d[8] |= 0x80;
+      }
+      d[10]=0;
+      serptr->Write((char *)d,11);
+    }
   };
 
 public:
@@ -427,6 +486,7 @@ public:
   
   void SetMaxIntensity(int maxintensity) {
     int temp;
+    max_intensity=maxintensity;
     for (int i=0; i<=maxintensity; i++) {
       temp=(int)(100.0*(double)i/(double)maxintensity+0.5);
       switch (temp) {
@@ -447,7 +507,7 @@ public:
       d[0]=0;
       d[1]=chindex >> 4;
       if (d[1] < 0xF0) d[1]++;
-      d[2]=4;
+      d[2]=4;  // ramp command
       int deltaInt=abs((int)d[3] - (int)d[4]);
       int ramp=(int)((double)deltaInt/239.0*510.0*1000.0/(double)duration+0.5);
       d[5]=ramp >> 8;
@@ -465,28 +525,20 @@ public:
     }
   };
 
-  void twinkle (int chindex, int duration, int period) {
-    //printf("LOR twinkle %d\n",chindex);
-    unsigned char d[5];
-    d[0]=0;
-    d[1]=chindex >> 4;
-    if (d[1] < 0xF0) d[1]++;
-    d[2]=6;
-    d[3]=0x80 | (chindex % 16);
-    d[4]=0;
-    serptr->Write((char *)d,5);
+  void twinkle (int chindex, int duration, int period, int startintensity=-1, int endintensity=-1) {
+    if (startintensity < 0 || endintensity < 0 || (startintensity == max_intensity && endintensity == max_intensity)) {
+      shimtwink(6, chindex, duration, period);
+    } else {
+      shimtwinkRamp(6, chindex, duration, period, startintensity, endintensity);
+    }
   };
 
-  void shimmer (int chindex, int duration, int period) {
-    //printf("LOR shimmer %d\n",chindex);
-    unsigned char d[5];
-    d[0]=0;
-    d[1]=chindex >> 4;
-    if (d[1] < 0xF0) d[1]++;
-    d[2]=7;
-    d[3]=0x80 | (chindex % 16);
-    d[4]=0;
-    serptr->Write((char *)d,5);
+  void shimmer (int chindex, int duration, int period, int startintensity=-1, int endintensity=-1) {
+    if (startintensity < 0 || endintensity < 0 || (startintensity == max_intensity && endintensity == max_intensity)) {
+      shimtwink(7, chindex, duration, period);
+    } else {
+      shimtwinkRamp(7, chindex, duration, period, startintensity, endintensity);
+    }
   };
 
   void off (int chindex) {
@@ -542,12 +594,12 @@ public:
     networks[netnum]->SetIntensity(chindex, intensity);
   };
 
-  void twinkle (int netnum, int chindex, int duration, int period) {
-    networks[netnum]->twinkle(chindex, duration, period);
+  void twinkle (int netnum, int chindex, int duration, int period, int startintensity=-1, int endintensity=-1) {
+    networks[netnum]->twinkle(chindex, duration, period, startintensity, endintensity);
   };
 
-  void shimmer (int netnum, int chindex, int duration, int period) {
-    networks[netnum]->shimmer(chindex, duration, period);
+  void shimmer (int netnum, int chindex, int duration, int period, int startintensity=-1, int endintensity=-1) {
+    networks[netnum]->shimmer(chindex, duration, period, startintensity, endintensity);
   };
 
   void off (int netnum, int chindex) {
