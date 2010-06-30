@@ -3,6 +3,7 @@
 	<object class="wxFrame" name="xTesterFrame">
 		<title>xTester</title>
 		<icon>../include/xlights.ico</icon>
+		<size>476,263</size>
 		<id_arg>0</id_arg>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 			<object class="sizeritem">
@@ -53,7 +54,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
-								<size>219,161</size>
+								<size>281,220</size>
 								<object class="notebookpage">
 									<object class="wxPanel" name="ID_PANEL1" variable="Panel_Dim" member="yes">
 										<pos>29,39</pos>
@@ -133,6 +134,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxSlider" name="ID_SLIDER2" variable="Slider1" member="yes">
+													<value>50</value>
 													<size>184,24</size>
 													<style>wxSTATIC_BORDER</style>
 												</object>
@@ -196,6 +198,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxSlider" name="ID_SLIDER3" variable="Slider3" member="yes">
+													<value>50</value>
 													<size>184,24</size>
 													<style>wxSTATIC_BORDER</style>
 												</object>
@@ -228,6 +231,201 @@
 										</object>
 									</object>
 									<label>Alternate</label>
+								</object>
+								<object class="notebookpage">
+									<object class="wxPanel" name="ID_PANEL5" variable="Panel1" member="yes">
+										<pos>119,15</pos>
+										<size>271,194</size>
+										<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+											<cols>1</cols>
+											<growablecols>0</growablecols>
+											<object class="sizeritem">
+												<object class="wxCheckBox" name="ID_CHECKBOX_RUNTW" variable="CheckBoxRunTw" member="yes">
+													<label>Twinkle selected lights</label>
+												</object>
+												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+												<border>10</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxBoxSizer" variable="BoxSizer9" member="no">
+													<object class="sizeritem">
+														<object class="wxRadioButton" name="ID_RADIOBUTTON_TWNOFADE" variable="RadioButtonTwNoFade" member="yes">
+															<label>No Fade</label>
+															<selected>1</selected>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxRadioButton" name="ID_RADIOBUTTON_TWFADE" variable="RadioButtonTwFade" member="yes">
+															<label>Fade In</label>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxStaticText" name="ID_STATICTEXT12" variable="StaticText12" member="yes">
+													<label>Twinkle Rate</label>
+													<font>
+														<size>10</size>
+														<style>normal</style>
+														<weight>bold</weight>
+														<underlined>0</underlined>
+														<family>swiss</family>
+													</font>
+												</object>
+												<flag>wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText15" member="yes">
+													<label>Not supported on LOR or D-Light networks</label>
+												</object>
+												<flag>wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxSlider" name="ID_SLIDER_TWRATE" variable="SliderTwRate" member="yes">
+													<value>50</value>
+													<style>wxSTATIC_BORDER</style>
+												</object>
+												<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>10</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxBoxSizer" variable="BoxSizer7" member="no">
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT13" variable="StaticText13" member="yes">
+															<label>Slow</label>
+														</object>
+														<flag>wxALL|wxSHAPED|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
+															<label>Fast</label>
+														</object>
+														<flag>wxALL|wxSHAPED|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>10</border>
+												<option>1</option>
+											</object>
+										</object>
+									</object>
+									<label>Twinkle</label>
+								</object>
+								<object class="notebookpage">
+									<object class="wxPanel" name="ID_PANEL6" variable="Panel2" member="yes">
+										<pos>91,12</pos>
+										<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+											<cols>1</cols>
+											<growablecols>0</growablecols>
+											<object class="sizeritem">
+												<object class="wxCheckBox" name="ID_CHECKBOX_RUNSH" variable="CheckBoxRunSh" member="yes">
+													<label>Shimmer selected lights</label>
+												</object>
+												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+												<border>10</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxBoxSizer" variable="BoxSizer10" member="no">
+													<object class="sizeritem">
+														<object class="wxRadioButton" name="ID_RADIOBUTTON_SHNOFADE" variable="RadioButtonShNoFade" member="yes">
+															<label>No Fade</label>
+															<selected>1</selected>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxRadioButton" name="ID_RADIOBUTTON_SHFADE" variable="RadioButtonShFade" member="yes">
+															<label>Fade In</label>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxStaticText" name="ID_STATICTEXT16" variable="StaticText16" member="yes">
+													<label>Shimmer Rate</label>
+													<font>
+														<size>10</size>
+														<style>normal</style>
+														<weight>bold</weight>
+														<underlined>0</underlined>
+														<family>swiss</family>
+													</font>
+												</object>
+												<flag>wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxStaticText" name="ID_STATICTEXT17" variable="StaticText17" member="yes">
+													<label>Not supported on LOR or D-Light networks</label>
+												</object>
+												<flag>wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxSlider" name="ID_SLIDER4" variable="SliderShRate" member="yes">
+													<value>50</value>
+													<style>wxSTATIC_BORDER</style>
+												</object>
+												<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>10</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxBoxSizer" variable="BoxSizer11" member="no">
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT18" variable="StaticText18" member="yes">
+															<label>Slow</label>
+														</object>
+														<flag>wxALL|wxSHAPED|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT19" variable="StaticText19" member="yes">
+															<label>Fast</label>
+														</object>
+														<flag>wxALL|wxSHAPED|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>10</border>
+												<option>1</option>
+											</object>
+										</object>
+									</object>
+									<label>Shimmer</label>
 								</object>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

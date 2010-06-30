@@ -44,9 +44,24 @@
 #include "../include/globals.h"
 #include "../include/tinyxml.h"
 
+class LorEventClass
+{
+    public:
+
+    LorEventClass(int net_num, int ch_index, TiXmlElement* xml_data) {
+        netnum=net_num;
+        chindex=ch_index;
+        xmldata=xml_data;
+    }
+
+    int netnum;
+    int chindex;
+    TiXmlElement* xmldata;
+};
+
 typedef std::set<std::pair<int, int> > GridSelection;
-typedef std::multimap<int, TiXmlElement* > SeqEventMap;
-typedef std::pair<int, TiXmlElement* > EventPair;
+typedef std::multimap<int, LorEventClass* > LorEventMap;
+typedef std::pair<int, LorEventClass* > LorEventPair;
 
 class xScheduleFrame: public wxFrame
 {
@@ -125,7 +140,7 @@ class xScheduleFrame: public wxFrame
         PlayerDialog* PlayerDlg;
         bool UnsavedChanges;
         bool PortsOK;
-        SeqEventMap EventMap;
+        LorEventMap EventMap;
 
         wxString GetAttribute(TiXmlElement* e, const char *attr);
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);

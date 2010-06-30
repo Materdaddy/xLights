@@ -588,6 +588,7 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
                 LoadLorChannels(e);
             }
         }
+        xout.SetMaxIntensity(100);
         if (wxFile::Exists(musicFilename) && PlayerDlg->MediaCtrl->Load(musicFilename)) {
             PlayerDlg->Show();
         } else {
@@ -621,7 +622,7 @@ void xScheduleFrame::LoadLorChannel(TiXmlElement* n, int netnum, int chindex)
     for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
         if (e->ValueStr() == "effect") {
             if (e->QueryIntAttribute("startCentisecond",&start) == TIXML_SUCCESS) {
-                EventMap.insert(EventPair(start,e));
+                EventMap.insert(LorEventPair(start, new LorEventClass(netnum,chindex,e)));
             }
         }
     }

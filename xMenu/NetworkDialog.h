@@ -24,6 +24,7 @@ class NetworkDialog: public wxDialog
 		virtual ~NetworkDialog();
 
 		//(*Declarations(NetworkDialog)
+		wxButton* ButtonNetClose;
 		wxPanel* Panel1;
 		wxGrid* GridNetwork;
 		wxButton* ButtonSave;
@@ -37,6 +38,7 @@ class NetworkDialog: public wxDialog
 		static const long ID_BUTTON_SAVE;
 		static const long ID_BUTTON_ADDROW;
 		static const long ID_BUTTON_DELROW;
+		static const long ID_BUTTON_NETCLOSE;
 		static const long ID_GRID_NETWORK;
 		static const long ID_PANEL1;
 		//*)
@@ -48,6 +50,8 @@ class NetworkDialog: public wxDialog
 		void OnButtonAddRowClick(wxCommandEvent& event);
 		void OnButtonDelRowClick(wxCommandEvent& event);
 		void OnGridNetworkEditorShown(wxGridEvent& event);
+		void OnGridNetworkCellLeftClick(wxGridEvent& event);
+		void OnButtonNetCloseClick(wxCommandEvent& event);
 		//*)
 
         wxFileName networkFile;

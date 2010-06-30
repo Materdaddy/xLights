@@ -16,6 +16,7 @@
 #include <wx/stattext.h>
 #include <wx/menu.h>
 #include <wx/checkbox.h>
+#include <wx/radiobut.h>
 #include <wx/slider.h>
 #include <wx/panel.h>
 #include <wx/button.h>
@@ -74,6 +75,10 @@ class xTesterFrame: public wxFrame
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
         void OnButton1Click(wxCommandEvent& event);
+        void OnButtonSh3Click(wxCommandEvent& event);
+        void OnButtonSh10Click(wxCommandEvent& event);
+        void OnButtonTw3Click(wxCommandEvent& event);
+        void OnButtonTw10Click(wxCommandEvent& event);
         //*)
 
         void LoadFile();
@@ -101,6 +106,24 @@ class xTesterFrame: public wxFrame
         static const long ID_STATICTEXT8;
         static const long ID_STATICTEXT9;
         static const long ID_PANEL3;
+        static const long ID_CHECKBOX_RUNTW;
+        static const long ID_RADIOBUTTON_TWNOFADE;
+        static const long ID_RADIOBUTTON_TWFADE;
+        static const long ID_STATICTEXT12;
+        static const long ID_STATICTEXT15;
+        static const long ID_SLIDER_TWRATE;
+        static const long ID_STATICTEXT13;
+        static const long ID_STATICTEXT14;
+        static const long ID_PANEL5;
+        static const long ID_CHECKBOX_RUNSH;
+        static const long ID_RADIOBUTTON_SHNOFADE;
+        static const long ID_RADIOBUTTON_SHFADE;
+        static const long ID_STATICTEXT16;
+        static const long ID_STATICTEXT17;
+        static const long ID_SLIDER4;
+        static const long ID_STATICTEXT18;
+        static const long ID_STATICTEXT19;
+        static const long ID_PANEL6;
         static const long ID_NOTEBOOK1;
         static const long ID_PANEL4;
         static const long idMenuQuit;
@@ -115,23 +138,41 @@ class xTesterFrame: public wxFrame
         wxPanel* Panel_Dim;
         wxStaticText* StaticText9;
         wxNotebook* Notebook1;
+        wxCheckBox* CheckBoxRunSh;
+        wxStaticText* StaticText13;
         wxStaticText* StaticText2;
+        wxStaticText* StaticText14;
+        wxRadioButton* RadioButtonTwNoFade;
         wxButton* Button1;
         wxStaticText* StaticText6;
+        wxRadioButton* RadioButtonShNoFade;
         wxSlider* Slider3;
+        wxStaticText* StaticText19;
         wxStaticText* StaticText8;
         wxStaticText* StaticText11;
+        wxStaticText* StaticText18;
+        wxCheckBox* CheckBoxRunTw;
+        wxPanel* Panel1;
         wxStaticText* StaticText1;
         wxStaticText* StaticText3;
         wxPanel* Panel3;
         wxCheckBox* CheckBoxRunAlt;
+        wxRadioButton* RadioButtonShFade;
         wxStaticText* StaticText5;
         wxStaticText* StaticText7;
         wxStatusBar* StatusBar1;
         wxPanel* Panel_Seq;
+        wxSlider* SliderTwRate;
+        wxStaticText* StaticText15;
+        wxStaticText* StaticText12;
+        wxRadioButton* RadioButtonTwFade;
+        wxPanel* Panel2;
         wxSlider* SliderMasterDimmer;
         wxNotebook* Notebook2;
+        wxStaticText* StaticText17;
         wxStaticText* StaticText4;
+        wxSlider* SliderShRate;
+        wxStaticText* StaticText16;
         wxPanel* Panel_Alt;
         wxCheckBox* CheckBoxRunSeq;
         //*)
@@ -140,6 +181,7 @@ class xTesterFrame: public wxFrame
         WX_DEFINE_ARRAY(NetworkInfo*, NetworkArray);
         NetworkArray Networks;
         NetworkInfo* AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
+        void alloff();
         wxTimer timer;
         wxDateTime starttime;
 

@@ -15,6 +15,7 @@
 const long NetworkDialog::ID_BUTTON_SAVE = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADDROW = wxNewId();
 const long NetworkDialog::ID_BUTTON_DELROW = wxNewId();
+const long NetworkDialog::ID_BUTTON_NETCLOSE = wxNewId();
 const long NetworkDialog::ID_GRID_NETWORK = wxNewId();
 const long NetworkDialog::ID_PANEL1 = wxNewId();
 //*)
@@ -46,6 +47,8 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	BoxSizer1->Add(ButtonAddRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonDelRow = new wxButton(Panel1, ID_BUTTON_DELROW, _("Delete Row"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_DELROW"));
 	BoxSizer1->Add(ButtonDelRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonNetClose = new wxButton(Panel1, ID_BUTTON_NETCLOSE, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_NETCLOSE"));
+	BoxSizer1->Add(ButtonNetClose, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(BoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridNetwork = new wxGrid(Panel1, ID_GRID_NETWORK, wxDefaultPosition, wxSize(530,139), 0, _T("ID_GRID_NETWORK"));
 	GridNetwork->CreateGrid(0,4);
@@ -71,12 +74,13 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	Connect(ID_BUTTON_SAVE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonSaveClick);
 	Connect(ID_BUTTON_ADDROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddRowClick);
 	Connect(ID_BUTTON_DELROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonDelRowClick);
+	Connect(ID_BUTTON_NETCLOSE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonNetCloseClick);
 	Connect(ID_GRID_NETWORK,wxEVT_GRID_EDITOR_SHOWN,(wxObjectEventFunction)&NetworkDialog::OnGridNetworkEditorShown);
 	//*)
 
     wxArrayString types;
     types.Add(_("DMX-Entec Pro/Lynx"));
-    types.Add(_("LOR/d-Light"));
+    types.Add(_("LOR/D-Light"));
     types.Add(_("Renard"));
     wxGridCellAttr* col0=new wxGridCellAttr();
     col0->SetEditor(new wxGridCellChoiceEditor(types));
@@ -199,6 +203,7 @@ void NetworkDialog::SetAttribute(TiXmlElement* e, std::string name, wxString val
 void NetworkDialog::OnButtonSaveClick(wxCommandEvent& event)
 {
     SaveFile();
+    EndModal(1);
 }
 
 void NetworkDialog::OnButtonAddRowClick(wxCommandEvent& event)
@@ -208,6 +213,11 @@ void NetworkDialog::OnButtonAddRowClick(wxCommandEvent& event)
 
 void NetworkDialog::OnButtonDelRowClick(wxCommandEvent& event)
 {
+    wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
+    for(size_t i = 0; i < selectedRows.GetCount(); i++)
+    {
+        GridNetwork->DeleteRows(selectedRows[i]);
+    }
 }
 
 void NetworkDialog::PopulatePortChooser(wxArrayString *chooser)
@@ -234,3 +244,7 @@ void NetworkDialog::PopulatePortChooser(wxArrayString *chooser)
 #endif
 }
 
+void NetworkDialog::OnButtonNetCloseClick(wxCommandEvent& event)
+{
+    EndModal(0);
+}

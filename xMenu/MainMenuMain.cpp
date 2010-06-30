@@ -81,7 +81,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer1;
     wxBoxSizer* BoxSizer3;
     wxMenu* Menu2;
-    
+
     Create(parent, wxID_ANY, _("xLights"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(204,368));
     {
@@ -145,7 +145,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     SetStatusBar(StatusBar1);
     DirDialog1 = new wxDirDialog(this, _("Select Show Directory"), wxEmptyString, wxDD_DEFAULT_STYLE, wxDefaultPosition, wxDefaultSize, _T("wxDirDialog"));
     BoxSizer1->SetSizeHints(this);
-    
+
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(ID_BUTTON_NETWORK_SETUP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonNetworkSetupClick);
     Connect(ID_BUTTON_SEQUENCE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonSequenceClick);
@@ -230,7 +230,12 @@ void MainMenuFrame::Exec(wxString program)
 void MainMenuFrame::OnButtonNetworkSetupClick(wxCommandEvent& event)
 {
 	NetworkDialog NetDlg(this);
-    NetDlg.ShowModal();
+    if (NetDlg.ShowModal() > 0) {
+        // save was pressed
+        StatusBar1->SetStatusText(_("Network settings saved"));
+    } else {
+        StatusBar1->SetStatusText(_(""));
+    }
     SetButtonEnable();
 }
 
