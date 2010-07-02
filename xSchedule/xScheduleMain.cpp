@@ -480,11 +480,11 @@ void xScheduleFrame::ScanForFiles()
     int i;
 
     int baseid=1000*Notebook1->GetSelection();
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
-    wxCheckBox* CheckBoxAudio=(wxCheckBox*)Notebook1->FindWindow(baseid+CHKBOX_AUDIO);
-    wxCheckBox* CheckBoxVideo=(wxCheckBox*)Notebook1->FindWindow(baseid+CHKBOX_VIDEO);
-    wxCheckBox* CheckBoxLOR=(wxCheckBox*)Notebook1->FindWindow(baseid+CHKBOX_LOR);
-    wxCheckBox* CheckBoxVixen=(wxCheckBox*)Notebook1->FindWindow(baseid+CHKBOX_VIXEN);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxCheckBox* CheckBoxAudio=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_AUDIO,Notebook1);
+    wxCheckBox* CheckBoxVideo=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_VIDEO,Notebook1);
+    wxCheckBox* CheckBoxLOR=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_LOR,Notebook1);
+    wxCheckBox* CheckBoxVixen=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_VIXEN,Notebook1);
 
     wxFileName* oName=new wxFileName();
     oName->AssignDir( CurrentDir );
@@ -545,7 +545,7 @@ char xScheduleFrame::ExtType(const wxString& ext) {
 void xScheduleFrame::OnButtonPlayClick()
 {
     int baseid=1000*Notebook1->GetSelection();
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
     wxString filename = CheckListBoxPlay->GetStringSelection();
     if (filename.IsEmpty()) {
         wxMessageBox(_("Nothing selected!"), _("Error"));
@@ -636,7 +636,7 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
 void xScheduleFrame::OnButtonUpClick()
 {
     int baseid=1000*Notebook1->GetSelection();
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
     int idx = CheckListBoxPlay->GetSelection();
     if (idx == wxNOT_FOUND) return;
     if (idx == 0) return;
@@ -653,7 +653,7 @@ void xScheduleFrame::OnButtonUpClick()
 void xScheduleFrame::OnButtonDownClick()
 {
     int baseid=1000*Notebook1->GetSelection();
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
     int idx = CheckListBoxPlay->GetSelection();
     if (idx == wxNOT_FOUND) return;
     if (idx == CheckListBoxPlay->GetCount()-1) return;
@@ -780,9 +780,9 @@ void xScheduleFrame::SaveFile()
         plist = new TiXmlElement( "playlist" );
         plist->SetAttribute("name", Notebook1->GetPageText(pagenum).mb_str());
         baseid=1000*pagenum;
-        wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
+        wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
         for (int i=CHKBOX_AUDIO; i<=CHKBOX_VIXEN; i++) {
-            chkbox=(wxCheckBox*)Notebook1->FindWindow(baseid+i);
+            chkbox=(wxCheckBox*)wxWindow::FindWindowById(baseid+i,Notebook1);
             plist->SetAttribute(chkbox->GetLabelText().mb_str(), chkbox->GetValue() ? "1" : "0");
         }
         lists->LinkEndChild( plist );
@@ -868,10 +868,10 @@ void xScheduleFrame::LoadPlaylist(TiXmlElement* n)
     int baseid=1000*Notebook1->GetPageCount();
     AddPlaylist(name);
     for (int i=CHKBOX_AUDIO; i<=CHKBOX_VIXEN; i++) {
-        chkbox=(wxCheckBox*)Notebook1->FindWindow(baseid+i);
+        chkbox=(wxCheckBox*)wxWindow::FindWindowById(baseid+i,Notebook1);
         chkbox->SetValue( strncmp(n->Attribute(chkbox->GetLabelText().mb_str()), "0", 1) );
     }
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)Notebook1->FindWindow(baseid+PLAYLIST);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
     int cnt=0;
     for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
         if (e->ValueStr() == "listitem") {
