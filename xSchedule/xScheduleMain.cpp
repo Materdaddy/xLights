@@ -13,8 +13,6 @@
 #include <wx/filename.h>
 
 //(*InternalHeaders(xScheduleFrame)
-#include <wx/bitmap.h>
-#include <wx/icon.h>
 #include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
@@ -25,6 +23,39 @@
 #include "../include/tinyxmlparser.cpp"
 #include "../include/xlights_out.cpp"
 
+#include "../include/xlights.xpm"
+#include "../include/add.xpm"
+#include "../include/remove.xpm"
+#include "../include/floppy_disc.xpm"
+#include "../include/help.xpm"
+#include "../include/up.xpm"
+#include "../include/down.xpm"
+#include "../include/play.xpm"
+
+#define XTIMER_INTERVAL 100
+/*
+class MyArtProvider : public wxArtProvider
+{
+protected:
+    virtual wxBitmap CreateBitmap(const wxArtID& id, const wxArtClient& client,
+                                  const wxSize& size);
+};
+
+wxBitmap MyArtProvider::CreateBitmap(const wxArtID& id,
+                                     const wxArtClient& client,
+                                     const wxSize& WXUNUSED(size))
+{
+    if (id == _("xlights_add"))
+        return wxBitmap(add_xpm);
+    if (id == _("xlights_remove"))
+        return wxBitmap(remove_xpm);
+    if (id == _("xlights_floppy_disc"))
+        return wxBitmap(floppy_disc_xpm);
+    if (id == _("xlights_help"))
+        return wxBitmap(help_xpm);
+    return wxNullBitmap;
+};
+*/
 xOutput xout;
 
 //helper functions
@@ -80,14 +111,20 @@ const long xScheduleFrame::idMenuHelpContent = wxNewId();
 const long xScheduleFrame::idMenuAbout = wxNewId();
 const long xScheduleFrame::ID_STATUSBAR1 = wxNewId();
 //*)
+const long xScheduleFrame::ID_TIMER = wxNewId();
+
 
 BEGIN_EVENT_TABLE(xScheduleFrame,wxFrame)
     //(*EventTable(xScheduleFrame)
     //*)
+    EVT_TIMER(ID_TIMER, xScheduleFrame::OnTimer)
 END_EVENT_TABLE()
 
-xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
+
+xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIMER)
 {
+    //wxArtProvider::Push(new MyArtProvider);
+
     //(*Initialize(xScheduleFrame)
     wxMenuItem* MenuItem2;
     wxMenuItem* MenuItemAddList;
@@ -126,10 +163,10 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     Panel2 = new wxPanel(Panel1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, _T("ID_PANEL2"));
     AuiManager1 = new wxAuiManager(Panel2, wxAUI_MGR_DEFAULT);
     AuiToolBar1 = new wxAuiToolBar(Panel2, ID_AUITOOLBAR1, wxPoint(6,10), wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_ADD, _("Add playlist"), wxBitmap(wxImage(_T("../bin/add.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add playlist"), wxEmptyString, NULL);
-    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_DEL, _("Delete playlist"), wxBitmap(wxImage(_T("../bin/remove.png"))), wxNullBitmap, wxITEM_NORMAL, _("Delete playlist"), wxEmptyString, NULL);
-    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_HELP, _("Help"), wxBitmap(wxImage(_T("../bin/help.png"))), wxNullBitmap, wxITEM_NORMAL, _("Help"), wxEmptyString, NULL);
-    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_SAVE, _("Save"), wxBitmap(wxImage(_T("../bin/floppy_disc.png"))), wxNullBitmap, wxITEM_NORMAL, _("Save schedule"), wxEmptyString, NULL);
+    //AuiToolBar1->AddTool(ID_AUITOOLBARITEM_ADD, _("Add playlist"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Add playlist"), wxEmptyString, NULL);
+    //AuiToolBar1->AddTool(ID_AUITOOLBARITEM_DEL, _("Delete playlist"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Delete playlist"), wxEmptyString, NULL);
+    //AuiToolBar1->AddTool(ID_AUITOOLBARITEM_HELP, _("Help"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Help"), wxEmptyString, NULL);
+    //AuiToolBar1->AddTool(ID_AUITOOLBARITEM_SAVE, _("Save"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Save schedule"), wxEmptyString, NULL);
     AuiToolBar1->Realize();
     AuiManager1->AddPane(AuiToolBar1, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper());
     AuiManager1->Update();
@@ -235,7 +272,10 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAbout);
     //*)
 
-    PlayerDlg=new PlayerDialog(this);
+   	//wxIcon FrameIcon(xlights_xpm);
+   	//SetIcon(FrameIcon);
+    PlayerDlg = new PlayerDialog(this);
+    ResetTimer(NO_SEQ);
 
     // populate dates on calendar
 
@@ -292,11 +332,14 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     if (networkFile.FileExists()) {
         LoadNetworkFile();
     }
+    if (PortsOK) {
+        timer.Start(XTIMER_INTERVAL, wxTIMER_CONTINUOUS);
+    }
     scheduleFile.AssignDir( CurrentDir );
     scheduleFile.SetFullName(_(XLIGHTS_SCHEDULE_FILE));
     UnsavedChanges=false;
     if (scheduleFile.FileExists()) {
-        LoadScheduleFile();
+        //LoadScheduleFile();
     }
 }
 
@@ -314,28 +357,28 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     wxFont StaticText1Font(10,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText1->SetFont(StaticText1Font);
     FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-
+/*
     id=baseid+UP_BUTTON;
-    wxBitmapButton* BitmapButtonUp = new wxBitmapButton(PanelPlayList, id, wxBitmap(wxImage(_T("../bin/up.png"))));
+    wxBitmapButton* BitmapButtonUp = new wxBitmapButton(PanelPlayList, id, wxBitmap(up_xpm));
     BitmapButtonUp->SetDefault();
     BitmapButtonUp->SetToolTip(_("Move Up"));
     FlexGridSizer5->Add(BitmapButtonUp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonUpClick);
 
     id=baseid+DOWN_BUTTON;
-    wxBitmapButton* BitmapButtonDown = new wxBitmapButton(PanelPlayList, id, wxBitmap(wxImage(_T("../bin/down.png"))));
+    wxBitmapButton* BitmapButtonDown = new wxBitmapButton(PanelPlayList, id, wxBitmap(down_xpm));
     BitmapButtonDown->SetDefault();
     BitmapButtonDown->SetToolTip(_("Move Down"));
     FlexGridSizer5->Add(BitmapButtonDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonDownClick);
 
     id=baseid+PLAY_BUTTON;
-    wxBitmapButton* ButtonPlay = new wxBitmapButton(PanelPlayList, id, wxBitmap(wxImage(_T("../bin/play.png"))));
+    wxBitmapButton* ButtonPlay = new wxBitmapButton(PanelPlayList, id, wxBitmap(play_xpm));
     ButtonPlay->SetToolTip(_("Play"));
     ButtonPlay->SetHelpText(_("Plays the currently selected item in the play list"));
     FlexGridSizer5->Add(ButtonPlay, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonPlayClick);
-
+*/
     FlexGridSizer4->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     wxBoxSizer* BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
     wxStaticText* StaticText2 = new wxStaticText(PanelPlayList, -1, _("Files:"));
@@ -401,6 +444,7 @@ xScheduleFrame::~xScheduleFrame()
             SaveFile();
         }
     }
+    if (timer.IsRunning()) timer.Stop();
     //(*Destroy(xScheduleFrame)
     //*)
 }
@@ -415,6 +459,106 @@ void xScheduleFrame::OnAbout(wxCommandEvent& event)
     wxString msg = _(XLIGHTS_LICENSE);
     wxString hdg = wxString::Format(_("About xLights %s"),_(XLIGHTS_VERSION));
     wxMessageBox(msg, hdg);
+}
+
+void xScheduleFrame::TimerNoPlay() {
+    wxTimeSpan ts = wxDateTime::UNow() - starttime;
+    long msec = ts.GetMilliseconds().ToLong();
+    xout.TimerStart(msec);
+    xout.TimerEnd();
+    //wxString msg = wxString::Format(_("TimerNoPlay %d"),msec);
+    //StatusBar1->SetStatusText(msg);
+}
+
+void xScheduleFrame::ResetTimer(SeqPlayerStates newstate) {
+    SeqPlayerState = newstate;
+    xout.ResetTimer();
+    starttime = wxDateTime::UNow();
+}
+
+void xScheduleFrame::OnTimer(wxTimerEvent& event)
+{
+    long msec=0;
+    int startmsec, endmsec, duration, intensity, startint, endint;
+    int netnum, chindex;
+    static long lastmsec;
+    static LorEventMap::iterator LorIter;
+    TiXmlElement* e;
+    wxString action;
+    wxTimeSpan ts;
+    switch (SeqPlayerState) {
+        case PLAYING_LOR:
+            if (PlayerDlg->MediaCtrl->GetState() != wxMEDIASTATE_PLAYING) {
+                ResetTimer(PAUSE_LOR);
+                return;
+            }
+            msec = PlayerDlg->MediaCtrl->Tell();
+            xout.TimerStart(msec);
+            while (LorIter != LorEvents.end()) {
+
+                startmsec=LorIter->first * 10;
+                if (startmsec > msec) break;
+                endmsec=LorIter->second->EndCentiSec * 10;
+                netnum=LorIter->second->netnum;
+                chindex=LorIter->second->chindex;
+                e=LorIter->second->xmldata;
+                if (e) {
+                    action=GetAttribute(e,"type");
+                    if (e->QueryIntAttribute("intensity",&intensity) == TIXML_SUCCESS) {
+                        if (action == _("intensity")) {
+                            xout.SetIntensity(netnum,chindex,intensity);
+                        } else if (action == _("twinkle")) {
+                            xout.twinkle(netnum,chindex,400,intensity);
+                        } else if (action == _("shimmer")) {
+                            xout.shimmer(netnum,chindex,100,intensity);
+                        }
+                    } else if (e->QueryIntAttribute("startIntensity",&startint) == TIXML_SUCCESS) {
+                        if (e->QueryIntAttribute("endIntensity",&endint) == TIXML_SUCCESS) {
+                            duration = endmsec - startmsec;
+                            if (action == _("intensity")) {
+                                xout.ramp(netnum,chindex,duration,startint,endint);
+                            } else if (action == _("twinkle")) {
+                                xout.twinklefade(netnum,chindex,400,duration,startint,endint);
+                            } else if (action == _("shimmer")) {
+                                xout.shimmerfade(netnum,100,chindex,duration,startint,endint);
+                            }
+                        }
+                    }
+                } else {
+                    xout.off(netnum,chindex);
+                }
+
+                LorIter++;
+            }
+            xout.TimerEnd();
+            break;
+        case PAUSE_LOR:
+            if (PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING) {
+                ResetTimer(PLAYING_LOR);
+                msec = PlayerDlg->MediaCtrl->Tell();
+                LorIter=msec < 500 ? LorEvents.begin() : LorEvents.lower_bound(msec / 10);
+            } else {
+                TimerNoPlay();
+            }
+            break;
+        case PLAYING_VIX:
+            if (PlayerDlg->MediaCtrl->GetState() != wxMEDIASTATE_PLAYING) {
+                ResetTimer(PAUSE_VIX);
+                return;
+            }
+            break;
+        case PAUSE_VIX:
+            if (PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING) {
+                ResetTimer(PLAYING_VIX);
+            } else {
+                TimerNoPlay();
+            }
+            break;
+        default:
+            TimerNoPlay();
+            break;
+    }
+    lastmsec=msec;
 }
 
 wxString xScheduleFrame::GetAttribute(TiXmlElement* e, const char *attr)
@@ -578,7 +722,7 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
         wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
         return;
     }
-    EventMap.clear();
+    LorEvents.clear();
     TiXmlDocument doc( FileName.mb_str() );
     if (doc.LoadFile()) {
         TiXmlElement* root=doc.RootElement();
@@ -590,7 +734,9 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
         }
         xout.SetMaxIntensity(100);
         if (wxFile::Exists(musicFilename) && PlayerDlg->MediaCtrl->Load(musicFilename)) {
-            PlayerDlg->Show();
+            ResetTimer(PAUSE_LOR);
+            PlayerDlg->ShowModal();
+            ResetTimer(NO_SEQ);
         } else {
             wxMessageBox(_("Unable to play file:\n")+musicFilename, _("Error"));
         }
@@ -602,7 +748,7 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
 
 void xScheduleFrame::LoadLorChannels(TiXmlElement* n)
 {
-    int netnum, chindex, unit, circuit;
+    int netnum, unit, circuit;
     for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
         if (e->ValueStr() == "channel") {
             if (e->QueryIntAttribute("unit",&unit) == TIXML_SUCCESS &&
@@ -618,14 +764,24 @@ void xScheduleFrame::LoadLorChannels(TiXmlElement* n)
 
 void xScheduleFrame::LoadLorChannel(TiXmlElement* n, int netnum, int chindex)
 {
-    int start;
+    int start,end,lastend=0;
+    if (!PortsOK) {
+        wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
+        return;
+    }
     for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
         if (e->ValueStr() == "effect") {
-            if (e->QueryIntAttribute("startCentisecond",&start) == TIXML_SUCCESS) {
-                EventMap.insert(LorEventPair(start, new LorEventClass(netnum,chindex,e)));
+            if (e->QueryIntAttribute("startCentisecond",&start) == TIXML_SUCCESS &&
+                e->QueryIntAttribute("endCentisecond",&end) == TIXML_SUCCESS) {
+                if (start != lastend && lastend > 0) {
+                    LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,start,0)));
+                }
+                LorEvents.insert(LorEventPair(start, new LorEventClass(netnum,chindex,end,e)));
+                lastend=end;
             }
         }
     }
+    LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,lastend,0)));
 }
 
 void xScheduleFrame::PlayVixenFile(wxString& FileName)
@@ -733,7 +889,7 @@ void xScheduleFrame::OnAuiToolBarItemSaveClick(wxCommandEvent& event)
 
 void xScheduleFrame::SaveFile()
 {
-    int RowCount,baseid;
+    unsigned int RowCount,baseid;
     TiXmlElement* plist;
     TiXmlElement* item;
     wxCheckBox* chkbox;
@@ -856,7 +1012,7 @@ void xScheduleFrame::LoadPlaylists(TiXmlElement* n)
 {
     for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
         if (e->ValueStr() == "playlist") {
-            LoadPlaylist(e);
+            //LoadPlaylist(e);
         }
     }
 }

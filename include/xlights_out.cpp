@@ -38,6 +38,10 @@ public:
     strcpy(SerialConfig,"8N1");
   };
 
+  virtual ~xNetwork() {
+    if (serptr) delete serptr;
+  };
+  
   unsigned char MapIntensity(unsigned char intensity) {
     return IntensityMap[intensity];
   };
@@ -65,6 +69,9 @@ public:
   };
 
   virtual void TimerEnd() =0;
+
+  virtual void ResetTimer() {
+  };
 
   virtual void SetIntensity (int chindex, unsigned char intensity) {
     SetMappedIntensity(chindex, IntensityMap[intensity]);
@@ -265,7 +272,10 @@ public:
     for(unsigned int i=0; i < channels.size(); ++i) {
       delete channels[i];
     }
-    if (serptr) delete serptr;
+  };
+
+  void ResetTimer() {
+    timerCallbackList.clear();
   };
 
   // callbacks return true if they are finished, false if they will continue to run
@@ -528,6 +538,9 @@ public:
   };
 
   void SetChannelCount(int numchannels) {
+  };
+
+  void ResetTimer() {
     lastheartbeat=-1;
   };
 
@@ -605,10 +618,12 @@ public:
 class xOutput {
 protected:
   xNetwork* networks[MAXNETWORKS];
+  int lastnetnum;
 
 public:
   xOutput() {
     srand((unsigned)time(NULL));
+    lastnetnum = -1;
     for (int i=0; i<MAXNETWORKS; i++)
       networks[i]=0;
   };
@@ -624,6 +639,7 @@ public:
     networks[netnum] = netobj;
     netobj->SetChannelCount(chcount);
     netobj->InitSerialPort(portname, baudrate);
+    if (netnum > lastnetnum) lastnetnum = netnum;
   };
 
   int addnetwork (xNetwork* netobj, int chcount, const char* portname, int baudrate) {
@@ -642,14 +658,21 @@ public:
     }
   };
 
+  // chindex starts at 0
+  // duration is in milliseconds
+  // intensity values are relative to the last SetMaxIntensity call
   void ramp (int netnum, int chindex, int duration, int startintensity, int endintensity) {
     networks[netnum]->ramp(chindex, duration, startintensity, endintensity);
   };
 
+  // chindex starts at 0
+  // intensity is relative to the last SetMaxIntensity call
   void SetIntensity (int netnum, int chindex, int intensity) {
     networks[netnum]->SetIntensity(chindex, intensity);
   };
 
+  // chindex starts at 0
+  // intensity is relative to the last SetMaxIntensity call
   void twinkle (int netnum, int chindex, int period, int intensity) {
     networks[netnum]->twinkle(chindex, period, intensity);
   };
@@ -671,19 +694,25 @@ public:
   };
 
   void alloff () {
-    for(int i=0; i < MAXNETWORKS; ++i) {
+    for(int i=0; i <= lastnetnum; ++i) {
       if (networks[i]) networks[i]->alloff();
     }
   };
 
+  void ResetTimer() {
+    for(int i=0; i <= lastnetnum; ++i) {
+      if (networks[i]) networks[i]->ResetTimer();
+    }
+  };
+
   void TimerStart(long msec) {
-    for(int i=0; i < MAXNETWORKS; ++i) {
+    for(int i=0; i <= lastnetnum; ++i) {
       if (networks[i]) networks[i]->TimerStart(msec);
     }
   };
 
   void TimerEnd() {
-    for(int i=0; i < MAXNETWORKS; ++i) {
+    for(int i=0; i <= lastnetnum; ++i) {
       if (networks[i]) networks[i]->TimerEnd();
     }
   };

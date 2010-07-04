@@ -33,6 +33,7 @@
 #include <wx/checklst.h>
 #include <wx/datetime.h>
 #include <wx/file.h>
+#include <wx/timer.h>
 
 #include <set>
 #include <map>
@@ -48,14 +49,16 @@ class LorEventClass
 {
     public:
 
-    LorEventClass(int net_num, int ch_index, TiXmlElement* xml_data) {
+    LorEventClass(int net_num, int ch_index, int End_Centi, TiXmlElement* xml_data) {
         netnum=net_num;
         chindex=ch_index;
+        EndCentiSec=End_Centi;
         xmldata=xml_data;
     }
 
     int netnum;
     int chindex;
+    int EndCentiSec;
     TiXmlElement* xmldata;
 };
 
@@ -113,6 +116,7 @@ class xScheduleFrame: public wxFrame
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         //*)
+        static const long ID_TIMER;
 
         //(*Declarations(xScheduleFrame)
         wxAuiManager* AuiManager1;
@@ -132,6 +136,26 @@ class xScheduleFrame: public wxFrame
         wxChoice* ChoiceEndTime;
         //*)
 
+        // these are added to 1000*pagenum to get the control id
+        enum PlayListIds {
+            CHKBOX_AUDIO,
+            CHKBOX_VIDEO,
+            CHKBOX_LOR,
+            CHKBOX_VIXEN,
+            UP_BUTTON,
+            DOWN_BUTTON,
+            PLAY_BUTTON,
+            PLAYLIST
+        };
+
+        enum SeqPlayerStates {
+            NO_SEQ,
+            PLAYING_LOR,
+            PLAYING_VIX,
+            PAUSE_LOR,
+            PAUSE_VIX
+        };
+
         wxString CurrentDir;
         wxFileName networkFile;
         wxFileName scheduleFile;
@@ -140,7 +164,10 @@ class xScheduleFrame: public wxFrame
         PlayerDialog* PlayerDlg;
         bool UnsavedChanges;
         bool PortsOK;
-        LorEventMap EventMap;
+        LorEventMap LorEvents;
+        wxTimer timer;
+        wxDateTime starttime;
+        SeqPlayerStates SeqPlayerState;
 
         wxString GetAttribute(TiXmlElement* e, const char *attr);
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
@@ -163,18 +190,9 @@ class xScheduleFrame: public wxFrame
         void PlayVixenFile(wxString& FileName);
         void LoadLorChannels(TiXmlElement* n);
         void LoadLorChannel(TiXmlElement* n, int netnum, int chindex);
-
-        // these are added to 1000*pagenum to get the control id
-        enum PlayListIds {
-            CHKBOX_AUDIO,
-            CHKBOX_VIDEO,
-            CHKBOX_LOR,
-            CHKBOX_VIXEN,
-            UP_BUTTON,
-            DOWN_BUTTON,
-            PLAY_BUTTON,
-            PLAYLIST
-        };
+        void OnTimer(wxTimerEvent& event);
+        void ResetTimer(SeqPlayerStates newstate);
+        void TimerNoPlay();
 
         DECLARE_EVENT_TABLE()
 };

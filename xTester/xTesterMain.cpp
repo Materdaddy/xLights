@@ -10,13 +10,14 @@
 #include "xTesterMain.h"
 #include <wx/msgdlg.h>
 #include <wx/config.h>
+#include <wx/icon.h>
+
+#include "../include/xlights.xpm"
+
 
 //(*InternalHeaders(xTesterFrame)
-#include <wx/bitmap.h>
-#include <wx/icon.h>
 #include <wx/font.h>
 #include <wx/intl.h>
-#include <wx/image.h>
 #include <wx/string.h>
 //*)
 
@@ -138,11 +139,6 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
 
     Create(parent, wxID_ANY, _("xTester"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(476,263));
-    {
-    	wxIcon FrameIcon;
-    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("../include/xlights.ico"))));
-    	SetIcon(FrameIcon);
-    }
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
     Panel3 = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, _T("ID_PANEL4"));
     FlexGridSizer2 = new wxFlexGridSizer(2, 2, 0, 0);
@@ -308,6 +304,9 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnAbout);
     //*)
+
+    wxIcon FrameIcon(xlights_xpm);
+    SetIcon(FrameIcon);
 
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));

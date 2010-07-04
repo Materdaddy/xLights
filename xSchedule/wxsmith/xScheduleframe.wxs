@@ -27,7 +27,6 @@
 											<pos>6,10</pos>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_ADD" variable="AuiToolBarItemAdd" member="yes">
-													<bitmap>../bin/add.png</bitmap>
 													<shorthelp>Add playlist</shorthelp>
 													<handler function="OnAuiToolBarItemAddClick" entry="EVT_TOOL" />
 												</object>
@@ -35,7 +34,6 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_DEL" variable="AuiToolBarItemDel" member="yes">
-													<bitmap>../bin/remove.png</bitmap>
 													<shorthelp>Delete playlist</shorthelp>
 													<handler function="OnAuiToolBarItemDelClick" entry="EVT_TOOL" />
 												</object>
@@ -43,7 +41,6 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_HELP" variable="AuiToolBarItemHelp" member="yes">
-													<bitmap>../bin/help.png</bitmap>
 													<shorthelp>Help</shorthelp>
 													<handler function="OnAuiToolBarItemHelpClick" entry="EVT_TOOL" />
 												</object>
@@ -51,7 +48,6 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_SAVE" variable="AuiToolBarItemSave" member="yes">
-													<bitmap>../bin/floppy_disc.png</bitmap>
 													<shorthelp>Save schedule</shorthelp>
 													<handler function="OnAuiToolBarItemSaveClick" entry="EVT_TOOL" />
 												</object>

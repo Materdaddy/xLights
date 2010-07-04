@@ -14,12 +14,12 @@
 #include <wx/config.h>
 #include <wx/utils.h>
 
+#include "../include/xlights.xpm"
+
+
 //(*InternalHeaders(MainMenuFrame)
-#include <wx/bitmap.h>
-#include <wx/icon.h>
 #include <wx/font.h>
 #include <wx/intl.h>
-#include <wx/image.h>
 #include <wx/string.h>
 //*)
 
@@ -84,11 +84,6 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
 
     Create(parent, wxID_ANY, _("xLights"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(204,368));
-    {
-    	wxIcon FrameIcon;
-    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("../include/xlights.ico"))));
-    	SetIcon(FrameIcon);
-    }
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, _T("ID_PANEL1"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -156,6 +151,8 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnAbout);
     //*)
 
+    wxIcon FrameIcon(xlights_xpm);
+    SetIcon(FrameIcon);
     wxStandardPathsBase& stdp = wxStandardPaths::Get();
     ThisExe = stdp.GetExecutablePath();
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));

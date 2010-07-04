@@ -2,7 +2,6 @@
 <wxsmith>
 	<object class="wxFrame" name="xTesterFrame">
 		<title>xTester</title>
-		<icon>../include/xlights.ico</icon>
 		<size>476,263</size>
 		<id_arg>0</id_arg>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
