@@ -27,6 +27,7 @@
 											<pos>6,10</pos>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_ADD" variable="AuiToolBarItemAdd" member="yes">
+													<bitmap stock_id="xlights_add" stock_client="wxART_TOOLBAR" />
 													<shorthelp>Add playlist</shorthelp>
 													<handler function="OnAuiToolBarItemAddClick" entry="EVT_TOOL" />
 												</object>
@@ -34,6 +35,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_DEL" variable="AuiToolBarItemDel" member="yes">
+													<bitmap stock_id="xlights_remove" stock_client="wxART_TOOLBAR" />
 													<shorthelp>Delete playlist</shorthelp>
 													<handler function="OnAuiToolBarItemDelClick" entry="EVT_TOOL" />
 												</object>
@@ -41,6 +43,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_HELP" variable="AuiToolBarItemHelp" member="yes">
+													<bitmap stock_id="xlights_help" stock_client="wxART_TOOLBAR" />
 													<shorthelp>Help</shorthelp>
 													<handler function="OnAuiToolBarItemHelpClick" entry="EVT_TOOL" />
 												</object>
@@ -48,6 +51,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_SAVE" variable="AuiToolBarItemSave" member="yes">
+													<bitmap stock_id="xlights_floppy_disc" stock_client="wxART_TOOLBAR" />
 													<shorthelp>Save schedule</shorthelp>
 													<handler function="OnAuiToolBarItemSaveClick" entry="EVT_TOOL" />
 												</object>

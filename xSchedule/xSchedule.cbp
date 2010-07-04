@@ -94,9 +94,6 @@
 		<Compiler>
 			<Add option="-DwxUSE_UNICODE" />
 		</Compiler>
-		<ResourceCompiler>
-			<Add directory="$(#wx)/include" />
-		</ResourceCompiler>
 		<Linker>
 			<Add library="../bin/libctb.a" />
 		</Linker>

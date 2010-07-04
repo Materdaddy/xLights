@@ -11,8 +11,12 @@
 #include <wx/msgdlg.h>
 #include <wx/dir.h>
 #include <wx/filename.h>
+#include <wx/artprov.h>
 
 //(*InternalHeaders(xScheduleFrame)
+#include <wx/artprov.h>
+#include <wx/bitmap.h>
+#include <wx/icon.h>
 #include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
@@ -33,7 +37,7 @@
 #include "../include/play.xpm"
 
 #define XTIMER_INTERVAL 100
-/*
+
 class MyArtProvider : public wxArtProvider
 {
 protected:
@@ -45,6 +49,8 @@ wxBitmap MyArtProvider::CreateBitmap(const wxArtID& id,
                                      const wxArtClient& client,
                                      const wxSize& WXUNUSED(size))
 {
+    if (client != wxART_TOOLBAR)
+        return wxNullBitmap;
     if (id == _("xlights_add"))
         return wxBitmap(add_xpm);
     if (id == _("xlights_remove"))
@@ -55,7 +61,7 @@ wxBitmap MyArtProvider::CreateBitmap(const wxArtID& id,
         return wxBitmap(help_xpm);
     return wxNullBitmap;
 };
-*/
+
 xOutput xout;
 
 //helper functions
@@ -123,7 +129,7 @@ END_EVENT_TABLE()
 
 xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIMER)
 {
-    //wxArtProvider::Push(new MyArtProvider);
+    wxArtProvider::Push(new MyArtProvider);
 
     //(*Initialize(xScheduleFrame)
     wxMenuItem* MenuItem2;
@@ -163,10 +169,10 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     Panel2 = new wxPanel(Panel1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, _T("ID_PANEL2"));
     AuiManager1 = new wxAuiManager(Panel2, wxAUI_MGR_DEFAULT);
     AuiToolBar1 = new wxAuiToolBar(Panel2, ID_AUITOOLBAR1, wxPoint(6,10), wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-    //AuiToolBar1->AddTool(ID_AUITOOLBARITEM_ADD, _("Add playlist"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Add playlist"), wxEmptyString, NULL);
-    //AuiToolBar1->AddTool(ID_AUITOOLBARITEM_DEL, _("Delete playlist"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Delete playlist"), wxEmptyString, NULL);
-    //AuiToolBar1->AddTool(ID_AUITOOLBARITEM_HELP, _("Help"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Help"), wxEmptyString, NULL);
-    //AuiToolBar1->AddTool(ID_AUITOOLBARITEM_SAVE, _("Save"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Save schedule"), wxEmptyString, NULL);
+    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_ADD, _("Add playlist"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("xlights_add")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Add playlist"), wxEmptyString, NULL);
+    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_DEL, _("Delete playlist"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("xlights_remove")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Delete playlist"), wxEmptyString, NULL);
+    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_HELP, _("Help"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("xlights_help")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Help"), wxEmptyString, NULL);
+    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_SAVE, _("Save"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("xlights_floppy_disc")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Save schedule"), wxEmptyString, NULL);
     AuiToolBar1->Realize();
     AuiManager1->AddPane(AuiToolBar1, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper());
     AuiManager1->Update();
@@ -272,8 +278,8 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAbout);
     //*)
 
-   	//wxIcon FrameIcon(xlights_xpm);
-   	//SetIcon(FrameIcon);
+   	wxIcon FrameIcon(xlights_xpm);
+   	SetIcon(FrameIcon);
     PlayerDlg = new PlayerDialog(this);
     ResetTimer(NO_SEQ);
 
@@ -339,7 +345,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     scheduleFile.SetFullName(_(XLIGHTS_SCHEDULE_FILE));
     UnsavedChanges=false;
     if (scheduleFile.FileExists()) {
-        //LoadScheduleFile();
+        LoadScheduleFile();
     }
 }
 
@@ -357,7 +363,7 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     wxFont StaticText1Font(10,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText1->SetFont(StaticText1Font);
     FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-/*
+
     id=baseid+UP_BUTTON;
     wxBitmapButton* BitmapButtonUp = new wxBitmapButton(PanelPlayList, id, wxBitmap(up_xpm));
     BitmapButtonUp->SetDefault();
@@ -378,7 +384,7 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     ButtonPlay->SetHelpText(_("Plays the currently selected item in the play list"));
     FlexGridSizer5->Add(ButtonPlay, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonPlayClick);
-*/
+
     FlexGridSizer4->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     wxBoxSizer* BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
     wxStaticText* StaticText2 = new wxStaticText(PanelPlayList, -1, _("Files:"));
@@ -694,10 +700,10 @@ void xScheduleFrame::OnButtonPlayClick()
     if (filename.IsEmpty()) {
         wxMessageBox(_("Nothing selected!"), _("Error"));
     } else {
-        wxFileName* oName=new wxFileName(CurrentDir, filename);
-        wxString fullpath=oName->GetFullPath();
+        wxFileName oName(CurrentDir, filename);
+        wxString fullpath=oName.GetFullPath();
         PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
-        switch (ExtType(oName->GetExt())) {
+        switch (ExtType(oName.GetExt())) {
             case 'a':
             case 'v':
                 if (wxFile::Exists(fullpath) && PlayerDlg->MediaCtrl->Load(fullpath)) {
@@ -733,6 +739,12 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
             }
         }
         xout.SetMaxIntensity(100);
+
+        wxFileName fn1(musicFilename);
+        if (!fn1.FileExists()) {
+            wxFileName fn2(CurrentDir,fn1.GetFullName());
+            musicFilename=fn2.GetFullPath();
+        }
         if (wxFile::Exists(musicFilename) && PlayerDlg->MediaCtrl->Load(musicFilename)) {
             ResetTimer(PAUSE_LOR);
             PlayerDlg->ShowModal();
@@ -1012,7 +1024,7 @@ void xScheduleFrame::LoadPlaylists(TiXmlElement* n)
 {
     for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
         if (e->ValueStr() == "playlist") {
-            //LoadPlaylist(e);
+            LoadPlaylist(e);
         }
     }
 }
