@@ -485,10 +485,12 @@ void xScheduleFrame::ResetTimer(SeqPlayerStates newstate) {
 void xScheduleFrame::OnTimer(wxTimerEvent& event)
 {
     long msec=0;
-    int startmsec, endmsec, duration, intensity, startint, endint;
+    int startmsec, endmsec, duration, lorintensity, startint, endint, period;
     int netnum, chindex;
     static long lastmsec;
     static LorEventMap::iterator LorIter;
+    static std::string LastIntensity;
+    char vixintensity;
     TiXmlElement* e;
     wxString action;
     wxTimeSpan ts;
@@ -510,13 +512,13 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 e=LorIter->second->xmldata;
                 if (e) {
                     action=GetAttribute(e,"type");
-                    if (e->QueryIntAttribute("intensity",&intensity) == TIXML_SUCCESS) {
+                    if (e->QueryIntAttribute("intensity",&lorintensity) == TIXML_SUCCESS) {
                         if (action == _("intensity")) {
-                            xout.SetIntensity(netnum,chindex,intensity);
+                            xout.SetIntensity(netnum,chindex,lorintensity);
                         } else if (action == _("twinkle")) {
-                            xout.twinkle(netnum,chindex,400,intensity);
+                            xout.twinkle(netnum,chindex,400,lorintensity);
                         } else if (action == _("shimmer")) {
-                            xout.shimmer(netnum,chindex,100,intensity);
+                            xout.shimmer(netnum,chindex,100,lorintensity);
                         }
                     } else if (e->QueryIntAttribute("startIntensity",&startint) == TIXML_SUCCESS) {
                         if (e->QueryIntAttribute("endIntensity",&endint) == TIXML_SUCCESS) {
@@ -552,9 +554,23 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 ResetTimer(PAUSE_VIX);
                 return;
             }
+            msec = PlayerDlg->MediaCtrl->Tell();
+            period = msec / VixEventPeriod;
+            xout.TimerStart(msec);
+            if (period < VixNumPeriods) {
+                for (chindex=0; chindex<VixLastChannel; chindex++) {
+                    vixintensity=VixEventData[chindex*VixNumPeriods+period];
+                    if (vixintensity != LastIntensity[chindex]) {
+                        xout.SetIntensity(0, chindex, vixintensity);
+                        LastIntensity[chindex]=vixintensity;
+                    }
+                }
+            }
+            xout.TimerEnd();
             break;
         case PAUSE_VIX:
             if (PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING) {
+                LastIntensity.resize(VixLastChannel,1);
                 ResetTimer(PLAYING_VIX);
             } else {
                 TimerNoPlay();
@@ -798,7 +814,70 @@ void xScheduleFrame::LoadLorChannel(TiXmlElement* n, int netnum, int chindex)
 
 void xScheduleFrame::PlayVixenFile(wxString& FileName)
 {
-    wxMessageBox(_("Don't know how to play Vixen files yet!"), _("Error"));
+    int MaxIntensity = 255;
+    int toValue;
+    std::string tag;
+    wxFileName fn;
+    const TiXmlNode* xmlNode;
+    const TiXmlElement* pluginNode;
+    const TiXmlText* textNode;
+    fn.AssignDir(CurrentDir);
+    if (!PortsOK) {
+        wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
+        return;
+    }
+    VixLastChannel = -1;
+    VixEventPeriod=-1;
+    TiXmlDocument doc( FileName.mb_str() );
+    if (doc.LoadFile()) {
+        TiXmlElement* root=doc.RootElement();
+        for( TiXmlElement* e=root->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
+            tag = e->ValueStr();
+            if (tag == "EventPeriodInMilliseconds") {
+                VixEventPeriod = atoi(e->GetText());
+            } else if (tag == "MaximumLevel") {
+                MaxIntensity = atoi(e->GetText());
+            } else if (tag == "Audio" || tag == "Song") {
+                wxString filename(e->Attribute("filename"), wxConvUTF8);
+                fn.SetFullName(filename);
+            } else if (tag == "EventValues") {
+                xmlNode = e->FirstChild();
+                if (xmlNode && xmlNode->Type() == TiXmlNode::TEXT) {
+                    textNode=xmlNode->ToText();
+                    VixEventData = base64_decode(textNode->ValueStr());
+                }
+            } else if (tag == "PlugInData") {
+                xmlNode = e->FirstChild("PlugIn");
+                if (xmlNode) {
+                    pluginNode=xmlNode->ToElement();
+                    if (pluginNode->QueryIntAttribute("to",&toValue) == TIXML_SUCCESS) {
+                        if (toValue > VixLastChannel) VixLastChannel=toValue;
+                    }
+                }
+            }
+        }
+        xout.SetMaxIntensity(MaxIntensity);
+
+        if (VixEventPeriod < 0) {
+            wxMessageBox(_("EventPeriodInMilliseconds is undefined"), _("Vixen Error"));
+        } else if (VixLastChannel < 0) {
+            wxMessageBox(_("Unable to determine number of channels"), _("Vixen Error"));
+        } else if (!fn.FileExists()) {
+            wxMessageBox(_("No such file:\n")+fn.GetFullPath(), _("Vixen Error"));
+        } else if (!PlayerDlg->MediaCtrl->Load(fn.GetFullPath())) {
+            wxMessageBox(_("Unable to play file:\n")+fn.GetFullPath(), _("Vixen Error"));
+        } else {
+            VixNumPeriods = VixEventData.size() / VixLastChannel;
+            wxString msg = wxString::Format(_("Data size=%d, Channel Count=%d, NumPeriods=%d, Period Len=%d, Media File=%s"),VixEventData.size(),VixLastChannel,VixNumPeriods,VixEventPeriod,fn.GetFullPath().c_str());
+            StatusBar1->SetStatusText(msg);
+            ResetTimer(PAUSE_VIX);
+            PlayerDlg->ShowModal();
+            ResetTimer(NO_SEQ);
+        }
+    } else {
+        wxString msg(doc.ErrorDesc(), wxConvUTF8);
+        wxMessageBox(msg, _("Error Loading File"));
+    }
 }
 
 void xScheduleFrame::OnButtonUpClick()
@@ -1153,3 +1232,55 @@ GridSelection xScheduleFrame::getGridSelection(wxGrid & grid)
 
   return selection;
 }
+
+
+// from: http://www.adp-gmbh.ch/cpp/common/base64.html
+// Copyright (C) 2004-2008 René Nyffenegger
+static inline bool is_base64(unsigned char c) {
+  return (isalnum(c) || (c == '+') || (c == '/'));
+}
+
+static const std::string base64_chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+std::string xScheduleFrame::base64_decode(std::string const& encoded_string) {
+  int in_len = encoded_string.size();
+  int i = 0;
+  int j = 0;
+  int in_ = 0;
+  unsigned char char_array_4[4], char_array_3[3];
+  std::string ret;
+
+  while (in_len-- && ( encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
+    char_array_4[i++] = encoded_string[in_]; in_++;
+    if (i ==4) {
+      for (i = 0; i <4; i++)
+        char_array_4[i] = base64_chars.find(char_array_4[i]);
+
+      char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+      char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+      char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+      for (i = 0; (i < 3); i++)
+        ret += char_array_3[i];
+      i = 0;
+    }
+  }
+
+  if (i) {
+    for (j = i; j <4; j++)
+      char_array_4[j] = 0;
+
+    for (j = 0; j <4; j++)
+      char_array_4[j] = base64_chars.find(char_array_4[j]);
+
+    char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+    char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+    char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+    for (j = 0; (j < i - 1); j++) ret += char_array_3[j];
+  }
+
+  return ret;
+}
+

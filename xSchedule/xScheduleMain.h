@@ -168,6 +168,10 @@ class xScheduleFrame: public wxFrame
         wxTimer timer;
         wxDateTime starttime;
         SeqPlayerStates SeqPlayerState;
+        int VixEventPeriod;
+        int VixNumPeriods;
+        int VixLastChannel;
+        std::string VixEventData;
 
         wxString GetAttribute(TiXmlElement* e, const char *attr);
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
@@ -193,6 +197,7 @@ class xScheduleFrame: public wxFrame
         void OnTimer(wxTimerEvent& event);
         void ResetTimer(SeqPlayerStates newstate);
         void TimerNoPlay();
+        std::string base64_decode(std::string const& encoded_string);
 
         DECLARE_EVENT_TABLE()
 };
