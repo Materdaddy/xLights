@@ -14,12 +14,15 @@
 #include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/app.h>
 #include <wx/menu.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/grid.h>
+#include <wx/snglinst.h>
 #include <wx/choice.h>
 #include <wx/button.h>
+#include <wx/utils.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
 //*)
@@ -37,6 +40,7 @@
 
 #include <set>
 #include <map>
+#include <vector>
 
 #include "PlayerDialog.h"
 #include "NewListDialog.h"
@@ -87,6 +91,7 @@ class xScheduleFrame: public wxFrame
         void OnAuiToolBarItemSaveClick(wxCommandEvent& event);
         void OnButtonSetClick(wxCommandEvent& event);
         void OnButtonClearClick(wxCommandEvent& event);
+        void OnMenuItemRefreshSelected(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -112,6 +117,7 @@ class xScheduleFrame: public wxFrame
         static const long idMenuAddList;
         static const long idMenuRenameList;
         static const long idMenuDelList;
+        static const long ID_MENUITEM1;
         static const long idMenuHelpContent;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
@@ -128,6 +134,7 @@ class xScheduleFrame: public wxFrame
         wxButton* ButtonClear;
         wxGrid* Grid1;
         wxChoice* ChoiceStartTime;
+        wxSingleInstanceChecker SingleInstanceChecker1;
         wxStaticText* StaticText5;
         wxPanel* PanelCal;
         wxStatusBar* StatusBar1;
@@ -172,6 +179,7 @@ class xScheduleFrame: public wxFrame
         int VixNumPeriods;
         int VixLastChannel;
         std::string VixEventData;
+        std::vector<int> VixNetwork;
 
         wxString GetAttribute(TiXmlElement* e, const char *attr);
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);

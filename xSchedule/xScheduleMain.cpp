@@ -113,6 +113,7 @@ const long xScheduleFrame::idMenuQuit = wxNewId();
 const long xScheduleFrame::idMenuAddList = wxNewId();
 const long xScheduleFrame::idMenuRenameList = wxNewId();
 const long xScheduleFrame::idMenuDelList = wxNewId();
+const long xScheduleFrame::ID_MENUITEM1 = wxNewId();
 const long xScheduleFrame::idMenuHelpContent = wxNewId();
 const long xScheduleFrame::idMenuAbout = wxNewId();
 const long xScheduleFrame::ID_STATUSBAR1 = wxNewId();
@@ -132,25 +133,26 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     wxArtProvider::Push(new MyArtProvider);
 
     //(*Initialize(xScheduleFrame)
+    wxMenu* MenuHelp;
     wxMenuItem* MenuItem2;
     wxMenuItem* MenuItemAddList;
     wxFlexGridSizer* FlexGridSizer10;
-    wxMenu* Menu3;
+    wxMenuItem* MenuItemRefresh;
     wxMenuItem* MenuItem1;
     wxMenuItem* MenuItem4;
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
-    wxMenu* Menu1;
     wxMenuItem* MenuItemDelList;
     wxMenuItem* MenuItem3;
     wxFlexGridSizer* FlexGridSizer8;
+    wxMenu* MenuFile;
     wxMenuItem* MenuItemRenameList;
     wxMenuBar* MenuBar1;
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer11;
     wxBoxSizer* BoxSizer3;
-    wxMenu* Menu2;
+    wxMenu* MenuPlaylist;
 
     Create(parent, wxID_ANY, _("xSchedule"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(635,311));
@@ -234,26 +236,28 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     FlexGridSizer1->Add(Panel1, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     SetSizer(FlexGridSizer1);
     MenuBar1 = new wxMenuBar();
-    Menu1 = new wxMenu();
-    MenuItem3 = new wxMenuItem(Menu1, idMenuSave, _("Save\tCtrl-S"), wxEmptyString, wxITEM_NORMAL);
-    Menu1->Append(MenuItem3);
-    MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
-    Menu1->Append(MenuItem1);
-    MenuBar1->Append(Menu1, _("&File"));
-    Menu3 = new wxMenu();
-    MenuItemAddList = new wxMenuItem(Menu3, idMenuAddList, _("Add"), wxEmptyString, wxITEM_NORMAL);
-    Menu3->Append(MenuItemAddList);
-    MenuItemRenameList = new wxMenuItem(Menu3, idMenuRenameList, _("Rename"), wxEmptyString, wxITEM_NORMAL);
-    Menu3->Append(MenuItemRenameList);
-    MenuItemDelList = new wxMenuItem(Menu3, idMenuDelList, _("Delete"), wxEmptyString, wxITEM_NORMAL);
-    Menu3->Append(MenuItemDelList);
-    MenuBar1->Append(Menu3, _("Playlist"));
-    Menu2 = new wxMenu();
-    MenuItem4 = new wxMenuItem(Menu2, idMenuHelpContent, _("Content"), wxEmptyString, wxITEM_NORMAL);
-    Menu2->Append(MenuItem4);
-    MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
-    Menu2->Append(MenuItem2);
-    MenuBar1->Append(Menu2, _("Help"));
+    MenuFile = new wxMenu();
+    MenuItem3 = new wxMenuItem(MenuFile, idMenuSave, _("Save\tCtrl-S"), wxEmptyString, wxITEM_NORMAL);
+    MenuFile->Append(MenuItem3);
+    MenuItem1 = new wxMenuItem(MenuFile, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
+    MenuFile->Append(MenuItem1);
+    MenuBar1->Append(MenuFile, _("&File"));
+    MenuPlaylist = new wxMenu();
+    MenuItemAddList = new wxMenuItem(MenuPlaylist, idMenuAddList, _("Add"), wxEmptyString, wxITEM_NORMAL);
+    MenuPlaylist->Append(MenuItemAddList);
+    MenuItemRenameList = new wxMenuItem(MenuPlaylist, idMenuRenameList, _("Rename"), wxEmptyString, wxITEM_NORMAL);
+    MenuPlaylist->Append(MenuItemRenameList);
+    MenuItemDelList = new wxMenuItem(MenuPlaylist, idMenuDelList, _("Delete"), wxEmptyString, wxITEM_NORMAL);
+    MenuPlaylist->Append(MenuItemDelList);
+    MenuItemRefresh = new wxMenuItem(MenuPlaylist, ID_MENUITEM1, _("Refresh"), wxEmptyString, wxITEM_NORMAL);
+    MenuPlaylist->Append(MenuItemRefresh);
+    MenuBar1->Append(MenuPlaylist, _("Playlist"));
+    MenuHelp = new wxMenu();
+    MenuItem4 = new wxMenuItem(MenuHelp, idMenuHelpContent, _("Content"), wxEmptyString, wxITEM_NORMAL);
+    MenuHelp->Append(MenuItem4);
+    MenuItem2 = new wxMenuItem(MenuHelp, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
+    MenuHelp->Append(MenuItem2);
+    MenuBar1->Append(MenuHelp, _("Help"));
     SetMenuBar(MenuBar1);
     StatusBar1 = new wxStatusBar(this, ID_STATUSBAR1, 0, _T("ID_STATUSBAR1"));
     int __wxStatusBarWidths_1[1] = { -1 };
@@ -261,6 +265,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     StatusBar1->SetFieldsCount(1,__wxStatusBarWidths_1);
     StatusBar1->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(StatusBar1);
+    SingleInstanceChecker1.Create(wxTheApp->GetAppName() + _T("_") + wxGetUserId() + _T("_Guard"));
     FlexGridSizer1->SetSizeHints(this);
 
     Connect(ID_AUITOOLBARITEM_ADD,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemAddClick);
@@ -274,6 +279,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     Connect(idMenuAddList,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemAddClick);
     Connect(idMenuRenameList,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnMenuItemRenameListSelected);
     Connect(idMenuDelList,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemDelClick);
+    Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnMenuItemRefreshSelected);
     Connect(idMenuHelpContent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemHelpClick);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAbout);
     //*)
@@ -561,7 +567,7 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 for (chindex=0; chindex<VixLastChannel; chindex++) {
                     vixintensity=VixEventData[chindex*VixNumPeriods+period];
                     if (vixintensity != LastIntensity[chindex]) {
-                        xout.SetIntensity(0, chindex, vixintensity);
+                        xout.SetIntensity(VixNetwork[chindex], chindex, vixintensity);
                         LastIntensity[chindex]=vixintensity;
                     }
                 }
@@ -570,6 +576,7 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             break;
         case PAUSE_VIX:
             if (PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING) {
+                if (VixLastChannel > VixNetwork.size()) VixLastChannel=VixNetwork.size();
                 LastIntensity.resize(VixLastChannel,1);
                 ResetTimer(PLAYING_VIX);
             } else {
@@ -612,17 +619,18 @@ void xScheduleFrame::LoadNetworkFile()
 
 void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels)
 {
+    int netnum=-1;
     wxString net3 = NetworkType.Left(3);
     int baud = atoi(BaudRate.mb_str(wxConvUTF8));
     char port[20];
     strcpy( port, (const char*)ComPort.mb_str(wxConvUTF8) );
     try {
         if (net3 == _("LOR")) {
-            xout.addnetwork(new xNetwork_LOR(),MaxChannels,port,baud);
+            netnum=xout.addnetwork(new xNetwork_LOR(),MaxChannels,port,baud);
         } else if (net3 == _("Ren")) {
-            xout.addnetwork(new xNetwork_Renard(),MaxChannels,port,baud);
+            netnum=xout.addnetwork(new xNetwork_Renard(),MaxChannels,port,baud);
         } else if (net3 == _("DMX")) {
-            xout.addnetwork(new xNetwork_DMXentec(),MaxChannels,port,baud);
+            netnum=xout.addnetwork(new xNetwork_DMXentec(),MaxChannels,port,baud);
         }
     }
     catch (const char *str) {
@@ -637,6 +645,8 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
         wxMessageBox(msg+errmsg, _("Communication Error"));
         PortsOK=false;
     }
+    for (int i=0; i<MaxChannels; i++)
+        VixNetwork.push_back(netnum);
 }
 
 void xScheduleFrame::ScanForFiles()
@@ -666,7 +676,10 @@ void xScheduleFrame::ScanForFiles()
             case 'L': ok=CheckBoxLOR->IsChecked(); break;
             case 'V': ok=CheckBoxVixen->IsChecked(); break;
         }
-        if (!ok) CheckListBoxPlay->Delete(i);
+        if (!ok || !oName->FileExists()) {
+            CheckListBoxPlay->Delete(i);
+            UnsavedChanges=true;
+        }
     }
 
     // scan directory for matches
@@ -685,6 +698,7 @@ void xScheduleFrame::ScanForFiles()
             if (ok) {
                 i=CheckListBoxPlay->Append(filename);
                 CheckListBoxPlay->Check(i);
+                UnsavedChanges=true;
             }
         } while (d->GetNext(&filename));
     }
@@ -1129,6 +1143,7 @@ void xScheduleFrame::LoadPlaylist(TiXmlElement* n)
             cnt++;
         }
     }
+    ScanForFiles();
 }
 
 void xScheduleFrame::OnButtonSetClick(wxCommandEvent& event)
@@ -1284,3 +1299,8 @@ std::string xScheduleFrame::base64_decode(std::string const& encoded_string) {
   return ret;
 }
 
+
+void xScheduleFrame::OnMenuItemRefreshSelected(wxCommandEvent& event)
+{
+    ScanForFiles();
+}

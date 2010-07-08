@@ -225,7 +225,7 @@
 			</object>
 		</object>
 		<object class="wxMenuBar" variable="MenuBar1" member="no">
-			<object class="wxMenu" variable="Menu1" member="no">
+			<object class="wxMenu" variable="MenuFile" member="no">
 				<label>&amp;File</label>
 				<object class="wxMenuItem" name="idMenuSave" variable="MenuItem3" member="no">
 					<label>Save</label>
@@ -239,7 +239,7 @@
 					<handler function="OnQuit" entry="EVT_MENU" />
 				</object>
 			</object>
-			<object class="wxMenu" variable="Menu3" member="no">
+			<object class="wxMenu" variable="MenuPlaylist" member="no">
 				<label>Playlist</label>
 				<object class="wxMenuItem" name="idMenuAddList" variable="MenuItemAddList" member="no">
 					<label>Add</label>
@@ -253,8 +253,12 @@
 					<label>Delete</label>
 					<handler function="OnAuiToolBarItemDelClick" entry="EVT_MENU" />
 				</object>
+				<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItemRefresh" member="yes">
+					<label>Refresh</label>
+					<handler function="OnMenuItemRefreshSelected" entry="EVT_MENU" />
+				</object>
 			</object>
-			<object class="wxMenu" variable="Menu2" member="no">
+			<object class="wxMenu" variable="MenuHelp" member="no">
 				<label>Help</label>
 				<object class="wxMenuItem" name="idMenuHelpContent" variable="MenuItem4" member="no">
 					<label>Content</label>
@@ -273,5 +277,6 @@
 			<widths>-1</widths>
 			<styles>wxSB_NORMAL</styles>
 		</object>
+		<object class="wxSingleInstanceChecker" variable="SingleInstanceChecker1" member="yes" />
 	</object>
 </wxsmith>

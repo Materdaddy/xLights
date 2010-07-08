@@ -668,6 +668,7 @@ public:
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
   void SetIntensity (int netnum, int chindex, int intensity) {
+    if (netnum < 0 || netnum >= MAXNETWORKS) return; 
     networks[netnum]->SetIntensity(chindex, intensity);
   };
 
