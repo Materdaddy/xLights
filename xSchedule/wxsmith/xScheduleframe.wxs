@@ -277,6 +277,5 @@
 			<widths>-1</widths>
 			<styles>wxSB_NORMAL</styles>
 		</object>
-		<object class="wxSingleInstanceChecker" variable="SingleInstanceChecker1" member="yes" />
 	</object>
 </wxsmith>

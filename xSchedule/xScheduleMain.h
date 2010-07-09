@@ -3,8 +3,22 @@
  * Purpose:   Defines Application Frame
  * Author:    Matt Brown (dowdybrown@yahoo.com)
  * Created:   2010-05-15
- * Copyright: Matt Brown (dowdybrown.com)
+ * Copyright: 2010 by Matt Brown
  * License:
+     This file is part of xLights.
+
+    xLights is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    xLights is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with xLights.  If not, see <http://www.gnu.org/licenses/>.
  **************************************************************/
 
 #ifndef XSCHEDULEMAIN_H
@@ -14,15 +28,12 @@
 #include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
-#include <wx/app.h>
 #include <wx/menu.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/grid.h>
-#include <wx/snglinst.h>
 #include <wx/choice.h>
 #include <wx/button.h>
-#include <wx/utils.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
 //*)
@@ -129,12 +140,12 @@ class xScheduleFrame: public wxFrame
         wxAuiToolBar* AuiToolBar1;
         wxNotebook* Notebook1;
         wxStaticText* StaticText6;
+        wxMenuItem* MenuItemRefresh;
         wxButton* ButtonSet;
         wxPanel* Panel1;
         wxButton* ButtonClear;
         wxGrid* Grid1;
         wxChoice* ChoiceStartTime;
-        wxSingleInstanceChecker SingleInstanceChecker1;
         wxStaticText* StaticText5;
         wxPanel* PanelCal;
         wxStatusBar* StatusBar1;
