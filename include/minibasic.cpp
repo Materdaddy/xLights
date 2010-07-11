@@ -2,7 +2,7 @@
  * MiniBasic++
  * By Matt Brown
  * An embeddable BASIC interpreter
- * 
+ *
  * Derived from the C implementation by Malcolm Mclean, Leeds University
  */
 
@@ -23,6 +23,10 @@
 class MiniBasicClass {
 
 protected:
+
+virtual void infunc(char*,char*,int) = 0;  /* prompt function */
+virtual void outfunc(char*) = 0;           /* output function */
+virtual void errfunc(const char*) = 0;     /* error function */
 
 enum ErrorCodes {
   ERR_CLEAR = 0,
@@ -88,7 +92,7 @@ typedef struct {
 } DIMVAR;
 
 typedef struct {
-  int type;       /* type of variable (STRID or FLTID or ERROR) */   
+  int type;       /* type of variable (STRID or FLTID or ERRORTOK) */
   char **sval;    /* pointer to string data */
   double *dval;   /* pointer to real data */
 } LVALUE;
@@ -123,7 +127,7 @@ int AND, OR, THEN, STEP, TO, NEXT;
 int EOS, EOL, DIV, MULT, PLUS, MINUS;
 int OPAREN, CPAREN, SHRIEK, COMMA, QUOTE;
 int MOD, EQUALS, GREATER, LESS, SEMICOLON;
-int VALUE, STRID, FLTID, DIMFLTID, DIMSTRID, ERROR;
+int VALUE, STRID, FLTID, DIMFLTID, DIMSTRID, ERRORTOK;
 double dvalue;              /* getvalue result */
 
 
@@ -139,10 +143,6 @@ int ndimvariables;          /* number of dimensioned arrays */
 char *script;               /* script source */
 LINE *lines;                /* list of line starts */
 int nlines;                 /* number of BASIC lines in program */
-
-void (*infunc)(char*,char*,int);  /* input function */
-void (*outfunc)(char*);     /* output function */
-void (*errfunc)(const char*); /* error function */
 
 const char *string;         /* string we are parsing */
 TOKEN *token;               /* current token (lookahead) */
@@ -179,7 +179,7 @@ char *mystrdup(const char *str) {
   Count the instances of ch in str
   Params: str - string to check
           ch - character to count
-  Returns: no time chs occurs in str. 
+  Returns: no time chs occurs in str.
 */
 int mystrcount(const char *str, char ch) {
   int answer = 0;
@@ -200,7 +200,7 @@ int mystrcount(const char *str, char ch) {
 void mystrgrablit(char *dest, const char *src) {
   assert(*src == '"');
   src++;
-  
+
   while(*src) {
     if(*src == '"') {
       if(src[1] == '"') {
@@ -244,7 +244,7 @@ char *mystrend(const char *str, char quote) {
 }
 
 void sendErrorMsg(const char *msg) {
-  if (errfunc) errfunc(msg);
+  errfunc(msg);
 }
 
 /*
@@ -352,7 +352,7 @@ void cleanup(void) {
 void reporterror(int lineno)
 {
   char msgbuf[100];
-  
+
   switch(errorflag) {
     case ERR_CLEAR:
       assert(0);
@@ -439,13 +439,13 @@ TOKEN* gettoken(const char *str)
 
   if(isdigit(*str))
     return &tokentable[VALUE];
-    
+
   int i=firstchartoken;
   while (tokentable[i].tokentype == TOK_CHAR) {
     if (*str == tokentable[i].name[0]) return &tokentable[i];
     i++;
   }
-  
+
   int l;
   while (i < ntokens) {
     //printf("gettoken trying: %d %s\n",i,tokentable[i].name);
@@ -467,7 +467,7 @@ TOKEN* gettoken(const char *str)
     }
   }
 
-  return &tokentable[ERROR];
+  return &tokentable[ERRORTOK];
 }
 
 /*
@@ -573,7 +573,7 @@ int getnextline(const char *str) {
 }
 
 /*
-  check that we have a token of the passed type 
+  check that we have a token of the passed type
   (if not set the errorflag)
   Move parser on to next token. Sets token and string.
 */
@@ -599,7 +599,7 @@ void match(int tok)
 
   string += len;
   token = gettoken(string);
-  if (token->tokennum == ERROR) seterror(ERR_SYNTAX);
+  if (token->tokennum == ERRORTOK) seterror(ERR_SYNTAX);
 }
 
 /*
@@ -622,7 +622,7 @@ char *mystrconcat(const char *str, const char *cat) {
 }
 
 /*
-  compute x!  
+  compute x!
 */
 double factorial(double x) {
   double answer = 1.0;
@@ -856,7 +856,7 @@ double do_now(void) {
   struct tm* timeinfo;
   rawtime=time(NULL);
   timeinfo = localtime ( &rawtime );
-  return dateserial(1900+timeinfo->tm_year, 1+timeinfo->tm_mon, timeinfo->tm_mday) + 
+  return dateserial(1900+timeinfo->tm_year, 1+timeinfo->tm_mon, timeinfo->tm_mday) +
          timeserial(timeinfo->tm_hour, timeinfo->tm_min, (double)timeinfo->tm_sec);
 }
 
@@ -1141,7 +1141,7 @@ double factor() {
 }
 
 /*
-  parses a term 
+  parses a term
 */
 double term(void)
 {
@@ -1201,7 +1201,7 @@ double expr(void)
   Returns: 1 if a string, else 0
 */
 int isstring(TOKEN* token) {
-  if(token->tokennum == STRID || token->tokennum == QUOTE || token->tokennum == DIMSTRID 
+  if(token->tokennum == STRID || token->tokennum == QUOTE || token->tokennum == DIMSTRID
     || token->tokentype == TOK_SFUNC)
   return 1;
   return 0;
@@ -1260,7 +1260,7 @@ char *do_format(void) {
   match(COMMA);
   int fmtidx = integer( expr() );
   match(CPAREN);
-  
+
   time_t utime = floor((d-25569.0)*86400.0);
   timeinfo = gmtime(&utime);
   switch (fmtidx) {
@@ -1337,7 +1337,7 @@ char *do_right(void)
     seterror(ERR_ILLEGALOFFSET);
     return str;
   }
-  
+
   answer = mystrdup( &str[strlen(str) - x] );
   free(str);
   if(!answer) seterror(ERR_OUTOFMEMORY);
@@ -1373,7 +1373,7 @@ char *do_mid(void)
     if(!answer) seterror(ERR_OUTOFMEMORY);
     return answer;
   }
-  
+
   if(x < 1.0) {
     seterror(ERR_ILLEGALOFFSET);
     return str;
@@ -1442,7 +1442,7 @@ char *do_string(void)
   Params: dv - the array's entry in variable list
           ... - integers telling which array element to get
   Returns: the address of that element, 0 on fail
-*/ 
+*/
 void *getdimvar(DIMVAR *dv, ...) {
   va_list vargs;
   int index[5];
@@ -1466,21 +1466,21 @@ void *getdimvar(DIMVAR *dv, ...) {
   if(dv->type == FLTID) {
     switch(dv->ndims) {
       case 1:
-        answer = &dv->dval[ index[0] ]; 
+        answer = &dv->dval[ index[0] ];
         break;
       case 2:
-        answer = &dv->dval[ index[1] * dv->dim[0] 
+        answer = &dv->dval[ index[1] * dv->dim[0]
           + index[0] ];
         break;
       case 3:
-        answer = &dv->dval[ index[2] * (dv->dim[0] * dv->dim[1]) 
-          + index[1] * dv->dim[0] 
+        answer = &dv->dval[ index[2] * (dv->dim[0] * dv->dim[1])
+          + index[1] * dv->dim[0]
           + index[0] ];
         break;
       case 4:
-        answer = &dv->dval[ index[3] * (dv->dim[0] + dv->dim[1] + dv->dim[2]) 
-          + index[2] * (dv->dim[0] * dv->dim[1]) 
-          + index[1] * dv->dim[0] 
+        answer = &dv->dval[ index[3] * (dv->dim[0] + dv->dim[1] + dv->dim[2])
+          + index[2] * (dv->dim[0] * dv->dim[1])
+          + index[1] * dv->dim[0]
           + index[0] ];
       case 5:
         answer = &dv->dval[ index[4] * (dv->dim[0] + dv->dim[1] + dv->dim[2] + dv->dim[3])
@@ -1493,21 +1493,21 @@ void *getdimvar(DIMVAR *dv, ...) {
   } else if(dv->type = STRID) {
     switch(dv->ndims) {
       case 1:
-        answer = &dv->str[ index[0] ]; 
+        answer = &dv->str[ index[0] ];
         break;
       case 2:
-        answer = &dv->str[ index[1] * dv->dim[0] 
+        answer = &dv->str[ index[1] * dv->dim[0]
           + index[0] ];
         break;
       case 3:
-        answer = &dv->str[ index[2] * (dv->dim[0] * dv->dim[1]) 
-          + index[1] * dv->dim[0] 
+        answer = &dv->str[ index[2] * (dv->dim[0] * dv->dim[1])
+          + index[1] * dv->dim[0]
           + index[0] ];
         break;
       case 4:
-        answer = &dv->str[ index[3] * (dv->dim[0] + dv->dim[1] + dv->dim[2]) 
-          + index[2] * (dv->dim[0] * dv->dim[1]) 
-          + index[1] * dv->dim[0] 
+        answer = &dv->str[ index[3] * (dv->dim[0] + dv->dim[1] + dv->dim[2])
+          + index[2] * (dv->dim[0] * dv->dim[1])
+          + index[1] * dv->dim[0]
           + index[0] ];
         break;
       case 5:
@@ -1525,7 +1525,7 @@ void *getdimvar(DIMVAR *dv, ...) {
 
 /*
   read a dimensioned string variable from input.
-  Returns: pointer to string (not malloced) 
+  Returns: pointer to string (not malloced)
 */
 char *stringdimvar(void) {
   char id[32];
@@ -1596,7 +1596,7 @@ char *stringdimvar(void) {
 
 /*
   parse a string variable.
-  Returns: pointer to string (not malloced) 
+  Returns: pointer to string (not malloced)
 */
 char *stringvar(void) {
   char id[32];
@@ -1618,7 +1618,7 @@ char *stringvar(void) {
   parse a string literal
   Returns: malloced string literal
   Notes: newlines aren't allwed in literals, but blind
-         concatenation across newlines is. 
+         concatenation across newlines is.
 */
 char *stringliteral(void) {
   int len = 1;
@@ -1676,7 +1676,7 @@ char *stringexpr(void) {
   char *temp;
   int tnum=token->tokennum;
   TOKEN* lasttok=token;
-  
+
   if (token->tokentype == TOK_SFUNC) {
     match(token->tokennum);
     left = (this->*lasttok->sfunc)();
@@ -1686,7 +1686,7 @@ char *stringexpr(void) {
     left = mystrdup(stringvar());
   } else if (tnum == QUOTE) {
     left = stringliteral();
-  } else { 
+  } else {
     if(!isstring(token))
       seterror(ERR_TYPEMISMATCH);
     else
@@ -1788,13 +1788,13 @@ VARIABLE *addfloat(const char *id) {
     seterror(ERR_OUTOFMEMORY);
   }
 
-  return 0; 
+  return 0;
 }
 
 /*
   add a string variable to table.
   Params: id - id of variable to get (including trailing $)
-  Retruns: pointer to new entry in table, 0 on fail.       
+  Retruns: pointer to new entry in table, 0 on fail.
 */
 VARIABLE *addstring(const char *id) {
   VARIABLE *vars;
@@ -1828,8 +1828,8 @@ void lvalue(LVALUE *lv) {
   int index[5];
   void *valptr = 0;
   int type;
-  
-  lv->type = ERROR;
+
+  lv->type = ERRORTOK;
   lv->dval = 0;
   lv->sval = 0;
 
@@ -1970,7 +1970,7 @@ DIMVAR *adddimvar(const char *id) {
   } else {
     seterror(ERR_OUTOFMEMORY);
   }
- 
+
   return 0;
 }
 
@@ -1978,7 +1978,7 @@ DIMVAR *adddimvar(const char *id) {
   dimension an array.
   Params: id - the id of the array (include leading ()
           ndims - number of dimension (1-5)
-          ... - integers giving dimension size, 
+          ... - integers giving dimension size,
 */
 DIMVAR *dimension(const char *id, int ndims, ...) {
   DIMVAR *dv;
@@ -2081,7 +2081,7 @@ int do_dim(void) {
     }
 
     match(CPAREN);
-    
+
     for(i=0;i<ndims;i++) {
       if(dims[i] < 0 || dims[i] != (int) dims[i]) {
         seterror(ERR_BADSUBSCRIPT);
@@ -2178,7 +2178,7 @@ int boolexpr(void)
 
 /*
   get a relational operator
-  returns operator parsed or ERROR
+  returns operator parsed or ERRORTOK
 */
 int relop(void) {
   if (token->tokennum == EQUALS) {
@@ -2190,7 +2190,7 @@ int relop(void) {
       match(EQUALS);
       return ROP_GTE;
     }
-    return ROP_GT; 
+    return ROP_GT;
   } else if (token->tokennum == LESS) {
     match(LESS);
     if(token->tokennum == EQUALS) {
@@ -2203,7 +2203,7 @@ int relop(void) {
     return ROP_LT;
   } else {
     seterror(ERR_SYNTAX);
-    return ERROR;
+    return ERRORTOK;
   }
 }
 
@@ -2547,7 +2547,7 @@ MiniBasicClass()
 {
   emptystring[0]='\0';
 
-  ERROR   =AddToken("", TOK_OTHER);
+  ERRORTOK=AddToken("", TOK_OTHER);
   VALUE   =AddToken("", TOK_OTHER);
   STRID   =AddToken("", TOK_OTHER);
   FLTID   =AddToken("", TOK_OTHER);
@@ -2575,13 +2575,13 @@ MiniBasicClass()
   AddNumericFunction("SIN",   &MiniBasicClass::do_sin);
   AddNumericFunction("COS",   &MiniBasicClass::do_cos);
   AddNumericFunction("TAN",   &MiniBasicClass::do_tan);
-  AddNumericFunction("LN",    &MiniBasicClass::do_ln); 
+  AddNumericFunction("LN",    &MiniBasicClass::do_ln);
   AddNumericFunction("POW",   &MiniBasicClass::do_pow);
   AddNumericFunction("PI",    &MiniBasicClass::do_pi);
   AddNumericFunction("SQRT",  &MiniBasicClass::do_sqrt);
   AddNumericFunction("ABS",   &MiniBasicClass::do_abs);
   AddNumericFunction("LEN",   &MiniBasicClass::do_len);
-  AddNumericFunction("ASCII", &MiniBasicClass::do_ascii); 
+  AddNumericFunction("ASCII", &MiniBasicClass::do_ascii);
   AddNumericFunction("ASIN",  &MiniBasicClass::do_asin);
   AddNumericFunction("ACOS",  &MiniBasicClass::do_acos);
   AddNumericFunction("ATAN",  &MiniBasicClass::do_atan);
@@ -2609,20 +2609,20 @@ MiniBasicClass()
   AddStringFunction("STRING$", &MiniBasicClass::do_string);
   AddStringFunction("FORMATDATETIME$", &MiniBasicClass::do_format);
 
-  AddCommand("PRINT", &MiniBasicClass::do_print); 
+  AddCommand("PRINT", &MiniBasicClass::do_print);
   AddCommand("LET",   &MiniBasicClass::do_let);
   AddCommand("DIM",   &MiniBasicClass::do_dim);
-  AddCommand("IF",    &MiniBasicClass::do_if); 
+  AddCommand("IF",    &MiniBasicClass::do_if);
   AddCommand("GOTO",  &MiniBasicClass::do_goto);
-  AddCommand("INPUT", &MiniBasicClass::do_input); 
+  AddCommand("INPUT", &MiniBasicClass::do_input);
   AddCommand("REM",   &MiniBasicClass::do_rem);
   AddCommand("FOR",   &MiniBasicClass::do_for);
   NEXT=AddCommand("NEXT",  &MiniBasicClass::do_next);
 
   THEN    =AddToken("THEN", TOK_OTHER);
   AND     =AddToken("AND",  TOK_OTHER);
-  OR      =AddToken("OR",   TOK_OTHER); 
-  TO      =AddToken("TO",   TOK_OTHER); 
+  OR      =AddToken("OR",   TOK_OTHER);
+  TO      =AddToken("TO",   TOK_OTHER);
   STEP    =AddToken("STEP", TOK_OTHER);
   MOD     =AddToken("MOD",  TOK_OTHER);
 }
@@ -2632,47 +2632,14 @@ MiniBasicClass()
   cleanup();
 }
 
-void setIO(void (*infunction)(char *, char*, int), void (*outfunction)(char*), void (*errfunction)(const char*)) {
-  infunc=infunction;
-  outfunc=outfunction;
-  errfunc=errfunction;
-}
 
 /*
-  function to slurp in an ASCII file
-  Params: path - path to file
+  Set script to be executed
+  Params: userscript - text of basic script to be run
   Returns: 1 on success, 0 on failure
 */
-int loadfile(char *path) {
-  FILE *fp;
-  int ch;
-  long i = 0;
-  long size = 0;
-  
-  //printf("loadfile %s\n", path);
-  fp = fopen(path, "r");
-  if(!fp) {
-    printf("Can't open %s\n", path);
-    return 0;
-  }
-
-  fseek(fp, 0, SEEK_END);
-  size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-
-  script = (char *)malloc(size + 100);
-  if(!script) {
-    printf("Out of memory\n");
-    fclose(fp);
-    return 0;
-  }
-
-  while( (ch = fgetc(fp)) != EOF)
-    script[i++] = ch;
-
-  script[i++] = 0;
-  fclose(fp);
-
+int setScript(const char *userscript) {
+  script=mystrdup(userscript);
   return setup();
 }
 
@@ -2686,8 +2653,6 @@ int run() {
   int nextline;
   int answer = 1;
   char msgbuf[100];
-  
-  //printf("run\n");
 
   while(curline != -1) {
     string = lines[curline].str;

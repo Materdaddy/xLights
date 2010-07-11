@@ -29,6 +29,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
+#include <wx/textctrl.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/grid.h>
@@ -88,6 +89,10 @@ class xScheduleFrame: public wxFrame
         xScheduleFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~xScheduleFrame();
 
+        void BasicPrompt(char* prompt, char* buff, int size);
+        void BasicOutput(char *msg);
+        void BasicError(const char *msg);
+
     private:
 
         //(*Handlers(xScheduleFrame)
@@ -103,6 +108,7 @@ class xScheduleFrame: public wxFrame
         void OnButtonSetClick(wxCommandEvent& event);
         void OnButtonClearClick(wxCommandEvent& event);
         void OnMenuItemRefreshSelected(wxCommandEvent& event);
+        void OnNotebook1PageChanged(wxNotebookEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -110,6 +116,7 @@ class xScheduleFrame: public wxFrame
         static const long ID_AUITOOLBARITEM_DEL;
         static const long ID_AUITOOLBARITEM_HELP;
         static const long ID_AUITOOLBARITEM_SAVE;
+        static const long ID_AUITOOLBARITEM_STOP;
         static const long ID_AUITOOLBAR1;
         static const long ID_PANEL2;
         static const long ID_CHOICE_PLAYLIST;
@@ -121,6 +128,8 @@ class xScheduleFrame: public wxFrame
         static const long ID_BUTTON_CLEAR;
         static const long ID_GRID1;
         static const long ID_PANEL_CAL;
+        static const long ID_TEXTCTRL_LOG;
+        static const long ID_PANEL_LOG;
         static const long ID_NOTEBOOK1;
         static const long ID_PANEL1;
         static const long idMenuSave;
@@ -139,6 +148,8 @@ class xScheduleFrame: public wxFrame
         wxAuiManager* AuiManager1;
         wxAuiToolBar* AuiToolBar1;
         wxNotebook* Notebook1;
+        wxPanel* PanelLog;
+        wxTextCtrl* TextCtrlLog;
         wxStaticText* StaticText6;
         wxMenuItem* MenuItemRefresh;
         wxButton* ButtonSet;
@@ -163,7 +174,9 @@ class xScheduleFrame: public wxFrame
             UP_BUTTON,
             DOWN_BUTTON,
             PLAY_BUTTON,
-            PLAYLIST
+            RUN_BUTTON,
+            PLAYLIST,
+            PLAYLIST_LOGIC
         };
 
         enum SeqPlayerStates {
@@ -205,7 +218,8 @@ class xScheduleFrame: public wxFrame
         void ScanForFiles();
         char ExtType(const wxString& ext);
         void AddPlaylist(const wxString& name);
-        void OnButtonPlayClick();
+        void OnButtonRunPlaylistClick();
+        void OnButtonPlayItemClick();
         void OnButtonUpClick();
         void OnButtonDownClick();
         GridSelection getGridSelection(wxGrid & grid);

@@ -57,6 +57,14 @@
 												</object>
 												<label>Save</label>
 											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_STOP" variable="AuiToolBarItemStop" member="yes">
+													<bitmap stock_id="xlights_stop_sign" stock_client="wxART_TOOLBAR" />
+													<shorthelp>Stop Playlist</shorthelp>
+												</object>
+												<label>Stop Playlist</label>
+												<enabled>0</enabled>
+											</object>
 										</object>
 										<name>PaneName</name>
 										<standardpanetype>Toolbar</standardpanetype>
@@ -81,6 +89,7 @@
 						<object class="sizeritem">
 							<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
 								<size>799,275</size>
+								<handler function="OnNotebook1PageChanged" entry="EVT_NOTEBOOK_PAGE_CHANGED" />
 								<object class="notebookpage">
 									<object class="wxPanel" name="ID_PANEL_CAL" variable="PanelCal" member="yes">
 										<pos>49,10</pos>
@@ -211,6 +220,24 @@
 										</object>
 									</object>
 									<label>Calendar</label>
+								</object>
+								<object class="notebookpage">
+									<object class="wxPanel" name="ID_PANEL_LOG" variable="PanelLog" member="yes">
+										<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+											<cols>1</cols>
+											<growablecols>0</growablecols>
+											<growablerows>0</growablerows>
+											<object class="sizeritem">
+												<object class="wxTextCtrl" name="ID_TEXTCTRL_LOG" variable="TextCtrlLog" member="yes">
+													<style>wxTE_MULTILINE|wxHSCROLL</style>
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+										</object>
+									</object>
+									<label>Log</label>
 								</object>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

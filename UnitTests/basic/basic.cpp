@@ -20,19 +20,6 @@ void usage(void)
 }
 
 
-void stdprompt(char* prompt, char* buff, int size) {
-  fputs(prompt, stdout);
-  fgets(buff, size, stdin);
-}
-
-void stdoutput(char *msg) {
-  fputs(msg, stdout);
-}
-
-void stderror(const char *msg) {
-  fputs(msg, stderr);
-}
-
 /*
  * This demonstrates how MiniBasic++ can be extended
  * using standard C++ inheritance.
@@ -52,16 +39,66 @@ protected:
     return answer;
   };
 
+  void infunc(char* prompt, char* buff, int size) {
+    fputs(prompt, stdout);
+    fgets(buff, size, stdin);
+  }
+
+  void outfunc(char *msg) {
+    fputs(msg, stdout);
+  }
+
+  void errfunc(const char *msg) {
+    fputs(msg, stderr);
+  }
+
 public:
 
   mybasic() {
     AddStringFunction("AUTHOR$", static_cast<StringFuncPtr>(&mybasic::do_author));
   };
 
+  /*
+    function to slurp in an ASCII file
+    Params: path - path to file
+    Returns: 1 on success, 0 on failure
+  */
+  int loadfile(char *path) {
+    FILE *fp;
+    int ch;
+    long i = 0;
+    long size = 0;
+
+    //printf("loadfile %s\n", path);
+    fp = fopen(path, "r");
+    if(!fp) {
+      printf("Can't open %s\n", path);
+      return 0;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    script = (char *)malloc(size + 100);
+    if(!script) {
+      printf("Out of memory\n");
+      fclose(fp);
+      return 0;
+    }
+
+    while( (ch = fgetc(fp)) != EOF)
+      script[i++] = ch;
+
+    script[i++] = 0;
+    fclose(fp);
+
+    return setup();
+  }
+
 };
 
 mybasic basic;
-//MiniBasicClass basic;  // this would give us everything except the AUTHOR$ function
 
 /*
   call with the name of the Minibasic script file
@@ -71,7 +108,6 @@ int main(int argc, char **argv)
   if(argc == 1) {
     usage();
   } else {
-    basic.setIO(&stdprompt, &stdoutput, &stderror);
     if (basic.loadfile(argv[1])) {
       basic.run();
     }
