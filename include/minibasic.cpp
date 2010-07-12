@@ -2648,7 +2648,7 @@ int setScript(const char *userscript) {
   Interpret a BASIC script
   Returns: 1 on success, 0 on error condition.
 */
-int run() {
+virtual int run() {
   int curline = 0;
   int nextline;
   int answer = 1;

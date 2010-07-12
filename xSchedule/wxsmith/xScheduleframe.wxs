@@ -61,6 +61,7 @@
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_STOP" variable="AuiToolBarItemStop" member="yes">
 													<bitmap stock_id="xlights_stop_sign" stock_client="wxART_TOOLBAR" />
 													<shorthelp>Stop Playlist</shorthelp>
+													<handler function="OnAuiToolBarItemStopClick" entry="EVT_TOOL" />
 												</object>
 												<label>Stop Playlist</label>
 												<enabled>0</enabled>

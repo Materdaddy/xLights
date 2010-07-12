@@ -81,6 +81,7 @@ class LorEventClass
 typedef std::set<std::pair<int, int> > GridSelection;
 typedef std::multimap<int, LorEventClass* > LorEventMap;
 typedef std::pair<int, LorEventClass* > LorEventPair;
+typedef std::vector<std::pair<int, int> > VixChannelVector; // first is network #, second is channel #
 
 class xScheduleFrame: public wxFrame
 {
@@ -92,6 +93,7 @@ class xScheduleFrame: public wxFrame
         void BasicPrompt(char* prompt, char* buff, int size);
         void BasicOutput(char *msg);
         void BasicError(const char *msg);
+        char ExtType(const wxString& ext);
 
     private:
 
@@ -109,6 +111,7 @@ class xScheduleFrame: public wxFrame
         void OnButtonClearClick(wxCommandEvent& event);
         void OnMenuItemRefreshSelected(wxCommandEvent& event);
         void OnNotebook1PageChanged(wxNotebookEvent& event);
+        void OnAuiToolBarItemStopClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -203,7 +206,7 @@ class xScheduleFrame: public wxFrame
         int VixNumPeriods;
         int VixLastChannel;
         std::string VixEventData;
-        std::vector<int> VixNetwork;
+        VixChannelVector VixNetwork;
 
         wxString GetAttribute(TiXmlElement* e, const char *attr);
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
@@ -216,7 +219,6 @@ class xScheduleFrame: public wxFrame
         void LoadPlaylist(TiXmlElement* n);
         void SaveFile();
         void ScanForFiles();
-        char ExtType(const wxString& ext);
         void AddPlaylist(const wxString& name);
         void OnButtonRunPlaylistClick();
         void OnButtonPlayItemClick();

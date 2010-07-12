@@ -52,7 +52,21 @@
 #include "../include/down.xpm"
 #include "../include/play.xpm"
 
+
+/* ****************************************************
+ * Define xlights output object
+ * All of the light control commands flow through here
+ */
+
 #define XTIMER_INTERVAL 100
+
+xOutput xout;
+
+
+
+/* ****************************************************
+ * Helper class to provide access to the bitmaps on the toolbar
+ */
 
 class MyArtProvider : public wxArtProvider
 {
@@ -80,15 +94,20 @@ wxBitmap MyArtProvider::CreateBitmap(const wxArtID& id,
     return wxNullBitmap;
 };
 
-xOutput xout;
 
 
+/* ****************************************************
+ * Extend the MiniBasic script class
+ * with customized commands for xLights
+ */
 
 class xlbasic: public MiniBasicClass {
 
 protected:
 
     xScheduleFrame* xsched;
+    wxCheckListBox* playlist;
+    bool haltflag;
 
     void infunc(char* prompt, char* buff, int size) {
     }
@@ -101,22 +120,128 @@ protected:
         xsched->BasicError(msg);
     }
 
-  char* do_author(void) {
-    const char* date="MiniBasic++ by Matt Brown. Derived from the C implementation by Malcolm Mclean, Leeds University.";
-    char *answer = mystrdup(date);
-    if(!answer) seterror(ERR_OUTOFMEMORY);
-    return answer;
-  };
+    double do_playlistsize(void) {
+        return playlist->GetCount();
+    }
+
+    double do_itemchecked(void) {
+        double answer=0;
+        match(OPAREN);
+        int idx = floor(expr());
+        match(CPAREN);
+        if(1 <= idx && idx <= playlist->GetCount())
+            answer = playlist->IsChecked(idx-1) ? 1.0 : 0.0;
+        else
+            seterror(ERR_ILLEGALOFFSET);
+        return answer;
+    }
+
+    char* do_itemname(void) {
+        char *answer = 0;
+        match(OPAREN);
+        int idx = floor(expr());
+        match(CPAREN);
+        if(1 <= idx && idx <= playlist->GetCount()) {
+            wxString n = playlist->GetString(idx-1);
+            answer = mystrdup(n.mb_str());
+            if(!answer) seterror(ERR_OUTOFMEMORY);
+        } else {
+            seterror(ERR_ILLEGALOFFSET);
+        }
+        return answer;
+    };
+
+    char* do_itemtype(void) {
+        char *answer = 0;
+        char buf[2];
+        match(OPAREN);
+        int idx = floor(expr());
+        match(CPAREN);
+        if(1 <= idx && idx <= playlist->GetCount()) {
+            wxString n = playlist->GetString(idx-1);
+            wxString ext = n.AfterLast('.');
+            buf[0] = xsched->ExtType(ext);
+            buf[1] = 0;
+            answer = mystrdup(buf);
+            if(!answer) seterror(ERR_OUTOFMEMORY);
+        } else {
+            seterror(ERR_ILLEGALOFFSET);
+        }
+        return answer;
+    };
 
 public:
 
     xlbasic() {
-        AddStringFunction("AUTHOR$", static_cast<StringFuncPtr>(&xlbasic::do_author));
+        AddNumericFunction("PLAYLISTSIZE", static_cast<NumericFuncPtr>(&xlbasic::do_playlistsize));
+        AddStringFunction("ITEMNAME$", static_cast<StringFuncPtr>(&xlbasic::do_itemname));
+        AddStringFunction("ITEMTYPE$", static_cast<StringFuncPtr>(&xlbasic::do_itemtype));
+        AddNumericFunction("ITEMCHECKED", static_cast<NumericFuncPtr>(&xlbasic::do_itemchecked));
     };
 
     void setFrame(xScheduleFrame* fr) {
         xsched=fr;
     };
+
+    void setPlaylist(wxCheckListBox* chklist) {
+        playlist=chklist;
+    };
+
+
+    void halt() {
+        haltflag=true;
+    }
+
+
+    /*
+      Interpret a BASIC script
+      Returns: 1 on success, 0 on error condition.
+    */
+    int run() {
+      int curline = 0;
+      int nextline;
+      int answer = 1;
+      char msgbuf[100];
+
+      haltflag=false;
+      while(curline != -1) {
+        string = lines[curline].str;
+        token = gettoken(string);
+        errorflag = 0;
+
+        nextline = line();
+        if(errorflag) {
+          reporterror(lines[curline].no);
+          answer = 0;
+          break;
+        }
+
+        if(nextline == -1)
+          break;
+
+        wxYield();
+
+        if(nextline == 0) {
+          curline++;
+          if(curline == nlines) break;
+        } else if (haltflag) {
+          sprintf(msgbuf, "Execution halted at line %d\n", lines[curline].no);
+          sendErrorMsg(msgbuf);
+          answer = 0;
+          break;
+        } else {
+          curline = findline(nextline);
+          if(curline == -1) {
+            sprintf(msgbuf, "line %d not found\n", nextline);
+            sendErrorMsg(msgbuf);
+            answer = 0;
+            break;
+          }
+        }
+      }
+
+      return answer;
+    }
 
 };
 
@@ -192,6 +317,7 @@ END_EVENT_TABLE()
 
 xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIMER)
 {
+    SetIcon(wxICON(xlights_xpm));
     wxArtProvider::Push(new MyArtProvider);
 
     //(*Initialize(xScheduleFrame)
@@ -345,6 +471,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     Connect(ID_AUITOOLBARITEM_DEL,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemDelClick);
     Connect(ID_AUITOOLBARITEM_HELP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemHelpClick);
     Connect(ID_AUITOOLBARITEM_SAVE,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemSaveClick);
+    Connect(ID_AUITOOLBARITEM_STOP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemStopClick);
     Connect(ID_BUTTON_SET,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonSetClick);
     Connect(ID_BUTTON_CLEAR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonClearClick);
     Connect(ID_NOTEBOOK1,wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&xScheduleFrame::OnNotebook1PageChanged);
@@ -358,8 +485,6 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAbout);
     //*)
 
-   	wxIcon FrameIcon(xlights_xpm);
-   	SetIcon(FrameIcon);
     PlayerDlg = new PlayerDialog(this);
     ResetTimer(NO_SEQ);
 
@@ -667,7 +792,7 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 for (chindex=0; chindex<VixLastChannel; chindex++) {
                     vixintensity=VixEventData[chindex*VixNumPeriods+period];
                     if (vixintensity != LastIntensity[chindex]) {
-                        xout.SetIntensity(VixNetwork[chindex], chindex, vixintensity);
+                        xout.SetIntensity(VixNetwork[chindex].first, VixNetwork[chindex].second, vixintensity);
                         LastIntensity[chindex]=vixintensity;
                     }
                 }
@@ -745,8 +870,8 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
         wxMessageBox(msg+errmsg, _("Communication Error"));
         PortsOK=false;
     }
-    for (int i=0; i<MaxChannels; i++)
-        VixNetwork.push_back(netnum);
+    for (int ch=0; ch<MaxChannels; ch++)
+        VixNetwork.push_back(std::make_pair(netnum, ch));
 }
 
 void xScheduleFrame::ScanForFiles()
@@ -1422,14 +1547,25 @@ void xScheduleFrame::OnButtonRunPlaylistClick()
     int baseid=1000*nbidx;
     wxString PageName=Notebook1->GetPageText(nbidx);
     wxTextCtrl* LogicCtl=(wxTextCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LOGIC,Notebook1);
+    wxCheckListBox* Playlist=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
     wxString userscript=LogicCtl->GetValue();
     if (userscript.IsEmpty()) {
         wxMessageBox(_("No script to run!"));
     } else {
         if (userscript.Last() != '\n') userscript += _("\n"); // ensure script ends with a newline
         StatusBar1->SetStatusText(_("Starting logic for playlist: ")+PageName);
+        basic.setPlaylist(Playlist);
         basic.setScript(userscript.mb_str(wxConvUTF8));
+        AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, true);
+        AuiToolBar1->Realize();
         basic.run();
+        AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, false);
+        AuiToolBar1->Realize();
         StatusBar1->SetStatusText(_("Ended playlist: ")+PageName);
     }
+}
+
+void xScheduleFrame::OnAuiToolBarItemStopClick(wxCommandEvent& event)
+{
+    basic.halt();
 }
