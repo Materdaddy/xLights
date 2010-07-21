@@ -94,6 +94,7 @@ class xScheduleFrame: public wxFrame
         void BasicOutput(char *msg);
         void BasicError(const char *msg);
         char ExtType(const wxString& ext);
+        bool Play(wxString& filename);
 
     private:
 

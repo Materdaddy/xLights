@@ -250,7 +250,7 @@ void sendErrorMsg(const char *msg) {
 /*
   Sets up all our globals, including the list of lines.
   Params: script - the script passed by the user
-  Returns: 1 on success, 0 on failure
+  Returns: true on success, false on failure
 */
 int setup() {
   int i;
@@ -262,7 +262,7 @@ int setup() {
   lines = (LINE *)malloc(nlines * sizeof(LINE));
   if (!lines) {
     sendErrorMsg("Out of memory\n");
-    return 0;
+    return false;
   }
 
   for(i=0;i<nlines;i++) {
@@ -278,9 +278,9 @@ int setup() {
   }
 
   if (!nlines) {
-    sendErrorMsg("Can't read program\n");
+    sendErrorMsg("Can't read program, it needs line numbers\n");
     free(lines);
-    return 0;
+    return false;
   }
 
   for (i=1;i<nlines;i++) {
@@ -288,7 +288,7 @@ int setup() {
       sprintf(msgbuf, "program lines %d and %d not in order\n", lines[i-1].no, lines[i].no);
       sendErrorMsg(msgbuf);
       free(lines);
-      return 0;
+      return false;
     }
   }
 
@@ -298,7 +298,7 @@ int setup() {
   dimvariables = 0;
   ndimvariables = 0;
 
-  return 1;
+  return true;
 }
 
 /*

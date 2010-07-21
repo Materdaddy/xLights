@@ -120,10 +120,12 @@ protected:
         xsched->BasicError(msg);
     }
 
+    // returns the length of the playlist
     double do_playlistsize(void) {
         return playlist->GetCount();
     }
 
+    // returns 1 if item is checked, 0 otherwise
     double do_itemchecked(void) {
         double answer=0;
         match(OPAREN);
@@ -170,6 +172,26 @@ protected:
         return answer;
     };
 
+    // returns 1 if item was able to be played, 0 otherwise
+    double do_PlayItem(void)
+    {
+        double answer=1;
+        match(OPAREN);
+        int idx = floor(expr());
+        match(CPAREN);
+        if(1 <= idx && idx <= playlist->GetCount()) {
+            wxString filename = playlist->GetString(idx-1);
+            wxMessageBox(filename, _("File"));
+            //PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
+            if (!xsched->Play(filename)) {
+                answer=0;
+            }
+        } else {
+            seterror(ERR_ILLEGALOFFSET);
+        }
+        return answer;
+    }
+
 public:
 
     xlbasic() {
@@ -177,6 +199,7 @@ public:
         AddStringFunction("ITEMNAME$", static_cast<StringFuncPtr>(&xlbasic::do_itemname));
         AddStringFunction("ITEMTYPE$", static_cast<StringFuncPtr>(&xlbasic::do_itemtype));
         AddNumericFunction("ITEMCHECKED", static_cast<NumericFuncPtr>(&xlbasic::do_itemchecked));
+        AddNumericFunction("PLAYITEM", static_cast<NumericFuncPtr>(&xlbasic::do_PlayItem));
     };
 
     void setFrame(xScheduleFrame* fr) {
@@ -219,7 +242,7 @@ public:
         if(nextline == -1)
           break;
 
-        wxYield();
+        wxYield(); // allow the UI to process events while script is running
 
         if(nextline == 0) {
           curline++;
@@ -955,26 +978,33 @@ void xScheduleFrame::OnButtonPlayItemClick()
     if (filename.IsEmpty()) {
         wxMessageBox(_("Nothing selected!"), _("Error"));
     } else {
-        wxFileName oName(CurrentDir, filename);
-        wxString fullpath=oName.GetFullPath();
         PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
-        switch (ExtType(oName.GetExt())) {
-            case 'a':
-            case 'v':
-                if (wxFile::Exists(fullpath) && PlayerDlg->MediaCtrl->Load(fullpath)) {
-                    PlayerDlg->Show();
-                } else {
-                    wxMessageBox(_("Unable to play file:\n")+fullpath, _("Error"));
-                }
-                break;
-            case 'L':
-                PlayLorFile(fullpath);
-                break;
-            case 'V':
-                PlayVixenFile(fullpath);
-                break;
+        if (!Play(filename)) {
+            wxMessageBox(_("Unable to play file:\n")+filename, _("Error"));
         }
     }
+}
+
+bool xScheduleFrame::Play(wxString& filename) {
+    wxFileName oName(CurrentDir, filename);
+    wxString fullpath=oName.GetFullPath();
+    switch (ExtType(oName.GetExt())) {
+        case 'a':
+        case 'v':
+            if (wxFile::Exists(fullpath) && PlayerDlg->MediaCtrl->Load(fullpath)) {
+                PlayerDlg->Show();
+            } else {
+                return false;
+            }
+            break;
+        case 'L':
+            PlayLorFile(fullpath);
+            break;
+        case 'V':
+            PlayVixenFile(fullpath);
+            break;
+    }
+    return true;
 }
 
 void xScheduleFrame::PlayLorFile(wxString& FileName)
@@ -1266,7 +1296,7 @@ void xScheduleFrame::SaveFile()
     root->LinkEndChild( lists );
 
     int cnt=Notebook1->GetPageCount();
-    for (int pagenum=1; pagenum < cnt; pagenum++) {
+    for (int pagenum=2; pagenum < cnt; pagenum++) {
         plist = new TiXmlElement( "playlist" );
         plist->SetAttribute("name", Notebook1->GetPageText(pagenum).mb_str());
         baseid=1000*pagenum;
@@ -1552,16 +1582,19 @@ void xScheduleFrame::OnButtonRunPlaylistClick()
     if (userscript.IsEmpty()) {
         wxMessageBox(_("No script to run!"));
     } else {
-        if (userscript.Last() != '\n') userscript += _("\n"); // ensure script ends with a newline
-        StatusBar1->SetStatusText(_("Starting logic for playlist: ")+PageName);
+        if (!userscript.EndsWith(_("\n"))) userscript += _("\n"); // ensure script ends with a newline
         basic.setPlaylist(Playlist);
-        basic.setScript(userscript.mb_str(wxConvUTF8));
-        AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, true);
-        AuiToolBar1->Realize();
-        basic.run();
-        AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, false);
-        AuiToolBar1->Realize();
-        StatusBar1->SetStatusText(_("Ended playlist: ")+PageName);
+        if (basic.setScript(userscript.mb_str(wxConvUTF8))) {
+            StatusBar1->SetStatusText(_("Starting logic for playlist: ")+PageName);
+            AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, true);
+            AuiToolBar1->Realize();
+            basic.run();
+            AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, false);
+            AuiToolBar1->Realize();
+            StatusBar1->SetStatusText(_("Ended playlist: ")+PageName);
+        } else {
+            StatusBar1->SetStatusText(_("Error in playlist logic: ")+PageName);
+        }
     }
 }
 
