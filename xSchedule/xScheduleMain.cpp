@@ -36,12 +36,10 @@
 #include <wx/string.h>
 //*)
 
-#include "../include/tinyxml.cpp"
-#include "../include/tinyxmlerror.cpp"
-#include "../include/tinyxmlparser.cpp"
 #include "../include/xlights_out.cpp"
 #include "../include/minibasic.cpp"
 
+// image files
 #include "../include/xlights.xpm"
 #include "../include/add.xpm"
 #include "../include/remove.xpm"
@@ -108,6 +106,7 @@ protected:
     xScheduleFrame* xsched;
     wxCheckListBox* playlist;
     bool haltflag;
+    int runstate;
 
     void infunc(char* prompt, char* buff, int size) {
     }
@@ -118,6 +117,11 @@ protected:
 
     void errfunc(const char *msg) {
         xsched->BasicError(msg);
+    }
+
+    // suspend script execution
+    int do_wait(void) {
+        return -2;
     }
 
     // returns the length of the playlist
@@ -181,7 +185,7 @@ protected:
         match(CPAREN);
         if(1 <= idx && idx <= playlist->GetCount()) {
             wxString filename = playlist->GetString(idx-1);
-            wxMessageBox(filename, _("File"));
+            //wxMessageBox(filename, _("File"));
             //PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
             if (!xsched->Play(filename)) {
                 answer=0;
@@ -192,14 +196,72 @@ protected:
         return answer;
     }
 
+    /*
+      Interpret a BASIC script
+      Returns: true on success, false on error condition.
+    */
+    virtual bool runFromLineIdx(int curline = 0) {
+      int nextline = -1;
+      bool answer = true;
+      char msgbuf[100];
+
+      runstate=1;
+      haltflag=false;
+      while(curline != -1) {
+        string = lines[curline].str;
+        token = gettoken(string);
+        errorflag = 0;
+
+        nextline = line();
+        if(errorflag) {
+          reporterror(lines[curline].no);
+          answer = false;
+          break;
+        }
+
+        if(nextline < 0)
+          break;
+
+        wxYield(); // allow the UI to process events while script is running
+
+        if(nextline == 0) {
+          curline++;
+          if(curline == nlines) break;
+        } else if (haltflag) {
+          sprintf(msgbuf, "Execution halted at line %d\n", lines[curline].no);
+          sendErrorMsg(msgbuf);
+          answer = false;
+          break;
+        } else {
+          curline = findline(nextline);
+          if(curline == -1) {
+            sprintf(msgbuf, "line %d not found\n", nextline);
+            sendErrorMsg(msgbuf);
+            answer = false;
+            break;
+          }
+        }
+      }
+
+      if (nextline == -2 && answer) {
+          runstate=-1;  // suspended
+      } else {
+          runstate=0;
+          xsched->EndScript(scriptname);
+      }
+      return answer;
+    }
+
 public:
 
     xlbasic() {
+        runstate=0;
         AddNumericFunction("PLAYLISTSIZE", static_cast<NumericFuncPtr>(&xlbasic::do_playlistsize));
         AddStringFunction("ITEMNAME$", static_cast<StringFuncPtr>(&xlbasic::do_itemname));
         AddStringFunction("ITEMTYPE$", static_cast<StringFuncPtr>(&xlbasic::do_itemtype));
         AddNumericFunction("ITEMCHECKED", static_cast<NumericFuncPtr>(&xlbasic::do_itemchecked));
         AddNumericFunction("PLAYITEM", static_cast<NumericFuncPtr>(&xlbasic::do_PlayItem));
+        AddCommand("WAIT", static_cast<CommandPtr>(&xlbasic::do_wait));
     };
 
     void setFrame(xScheduleFrame* fr) {
@@ -212,58 +274,25 @@ public:
 
 
     void halt() {
-        haltflag=true;
+        if (runstate == 1) {
+            haltflag=true;
+        } else {
+            runstate=0;
+            xsched->EndScript(scriptname);
+        }
     }
 
+    bool IsRunning() {
+        return runstate!=0;
+    }
 
     /*
-      Interpret a BASIC script
-      Returns: 1 on success, 0 on error condition.
+      Interpret BASIC script starting at first line
+      Returns: true on success, false on error condition.
     */
-    int run() {
-      int curline = 0;
-      int nextline;
-      int answer = 1;
-      char msgbuf[100];
-
-      haltflag=false;
-      while(curline != -1) {
-        string = lines[curline].str;
-        token = gettoken(string);
-        errorflag = 0;
-
-        nextline = line();
-        if(errorflag) {
-          reporterror(lines[curline].no);
-          answer = 0;
-          break;
-        }
-
-        if(nextline == -1)
-          break;
-
-        wxYield(); // allow the UI to process events while script is running
-
-        if(nextline == 0) {
-          curline++;
-          if(curline == nlines) break;
-        } else if (haltflag) {
-          sprintf(msgbuf, "Execution halted at line %d\n", lines[curline].no);
-          sendErrorMsg(msgbuf);
-          answer = 0;
-          break;
-        } else {
-          curline = findline(nextline);
-          if(curline == -1) {
-            sprintf(msgbuf, "line %d not found\n", nextline);
-            sendErrorMsg(msgbuf);
-            answer = 0;
-            break;
-          }
-        }
-      }
-
-      return answer;
+    virtual bool run() {
+        xsched->StartScript(scriptname);
+        return runFromLineIdx(0);
     }
 
 };
@@ -314,6 +343,8 @@ const long xScheduleFrame::ID_BUTTON_SET = wxNewId();
 const long xScheduleFrame::ID_BUTTON_CLEAR = wxNewId();
 const long xScheduleFrame::ID_GRID1 = wxNewId();
 const long xScheduleFrame::ID_PANEL_CAL = wxNewId();
+const long xScheduleFrame::ID_BUTTON_CLEARLOG = wxNewId();
+const long xScheduleFrame::ID_BUTTON_SAVELOG = wxNewId();
 const long xScheduleFrame::ID_TEXTCTRL_LOG = wxNewId();
 const long xScheduleFrame::ID_PANEL_LOG = wxNewId();
 const long xScheduleFrame::ID_NOTEBOOK1 = wxNewId();
@@ -329,14 +360,15 @@ const long xScheduleFrame::idMenuAbout = wxNewId();
 const long xScheduleFrame::ID_STATUSBAR1 = wxNewId();
 //*)
 const long xScheduleFrame::ID_TIMER = wxNewId();
+const long xScheduleFrame::ID_PLAYER_DIALOG = wxNewId();
 
 
 BEGIN_EVENT_TABLE(xScheduleFrame,wxFrame)
     //(*EventTable(xScheduleFrame)
     //*)
     EVT_TIMER(ID_TIMER, xScheduleFrame::OnTimer)
+    EVT_COMMAND(ID_PLAYER_DIALOG, wxEVT_MEDIA_FINISHED, xScheduleFrame::OnMediaEnd)
 END_EVENT_TABLE()
-
 
 xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIMER)
 {
@@ -358,6 +390,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     wxMenuItem* MenuItem3;
     wxFlexGridSizer* FlexGridSizer8;
     wxMenu* MenuFile;
+    wxBoxSizer* BoxSizer1;
     wxMenuItem* MenuItemRenameList;
     wxMenuBar* MenuBar1;
     wxFlexGridSizer* FlexGridSizer1;
@@ -444,7 +477,13 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     PanelLog = new wxPanel(Notebook1, ID_PANEL_LOG, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_LOG"));
     FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
-    FlexGridSizer3->AddGrowableRow(0);
+    FlexGridSizer3->AddGrowableRow(1);
+    BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
+    ButtonClearLog = new wxButton(PanelLog, ID_BUTTON_CLEARLOG, _("Clear"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CLEARLOG"));
+    BoxSizer1->Add(ButtonClearLog, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonSaveLog = new wxButton(PanelLog, ID_BUTTON_SAVELOG, _("Save"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SAVELOG"));
+    BoxSizer1->Add(ButtonSaveLog, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer3->Add(BoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     TextCtrlLog = new wxTextCtrl(PanelLog, ID_TEXTCTRL_LOG, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxHSCROLL, wxDefaultValidator, _T("ID_TEXTCTRL_LOG"));
     FlexGridSizer3->Add(TextCtrlLog, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     PanelLog->SetSizer(FlexGridSizer3);
@@ -497,6 +536,8 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     Connect(ID_AUITOOLBARITEM_STOP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemStopClick);
     Connect(ID_BUTTON_SET,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonSetClick);
     Connect(ID_BUTTON_CLEAR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonClearClick);
+    Connect(ID_BUTTON_CLEARLOG,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonClearLogClick);
+    Connect(ID_BUTTON_SAVELOG,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonSaveLogClick);
     Connect(ID_NOTEBOOK1,wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&xScheduleFrame::OnNotebook1PageChanged);
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemSaveClick);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnQuit);
@@ -508,7 +549,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAbout);
     //*)
 
-    PlayerDlg = new PlayerDialog(this);
+    PlayerDlg = new PlayerDialog(this, ID_PLAYER_DIALOG);
     ResetTimer(NO_SEQ);
 
     // populate dates on calendar
@@ -592,6 +633,20 @@ void xScheduleFrame::BasicOutput(char *msg) {
 void xScheduleFrame::BasicError(const char *msg) {
     wxString wxmsg(msg, wxConvUTF8);
     TextCtrlLog->AppendText(wxmsg);
+}
+
+void xScheduleFrame::StartScript(const char *scriptname) {
+    AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, true);
+    AuiToolBar1->Realize();
+    wxString wxname(scriptname, wxConvUTF8);
+    StatusBar1->SetStatusText(_("Starting playlist: ")+wxname);
+}
+
+void xScheduleFrame::EndScript(const char *scriptname) {
+    AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, false);
+    AuiToolBar1->Realize();
+    wxString wxname(scriptname, wxConvUTF8);
+    StatusBar1->SetStatusText(_("Ended playlist: ")+wxname);
 }
 
 void xScheduleFrame::AddPlaylist(const wxString& name) {
@@ -738,15 +793,15 @@ void xScheduleFrame::ResetTimer(SeqPlayerStates newstate) {
 
 void xScheduleFrame::OnTimer(wxTimerEvent& event)
 {
-    long msec=0;
-    int startmsec, endmsec, duration, lorintensity, startint, endint, period;
+    long msec=0, lorintensity, startint, endint;
+    int startmsec, endmsec, duration, period;
     int netnum, chindex;
     static long lastmsec;
     static LorEventMap::iterator LorIter;
     static std::string LastIntensity;
     char vixintensity;
-    TiXmlElement* e;
-    wxString action;
+    wxXmlNode* e;
+    wxString action, tempstr;
     wxTimeSpan ts;
     switch (SeqPlayerState) {
         case PLAYING_LOR:
@@ -765,8 +820,10 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 chindex=LorIter->second->chindex;
                 e=LorIter->second->xmldata;
                 if (e) {
-                    action=GetAttribute(e,"type");
-                    if (e->QueryIntAttribute("intensity",&lorintensity) == TIXML_SUCCESS) {
+                    action=e->GetPropVal(wxT("type"), wxT(""));
+                    if (e->HasProp(wxT("intensity"))) {
+                        tempstr=e->GetPropVal(wxT("intensity"), wxT("0"));
+                        tempstr.ToLong(&lorintensity);
                         if (action == _("intensity")) {
                             xout.SetIntensity(netnum,chindex,lorintensity);
                         } else if (action == _("twinkle")) {
@@ -774,16 +831,18 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                         } else if (action == _("shimmer")) {
                             xout.shimmer(netnum,chindex,100,lorintensity);
                         }
-                    } else if (e->QueryIntAttribute("startIntensity",&startint) == TIXML_SUCCESS) {
-                        if (e->QueryIntAttribute("endIntensity",&endint) == TIXML_SUCCESS) {
-                            duration = endmsec - startmsec;
-                            if (action == _("intensity")) {
-                                xout.ramp(netnum,chindex,duration,startint,endint);
-                            } else if (action == _("twinkle")) {
-                                xout.twinklefade(netnum,chindex,400,duration,startint,endint);
-                            } else if (action == _("shimmer")) {
-                                xout.shimmerfade(netnum,100,chindex,duration,startint,endint);
-                            }
+                    } else if (e->HasProp(wxT("startIntensity")) && e->HasProp(wxT("endIntensity"))) {
+                        tempstr=e->GetPropVal(wxT("startIntensity"), wxT("0"));
+                        tempstr.ToLong(&startint);
+                        tempstr=e->GetPropVal(wxT("endIntensity"), wxT("100"));
+                        tempstr.ToLong(&endint);
+                        duration = endmsec - startmsec;
+                        if (action == _("intensity")) {
+                            xout.ramp(netnum,chindex,duration,startint,endint);
+                        } else if (action == _("twinkle")) {
+                            xout.twinklefade(netnum,chindex,400,duration,startint,endint);
+                        } else if (action == _("shimmer")) {
+                            xout.shimmerfade(netnum,100,chindex,duration,startint,endint);
                         }
                     }
                 } else {
@@ -838,30 +897,26 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
     lastmsec=msec;
 }
 
-wxString xScheduleFrame::GetAttribute(TiXmlElement* e, const char *attr)
-{
-    wxString s(e->Attribute(attr), wxConvUTF8);
-    return s;
-}
-
 void xScheduleFrame::LoadNetworkFile()
 {
-    wxString FileName=networkFile.GetFullPath();
-    TiXmlDocument doc( FileName.mb_str() );
-    if (doc.LoadFile()) {
+    long MaxChan;
+    wxString tempstr;
+    wxXmlDocument doc;
+    if (doc.Load( networkFile.GetFullPath() )) {
         int r=0;
-        for( TiXmlElement* e=doc.RootElement()->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-            if (e->ValueStr() == "network") {
-                AddNetwork(GetAttribute(e,"NetworkType"),
-                           GetAttribute(e,"ComPort"),
-                           GetAttribute(e,"BaudRate"),
-                           atoi(GetAttribute(e,"MaxChannels").mb_str(wxConvUTF8)));
+        for( wxXmlNode* e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
+            tempstr.ToLong(&MaxChan);
+            if (e->GetName() == _("network")) {
+                AddNetwork(e->GetPropVal(wxT("NetworkType"), wxT("")),
+                           e->GetPropVal(wxT("ComPort"), wxT("")),
+                           e->GetPropVal(wxT("BaudRate"), wxT("")),
+                           MaxChan);
                 r++;
             }
         }
     } else {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Loading Network File"));
+        wxMessageBox(_("Unable to load network file"), _("Error"));
     }
 }
 
@@ -1014,12 +1069,12 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
         return;
     }
     LorEvents.clear();
-    TiXmlDocument doc( FileName.mb_str() );
-    if (doc.LoadFile()) {
-        TiXmlElement* root=doc.RootElement();
-        wxString musicFilename(root->Attribute("musicFilename"), wxConvUTF8);
-        for( TiXmlElement* e=root->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-            if (e->ValueStr() == "channels") {
+    wxXmlDocument doc;
+    if (doc.Load( FileName )) {
+        wxXmlNode* root=doc.GetRoot();
+        wxString musicFilename=root->GetPropVal(wxT("musicFilename"), wxT(""));
+        for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            if (e->GetName() == _("channels")) {
                 LoadLorChannels(e);
             }
         }
@@ -1038,44 +1093,48 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
             wxMessageBox(_("Unable to play file:\n")+musicFilename, _("Error"));
         }
     } else {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Loading File"));
+        wxMessageBox(_("Unable to load schedule file"), _("Error"));
     }
 }
 
-void xScheduleFrame::LoadLorChannels(TiXmlElement* n)
+void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
 {
-    int netnum, unit, circuit;
-    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-        if (e->ValueStr() == "channel") {
-            if (e->QueryIntAttribute("unit",&unit) == TIXML_SUCCESS &&
-                e->QueryIntAttribute("circuit",&circuit) == TIXML_SUCCESS) {
-                if (e->QueryIntAttribute("network",&netnum) != TIXML_SUCCESS) {
-                    netnum=0;
-                }
-                LoadLorChannel(e,netnum,(unit-1)*16+circuit-1);
-            }
+    long netnum, unit, circuit;
+    wxString tempstr;
+    for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() != _("channel")) continue;
+        if (e->HasProp(_("unit")) && e->HasProp(_("circuit"))) {
+            tempstr=e->GetPropVal(wxT("unit"), wxT("0"));
+            tempstr.ToLong(&unit);
+            tempstr=e->GetPropVal(wxT("circuit"), wxT("0"));
+            tempstr.ToLong(&circuit);
+            tempstr=e->GetPropVal(wxT("network"), wxT("0"));
+            tempstr.ToLong(&netnum);
+            LoadLorChannel(e,netnum,(unit-1)*16+circuit-1);
         }
     }
 }
 
-void xScheduleFrame::LoadLorChannel(TiXmlElement* n, int netnum, int chindex)
+void xScheduleFrame::LoadLorChannel(wxXmlNode* n, int netnum, int chindex)
 {
-    int start,end,lastend=0;
+    long start,end,lastend=0;
+    wxString tempstr;
     if (!PortsOK) {
         wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
         return;
     }
-    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-        if (e->ValueStr() == "effect") {
-            if (e->QueryIntAttribute("startCentisecond",&start) == TIXML_SUCCESS &&
-                e->QueryIntAttribute("endCentisecond",&end) == TIXML_SUCCESS) {
-                if (start != lastend && lastend > 0) {
-                    LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,start,0)));
-                }
-                LorEvents.insert(LorEventPair(start, new LorEventClass(netnum,chindex,end,e)));
-                lastend=end;
+    for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() != _("effect")) continue;
+        if (e->HasProp(_("startCentisecond")) && e->HasProp(_("endCentisecond"))) {
+            tempstr=e->GetPropVal(wxT("startCentisecond"), wxT("0"));
+            tempstr.ToLong(&start);
+            tempstr=e->GetPropVal(wxT("endCentisecond"), wxT("0"));
+            tempstr.ToLong(&end);
+            if (start != lastend && lastend > 0) {
+                LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,start,0)));
             }
+            LorEvents.insert(LorEventPair(start, new LorEventClass(netnum,chindex,end,e)));
+            lastend=end;
         }
     }
     LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,lastend,0)));
@@ -1083,13 +1142,11 @@ void xScheduleFrame::LoadLorChannel(TiXmlElement* n, int netnum, int chindex)
 
 void xScheduleFrame::PlayVixenFile(wxString& FileName)
 {
-    int MaxIntensity = 255;
-    int toValue;
-    std::string tag;
+    long MaxIntensity = 255;
+    long toValue;
+    wxString tag,tempstr;
     wxFileName fn;
-    const TiXmlNode* xmlNode;
-    const TiXmlElement* pluginNode;
-    const TiXmlText* textNode;
+    wxXmlNode* xmlNode;
     fn.AssignDir(CurrentDir);
     if (!PortsOK) {
         wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
@@ -1097,31 +1154,32 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
     }
     VixLastChannel = -1;
     VixEventPeriod=-1;
-    TiXmlDocument doc( FileName.mb_str() );
-    if (doc.LoadFile()) {
-        TiXmlElement* root=doc.RootElement();
-        for( TiXmlElement* e=root->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-            tag = e->ValueStr();
-            if (tag == "EventPeriodInMilliseconds") {
-                VixEventPeriod = atoi(e->GetText());
-            } else if (tag == "MaximumLevel") {
-                MaxIntensity = atoi(e->GetText());
-            } else if (tag == "Audio" || tag == "Song") {
-                wxString filename(e->Attribute("filename"), wxConvUTF8);
+    wxXmlDocument doc( FileName );
+    if (doc.IsOk()) {
+        wxXmlNode* root=doc.GetRoot();
+        for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            tag = e->GetName();
+            if (tag == _("EventPeriodInMilliseconds")) {
+                tempstr=e->GetNodeContent();
+                tempstr.ToLong(&VixEventPeriod);
+            } else if (tag == _("MaximumLevel")) {
+                tempstr=e->GetNodeContent();
+                tempstr.ToLong(&MaxIntensity);
+            } else if (tag == _("Audio") || tag == _("Song")) {
+                wxString filename=e->GetPropVal(wxT("filename"), wxT(""));
                 fn.SetFullName(filename);
-            } else if (tag == "EventValues") {
-                xmlNode = e->FirstChild();
-                if (xmlNode && xmlNode->Type() == TiXmlNode::TEXT) {
-                    textNode=xmlNode->ToText();
-                    VixEventData = base64_decode(textNode->ValueStr());
-                }
-            } else if (tag == "PlugInData") {
-                xmlNode = e->FirstChild("PlugIn");
-                if (xmlNode) {
-                    pluginNode=xmlNode->ToElement();
-                    if (pluginNode->QueryIntAttribute("to",&toValue) == TIXML_SUCCESS) {
-                        if (toValue > VixLastChannel) VixLastChannel=toValue;
+            } else if (tag == _("EventValues")) {
+                VixEventData = base64_decode(e->GetNodeContent());
+            } else if (tag == _("PlugInData")) {
+                for( wxXmlNode* p=e->GetChildren(); p!=NULL; p=p->GetNext() ) {
+                    if (p->GetName() == _("PlugIn")) {
+                        if (p->HasProp(_("to"))) {
+                            tempstr=e->GetPropVal(wxT("to"), wxT("0"));
+                            tempstr.ToLong(&toValue);
+                            if (toValue > VixLastChannel) VixLastChannel=toValue;
+                        }
                     }
+                    break;
                 }
             }
         }
@@ -1144,8 +1202,7 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
             ResetTimer(NO_SEQ);
         }
     } else {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Loading File"));
+        wxMessageBox(_("Unable to load Vixen file"), _("Error"));
     }
 }
 
@@ -1254,20 +1311,16 @@ void xScheduleFrame::OnAuiToolBarItemSaveClick(wxCommandEvent& event)
 void xScheduleFrame::SaveFile()
 {
     unsigned int RowCount,baseid;
-    TiXmlElement* plist;
-    TiXmlElement* item;
     wxCheckBox* chkbox;
-    wxString FileName=scheduleFile.GetFullPath();
-    TiXmlDocument doc( FileName.mb_str() );
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-    doc.LinkEndChild( decl );
-    TiXmlElement* root = new TiXmlElement( "xSchedule" );
-    root->SetAttribute("computer", wxGetHostName().mb_str());
-    doc.LinkEndChild( root );
+    wxXmlDocument doc;
+    wxXmlNode *item, *plist;
+    wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, _("xSchedule") );
+    root->SetProperties(new wxXmlProperty(_("computer"), wxGetHostName()));
+    doc.SetRoot( root );
 
     // save calendar
-    TiXmlElement* sched = new TiXmlElement( "schedule" );
-    root->LinkEndChild( sched );
+    wxXmlNode* sched = new wxXmlNode( root, wxXML_ELEMENT_NODE, wxT("schedule") );
+    root->AddChild(sched);
     int nrows=Grid1->GetNumberRows();
     wxDateTime t1,t2,d=CalStart;
     wxString v,v1,playlist,timerange;
@@ -1280,80 +1333,83 @@ void xScheduleFrame::SaveFile()
                 timerange=v1.AfterFirst('\n');
                 t1.ParseTime(timerange.BeforeFirst('-'));
                 t2.ParseTime(timerange.AfterFirst('-'));
-                item = new TiXmlElement( "playdate" );
-                item->SetAttribute("playlist", playlist.mb_str());
-                item->SetAttribute("date", d.FormatISODate().mb_str());
-                item->SetAttribute("timestart", t1.FormatISOTime().mb_str());
-                item->SetAttribute("timeend", t2.FormatISOTime().mb_str());
-                sched->LinkEndChild( item );
+                item = new wxXmlNode( wxXML_ELEMENT_NODE, _("playdate") );
+                item->AddProperty( wxT("playlist"), playlist );
+                item->AddProperty( wxT("date"), d.FormatISODate() );
+                item->AddProperty( wxT("timestart"), t1.FormatISOTime() );
+                item->AddProperty( wxT("timeend"), t2.FormatISOTime() );
+                sched->AddChild( item );
             }
             d+=wxDateSpan::Day();
         }
     }
 
     // save playlists
-    TiXmlElement* lists = new TiXmlElement( "playlists" );
-    root->LinkEndChild( lists );
+    wxXmlNode* lists = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("playlists") );
+    root->AddChild(lists);
 
     int cnt=Notebook1->GetPageCount();
     for (int pagenum=2; pagenum < cnt; pagenum++) {
-        plist = new TiXmlElement( "playlist" );
-        plist->SetAttribute("name", Notebook1->GetPageText(pagenum).mb_str());
+        plist = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("playlist") );
+        plist->AddProperty( wxT("name"), Notebook1->GetPageText(pagenum) );
         baseid=1000*pagenum;
         wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
         for (int i=CHKBOX_AUDIO; i<=CHKBOX_VIXEN; i++) {
             chkbox=(wxCheckBox*)wxWindow::FindWindowById(baseid+i,Notebook1);
-            plist->SetAttribute(chkbox->GetLabelText().mb_str(), chkbox->GetValue() ? "1" : "0");
+            v = chkbox->GetValue() ? _("1") : _("0");
+            plist->AddProperty( chkbox->GetLabelText(), v );
         }
-        lists->LinkEndChild( plist );
+        lists->AddChild( plist );
+
         RowCount=CheckListBoxPlay->GetCount();
         for (unsigned int r=0; r < RowCount; r++ ) {
-            item = new TiXmlElement( "listitem" );
-            item->SetAttribute("name",CheckListBoxPlay->GetString(r).mb_str());
-            item->SetAttribute("enabled",CheckListBoxPlay->IsChecked(r) ? "1" : "0");
-            plist->LinkEndChild( item );
+            item = new wxXmlNode( wxXML_ELEMENT_NODE, _("listitem") );
+            v = CheckListBoxPlay->IsChecked(r) ? _("1") : _("0");
+            item->AddProperty( wxT("name"), CheckListBoxPlay->GetString(r) );
+            item->AddProperty( wxT("enabled"), v );
+            plist->AddChild( item );
         }
     }
 
     // commit to disk
-    if (doc.SaveFile()) {
+    wxString FileName=scheduleFile.GetFullPath();
+    if (doc.Save(FileName)) {
         UnsavedChanges=false;
         StatusBar1->SetStatusText(_("File saved successfully"));
     } else {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Saving File"));
+        wxMessageBox(_("Unable to save schedule file"), _("Error"));
     }
 }
 
 void xScheduleFrame::LoadScheduleFile()
 {
-    wxString FileName=scheduleFile.GetFullPath();
-    TiXmlDocument doc( FileName.mb_str() );
-    if (doc.LoadFile()) {
-        TiXmlElement* root=doc.RootElement();
-        for( TiXmlElement* e=root->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-            if (e->ValueStr() == "schedule") {
+    wxXmlDocument doc;
+    wxString name;
+    if (doc.Load( scheduleFile.GetFullPath() )) {
+        wxXmlNode* root=doc.GetRoot();
+        for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            name=e->GetName();
+            if (name == _("schedule")) {
                 LoadSchedule(e);
-            } else if (e->ValueStr() == "playlists") {
+            } else if (name == _("playlists")) {
                 LoadPlaylists(e);
             }
         }
     } else {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Loading File"));
+        wxMessageBox(_("Unable to load schedule file"), _("Error"));
     }
 }
 
-void xScheduleFrame::LoadSchedule(TiXmlElement* n)
+void xScheduleFrame::LoadSchedule(wxXmlNode* n)
 {
     wxDateTime d,t1,t2;
     int days,r,c;
-    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-        if (e->ValueStr() == "playdate") {
-            wxString playlist(e->Attribute("playlist"), wxConvUTF8);
-            wxString playdate(e->Attribute("date"), wxConvUTF8);
-            wxString time1(e->Attribute("timestart"), wxConvUTF8);
-            wxString time2(e->Attribute("timeend"), wxConvUTF8);
+    for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() == _("playdate")) {
+            wxString playlist = e->GetPropVal( wxT("playlist"), wxT(""));
+            wxString playdate = e->GetPropVal( wxT("date"), wxT(""));
+            wxString time1 = e->GetPropVal( wxT("timestart"), wxT(""));
+            wxString time2 = e->GetPropVal( wxT("timeend"), wxT(""));
             if (d.ParseFormat(playdate,_("%Y-%m-%d")) == NULL) {
                 wxMessageBox(_("Invalid date in schedule file!"));
                 return;
@@ -1372,33 +1428,35 @@ void xScheduleFrame::LoadSchedule(TiXmlElement* n)
     }
 }
 
-void xScheduleFrame::LoadPlaylists(TiXmlElement* n)
+void xScheduleFrame::LoadPlaylists(wxXmlNode* n)
 {
-    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-        if (e->ValueStr() == "playlist") {
+    for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() == _("playlist")) {
             LoadPlaylist(e);
         }
     }
 }
 
-void xScheduleFrame::LoadPlaylist(TiXmlElement* n)
+void xScheduleFrame::LoadPlaylist(wxXmlNode* n)
 {
     wxCheckBox* chkbox;
-    wxString name(n->Attribute("name"), wxConvUTF8);
+    wxString chkval;
+    wxString name = n->GetPropVal( wxT("name"), wxT(""));
     int baseid=1000*Notebook1->GetPageCount();
     AddPlaylist(name);
     for (int i=CHKBOX_AUDIO; i<=CHKBOX_VIXEN; i++) {
         chkbox=(wxCheckBox*)wxWindow::FindWindowById(baseid+i,Notebook1);
-        chkbox->SetValue( strncmp(n->Attribute(chkbox->GetLabelText().mb_str()), "0", 1) );
+        chkval = n->GetPropVal( chkbox->GetLabelText(), wxT("0"));
+        chkbox->SetValue( chkval == _("1") );
     }
     wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
     int cnt=0;
-    for( TiXmlElement* e=n->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-        if (e->ValueStr() == "listitem") {
-            wxString itemname(e->Attribute("name"), wxConvUTF8);
-            bool itemchecked=(strncmp(e->Attribute("enabled"),"1",1) == 0);
+    for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() == _("listitem")) {
+            wxString itemname = e->GetPropVal( wxT("name"), wxT(""));
+            chkval = e->GetPropVal( wxT("enabled"), wxT("0"));
             CheckListBoxPlay->AppendString(itemname);
-            CheckListBoxPlay->Check(cnt,itemchecked);
+            CheckListBoxPlay->Check(cnt, chkval == _("1"));
             cnt++;
         }
     }
@@ -1517,7 +1575,7 @@ static inline bool is_base64(unsigned char c) {
 static const std::string base64_chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-std::string xScheduleFrame::base64_decode(std::string const& encoded_string) {
+std::string xScheduleFrame::base64_decode(wxString const& encoded_string) {
   int in_len = encoded_string.size();
   int i = 0;
   int j = 0;
@@ -1584,14 +1642,8 @@ void xScheduleFrame::OnButtonRunPlaylistClick()
     } else {
         if (!userscript.EndsWith(_("\n"))) userscript += _("\n"); // ensure script ends with a newline
         basic.setPlaylist(Playlist);
-        if (basic.setScript(userscript.mb_str(wxConvUTF8))) {
-            StatusBar1->SetStatusText(_("Starting logic for playlist: ")+PageName);
-            AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, true);
-            AuiToolBar1->Realize();
+        if (basic.setScript(PageName.mb_str(wxConvUTF8), userscript.mb_str(wxConvUTF8))) {
             basic.run();
-            AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, false);
-            AuiToolBar1->Realize();
-            StatusBar1->SetStatusText(_("Ended playlist: ")+PageName);
         } else {
             StatusBar1->SetStatusText(_("Error in playlist logic: ")+PageName);
         }
@@ -1601,4 +1653,20 @@ void xScheduleFrame::OnButtonRunPlaylistClick()
 void xScheduleFrame::OnAuiToolBarItemStopClick(wxCommandEvent& event)
 {
     basic.halt();
+}
+
+void xScheduleFrame::OnButtonSaveLogClick(wxCommandEvent& event)
+{
+}
+
+void xScheduleFrame::OnButtonClearLogClick(wxCommandEvent& event)
+{
+    TextCtrlLog->Clear();
+}
+
+void xScheduleFrame::OnMediaEnd( wxCommandEvent &event )
+{
+    if (basic.IsRunning()) {
+        wxMessageBox(_("OnMediaEnd"), _("Info"));
+    }
 }

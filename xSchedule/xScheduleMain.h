@@ -49,6 +49,7 @@
 #include <wx/datetime.h>
 #include <wx/file.h>
 #include <wx/timer.h>
+#include <wx/xml/xml.h>
 
 #include <set>
 #include <map>
@@ -59,13 +60,12 @@
 #include "DelListDialog.h"
 #include "RenListDialog.h"
 #include "../include/globals.h"
-#include "../include/tinyxml.h"
 
 class LorEventClass
 {
     public:
 
-    LorEventClass(int net_num, int ch_index, int End_Centi, TiXmlElement* xml_data) {
+    LorEventClass(int net_num, int ch_index, int End_Centi, wxXmlNode* xml_data) {
         netnum=net_num;
         chindex=ch_index;
         EndCentiSec=End_Centi;
@@ -75,7 +75,7 @@ class LorEventClass
     int netnum;
     int chindex;
     int EndCentiSec;
-    TiXmlElement* xmldata;
+    wxXmlNode* xmldata;
 };
 
 typedef std::set<std::pair<int, int> > GridSelection;
@@ -95,6 +95,8 @@ class xScheduleFrame: public wxFrame
         void BasicError(const char *msg);
         char ExtType(const wxString& ext);
         bool Play(wxString& filename);
+        void StartScript(const char *scriptname);
+        void EndScript(const char *scriptname);
 
     private:
 
@@ -113,6 +115,8 @@ class xScheduleFrame: public wxFrame
         void OnMenuItemRefreshSelected(wxCommandEvent& event);
         void OnNotebook1PageChanged(wxNotebookEvent& event);
         void OnAuiToolBarItemStopClick(wxCommandEvent& event);
+        void OnButtonSaveLogClick(wxCommandEvent& event);
+        void OnButtonClearLogClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -132,6 +136,8 @@ class xScheduleFrame: public wxFrame
         static const long ID_BUTTON_CLEAR;
         static const long ID_GRID1;
         static const long ID_PANEL_CAL;
+        static const long ID_BUTTON_CLEARLOG;
+        static const long ID_BUTTON_SAVELOG;
         static const long ID_TEXTCTRL_LOG;
         static const long ID_PANEL_LOG;
         static const long ID_NOTEBOOK1;
@@ -147,11 +153,13 @@ class xScheduleFrame: public wxFrame
         static const long ID_STATUSBAR1;
         //*)
         static const long ID_TIMER;
+        static const long ID_PLAYER_DIALOG;
 
         //(*Declarations(xScheduleFrame)
         wxAuiManager* AuiManager1;
         wxAuiToolBar* AuiToolBar1;
         wxNotebook* Notebook1;
+        wxButton* ButtonClearLog;
         wxPanel* PanelLog;
         wxTextCtrl* TextCtrlLog;
         wxStaticText* StaticText6;
@@ -160,6 +168,7 @@ class xScheduleFrame: public wxFrame
         wxPanel* Panel1;
         wxButton* ButtonClear;
         wxGrid* Grid1;
+        wxButton* ButtonSaveLog;
         wxChoice* ChoiceStartTime;
         wxStaticText* StaticText5;
         wxPanel* PanelCal;
@@ -203,21 +212,20 @@ class xScheduleFrame: public wxFrame
         wxTimer timer;
         wxDateTime starttime;
         SeqPlayerStates SeqPlayerState;
-        int VixEventPeriod;
+        long VixEventPeriod;
         int VixNumPeriods;
-        int VixLastChannel;
+        long VixLastChannel;
         std::string VixEventData;
         VixChannelVector VixNetwork;
 
-        wxString GetAttribute(TiXmlElement* e, const char *attr);
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
         void ClearGridCell(const int& row, const int& col);
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         void LoadNetworkFile();
         void LoadScheduleFile();
-        void LoadSchedule(TiXmlElement* n);
-        void LoadPlaylists(TiXmlElement* n);
-        void LoadPlaylist(TiXmlElement* n);
+        void LoadSchedule(wxXmlNode* n);
+        void LoadPlaylists(wxXmlNode* n);
+        void LoadPlaylist(wxXmlNode* n);
         void SaveFile();
         void ScanForFiles();
         void AddPlaylist(const wxString& name);
@@ -228,12 +236,13 @@ class xScheduleFrame: public wxFrame
         GridSelection getGridSelection(wxGrid & grid);
         void PlayLorFile(wxString& FileName);
         void PlayVixenFile(wxString& FileName);
-        void LoadLorChannels(TiXmlElement* n);
-        void LoadLorChannel(TiXmlElement* n, int netnum, int chindex);
+        void LoadLorChannels(wxXmlNode* n);
+        void LoadLorChannel(wxXmlNode* n, int netnum, int chindex);
         void OnTimer(wxTimerEvent& event);
         void ResetTimer(SeqPlayerStates newstate);
         void TimerNoPlay();
-        std::string base64_decode(std::string const& encoded_string);
+        void OnMediaEnd( wxCommandEvent &event );
+        std::string base64_decode(wxString const& encoded_string);
 
         DECLARE_EVENT_TABLE()
 };

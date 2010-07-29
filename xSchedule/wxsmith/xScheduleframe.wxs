@@ -227,7 +227,32 @@
 										<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 											<cols>1</cols>
 											<growablecols>0</growablecols>
-											<growablerows>0</growablerows>
+											<growablerows>1</growablerows>
+											<object class="sizeritem">
+												<object class="wxBoxSizer" variable="BoxSizer1" member="no">
+													<object class="sizeritem">
+														<object class="wxButton" name="ID_BUTTON_CLEARLOG" variable="ButtonClearLog" member="yes">
+															<label>Clear</label>
+															<handler function="OnButtonClearLogClick" entry="EVT_BUTTON" />
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxButton" name="ID_BUTTON_SAVELOG" variable="ButtonSaveLog" member="yes">
+															<label>Save</label>
+															<handler function="OnButtonSaveLogClick" entry="EVT_BUTTON" />
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
 											<object class="sizeritem">
 												<object class="wxTextCtrl" name="ID_TEXTCTRL_LOG" variable="TextCtrlLog" member="yes">
 													<style>wxTE_MULTILINE|wxHSCROLL</style>

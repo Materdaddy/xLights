@@ -141,6 +141,7 @@ DIMVAR *dimvariables;       /* dimensioned arrays */
 int ndimvariables;          /* number of dimensioned arrays */
 
 char *script;               /* script source */
+char *scriptname;           /* script name */
 LINE *lines;                /* list of line starts */
 int nlines;                 /* number of BASIC lines in program */
 
@@ -252,7 +253,7 @@ void sendErrorMsg(const char *msg) {
   Params: script - the script passed by the user
   Returns: true on success, false on failure
 */
-int setup() {
+bool setup() {
   int i;
   char msgbuf[100];
   char *s;
@@ -339,6 +340,7 @@ void cleanup(void) {
   if (lines) free(lines);
   lines = 0;
   nlines = 0;
+  if (scriptname) free(scriptname);
   if (script) free(script);
 }
 
@@ -2541,6 +2543,49 @@ int AddStringFunction(const char *tokstring, StringFuncPtr processfunc) {
 }
 
 
+/*
+  Interpret a BASIC script
+  Returns: true on success, false on error condition.
+*/
+virtual bool runFromLineIdx(int curline = 0) {
+  int nextline;
+  bool answer = true;
+  char msgbuf[100];
+
+  while(curline != -1) {
+    string = lines[curline].str;
+    token = gettoken(string);
+    errorflag = 0;
+
+    nextline = line();
+    if(errorflag) {
+      reporterror(lines[curline].no);
+      answer = false;
+      break;
+    }
+
+    if(nextline == -1)
+      break;
+
+    if(nextline == 0) {
+      curline++;
+      if(curline == nlines) break;
+    } else {
+      curline = findline(nextline);
+      if(curline == -1) {
+        sprintf(msgbuf, "line %d not found\n", nextline);
+        sendErrorMsg(msgbuf);
+        answer = false;
+        break;
+      }
+    }
+  }
+
+  return answer;
+}
+
+
+
 public:
 
 MiniBasicClass()
@@ -2635,55 +2680,39 @@ MiniBasicClass()
 
 /*
   Set script to be executed
-  Params: userscript - text of basic script to be run
-  Returns: 1 on success, 0 on failure
+  Params: script_text - text of basic script to be run
+  Returns: true on success, false on failure
 */
-int setScript(const char *userscript) {
-  script=mystrdup(userscript);
+bool setScript(const char *script_name, const char *script_text) {
+  cleanup();
+  scriptname=mystrdup(script_name);
+  script=mystrdup(script_text);
   return setup();
 }
 
 
 /*
-  Interpret a BASIC script
-  Returns: 1 on success, 0 on error condition.
+  Interpret BASIC script starting at first line
+  Returns: true on success, false on error condition.
 */
-virtual int run() {
-  int curline = 0;
-  int nextline;
-  int answer = 1;
+virtual bool run() {
+  return runFromLineIdx(0);
+}
+
+/*
+  Interpret BASIC script starting at line linenum
+  Returns: true on success, false on error condition.
+*/
+bool runat(int linenum) {
   char msgbuf[100];
-
-  while(curline != -1) {
-    string = lines[curline].str;
-    token = gettoken(string);
-    errorflag = 0;
-
-    nextline = line();
-    if(errorflag) {
-      reporterror(lines[curline].no);
-      answer = 0;
-      break;
-    }
-
-    if(nextline == -1)
-      break;
-
-    if(nextline == 0) {
-      curline++;
-      if(curline == nlines) break;
-    } else {
-      curline = findline(nextline);
-      if(curline == -1) {
-        sprintf(msgbuf, "line %d not found\n", nextline);
-        sendErrorMsg(msgbuf);
-        answer = 0;
-        break;
-      }
-    }
+  int lineIdx = findline(linenum);
+  if(lineIdx == -1) {
+    sprintf(msgbuf, "line %d not found\n", linenum);
+    sendErrorMsg(msgbuf);
+    return false;
+  } else {
+    return runFromLineIdx(lineIdx);
   }
-
-  return answer;
 }
 
 };

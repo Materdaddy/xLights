@@ -8,24 +8,6 @@
 #include "wx/timer.h"       //timer for updating status bar
 #include "wx/mediactrl.h"   //for wxMediaCtrl
 
-// ----------------------------------------------------------------------------
-// wxMediaPlayerTimer
-// ----------------------------------------------------------------------------
-
-class wxMediaPlayerTimer : public wxTimer
-{
-public:
-    //Ctor
-    //wxMediaPlayerTimer(wxMediaPlayerFrame* frame) {m_frame = frame;}
-
-    //Called each time the timer's timeout expires
-    void Notify();
-
-    //wxMediaPlayerFrame* m_frame;       //The wxMediaPlayerFrame
-};
-
-
-
 class PlayerDialog: public wxDialog
 {
 	public:
@@ -53,10 +35,10 @@ class PlayerDialog: public wxDialog
 
 		//(*Handlers(PlayerDialog)
 		void OnClose(wxCloseEvent& event);
+		void OnInit(wxInitDialogEvent& event);
 		//*)
 
 		static const long wxID_MEDIACTRL;
-		wxMediaPlayerTimer* m_timer;
 
 		DECLARE_EVENT_TABLE()
 };
