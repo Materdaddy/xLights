@@ -12,8 +12,8 @@
 #include <wx/config.h>
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
+#include <wx/xml/xml.h>
 #include "../include/globals.h"
-#include "../include/tinyxml.h"
 
 
 class NetworkDialog: public wxDialog
@@ -59,9 +59,6 @@ class NetworkDialog: public wxDialog
 
         void SaveFile();
         void LoadFile();
-        void LoadNetwork(TiXmlElement* n);
-        wxString GetAttribute(TiXmlElement* e, const char *attr);
-        void SetAttribute(TiXmlElement* e, std::string name, wxString v);
         void PopulatePortChooser(wxArrayString *chooser);
 
 		DECLARE_EVENT_TABLE()

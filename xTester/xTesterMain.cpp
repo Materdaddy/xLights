@@ -35,9 +35,6 @@
 #include <wx/string.h>
 //*)
 
-#include "../include/tinyxml.cpp"
-#include "../include/tinyxmlerror.cpp"
-#include "../include/tinyxmlparser.cpp"
 #include "../include/xlights_out.cpp"
 
 
@@ -539,30 +536,24 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
     //StatusBar1->SetStatusText(ts.Format(_("%S.%l")));
 }
 
-wxString xTesterFrame::GetAttribute(TiXmlElement* e, const char *attr)
-{
-    wxString s(e->Attribute(attr), wxConvUTF8);
-    return s;
-}
-
 void xTesterFrame::LoadFile()
 {
-    wxString FileName=networkFile.GetFullPath();
-    TiXmlDocument doc( FileName.mb_str() );
-    if (doc.LoadFile()) {
-        int r=0;
-        for( TiXmlElement* e=doc.RootElement()->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-            if (e->ValueStr() == "network") {
-                AddNetwork(GetAttribute(e,"NetworkType"),
-                           GetAttribute(e,"ComPort"),
-                           GetAttribute(e,"BaudRate"),
-                           atoi(GetAttribute(e,"MaxChannels").mb_str(wxConvUTF8)));
-                r++;
+    long MaxChan;
+    wxString tempstr;
+    wxXmlDocument doc;
+    if (doc.Load( networkFile.GetFullPath() )) {
+        for( wxXmlNode* e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
+            tempstr.ToLong(&MaxChan);
+            if (e->GetName() == _("network")) {
+                AddNetwork(e->GetPropVal(wxT("NetworkType"), wxT("")),
+                           e->GetPropVal(wxT("ComPort"), wxT("")),
+                           e->GetPropVal(wxT("BaudRate"), wxT("")),
+                           MaxChan);
             }
         }
     } else {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Loading Network File"));
+        wxMessageBox(_("Unable to load network definition file"), _("Error"));
     }
 }
 

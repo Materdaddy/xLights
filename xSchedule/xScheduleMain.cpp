@@ -903,7 +903,6 @@ void xScheduleFrame::LoadNetworkFile()
     wxString tempstr;
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
-        int r=0;
         for( wxXmlNode* e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
             tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
             tempstr.ToLong(&MaxChan);
@@ -912,11 +911,10 @@ void xScheduleFrame::LoadNetworkFile()
                            e->GetPropVal(wxT("ComPort"), wxT("")),
                            e->GetPropVal(wxT("BaudRate"), wxT("")),
                            MaxChan);
-                r++;
             }
         }
     } else {
-        wxMessageBox(_("Unable to load network file"), _("Error"));
+        wxMessageBox(_("Unable to load network definition file"), _("Error"));
     }
 }
 
@@ -1312,14 +1310,15 @@ void xScheduleFrame::SaveFile()
 {
     unsigned int RowCount,baseid;
     wxCheckBox* chkbox;
+    wxTextCtrl* TextCtrlLogic;
     wxXmlDocument doc;
-    wxXmlNode *item, *plist;
-    wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, _("xSchedule") );
-    root->SetProperties(new wxXmlProperty(_("computer"), wxGetHostName()));
+    wxXmlNode *item, *plist, *scriptnode, *scripttext;
+    wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("xSchedule") );
+    root->AddProperty( wxT("computer"), wxGetHostName());
     doc.SetRoot( root );
 
     // save calendar
-    wxXmlNode* sched = new wxXmlNode( root, wxXML_ELEMENT_NODE, wxT("schedule") );
+    wxXmlNode* sched = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("schedule") );
     root->AddChild(sched);
     int nrows=Grid1->GetNumberRows();
     wxDateTime t1,t2,d=CalStart;
@@ -1369,6 +1368,12 @@ void xScheduleFrame::SaveFile()
             item->AddProperty( wxT("enabled"), v );
             plist->AddChild( item );
         }
+        scriptnode = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("script") );
+        scripttext = new wxXmlNode( wxXML_TEXT_NODE, wxT("scripttext") );
+        TextCtrlLogic = (wxTextCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LOGIC,Notebook1);
+        scripttext->SetContent( TextCtrlLogic->GetValue() );
+        plist->AddChild( scriptnode );
+        scriptnode->AddChild( scripttext );
     }
 
     // commit to disk
@@ -1449,7 +1454,8 @@ void xScheduleFrame::LoadPlaylist(wxXmlNode* n)
         chkval = n->GetPropVal( chkbox->GetLabelText(), wxT("0"));
         chkbox->SetValue( chkval == _("1") );
     }
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxCheckListBox* CheckListBoxPlay = (wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxTextCtrl* TextCtrlLogic = (wxTextCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LOGIC,Notebook1);
     int cnt=0;
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == _("listitem")) {
@@ -1458,6 +1464,8 @@ void xScheduleFrame::LoadPlaylist(wxXmlNode* n)
             CheckListBoxPlay->AppendString(itemname);
             CheckListBoxPlay->Check(cnt, chkval == _("1"));
             cnt++;
+        } else if (e->GetName() == _("script")) {
+            TextCtrlLogic->SetValue( e->GetNodeContent() );
         }
     }
     ScanForFiles();
@@ -1667,6 +1675,7 @@ void xScheduleFrame::OnButtonClearLogClick(wxCommandEvent& event)
 void xScheduleFrame::OnMediaEnd( wxCommandEvent &event )
 {
     if (basic.IsRunning()) {
-        wxMessageBox(_("OnMediaEnd"), _("Info"));
+        //wxMessageBox(_("OnMediaEnd"), _("Info"));
+        basic.runat(1000);
     }
 }

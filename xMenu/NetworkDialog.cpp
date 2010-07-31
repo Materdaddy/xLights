@@ -6,9 +6,6 @@
 //*)
 
 #include <wx/msgdlg.h>
-#include "../include/tinyxml.cpp"
-#include "../include/tinyxmlerror.cpp"
-#include "../include/tinyxmlparser.cpp"
 
 
 //(*IdInit(NetworkDialog)
@@ -138,67 +135,49 @@ void NetworkDialog::OnGridNetworkEditorShown(wxGridEvent& event)
 
 void NetworkDialog::LoadFile()
 {
-    wxString FileName=networkFile.GetFullPath();
-    TiXmlDocument doc( FileName.mb_str() );
-    if (doc.LoadFile()) {
+    wxXmlDocument doc;
+    if (doc.Load( networkFile.GetFullPath() )) {
         int r=0;
-        for( TiXmlElement* e=doc.RootElement()->FirstChildElement(); e!=NULL; e=e->NextSiblingElement() ) {
-            if (e->ValueStr() == "network") {
+        for( wxXmlNode* e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            if (e->GetName() == _("network")) {
                 GridNetwork->AppendRows(1);
-                GridNetwork->SetCellValue(r,0,GetAttribute(e,"NetworkType"));
-                GridNetwork->SetCellValue(r,1,GetAttribute(e,"ComPort"));
-                GridNetwork->SetCellValue(r,2,GetAttribute(e,"BaudRate"));
-                GridNetwork->SetCellValue(r,3,GetAttribute(e,"MaxChannels"));
+                GridNetwork->SetCellValue(r,0,e->GetPropVal(wxT("NetworkType"), wxT("")));
+                GridNetwork->SetCellValue(r,1,e->GetPropVal(wxT("ComPort"), wxT("")));
+                GridNetwork->SetCellValue(r,2,e->GetPropVal(wxT("BaudRate"), wxT("")));
+                GridNetwork->SetCellValue(r,3,e->GetPropVal(wxT("MaxChannels"), wxT("0")));
                 r++;
             }
         }
     } else {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Loading Network File"));
+        wxMessageBox(_("Unable to load network definition file"), _("Error"));
     }
-}
-
-wxString NetworkDialog::GetAttribute(TiXmlElement* e, const char *attr)
-{
-    wxString s(e->Attribute(attr), wxConvUTF8);
-    return s;
 }
 
 void NetworkDialog::SaveFile()
 {
     int RowCount;
-  TiXmlElement* net;
-  wxString FileName=networkFile.GetFullPath();
-    TiXmlDocument doc( FileName.mb_str() );
-   TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-  doc.LinkEndChild( decl );
-  TiXmlElement* root = new TiXmlElement( "Networks" );
-    root->SetAttribute("computer", wxGetHostName().mb_str());
-  doc.LinkEndChild( root );
+    wxXmlNode* net;
+    wxXmlDocument doc;
+    wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Networks") );
+    root->AddProperty( wxT("computer"), wxGetHostName());
+    doc.SetRoot( root );
 
     RowCount=GridNetwork->GetNumberRows();
     for (int r=0; r < RowCount; r++ ) {
-        net = new TiXmlElement( "network" );
-        SetAttribute(net,"NetworkType",GridNetwork->GetCellValue(r,0));
-        SetAttribute(net,"ComPort",GridNetwork->GetCellValue(r,1));
-        SetAttribute(net,"BaudRate",GridNetwork->GetCellValue(r,2));
-        SetAttribute(net,"MaxChannels",GridNetwork->GetCellValue(r,3));
-        root->LinkEndChild( net );
+        net = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("network") );
+        net->AddProperty( wxT("NetworkType"), GridNetwork->GetCellValue(r,0));
+        net->AddProperty( wxT("ComPort"), GridNetwork->GetCellValue(r,1));
+        net->AddProperty( wxT("BaudRate"), GridNetwork->GetCellValue(r,2));
+        net->AddProperty( wxT("MaxChannels"), GridNetwork->GetCellValue(r,3));
+        root->AddChild( net );
     }
-    if (doc.SaveFile()) {
+    wxString FileName=networkFile.GetFullPath();
+    if (doc.Save( FileName )) {
         UnsavedChanges=false;
     } else {
-        wxString msg(doc.ErrorDesc(), wxConvUTF8);
-        wxMessageBox(msg, _("Error Network Saving File"));
+        wxMessageBox(_("Unable to save network definition file"), _("Error"));
     }
 }
-
-void NetworkDialog::SetAttribute(TiXmlElement* e, std::string name, wxString value)
-{
-    std::string svalue(value.mb_str());
-    e->SetAttribute(name, svalue);
-}
-
 
 void NetworkDialog::OnButtonSaveClick(wxCommandEvent& event)
 {

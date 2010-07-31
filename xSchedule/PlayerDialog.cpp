@@ -109,7 +109,7 @@ void PlayerDialog::OnMediaStop(wxMediaEvent& WXUNUSED(evt))
 
 void PlayerDialog::OnMediaFinished(wxMediaEvent& evt)
 {
-    wxMessageBox(_("OnMediaFinished"), _("Info"));
+    //wxMessageBox(_("OnMediaFinished"), _("Info"));
     evt.SetId(this->GetId());
     evt.ResumePropagation(1);
     GetEventHandler()->ProcessEvent( evt );

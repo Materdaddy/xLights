@@ -42,9 +42,10 @@
 #include <wx/checklst.h>
 #include <wx/timer.h>
 #include <wx/datetime.h>
+#include <wx/xml/xml.h>
 
 #include "../include/globals.h"
-#include "../include/tinyxml.h"
+
 
 class NetworkInfo
 {
@@ -96,7 +97,6 @@ class xTesterFrame: public wxFrame
         //*)
 
         void LoadFile();
-        wxString GetAttribute(TiXmlElement* e, const char *attr);
 
         //(*Identifiers(xTesterFrame)
         static const long ID_STATICTEXT1;
