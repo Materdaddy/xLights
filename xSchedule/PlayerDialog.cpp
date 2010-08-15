@@ -62,9 +62,9 @@ PlayerDialog::PlayerDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
                   wxMediaEventHandler(PlayerDialog::OnMediaPlay));
     this->Connect(wxID_MEDIACTRL, wxEVT_MEDIA_PAUSE,
                   wxMediaEventHandler(PlayerDialog::OnMediaPause));
+                  */
     this->Connect(wxID_MEDIACTRL, wxEVT_MEDIA_STOP,
                   wxMediaEventHandler(PlayerDialog::OnMediaStop));
-                  */
     this->Connect(wxID_MEDIACTRL, wxEVT_MEDIA_FINISHED,
                   wxMediaEventHandler(PlayerDialog::OnMediaFinished));
     this->Connect(wxID_MEDIACTRL, wxEVT_MEDIA_LOADED,
@@ -103,16 +103,20 @@ void PlayerDialog::OnMediaPause(wxMediaEvent& WXUNUSED(evt))
 {
 }
 
-void PlayerDialog::OnMediaStop(wxMediaEvent& WXUNUSED(evt))
+void PlayerDialog::OnMediaStop(wxMediaEvent& event)
 {
+    //wxMessageBox(_("OnMediaStop"), _("Info"));
+    event.SetId(this->GetId());
+    event.ResumePropagation(1);
+    GetEventHandler()->ProcessEvent( event );
 }
 
-void PlayerDialog::OnMediaFinished(wxMediaEvent& evt)
+void PlayerDialog::OnMediaFinished(wxMediaEvent& event)
 {
     //wxMessageBox(_("OnMediaFinished"), _("Info"));
-    evt.SetId(this->GetId());
-    evt.ResumePropagation(1);
-    GetEventHandler()->ProcessEvent( evt );
+    event.SetId(this->GetId());
+    event.ResumePropagation(1);
+    GetEventHandler()->ProcessEvent( event );
 }
 
 void PlayerDialog::OnClose(wxCloseEvent& event)

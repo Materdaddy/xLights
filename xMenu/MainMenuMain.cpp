@@ -165,8 +165,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnAbout);
     //*)
 
-    wxIcon FrameIcon(xlights_xpm);
-    SetIcon(FrameIcon);
+    SetIcon(wxIcon(xlights_xpm));
     wxStandardPathsBase& stdp = wxStandardPaths::Get();
     ThisExe = stdp.GetExecutablePath();
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));

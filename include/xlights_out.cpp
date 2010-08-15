@@ -41,6 +41,7 @@ protected:
   char SerialConfig[4];
   long timer_msec;
   int max_intensity;
+  int num_channels;
   friend class xChannel_Dimmer;
 
   virtual void SetMappedIntensity (int chindex, unsigned char intensity) =0;
@@ -50,6 +51,7 @@ public:
   xNetwork() {
     serptr=0;
     timer_msec=0;
+    num_channels=0;
     strcpy(SerialConfig,"8N1");
   };
 
@@ -59,6 +61,10 @@ public:
   
   unsigned char MapIntensity(unsigned char intensity) {
     return IntensityMap[intensity];
+  };
+
+  int GetChannelCount() {
+    return num_channels;
   };
 
   virtual void SetChannelCount(int numchannels) = 0;
@@ -313,6 +319,7 @@ public:
     for (int i=0; i<numchannels; i++) {
       channels.push_back(new xChannel_Dimmer(this,i));
     }
+    num_channels=numchannels;
   };
 
   virtual void ramp (int chindex, int duration, int startintensity, int endintensity) {
@@ -403,7 +410,6 @@ public:
 
   void TimerEnd() {
     if (changed && serptr) {
-      //printf("DMXentec data sent: %02X %02X %02X %02X %02X %02X\n",data[0],data[1],data[2],data[3],data[4],data[5]);
       serptr->Write((char *)data,datalen);
       changed=0;
     }
@@ -417,8 +423,8 @@ class xNetwork_Renard: public xNetwork_Dimmer {
 protected:
   unsigned char data[1024];
 
-  void SetMappedIntensity (int chindex, unsigned char intensity) {
-    data[chindex+2]=intensity;
+  void SetMappedIntensity (int chindex, unsigned char mappedintensity) {
+    data[chindex+2]=mappedintensity;
     changed=1;
   };
 
@@ -453,7 +459,6 @@ public:
 
   void TimerEnd() {
     if (changed && serptr) {
-      //printf("Renard data sent: %02X %02X %02X %02X %02X %02X\n",data[0],data[1],data[2],data[3],data[4],data[5]);
       serptr->Write((char *)data,datalen);
       changed=0;
     }
@@ -553,6 +558,7 @@ public:
   };
 
   void SetChannelCount(int numchannels) {
+    num_channels=numchannels;
   };
 
   void ResetTimer() {
@@ -677,36 +683,43 @@ public:
   // duration is in milliseconds
   // intensity values are relative to the last SetMaxIntensity call
   void ramp (int netnum, int chindex, int duration, int startintensity, int endintensity) {
-    networks[netnum]->ramp(chindex, duration, startintensity, endintensity);
+    if (chindex <= networks[netnum]->GetChannelCount())
+      networks[netnum]->ramp(chindex, duration, startintensity, endintensity);
   };
 
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
   void SetIntensity (int netnum, int chindex, int intensity) {
     if (netnum < 0 || netnum >= MAXNETWORKS) return; 
-    networks[netnum]->SetIntensity(chindex, intensity);
+    if (chindex <= networks[netnum]->GetChannelCount())
+      networks[netnum]->SetIntensity(chindex, intensity);
   };
 
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
   void twinkle (int netnum, int chindex, int period, int intensity) {
-    networks[netnum]->twinkle(chindex, period, intensity);
+    if (chindex <= networks[netnum]->GetChannelCount())
+      networks[netnum]->twinkle(chindex, period, intensity);
   };
 
   void twinklefade (int netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
-    networks[netnum]->twinklefade(chindex, period, duration, startintensity, endintensity);
+    if (chindex <= networks[netnum]->GetChannelCount())
+      networks[netnum]->twinklefade(chindex, period, duration, startintensity, endintensity);
   };
 
   void shimmer (int netnum, int chindex, int period, int intensity) {
-    networks[netnum]->shimmer(chindex, period, intensity);
+    if (chindex <= networks[netnum]->GetChannelCount())
+      networks[netnum]->shimmer(chindex, period, intensity);
   };
 
   void shimmerfade (int netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
-    networks[netnum]->shimmerfade(chindex, period, duration, startintensity, endintensity);
+    if (chindex <= networks[netnum]->GetChannelCount())
+      networks[netnum]->shimmerfade(chindex, period, duration, startintensity, endintensity);
   };
 
   void off (int netnum, int chindex) {
-    networks[netnum]->off(chindex);
+    if (chindex <= networks[netnum]->GetChannelCount())
+      networks[netnum]->off(chindex);
   };
 
   void alloff () {

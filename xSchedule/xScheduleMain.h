@@ -90,6 +90,7 @@ class xScheduleFrame: public wxFrame
         xScheduleFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~xScheduleFrame();
 
+        long SecondsRemaining;
         void BasicPrompt(char* prompt, char* buff, int size);
         void BasicOutput(char *msg);
         void BasicError(const char *msg);
@@ -153,6 +154,7 @@ class xScheduleFrame: public wxFrame
         static const long ID_STATUSBAR1;
         //*)
         static const long ID_TIMER;
+        static const long ID_SCHED_TIMER;
         static const long ID_PLAYER_DIALOG;
 
         //(*Declarations(xScheduleFrame)
@@ -210,6 +212,7 @@ class xScheduleFrame: public wxFrame
         bool PortsOK;
         LorEventMap LorEvents;
         wxTimer timer;
+        wxTimer schedtimer;
         wxDateTime starttime;
         SeqPlayerStates SeqPlayerState;
         long VixEventPeriod;
@@ -228,7 +231,9 @@ class xScheduleFrame: public wxFrame
         void LoadPlaylist(wxXmlNode* n);
         void SaveFile();
         void ScanForFiles();
+        void FileTypeButtonClicked();
         void AddPlaylist(const wxString& name);
+        void OnPlaylistToggle();
         void OnButtonRunPlaylistClick();
         void OnButtonPlayItemClick();
         void OnButtonUpClick();
@@ -238,10 +243,15 @@ class xScheduleFrame: public wxFrame
         void PlayVixenFile(wxString& FileName);
         void LoadLorChannels(wxXmlNode* n);
         void LoadLorChannel(wxXmlNode* n, int netnum, int chindex);
+        long DiffSeconds(wxString& strTime, wxTimeSpan& tsCurrent);
         void OnTimer(wxTimerEvent& event);
         void ResetTimer(SeqPlayerStates newstate);
         void TimerNoPlay();
+        int  FindNotebookPage(wxString& pagename);
+        void RunPlaylist(int nbidx);
+        void OnSchedTimer(wxTimerEvent& event);
         void OnMediaEnd( wxCommandEvent &event );
+        void OnMediaStop( wxCommandEvent &event );
         std::string base64_decode(wxString const& encoded_string);
 
         DECLARE_EVENT_TABLE()

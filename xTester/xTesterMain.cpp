@@ -316,8 +316,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnAbout);
     //*)
 
-    wxIcon FrameIcon(xlights_xpm);
-    SetIcon(FrameIcon);
+    SetIcon(wxIcon(xlights_xpm));
 
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));

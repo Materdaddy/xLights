@@ -2,7 +2,6 @@
 <wxsmith>
 	<object class="wxFrame" name="xScheduleFrame">
 		<title>xSchedule</title>
-		<icon>..\include\xlights.ico</icon>
 		<size>635,311</size>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -326,9 +325,9 @@
 			</object>
 		</object>
 		<object class="wxStatusBar" name="ID_STATUSBAR1" variable="StatusBar1" member="yes">
-			<fields>1</fields>
-			<widths>-1</widths>
-			<styles>wxSB_NORMAL</styles>
+			<fields>2</fields>
+			<widths>-1,-1</widths>
+			<styles>wxSB_NORMAL,wxSB_NORMAL</styles>
 		</object>
 	</object>
 </wxsmith>
