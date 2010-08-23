@@ -59,6 +59,7 @@
 #include "NewListDialog.h"
 #include "DelListDialog.h"
 #include "RenListDialog.h"
+#include "WizardDialog.h"
 #include "../include/globals.h"
 
 class LorEventClass
@@ -190,6 +191,7 @@ class xScheduleFrame: public wxFrame
             DOWN_BUTTON,
             PLAY_BUTTON,
             RUN_BUTTON,
+            WIZARD_BUTTON,
             PLAYLIST,
             PLAYLIST_LOGIC
         };
@@ -206,7 +208,7 @@ class xScheduleFrame: public wxFrame
         wxFileName networkFile;
         wxFileName scheduleFile;
         wxDateTime CalStart,CalEnd;
-        wxString datefmt, timefmt;
+        wxString datefmt, timefmt, LastSchedStart;
         PlayerDialog* PlayerDlg;
         bool UnsavedChanges;
         bool PortsOK;
@@ -233,26 +235,27 @@ class xScheduleFrame: public wxFrame
         void ScanForFiles();
         void FileTypeButtonClicked();
         void AddPlaylist(const wxString& name);
-        void OnPlaylistToggle();
-        void OnButtonRunPlaylistClick();
-        void OnButtonPlayItemClick();
-        void OnButtonUpClick();
-        void OnButtonDownClick();
         GridSelection getGridSelection(wxGrid & grid);
         void PlayLorFile(wxString& FileName);
         void PlayVixenFile(wxString& FileName);
         void LoadLorChannels(wxXmlNode* n);
         void LoadLorChannel(wxXmlNode* n, int netnum, int chindex);
         long DiffSeconds(wxString& strTime, wxTimeSpan& tsCurrent);
-        void OnTimer(wxTimerEvent& event);
         void ResetTimer(SeqPlayerStates newstate);
         void TimerNoPlay();
         int  FindNotebookPage(wxString& pagename);
         void RunPlaylist(int nbidx);
-        void OnSchedTimer(wxTimerEvent& event);
-        void OnMediaEnd( wxCommandEvent &event );
-        void OnMediaStop( wxCommandEvent &event );
         std::string base64_decode(wxString const& encoded_string);
+
+        void OnTimer(wxTimerEvent& event);
+        void OnSchedTimer(wxTimerEvent& event);
+        void OnPlaylistToggle();
+        void OnButtonRunPlaylistClick();
+        void OnButtonPlayItemClick();
+        void OnButtonUpClick();
+        void OnButtonDownClick();
+        void OnButtonWizardClick();
+        void OnMediaEnd( wxCommandEvent &event );
 
         DECLARE_EVENT_TABLE()
 };

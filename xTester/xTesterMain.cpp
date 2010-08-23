@@ -26,6 +26,9 @@
 #include <wx/config.h>
 #include <wx/icon.h>
 
+// For wxWidgets 2.9/3.0
+//#include <wx/kbdstate.h>
+
 #include "../include/xlights.xpm"
 
 
@@ -621,8 +624,21 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
         }
     }
     ListBox->Set(chNames);
+    ListBox->Connect(wxEVT_COMMAND_CHECKLISTBOX_TOGGLED,(wxObjectEventFunction)&xTesterFrame::OnCheckboxToggle, NULL, this);
 
     return NetInfo;
+}
+
+
+void xTesterFrame::OnCheckboxToggle(wxCommandEvent& event)
+{
+    static int lastrow=0;
+    int row=event.GetInt();
+    //StatusBar1->SetStatusText(wxString::Format(_("Row %d"),row));
+
+    // In wxWidgets 2.9/3.0:
+    // test state of shift key using wxKeyboardState class
+    // so that shift-click will select a range of checkboxes
 }
 
 

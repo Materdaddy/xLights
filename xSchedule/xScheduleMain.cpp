@@ -375,7 +375,6 @@ BEGIN_EVENT_TABLE(xScheduleFrame,wxFrame)
     EVT_TIMER(ID_TIMER, xScheduleFrame::OnTimer)
     EVT_TIMER(ID_SCHED_TIMER, xScheduleFrame::OnSchedTimer)
     EVT_COMMAND(ID_PLAYER_DIALOG, wxEVT_MEDIA_FINISHED, xScheduleFrame::OnMediaEnd)
-    EVT_COMMAND(ID_PLAYER_DIALOG, wxEVT_MEDIA_STOP, xScheduleFrame::OnMediaStop)
 END_EVENT_TABLE()
 
 xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
@@ -646,7 +645,7 @@ void xScheduleFrame::StartScript(const char *scriptname) {
     AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, true);
     AuiToolBar1->Realize();
     wxString wxname(scriptname, wxConvUTF8);
-    StatusBar1->SetStatusText(_("Starting playlist: ")+wxname);
+    StatusBar1->SetStatusText(_("Playing playlist: ")+wxname);
 }
 
 void xScheduleFrame::EndScript(const char *scriptname) {
@@ -732,17 +731,24 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     FlexGridSizer6->AddGrowableRow(1);
     Connect(id, wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, (wxObjectEventFunction)&xScheduleFrame::OnPlaylistToggle);
 
-    // Player Logic
-    wxFlexGridSizer* FlexGridSizer7 = new wxFlexGridSizer(0, 2, 0, 0);
+    // Player script
+    wxFlexGridSizer* FlexGridSizer7 = new wxFlexGridSizer(3);
     FlexGridSizer7->AddGrowableCol(1);
-    wxStaticText* StaticText3 = new wxStaticText(PanelPlayList, -1, _("Player Logic"));
+    wxStaticText* StaticText3 = new wxStaticText(PanelPlayList, -1, _("Player script"));
     wxFont StaticText3Font(10,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText3->SetFont(StaticText3Font);
     FlexGridSizer7->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 
+    id=baseid+WIZARD_BUTTON;
+    wxButton* ButtonWizard = new wxButton(PanelPlayList, id, _("Script Wizard..."));
+    ButtonWizard->SetToolTip(_("Run script wizard to create script"));
+    ButtonWizard->SetHelpText(_("Run script wizard to create script"));
+    FlexGridSizer7->Add(ButtonWizard, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonWizardClick);
+
     id=baseid+RUN_BUTTON;
     wxBitmapButton* ButtonRun = new wxBitmapButton(PanelPlayList, id, wxBitmap(play_xpm));
-    ButtonRun->SetToolTip(_("Run Player Logic"));
+    ButtonRun->SetToolTip(_("Run Player Script"));
     ButtonRun->SetHelpText(_("Plays the play list"));
     FlexGridSizer7->Add(ButtonRun, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonRunPlaylistClick);
@@ -757,6 +763,7 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     GridSizer1->SetSizeHints(PanelPlayList);
     Notebook1->AddPage(PanelPlayList, name, true);
     ChoicePlayList->AppendString(name);
+    TextCtrlLogic->SetValue( _("10 REM Run script wizard to create a script that will play the playlist\n") );
 }
 
 xScheduleFrame::~xScheduleFrame()
@@ -833,8 +840,11 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
             // check for the schedule end
             strTime=timerange.AfterFirst('-');
             SecondsRem = DiffSeconds(strTime, tsCurrent);
-            int minutes=SecondsRem / 60;
-            if (minutes > 60) {
+            int minutes=(SecondsRem + 59) / 60;  // round up
+            if (!PlayerDlg->IsShown()) {
+                TextCtrlLog->AppendText(_("Media player closed\n"));
+                basic.halt();
+            } else if (minutes > 60) {
                 StatusBar1->SetStatusText(_("Show will end at: ") + strTime, FldNum);
             } else if (minutes > 0) {
                 StatusBar1->SetStatusText(wxString::Format(_("Show will end in %d minutes"),minutes), FldNum);
@@ -844,18 +854,24 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
         } else {
             // check for next scheduled start
             strTime=timerange.BeforeFirst('-');
-            int minutes=DiffSeconds(strTime, tsCurrent) / 60;
+            long seconds=DiffSeconds(strTime, tsCurrent);
+            int minutes= (seconds + 59) / 60;  // round up
             if (minutes > 60) {
                 StatusBar1->SetStatusText(_("Next show will start at: ") + strTime, FldNum);
-            } else if (minutes > 0) {
+            } else if (minutes > 1) {
                 StatusBar1->SetStatusText(wxString::Format(_("Next show will start in %d minutes"),minutes), FldNum);
-            } else if (minutes == 0) {
+            } else if (minutes == 1) {
+                StatusBar1->SetStatusText(wxString::Format(_("Next show will start in %ld seconds"),seconds), FldNum);
+            } else if (minutes == 0 && v != LastSchedStart) {
                 int nbidx=FindNotebookPage(playlist);
                 if (nbidx > 0) {
                     RunPlaylist(nbidx);
+                    LastSchedStart=v;
                 } else {
                     StatusBar1->SetStatusText(_("ERROR: cannot find playlist ") + playlist, FldNum);
                 }
+            } else if (PlayerDlg->IsShown()) {
+                PlayerDlg->Show(false);
             } else {
                 StatusBar1->SetStatusText(_("Show has ended for today"), FldNum);
             }
@@ -1364,7 +1380,7 @@ void xScheduleFrame::OnAuiToolBarItemDelClick(wxCommandEvent& event)
     dialog.StaticTextDelName->SetLabel(Notebook1->GetPageText(idx));
     if (dialog.ShowModal() != wxID_OK) return;
     Notebook1->DeletePage(idx);
-    ChoicePlayList->Delete(idx-1);
+    ChoicePlayList->Delete(idx-2);
     UnsavedChanges=true;
 }
 
@@ -1762,14 +1778,71 @@ void xScheduleFrame::RunPlaylist(int nbidx)
     if (basic.setScript(PageName.mb_str(wxConvUTF8), userscript.mb_str(wxConvUTF8))) {
         basic.run();
     } else {
-        TextCtrlLog->AppendText(_("Error in playlist logic\n"));
-        StatusBar1->SetStatusText(_("Error in playlist logic"));
+        TextCtrlLog->AppendText(_("Error in playlist script\n"));
+        StatusBar1->SetStatusText(_("Error in playlist script"));
     }
 }
 
 void xScheduleFrame::OnButtonRunPlaylistClick()
 {
     RunPlaylist(Notebook1->GetSelection());
+}
+
+void xScheduleFrame::OnButtonWizardClick()
+{
+    WizardDialog dialog(this);
+    int nbidx=Notebook1->GetSelection();
+    dialog.StaticTextListName->SetLabel(Notebook1->GetPageText(nbidx));
+    if (dialog.ShowModal() != wxID_OK) return;
+
+    bool FirstItemOnce = dialog.CheckBoxFirstItem->GetValue();
+    bool LastItemOnce = dialog.CheckBoxLastItem->GetValue();
+    int baseid=1000*nbidx;
+    wxTextCtrl* LogicCtl=(wxTextCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LOGIC,Notebook1);
+    wxString script;
+    wxString loopstart = FirstItemOnce ? _("2") : _("1");
+    wxString loopend = LastItemOnce ? _("-1") : _("");
+
+    script.Append(_("10 REM *\n"));
+    script.Append(_("20 REM * Created: ") + wxDateTime::Now().Format() + _("\n"));
+    script.Append(_("30 REM *\n"));
+    if (FirstItemOnce) {
+        script.Append(_("50 LET NextItem=1\n"));
+        script.Append(_("60 GOTO 1100\n"));
+    } else {
+        script.Append(_("50 LET LastItemPlayed=999\n"));
+    }
+    script.Append(_("1000 REM *\n"));
+    script.Append(_("1001 REM * Jump here at end of song or sequence\n"));
+    script.Append(_("1002 REM *\n"));
+    script.Append(_("1005 IF SECONDSREMAINING <= 0 THEN 9000\n"));
+    script.Append(_("1010 REM Find next checked item in playlist\n"));
+    script.Append(_("1020 FOR NextItem=LastItemPlayed+1 TO PLAYLISTSIZE") + loopend + _("\n"));
+    script.Append(_("1030 IF ITEMCHECKED(NextItem)=1 THEN 1100\n"));
+    script.Append(_("1040 NEXT NextItem\n"));
+    script.Append(_("1050 REM Start over at beginning of list\n"));
+    script.Append(_("1060 FOR NextItem=") + loopstart + _(" TO PLAYLISTSIZE") + loopend + _("\n"));
+    script.Append(_("1070 IF ITEMCHECKED(NextItem)=1 THEN 1100\n"));
+    script.Append(_("1080 NEXT NextItem\n"));
+    script.Append(_("1090 GOTO 9000\n"));
+    script.Append(_("1100 REM *\n"));
+    script.Append(_("1101 REM * Play item NextItem\n"));
+    script.Append(_("1102 REM *\n"));
+    script.Append(_("1110 LET LastItemPlayed=NextItem\n"));
+    script.Append(_("1115 PRINT \"At:\", FORMATDATETIME$(NOW,5)\n"));
+    script.Append(_("1120 PRINT \"Playing:\",ITEMNAME$(NextItem)\n"));
+    script.Append(_("1130 LET X=PLAYITEM(NextItem)\n"));
+    script.Append(_("1140 WAIT\n"));
+    script.Append(_("9000 REM DONE\n"));
+    if (LastItemOnce) {
+        script.Append(_("9010 IF LastItemPlayed = PLAYLISTSIZE THEN 9100\n"));
+        script.Append(_("9020 LET NextItem=PLAYLISTSIZE\n"));
+        script.Append(_("9030 GOTO 1100\n"));
+        script.Append(_("9100 REM DONE\n"));
+    }
+
+    LogicCtl->SetValue( script );
+    UnsavedChanges=true;
 }
 
 void xScheduleFrame::OnAuiToolBarItemStopClick(wxCommandEvent& event)
@@ -1800,13 +1873,5 @@ void xScheduleFrame::OnMediaEnd( wxCommandEvent &event )
     if (basic.IsRunning()) {
         // reached end of song/sequence, so start script at line 1000
         basic.runat(1000);
-    }
-}
-
-void xScheduleFrame::OnMediaStop( wxCommandEvent &event )
-{
-    if (basic.IsRunning()) {
-        // user closed media player while playlist was running
-        basic.halt();
     }
 }

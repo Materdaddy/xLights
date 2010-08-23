@@ -196,6 +196,7 @@ class xTesterFrame: public wxFrame
         NetworkArray Networks;
         NetworkInfo* AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         void alloff();
+        void OnCheckboxToggle(wxCommandEvent& event);
         wxTimer timer;
         wxDateTime starttime;
 

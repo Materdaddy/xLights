@@ -26,7 +26,7 @@ PlayerDialog::PlayerDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	Create(parent, id, _("xPlayer"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("id"));
 	SetClientSize(wxDefaultSize);
 	Move(wxDefaultPosition);
-
+	
 	Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&PlayerDialog::OnClose);
 	//*)
 
@@ -62,9 +62,9 @@ PlayerDialog::PlayerDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
                   wxMediaEventHandler(PlayerDialog::OnMediaPlay));
     this->Connect(wxID_MEDIACTRL, wxEVT_MEDIA_PAUSE,
                   wxMediaEventHandler(PlayerDialog::OnMediaPause));
-                  */
     this->Connect(wxID_MEDIACTRL, wxEVT_MEDIA_STOP,
                   wxMediaEventHandler(PlayerDialog::OnMediaStop));
+                  */
     this->Connect(wxID_MEDIACTRL, wxEVT_MEDIA_FINISHED,
                   wxMediaEventHandler(PlayerDialog::OnMediaFinished));
     this->Connect(wxID_MEDIACTRL, wxEVT_MEDIA_LOADED,
@@ -106,9 +106,9 @@ void PlayerDialog::OnMediaPause(wxMediaEvent& WXUNUSED(evt))
 void PlayerDialog::OnMediaStop(wxMediaEvent& event)
 {
     //wxMessageBox(_("OnMediaStop"), _("Info"));
-    event.SetId(this->GetId());
-    event.ResumePropagation(1);
-    GetEventHandler()->ProcessEvent( event );
+    //event.SetId(this->GetId());
+    //event.ResumePropagation(1);
+    //GetEventHandler()->ProcessEvent( event );
 }
 
 void PlayerDialog::OnMediaFinished(wxMediaEvent& event)

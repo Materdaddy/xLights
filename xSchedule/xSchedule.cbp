@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="DebugWindows">
-				<Option output="../bin/xSchedule" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xSchedule" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -20,11 +20,11 @@
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
-					<Add directory="$(#wx)/lib/gcc_dll/mswud" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="$(#wx)/include" />
-					<Add directory="$(#wx)/lib/gcc_dll/mswud" />
+					<Add directory="$(#wx)\include" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-mthreads" />
@@ -32,7 +32,7 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseWindows">
-				<Option output="../bin/xSchedule" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xSchedule" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -44,11 +44,11 @@
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-O2" />
 					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
-					<Add directory="$(#wx)/lib/gcc_dll/mswu" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="$(#wx)/include" />
-					<Add directory="$(#wx)/lib/gcc_dll/mswu" />
+					<Add directory="$(#wx)\include" />
+					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-mthreads" />
@@ -57,7 +57,7 @@
 				</Linker>
 			</Target>
 			<Target title="DebugLinux">
-				<Option output="../bin/xSchedule" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xSchedule" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -73,7 +73,7 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseLinux">
-				<Option output="../bin/xSchedule" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\xSchedule" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -95,7 +95,7 @@
 			<Add option="-DwxUSE_UNICODE" />
 		</Compiler>
 		<Linker>
-			<Add library="../bin/libctb.a" />
+			<Add library="..\bin\libctb.a" />
 		</Linker>
 		<Unit filename="DelListDialog.cpp" />
 		<Unit filename="DelListDialog.h" />
@@ -105,10 +105,12 @@
 		<Unit filename="PlayerDialog.h" />
 		<Unit filename="RenListDialog.cpp" />
 		<Unit filename="RenListDialog.h" />
+		<Unit filename="WizardDialog.cpp" />
+		<Unit filename="WizardDialog.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
-		<Unit filename="wxsmith/xScheduleframe.wxs" />
+		<Unit filename="wxsmith\xScheduleframe.wxs" />
 		<Unit filename="xScheduleApp.cpp" />
 		<Unit filename="xScheduleApp.h" />
 		<Unit filename="xScheduleMain.cpp" />
@@ -125,6 +127,7 @@
 					<wxDialog wxs="wxsmith/NewListDialog.wxs" src="NewListDialog.cpp" hdr="NewListDialog.h" name="NewListDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/DelListDialog.wxs" src="DelListDialog.cpp" hdr="DelListDialog.h" name="DelListDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/RenListDialog.wxs" src="RenListDialog.cpp" hdr="RenListDialog.h" name="RenListDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/WizardDialog.wxs" src="WizardDialog.cpp" hdr="WizardDialog.h" name="WizardDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>
