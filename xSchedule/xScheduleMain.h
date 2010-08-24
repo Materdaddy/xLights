@@ -55,6 +55,7 @@
 #include <map>
 #include <vector>
 
+#include "PlayerFrame.h"
 #include "PlayerDialog.h"
 #include "NewListDialog.h"
 #include "DelListDialog.h"
@@ -62,21 +63,32 @@
 #include "WizardDialog.h"
 #include "../include/globals.h"
 
+enum LOR_ACTIONS {
+    LOR_INTENSITY,
+    LOR_TWINKLE,
+    LOR_SHIMMER,
+    LOR_UNKNOWN
+};
+
 class LorEventClass
 {
     public:
 
-    LorEventClass(int net_num, int ch_index, int End_Centi, wxXmlNode* xml_data) {
+    LorEventClass(int net_num, int ch_index, int End_Centi, LOR_ACTIONS act, int Start_Intensity, int End_Intesity) {
         netnum=net_num;
         chindex=ch_index;
         EndCentiSec=End_Centi;
-        xmldata=xml_data;
+        action=act;
+        StartIntensity=Start_Intensity;
+        EndIntesity=End_Intesity;
     }
 
     int netnum;
     int chindex;
     int EndCentiSec;
-    wxXmlNode* xmldata;
+    int StartIntensity;
+    int EndIntesity;
+    LOR_ACTIONS action;
 };
 
 typedef std::set<std::pair<int, int> > GridSelection;
@@ -96,7 +108,7 @@ class xScheduleFrame: public wxFrame
         void BasicOutput(char *msg);
         void BasicError(const char *msg);
         char ExtType(const wxString& ext);
-        bool Play(wxString& filename);
+        void Play(wxString& filename);
         void StartScript(const char *scriptname);
         void EndScript(const char *scriptname);
 
@@ -187,12 +199,13 @@ class xScheduleFrame: public wxFrame
             CHKBOX_VIDEO,
             CHKBOX_LOR,
             CHKBOX_VIXEN,
+            CHKBOX_MOVIEMODE,
             UP_BUTTON,
             DOWN_BUTTON,
             PLAY_BUTTON,
             RUN_BUTTON,
             WIZARD_BUTTON,
-            PLAYLIST,
+            PLAYLIST_LISTBOX,
             PLAYLIST_LOGIC
         };
 
@@ -204,18 +217,26 @@ class xScheduleFrame: public wxFrame
             PAUSE_VIX
         };
 
+        enum PlayModes {
+            NO_PLAY,
+            SINGLE,
+            PLAYLIST,
+            SCHEDULE
+        };
+
         wxString CurrentDir;
         wxFileName networkFile;
         wxFileName scheduleFile;
         wxDateTime CalStart,CalEnd;
         wxString datefmt, timefmt, LastSchedStart;
-        PlayerDialog* PlayerDlg;
+        PlayerFrame* PlayerDlg;
         bool UnsavedChanges;
         bool PortsOK;
         LorEventMap LorEvents;
         wxTimer timer;
         wxTimer schedtimer;
         wxDateTime starttime;
+        PlayModes PlayMode;
         SeqPlayerStates SeqPlayerState;
         long VixEventPeriod;
         int VixNumPeriods;
@@ -233,7 +254,6 @@ class xScheduleFrame: public wxFrame
         void LoadPlaylist(wxXmlNode* n);
         void SaveFile();
         void ScanForFiles();
-        void FileTypeButtonClicked();
         void AddPlaylist(const wxString& name);
         GridSelection getGridSelection(wxGrid & grid);
         void PlayLorFile(wxString& FileName);
@@ -245,10 +265,14 @@ class xScheduleFrame: public wxFrame
         void TimerNoPlay();
         int  FindNotebookPage(wxString& pagename);
         void RunPlaylist(int nbidx);
-        std::string base64_decode(wxString const& encoded_string);
+        void ShowPlayerSingle();
+        void PlayerError(const wxString& msg);
+        void SendToLogAndStatusBar(const wxString& msg);
+        std::string base64_decode(const wxString& encoded_string);
 
         void OnTimer(wxTimerEvent& event);
         void OnSchedTimer(wxTimerEvent& event);
+        void OnFileTypeButtonClicked();
         void OnPlaylistToggle();
         void OnButtonRunPlaylistClick();
         void OnButtonPlayItemClick();

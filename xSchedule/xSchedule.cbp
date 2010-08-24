@@ -101,8 +101,8 @@
 		<Unit filename="DelListDialog.h" />
 		<Unit filename="NewListDialog.cpp" />
 		<Unit filename="NewListDialog.h" />
-		<Unit filename="PlayerDialog.cpp" />
-		<Unit filename="PlayerDialog.h" />
+		<Unit filename="PlayerFrame.cpp" />
+		<Unit filename="PlayerFrame.h" />
 		<Unit filename="RenListDialog.cpp" />
 		<Unit filename="RenListDialog.h" />
 		<Unit filename="WizardDialog.cpp" />
@@ -123,11 +123,11 @@
 				<gui name="wxWidgets" src="xScheduleApp.cpp" main="xScheduleFrame" init_handlers="necessary" language="CPP" />
 				<resources>
 					<wxFrame wxs="wxsmith/xScheduleframe.wxs" src="xScheduleMain.cpp" hdr="xScheduleMain.h" name="xScheduleFrame" language="CPP" />
-					<wxDialog wxs="wxsmith/PlayerDialog.wxs" src="PlayerDialog.cpp" hdr="PlayerDialog.h" name="PlayerDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/NewListDialog.wxs" src="NewListDialog.cpp" hdr="NewListDialog.h" name="NewListDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/DelListDialog.wxs" src="DelListDialog.cpp" hdr="DelListDialog.h" name="DelListDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/RenListDialog.wxs" src="RenListDialog.cpp" hdr="RenListDialog.h" name="RenListDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/WizardDialog.wxs" src="WizardDialog.cpp" hdr="WizardDialog.h" name="WizardDialog" language="CPP" />
+					<wxFrame wxs="wxsmith/PlayerFrame.wxs" src="PlayerFrame.cpp" hdr="PlayerFrame.h" name="PlayerFrame" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

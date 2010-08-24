@@ -180,24 +180,17 @@ protected:
         return answer;
     };
 
-    // returns 1 if item was able to be played, 0 otherwise
-    double do_PlayItem(void)
+    // play item in playlist
+    int do_PlayItem(void)
     {
-        double answer=1;
-        match(OPAREN);
-        int idx = floor(expr());
-        match(CPAREN);
+        int idx = integer( expr() );
         if(1 <= idx && idx <= playlist->GetCount()) {
             wxString filename = playlist->GetString(idx-1);
-            //wxMessageBox(filename, _("File"));
-            //PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
-            if (!xsched->Play(filename)) {
-                answer=0;
-            }
+            xsched->Play(filename);
         } else {
             seterror(ERR_ILLEGALOFFSET);
         }
-        return answer;
+        return 0;
     }
 
     /*
@@ -265,7 +258,7 @@ public:
         AddStringFunction("ITEMNAME$", static_cast<StringFuncPtr>(&xlbasic::do_itemname));
         AddStringFunction("ITEMTYPE$", static_cast<StringFuncPtr>(&xlbasic::do_itemtype));
         AddNumericFunction("ITEMCHECKED", static_cast<NumericFuncPtr>(&xlbasic::do_itemchecked));
-        AddNumericFunction("PLAYITEM", static_cast<NumericFuncPtr>(&xlbasic::do_PlayItem));
+        AddCommand("PLAYITEM", static_cast<CommandPtr>(&xlbasic::do_PlayItem));
         AddCommand("WAIT", static_cast<CommandPtr>(&xlbasic::do_wait));
     };
 
@@ -552,7 +545,8 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     //*)
 
     SetIcon(wxIcon(xlights_xpm));
-    PlayerDlg = new PlayerDialog(this, ID_PLAYER_DIALOG);
+    PlayerDlg = new PlayerFrame(this, ID_PLAYER_DIALOG);
+    PlayMode=NO_PLAY;
     ResetTimer(NO_SEQ);
 
     // populate dates on calendar
@@ -651,8 +645,12 @@ void xScheduleFrame::StartScript(const char *scriptname) {
 void xScheduleFrame::EndScript(const char *scriptname) {
     AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, false);
     AuiToolBar1->Realize();
+    PlayerDlg->MediaCtrl->Stop();
+    ResetTimer(NO_SEQ);
+    PlayerDlg->Show(false);
+    xout.alloff();
     wxString wxname(scriptname, wxConvUTF8);
-    StatusBar1->SetStatusText(_("Ended playlist: ")+wxname);
+    SendToLogAndStatusBar(_("Ended playlist: ")+wxname);
 }
 
 void xScheduleFrame::AddPlaylist(const wxString& name) {
@@ -663,12 +661,17 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     wxFlexGridSizer* FlexGridSizer4 = new wxFlexGridSizer(3, 1, 0, 0);
     FlexGridSizer4->AddGrowableCol(0);
     FlexGridSizer4->AddGrowableRow(2);
-    wxFlexGridSizer* FlexGridSizer5 = new wxFlexGridSizer(0, 4, 0, 0);
+    wxFlexGridSizer* FlexGridSizer5 = new wxFlexGridSizer(0, 5, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
     wxStaticText* StaticText1 = new wxStaticText(PanelPlayList, -1, _("Play List"));
     wxFont StaticText1Font(10,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText1->SetFont(StaticText1Font);
     FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+
+    id=baseid+CHKBOX_MOVIEMODE;
+    wxCheckBox* CheckBoxMovieMode = new wxCheckBox(PanelPlayList, id, _("Movie Mode"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_MOVIEMODE"));
+    CheckBoxMovieMode->SetValue(false);
+    FlexGridSizer5->Add(CheckBoxMovieMode, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 
     id=baseid+UP_BUTTON;
     wxBitmapButton* BitmapButtonUp = new wxBitmapButton(PanelPlayList, id, wxBitmap(up_xpm));
@@ -700,29 +703,29 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     wxCheckBox* CheckBoxAudio = new wxCheckBox(PanelPlayList, id, _("Audio"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_AUDIO"));
     CheckBoxAudio->SetValue(false);
     BoxSizer4->Add(CheckBoxAudio, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, (wxObjectEventFunction)&xScheduleFrame::FileTypeButtonClicked);
+    Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnFileTypeButtonClicked);
 
     id=baseid+CHKBOX_VIDEO;
     wxCheckBox* CheckBoxVideo = new wxCheckBox(PanelPlayList, id, _("Video"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_VIDEO"));
     CheckBoxVideo->SetValue(false);
     BoxSizer4->Add(CheckBoxVideo, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, (wxObjectEventFunction)&xScheduleFrame::FileTypeButtonClicked);
+    Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnFileTypeButtonClicked);
 
     id=baseid+CHKBOX_LOR;
     wxCheckBox* CheckBoxLOR = new wxCheckBox(PanelPlayList, id, _("LOR"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_LOR"));
     CheckBoxLOR->SetValue(false);
     BoxSizer4->Add(CheckBoxLOR, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, (wxObjectEventFunction)&xScheduleFrame::FileTypeButtonClicked);
+    Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnFileTypeButtonClicked);
 
     id=baseid+CHKBOX_VIXEN;
     wxCheckBox* CheckBoxVixen = new wxCheckBox(PanelPlayList, id, _("Vixen"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_VIXEN"));
     CheckBoxVixen->SetValue(false);
     BoxSizer4->Add(CheckBoxVixen, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, (wxObjectEventFunction)&xScheduleFrame::FileTypeButtonClicked);
+    Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnFileTypeButtonClicked);
 
     FlexGridSizer4->Add(BoxSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 
-    id=baseid+PLAYLIST;
+    id=baseid+PLAYLIST_LISTBOX;
     wxCheckListBox* CheckListBoxPlay = new wxCheckListBox(PanelPlayList, id, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHECKLISTBOX_PLAY"));
     FlexGridSizer4->Add(CheckListBoxPlay, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     GridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -841,10 +844,7 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
             strTime=timerange.AfterFirst('-');
             SecondsRem = DiffSeconds(strTime, tsCurrent);
             int minutes=(SecondsRem + 59) / 60;  // round up
-            if (!PlayerDlg->IsShown()) {
-                TextCtrlLog->AppendText(_("Media player closed\n"));
-                basic.halt();
-            } else if (minutes > 60) {
+            if (minutes > 60) {
                 StatusBar1->SetStatusText(_("Show will end at: ") + strTime, FldNum);
             } else if (minutes > 0) {
                 StatusBar1->SetStatusText(wxString::Format(_("Show will end in %d minutes"),minutes), FldNum);
@@ -865,13 +865,15 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
             } else if (minutes == 0 && v != LastSchedStart) {
                 int nbidx=FindNotebookPage(playlist);
                 if (nbidx > 0) {
+                    PlayMode=SCHEDULE;
                     RunPlaylist(nbidx);
                     LastSchedStart=v;
                 } else {
                     StatusBar1->SetStatusText(_("ERROR: cannot find playlist ") + playlist, FldNum);
                 }
-            } else if (PlayerDlg->IsShown()) {
+            } else if (PlayMode == SCHEDULE && PlayerDlg->IsShown()) {
                 PlayerDlg->Show(false);
+                PlayMode=NO_PLAY;
             } else {
                 StatusBar1->SetStatusText(_("Show has ended for today"), FldNum);
             }
@@ -899,8 +901,6 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
     static LorEventMap::iterator LorIter;
     static std::string LastIntensity;
     char vixintensity;
-    wxXmlNode* e;
-    wxString action, tempstr;
     wxTimeSpan ts;
     switch (SeqPlayerState) {
         case PLAYING_LOR:
@@ -917,35 +917,32 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 endmsec=LorIter->second->EndCentiSec * 10;
                 netnum=LorIter->second->netnum;
                 chindex=LorIter->second->chindex;
-                e=LorIter->second->xmldata;
-                if (e) {
-                    action=e->GetPropVal(wxT("type"), wxT(""));
-                    if (e->HasProp(wxT("intensity"))) {
-                        tempstr=e->GetPropVal(wxT("intensity"), wxT("0"));
-                        tempstr.ToLong(&lorintensity);
-                        if (action == _("intensity")) {
-                            xout.SetIntensity(netnum,chindex,lorintensity);
-                        } else if (action == _("twinkle")) {
-                            xout.twinkle(netnum,chindex,400,lorintensity);
-                        } else if (action == _("shimmer")) {
-                            xout.shimmer(netnum,chindex,100,lorintensity);
-                        }
-                    } else if (e->HasProp(wxT("startIntensity")) && e->HasProp(wxT("endIntensity"))) {
-                        tempstr=e->GetPropVal(wxT("startIntensity"), wxT("0"));
-                        tempstr.ToLong(&startint);
-                        tempstr=e->GetPropVal(wxT("endIntensity"), wxT("100"));
-                        tempstr.ToLong(&endint);
-                        duration = endmsec - startmsec;
-                        if (action == _("intensity")) {
-                            xout.ramp(netnum,chindex,duration,startint,endint);
-                        } else if (action == _("twinkle")) {
-                            xout.twinklefade(netnum,chindex,400,duration,startint,endint);
-                        } else if (action == _("shimmer")) {
-                            xout.shimmerfade(netnum,100,chindex,duration,startint,endint);
-                        }
+                TextCtrlLog->AppendText(wxString::Format(_(" LOR ms=%ld, ch=%d, st=%d, en=%d\n"),msec,chindex,startmsec,endmsec));
+                if (LorIter->second->EndIntesity == -1) {
+                    switch (LorIter->second->action) {
+                        case LOR_INTENSITY:
+                            xout.SetIntensity(netnum,chindex,LorIter->second->StartIntensity);
+                            break;
+                        case LOR_TWINKLE:
+                            xout.twinkle(netnum,chindex,400,LorIter->second->StartIntensity);
+                            break;
+                        case LOR_SHIMMER:
+                            xout.shimmer(netnum,chindex,100,LorIter->second->StartIntensity);
+                            break;
                     }
                 } else {
-                    xout.off(netnum,chindex);
+                    duration = endmsec - startmsec;
+                    switch (LorIter->second->action) {
+                        case LOR_INTENSITY:
+                            xout.ramp(netnum,chindex,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            break;
+                        case LOR_TWINKLE:
+                            xout.twinklefade(netnum,chindex,400,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            break;
+                        case LOR_SHIMMER:
+                            xout.shimmerfade(netnum,chindex,100,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            break;
+                    }
                 }
 
                 LorIter++;
@@ -954,9 +951,9 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             break;
         case PAUSE_LOR:
             if (PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING) {
-                ResetTimer(PLAYING_LOR);
                 msec = PlayerDlg->MediaCtrl->Tell();
                 LorIter=msec < 500 ? LorEvents.begin() : LorEvents.lower_bound(msec / 10);
+                ResetTimer(PLAYING_LOR);
             } else {
                 TimerNoPlay();
             }
@@ -1049,7 +1046,7 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
         VixNetwork.push_back(std::make_pair(netnum, ch));
 }
 
-void xScheduleFrame::FileTypeButtonClicked()
+void xScheduleFrame::OnFileTypeButtonClicked()
 {
     UnsavedChanges=true;
     ScanForFiles();
@@ -1062,7 +1059,7 @@ void xScheduleFrame::ScanForFiles()
     int i;
 
     int baseid=1000*Notebook1->GetSelection();
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
     wxCheckBox* CheckBoxAudio=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_AUDIO,Notebook1);
     wxCheckBox* CheckBoxVideo=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_VIDEO,Notebook1);
     wxCheckBox* CheckBoxLOR=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_LOR,Notebook1);
@@ -1140,28 +1137,45 @@ void xScheduleFrame::OnButtonPlayItemClick()
         return;
     }
     int baseid=1000*Notebook1->GetSelection();
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
     wxString filename = CheckListBoxPlay->GetStringSelection();
     if (filename.IsEmpty()) {
         wxMessageBox(_("Nothing selected!"), _("Error"));
     } else {
-        PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
-        if (!Play(filename)) {
-            wxMessageBox(_("Unable to play file:\n")+filename, _("Error"));
-        }
+        PlayMode=SINGLE;
+        Play(filename);
     }
 }
 
-bool xScheduleFrame::Play(wxString& filename) {
+void xScheduleFrame::PlayerError(const wxString& msg)
+{
+    if (PlayMode == SCHEDULE) {
+        TextCtrlLog->AppendText(msg + _("\n"));
+    } else {
+        wxMessageBox(msg, _("Error"));
+    }
+}
+
+void xScheduleFrame::ShowPlayerSingle()
+{
+    if (PlayMode != SINGLE) return;
+    PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_DEFAULT);
+    PlayerDlg->ShowFullScreen(false, 0);
+    PlayerDlg->Show();
+}
+
+
+void xScheduleFrame::Play(wxString& filename) {
     wxFileName oName(CurrentDir, filename);
     wxString fullpath=oName.GetFullPath();
     switch (ExtType(oName.GetExt())) {
         case 'a':
         case 'v':
             if (wxFile::Exists(fullpath) && PlayerDlg->MediaCtrl->Load(fullpath)) {
-                PlayerDlg->Show();
+                ResetTimer(NO_SEQ);
+                ShowPlayerSingle();
             } else {
-                return false;
+                PlayerError(_("Unable to play file:\n")+filename);
             }
             break;
         case 'L':
@@ -1171,13 +1185,12 @@ bool xScheduleFrame::Play(wxString& filename) {
             PlayVixenFile(fullpath);
             break;
     }
-    return true;
 }
 
 void xScheduleFrame::PlayLorFile(wxString& FileName)
 {
     if (!PortsOK) {
-        wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
+        PlayerError(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."));
         return;
     }
     LorEvents.clear();
@@ -1198,14 +1211,13 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
             musicFilename=fn2.GetFullPath();
         }
         if (wxFile::Exists(musicFilename) && PlayerDlg->MediaCtrl->Load(musicFilename)) {
+            ShowPlayerSingle();
             ResetTimer(PAUSE_LOR);
-            PlayerDlg->ShowModal();
-            ResetTimer(NO_SEQ);
         } else {
-            wxMessageBox(_("Unable to play file:\n")+musicFilename, _("Error"));
+            PlayerError(_("Unable to play file:\n")+musicFilename);
         }
     } else {
-        wxMessageBox(_("Unable to load schedule file"), _("Error"));
+        PlayerError(_("Unable to load sequence:\n")+FileName);
     }
 }
 
@@ -1230,26 +1242,46 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
 void xScheduleFrame::LoadLorChannel(wxXmlNode* n, int netnum, int chindex)
 {
     long start,end,lastend=0;
+    long startint,endint;
+    LOR_ACTIONS action;
     wxString tempstr;
-    if (!PortsOK) {
-        wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
-        return;
-    }
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() != _("effect")) continue;
-        if (e->HasProp(_("startCentisecond")) && e->HasProp(_("endCentisecond"))) {
-            tempstr=e->GetPropVal(wxT("startCentisecond"), wxT("0"));
-            tempstr.ToLong(&start);
-            tempstr=e->GetPropVal(wxT("endCentisecond"), wxT("0"));
-            tempstr.ToLong(&end);
-            if (start != lastend && lastend > 0) {
-                LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,start,0)));
-            }
-            LorEvents.insert(LorEventPair(start, new LorEventClass(netnum,chindex,end,e)));
-            lastend=end;
+        if (!e->HasProp(_("startCentisecond"))) continue;
+        if (!e->HasProp(_("endCentisecond"))) continue;
+        if (!e->HasProp(_("type"))) continue;
+
+        tempstr=e->GetPropVal(wxT("type"), wxT(""));
+        if (tempstr == _("intensity")) {
+            action=LOR_INTENSITY;
+        } else if (tempstr == _("twinkle")) {
+            action=LOR_TWINKLE;
+        } else if (tempstr == _("shimmer")) {
+            action=LOR_SHIMMER;
+        } else {
+            continue;
         }
+        tempstr=e->GetPropVal(wxT("startCentisecond"), wxT("0"));
+        tempstr.ToLong(&start);
+        tempstr=e->GetPropVal(wxT("endCentisecond"), wxT("0"));
+        tempstr.ToLong(&end);
+        if (e->HasProp(wxT("intensity"))) {
+            tempstr=e->GetPropVal(wxT("intensity"), wxT("0"));
+            tempstr.ToLong(&startint);
+            endint=-1;
+        } else if (e->HasProp(wxT("startIntensity")) && e->HasProp(wxT("endIntensity"))) {
+            tempstr=e->GetPropVal(wxT("startIntensity"), wxT("0"));
+            tempstr.ToLong(&startint);
+            tempstr=e->GetPropVal(wxT("endIntensity"), wxT("100"));
+            tempstr.ToLong(&endint);
+        }
+        if (start != lastend && lastend > 0) {
+            LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,start,LOR_INTENSITY,0,-1)));
+        }
+        LorEvents.insert(LorEventPair(start, new LorEventClass(netnum,chindex,end,action,startint,endint)));
+        lastend=end;
     }
-    LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,lastend,0)));
+    LorEvents.insert(LorEventPair(lastend, new LorEventClass(netnum,chindex,lastend,LOR_INTENSITY,0,-1)));
 }
 
 void xScheduleFrame::PlayVixenFile(wxString& FileName)
@@ -1261,7 +1293,7 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
     wxXmlNode* xmlNode;
     fn.AssignDir(CurrentDir);
     if (!PortsOK) {
-        wxMessageBox(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."), _("Error"));
+        PlayerError(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."));
         return;
     }
     VixLastChannel = -1;
@@ -1298,30 +1330,29 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
         xout.SetMaxIntensity(MaxIntensity);
 
         if (VixEventPeriod < 0) {
-            wxMessageBox(_("EventPeriodInMilliseconds is undefined"), _("Vixen Error"));
+            PlayerError(_("EventPeriodInMilliseconds is undefined"));
         } else if (VixLastChannel <= 0) {
-            wxMessageBox(_("Unable to determine number of channels"), _("Vixen Error"));
+            PlayerError(_("Unable to determine number of channels"));
         } else if (!fn.FileExists()) {
-            wxMessageBox(_("No such file:\n")+fn.GetFullPath(), _("Vixen Error"));
+            PlayerError(_("No such file:\n")+fn.GetFullPath());
         } else if (!PlayerDlg->MediaCtrl->Load(fn.GetFullPath())) {
-            wxMessageBox(_("Unable to play file:\n")+fn.GetFullPath(), _("Vixen Error"));
+            PlayerError(_("Unable to play file:\n")+fn.GetFullPath());
         } else {
             VixNumPeriods = VixEventData.size() / VixLastChannel;
-            wxString msg = wxString::Format(_("Data size=%d, Channel Count=%d, NumPeriods=%d, Period Len=%d, Media File=%s"),VixEventData.size(),VixLastChannel,VixNumPeriods,VixEventPeriod,fn.GetFullPath().c_str());
-            StatusBar1->SetStatusText(msg);
+            //wxString msg = wxString::Format(_("Data size=%d, Channel Count=%d, NumPeriods=%d, Period Len=%d, Media File=%s"),VixEventData.size(),VixLastChannel,VixNumPeriods,VixEventPeriod,fn.GetFullPath().c_str());
+            //StatusBar1->SetStatusText(msg);
             ResetTimer(PAUSE_VIX);
-            PlayerDlg->ShowModal();
-            ResetTimer(NO_SEQ);
+            ShowPlayerSingle();
         }
     } else {
-        wxMessageBox(_("Unable to load Vixen file"), _("Error"));
+        PlayerError(_("Unable to load sequence:\n")+FileName);
     }
 }
 
 void xScheduleFrame::OnButtonUpClick()
 {
     int baseid=1000*Notebook1->GetSelection();
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
     int idx = CheckListBoxPlay->GetSelection();
     if (idx == wxNOT_FOUND) return;
     if (idx == 0) return;
@@ -1338,7 +1369,7 @@ void xScheduleFrame::OnButtonUpClick()
 void xScheduleFrame::OnButtonDownClick()
 {
     int baseid=1000*Notebook1->GetSelection();
-    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
     int idx = CheckListBoxPlay->GetSelection();
     if (idx == wxNOT_FOUND) return;
     if (idx == CheckListBoxPlay->GetCount()-1) return;
@@ -1403,7 +1434,7 @@ void xScheduleFrame::OnMenuItemRenameListSelected(wxCommandEvent& event)
         }
     }
     Notebook1->SetPageText(idx,name);
-    ChoicePlayList->SetString(idx-1,name);
+    ChoicePlayList->SetString(idx-2,name);
     UnsavedChanges=true;
 }
 
@@ -1466,11 +1497,13 @@ void xScheduleFrame::SaveFile()
         plist = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("playlist") );
         plist->AddProperty( wxT("name"), Notebook1->GetPageText(pagenum) );
         baseid=1000*pagenum;
-        wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
-        for (int i=CHKBOX_AUDIO; i<=CHKBOX_VIXEN; i++) {
+        wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
+        for (int i=CHKBOX_AUDIO; i<=CHKBOX_MOVIEMODE; i++) {
             chkbox=(wxCheckBox*)wxWindow::FindWindowById(baseid+i,Notebook1);
             v = chkbox->GetValue() ? _("1") : _("0");
-            plist->AddProperty( chkbox->GetLabelText(), v );
+            wxString label = chkbox->GetLabelText();
+            label.Replace(_(" "), _(""));
+            plist->AddProperty( label, v );
         }
         lists->AddChild( plist );
 
@@ -1563,12 +1596,15 @@ void xScheduleFrame::LoadPlaylist(wxXmlNode* n)
     wxString name = n->GetPropVal( wxT("name"), wxT(""));
     int baseid=1000*Notebook1->GetPageCount();
     AddPlaylist(name);
-    for (int i=CHKBOX_AUDIO; i<=CHKBOX_VIXEN; i++) {
+    for (int i=CHKBOX_AUDIO; i<=CHKBOX_MOVIEMODE; i++) {
         chkbox=(wxCheckBox*)wxWindow::FindWindowById(baseid+i,Notebook1);
-        chkval = n->GetPropVal( chkbox->GetLabelText(), wxT("0"));
+        if (!chkbox) continue;
+        wxString label = chkbox->GetLabelText();
+        label.Replace(_(" "), _(""));
+        chkval = n->GetPropVal(label, wxT("0"));
         chkbox->SetValue( chkval == _("1") );
     }
-    wxCheckListBox* CheckListBoxPlay = (wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxCheckListBox* CheckListBoxPlay = (wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
     wxTextCtrl* TextCtrlLogic = (wxTextCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LOGIC,Notebook1);
     int cnt=0;
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
@@ -1699,7 +1735,7 @@ static inline bool is_base64(unsigned char c) {
 static const std::string base64_chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-std::string xScheduleFrame::base64_decode(wxString const& encoded_string) {
+std::string xScheduleFrame::base64_decode(const wxString& encoded_string) {
   int in_len = encoded_string.size();
   int i = 0;
   int j = 0;
@@ -1760,31 +1796,41 @@ void xScheduleFrame::RunPlaylist(int nbidx)
     TextCtrlLog->AppendText(_("At: ") + wxDateTime::Now().FormatTime() + _("\n"));
     TextCtrlLog->AppendText(_("Starting playlist ") + PageName + _("\n"));
     if (basic.IsRunning()) {
-        TextCtrlLog->AppendText(_("ERROR: a playlist is already running!"));
-        StatusBar1->SetStatusText(_("ERROR: a playlist is already running!"));
+        SendToLogAndStatusBar(_("ERROR: a playlist is already running!"));
         return;
     }
     int baseid=1000*nbidx;
     wxTextCtrl* LogicCtl=(wxTextCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LOGIC,Notebook1);
-    wxCheckListBox* Playlist=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST,Notebook1);
+    wxCheckListBox* Playlist=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
+    wxCheckBox* MovieMode=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_MOVIEMODE,Notebook1);
     wxString userscript=LogicCtl->GetValue();
     if (userscript.IsEmpty()) {
-        TextCtrlLog->AppendText(_("ERROR: no script to run!\n"));
-        StatusBar1->SetStatusText(_("ERROR: no script to run!"));
+        SendToLogAndStatusBar(_("ERROR: no script to run!"));
         return;
     }
     if (!userscript.EndsWith(_("\n"))) userscript += _("\n"); // ensure script ends with a newline
     basic.setPlaylist(Playlist);
     if (basic.setScript(PageName.mb_str(wxConvUTF8), userscript.mb_str(wxConvUTF8))) {
         basic.run();
+        if (MovieMode->GetValue()) {
+            PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_NONE);
+            PlayerDlg->Show();
+            PlayerDlg->ShowFullScreen(true, wxFULLSCREEN_ALL);
+        }
     } else {
-        TextCtrlLog->AppendText(_("Error in playlist script\n"));
-        StatusBar1->SetStatusText(_("Error in playlist script"));
+        SendToLogAndStatusBar(_("Error in playlist script"));
     }
+}
+
+void xScheduleFrame::SendToLogAndStatusBar(const wxString& msg)
+{
+    TextCtrlLog->AppendText(msg + _("\n"));
+    StatusBar1->SetStatusText(msg);
 }
 
 void xScheduleFrame::OnButtonRunPlaylistClick()
 {
+    PlayMode=PLAYLIST;
     RunPlaylist(Notebook1->GetSelection());
 }
 
@@ -1831,7 +1877,7 @@ void xScheduleFrame::OnButtonWizardClick()
     script.Append(_("1110 LET LastItemPlayed=NextItem\n"));
     script.Append(_("1115 PRINT \"At:\", FORMATDATETIME$(NOW,5)\n"));
     script.Append(_("1120 PRINT \"Playing:\",ITEMNAME$(NextItem)\n"));
-    script.Append(_("1130 LET X=PLAYITEM(NextItem)\n"));
+    script.Append(_("1130 PLAYITEM NextItem\n"));
     script.Append(_("1140 WAIT\n"));
     script.Append(_("9000 REM DONE\n"));
     if (LastItemOnce) {
