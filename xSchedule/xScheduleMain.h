@@ -56,7 +56,6 @@
 #include <vector>
 
 #include "PlayerFrame.h"
-#include "PlayerDialog.h"
 #include "NewListDialog.h"
 #include "DelListDialog.h"
 #include "RenListDialog.h"
