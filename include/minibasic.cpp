@@ -1264,6 +1264,10 @@ char *do_format(void) {
   match(CPAREN);
 
   time_t utime = floor((d-25569.0)*86400.0 + 0.5);
+  if (utime < 0) {
+    seterror(ERR_BADVALUE);
+    return emptystring;
+  }
   timeinfo = gmtime(&utime);
   switch (fmtidx) {
     case 1:
