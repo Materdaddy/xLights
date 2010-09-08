@@ -66,7 +66,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON_SEQUENCE" variable="ButtonSequence" member="yes">
-										<label>Sequence</label>
+										<label>Sequencer</label>
 										<enabled>0</enabled>
 										<handler function="OnButtonSequenceClick" entry="EVT_BUTTON" />
 									</object>
@@ -76,7 +76,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON_SCHEDULE" variable="ButtonSchedule" member="yes">
-										<label>Schedule</label>
+										<label>Scheduler</label>
 										<enabled>0</enabled>
 										<handler function="OnButtonScheduleClick" entry="EVT_BUTTON" />
 									</object>
