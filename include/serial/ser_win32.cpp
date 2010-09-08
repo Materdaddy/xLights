@@ -1,0 +1,303 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        ser_win32.cpp
+// Purpose:
+// Author:      Joachim Buermann (adapted for xLights by Matt Brown)
+// Id:          $Id: serport.cpp,v 1.1.1.1 2004/11/24 10:30:11 jb Exp $
+// Copyright:   (c) 2001 Joachim Buermann
+// Licence:     wxWindows licence
+/////////////////////////////////////////////////////////////////////////////
+
+#include <string.h>
+#include <windows.h>
+
+#define SERIALPORT_BUFSIZE 4096
+
+namespace ctb {
+
+    /*!
+	 \class SerialPort
+
+	 \brief the win32 version
+    */
+    class SerialPort : public SerialPort_x
+    {
+    protected:
+	   /*!
+		\brief the win32 api equivalent for the Linux
+		file descriptor
+	   */
+	   HANDLE fd;
+	   /*!
+		\brief a very special struct in the win32 api for controling
+		an asynchronous serial communication through the com ports.
+	   */
+	   OVERLAPPED m_ov;
+
+	   /*!
+		\brief The win32 API only allows to test for an existing
+		break, framing, overrun or parity, not for the occured numbers.
+		So every error event decrement this internal error struct and
+		can request by an Ioctl call.
+	   */
+	   SerialPort_EINFO einfo;
+
+	   /*!
+		\brief The win32 API doesn't have any function to detect the
+		current state of the output lines RST and DTR (if someone knows
+		some function, please contact me).
+		So we save the state always after changing one or both lines
+		(for example, on Open, SetLineState and ChangeLineState)
+	   */
+	   int m_rtsdtr_state;
+
+	   int CloseDevice()
+		{
+		 if(fd != INVALID_HANDLE_VALUE) {
+		  CloseHandle(m_ov.hEvent);
+		  CloseHandle(fd);
+		  fd = INVALID_HANDLE_VALUE;
+		 }
+		 return 0;
+		};
+
+	   int OpenDevice(const wxString& devname, void* dcs)
+		{
+		 // if dcs isn't NULL, type cast
+		 if(dcs) m_dcs = *(SerialPort_DCS*)dcs;
+
+		 fd = CreateFile(devname,	// device name
+				GENERIC_READ | GENERIC_WRITE,	// O_RDWR
+				0,		// not shared
+				NULL,	// default value for object security ?!?
+				OPEN_EXISTING, // file (device) exists
+				FILE_FLAG_OVERLAPPED,	// asynchron handling
+				NULL); // no more handle flags
+
+		 if(fd == INVALID_HANDLE_VALUE) {
+		  return -1;
+		 }
+		 // save the device name
+		 m_devname = devname;
+
+		 // device control block
+		 DCB dcb;
+		 memset(&dcb,0,sizeof(dcb));
+		 dcb.DCBlength = sizeof(dcb);
+		 dcb.BaudRate = m_dcs.baud;
+		 dcb.fBinary = 1;
+
+		 m_rtsdtr_state = LinestateNull;
+
+		 // Specifies whether the CTS (clear-to-send) signal is monitored
+		 // for output flow control. If this member is TRUE and CTS is turned
+		 // off, output is suspended until CTS is sent again.
+		 dcb.fOutxCtsFlow = m_dcs.rtscts;
+
+		 // Specifies the DTR (data-terminal-ready) flow control.
+		 // This member can be one of the following values:
+		 // DTR_CONTROL_DISABLE   Disables the DTR line when the device is
+		 //                       opened and leaves it disabled.
+		 // DTR_CONTROL_ENABLE    Enables the DTR line when the device is
+		 //                       opened and leaves it on.
+		 // DTR_CONTROL_HANDSHAKE Enables DTR handshaking. If handshaking is
+		 //                       enabled, it is an error for the application
+		 //                       to adjust the line by using the
+		 //                       EscapeCommFunction function.
+		 dcb.fDtrControl = DTR_CONTROL_DISABLE;
+		 m_rtsdtr_state |= LinestateDtr;
+		 // Specifies the RTS flow control. If this value is zero, the
+		 // default is RTS_CONTROL_HANDSHAKE. This member can be one of
+		 // the following values:
+		 // RTS_CONTROL_DISABLE   Disables the RTS line when device is
+		 //                       opened and leaves it disabled.
+		 // RTS_CONTROL_ENABLED   Enables the RTS line when device is
+		 //                       opened and leaves it on.
+		 // RTS_CONTROL_HANDSHAKE Enables RTS handshaking. The driver
+		 //                       raises the RTS line when the
+		 //                       "type-ahead" (input)buffer is less than
+		 //                       one-half full and lowers the RTS line
+		 //                       when the buffer is more than three-quarters
+		 //                       full. If handshaking is enabled, it is an
+		 //                       error for the application to adjust the
+		 //                       line by using the EscapeCommFunction function.
+		 // RTS_CONTROL_TOGGLE    Specifies that the RTS line will be high if
+		 //                       bytes are available for transmission. After
+		 //                       all buffered bytes have been send, the RTS
+		 //                       line will be low.
+		 if(m_dcs.rtscts) dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
+		 else {
+		  dcb.fRtsControl = RTS_CONTROL_DISABLE;
+		  m_rtsdtr_state |= LinestateRts;
+		 }
+		 // Specifies the XON/XOFF flow control.
+		 // If fOutX is true (the default is false), transmission stops when the
+		 // XOFF character is received and starts again, when the XON character
+		 // is received.
+		 dcb.fOutX = m_dcs.xonxoff;
+		 // If fInX is true (default is false), the XOFF character is sent when
+		 // the input buffer comes within XoffLim bytes of being full, and the
+		 // XON character is sent, when the input buffer comes within XonLim
+		 // bytes of being empty.
+		 dcb.fInX = m_dcs.xonxoff;
+		 // default character for XOFF is 0x13 (hex 13)
+		 dcb.XoffChar = 0x13;
+		 // default character for XON is 0x11 (hex 11)
+		 dcb.XonChar = 0x11;
+		 // set the minimum number of bytes allowed in the input buffer before
+		 // the XON character is sent (3/4 of full size)
+		 dcb.XonLim = (SERIALPORT_BUFSIZE >> 2) * 3;
+		 // set the maximum number of free bytes in the input buffer, before the
+		 // XOFF character is sent (3/4 of full size)
+		 dcb.XoffLim = (SERIALPORT_BUFSIZE >> 2) * 3;
+
+		 // parity
+		 switch( m_dcs.parity ) {
+
+		 case ParityOdd: dcb.Parity = ODDPARITY; break;
+		 case ParityEven: dcb.Parity = EVENPARITY; break;
+		 case ParityMark: dcb.Parity = MARKPARITY; break;
+		 case ParitySpace: dcb.Parity = SPACEPARITY; break;
+		 default: dcb.Parity = NOPARITY;
+
+		 }
+		 // stopbits
+		 if(m_dcs.stopbits == 2) dcb.StopBits = TWOSTOPBITS;
+		 else dcb.StopBits = ONESTOPBIT;
+		 // wordlen, valid values are 5,6,7,8
+		 dcb.ByteSize = m_dcs.wordlen;
+
+		 if(!SetCommState(fd,&dcb))
+		  return -2;
+
+		 // create event for overlapped I/O
+		 // we need a event object, which inform us about the
+		 // end of an operation (here reading device)
+		 m_ov.hEvent = CreateEvent(NULL,// LPSECURITY_ATTRIBUTES lpsa
+					TRUE, // BOOL fManualReset
+					TRUE, // BOOL fInitialState
+					NULL); // LPTSTR lpszEventName
+		 if(m_ov.hEvent == INVALID_HANDLE_VALUE) {
+		  return -3;
+		 }
+
+		 /* THIS IS OBSOLETE!!!
+		 // event should be triggered, if there are some received data
+		 if(!SetCommMask(fd,EV_RXCHAR))
+		 return -4;
+		 */
+
+		 COMMTIMEOUTS cto = {MAXDWORD,0,0,0,0};
+		 if(!SetCommTimeouts(fd,&cto))
+		  return -5;
+
+		 // for a better performance with win95/98 I increased the internal
+		 // buffer to SERIALPORT_BUFSIZE (normal size is 1024, but this can
+		 // be a little bit to small, if you use a higher baudrate like 115200)
+		 if(!SetupComm(fd,SERIALPORT_BUFSIZE,SERIALPORT_BUFSIZE))
+		  return -6;
+
+		 // clear the internal error struct
+		 memset(&einfo,0,sizeof(einfo));
+		 return 0;
+		};
+
+    public:
+	   SerialPort()
+		{
+		 memset( &m_ov, 0, sizeof( OVERLAPPED ) );
+		 fd = INVALID_HANDLE_VALUE;
+		 m_rtsdtr_state = LinestateNull;
+		};
+
+	   ~SerialPort()
+		{
+		 Close();
+		};
+
+	   int IsOpen()
+		{
+		 return (fd != INVALID_HANDLE_VALUE);
+		};
+
+	   int Read(char* buf,size_t len)
+		{
+		 DWORD read;
+		 int m = m_fifo->items();
+		 while(len) {
+		  if(m_fifo->get(buf) == 1) {
+		   len--;
+		   buf++;
+		  }
+		  else {
+		   break;
+		  }
+		 }
+		 if(!ReadFile(fd,buf,len,&read,&m_ov)) {
+		  // if we use a asynchrone reading, ReadFile gives always
+		  // FALSE
+		  // ERROR_IO_PENDING means ok, other values show an error
+		  if(GetLastError() != ERROR_IO_PENDING) {
+		   // oops..., error in communication
+		   return -1;
+		  }
+		 }
+		 else {
+		  // ok, we have read all wanted bytes
+		  return (int)read + m;
+		 }
+		 return 0;
+		};
+
+	   int SendBreak(int duration)
+		{
+		 if(duration <= 0) duration = 1;
+		 if(!SetCommBreak(fd)) return -1;
+		 // win32 Sleep parameter is ms
+		 Sleep(duration * 250);
+		 if(!ClearCommBreak(fd)) return -1;
+		 // no error
+		 return 0;
+		};
+
+	   int SetBaudrate( int baudrate )
+		{
+		 DCB dcb;
+
+		 // get the current dcb...
+		 if(!GetCommState(fd,&dcb)) {
+		  return -1;
+		 }
+		 dcb.BaudRate = baudrate;
+		 // and write it back
+		 if(!SetCommState(fd,&dcb)) {
+		  return -1;
+		 }
+		 m_dcs.baud = baudrate;
+		 return 0;
+		};
+
+	   int Write(char* buf,size_t len)
+		{
+		 DWORD write;
+		 if(!WriteFile(fd,buf,len,&write,&m_ov)) {
+		  if(GetLastError() != ERROR_IO_PENDING) {
+		   return -1;
+		  }
+		  else {
+		   // VERY IMPORTANT to flush the data out of the internal
+		   // buffer
+		   FlushFileBuffers(fd);
+		   // first you must call GetOverlappedResult, then you
+		   // get the REALLY transmitted count of bytes
+		   if(!GetOverlappedResult(fd,&m_ov,&write,TRUE)) {
+			// ooops... something is going wrong
+			return (int)write;
+		   }
+		  }
+		 }
+		 return write;
+		};
+
+    };
+
+} // namespace ctb

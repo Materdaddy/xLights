@@ -95,9 +95,6 @@
 		<Compiler>
 			<Add option="-DwxUSE_UNICODE" />
 		</Compiler>
-		<Linker>
-			<Add library="..\bin\libctb.a" />
-		</Linker>
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>

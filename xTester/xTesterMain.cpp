@@ -75,6 +75,9 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 
 //(*IdInit(xTesterFrame)
 const long xTesterFrame::ID_STATICTEXT1 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON_1 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON_16 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON_ALL = wxNewId();
 const long xTesterFrame::ID_STATICTEXT3 = wxNewId();
 const long xTesterFrame::ID_BUTTON1 = wxNewId();
 const long xTesterFrame::ID_NOTEBOOK2 = wxNewId();
@@ -116,6 +119,7 @@ const long xTesterFrame::ID_PANEL6 = wxNewId();
 const long xTesterFrame::ID_NOTEBOOK1 = wxNewId();
 const long xTesterFrame::ID_PANEL4 = wxNewId();
 const long xTesterFrame::idMenuQuit = wxNewId();
+const long xTesterFrame::idMenuHelpContent = wxNewId();
 const long xTesterFrame::idMenuAbout = wxNewId();
 const long xTesterFrame::ID_STATUSBAR1 = wxNewId();
 //*)
@@ -143,6 +147,8 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     wxBoxSizer* BoxSizer2;
     wxBoxSizer* BoxSizer11;
     wxMenu* Menu1;
+    wxFlexGridSizer* FlexGridSizer7;
+    wxMenuItem* MenuItemHelpContent;
     wxBoxSizer* BoxSizer1;
     wxBoxSizer* BoxSizer9;
     wxMenuBar* MenuBar1;
@@ -159,10 +165,25 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     FlexGridSizer2->AddGrowableCol(0);
     FlexGridSizer2->AddGrowableCol(1);
     FlexGridSizer2->AddGrowableRow(1);
-    StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("1. Select channels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-    FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer7 = new wxFlexGridSizer(0, 4, 0, 0);
+    FlexGridSizer7->AddGrowableCol(0);
+    FlexGridSizer7->AddGrowableRow(0);
+    StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("Select channels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    wxFont StaticText1Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    StaticText1->SetFont(StaticText1Font);
+    FlexGridSizer7->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButton1 = new wxRadioButton(Panel3, ID_RADIOBUTTON_1, _("1"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_1"));
+    RadioButton1->SetValue(true);
+    FlexGridSizer7->Add(RadioButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButton16 = new wxRadioButton(Panel3, ID_RADIOBUTTON_16, _("16"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_16"));
+    FlexGridSizer7->Add(RadioButton16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonAll = new wxRadioButton(Panel3, ID_RADIOBUTTON_ALL, _("All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_ALL"));
+    FlexGridSizer7->Add(RadioButtonAll, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
-    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("2. Select test"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Select test"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    wxFont StaticText3Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    StaticText3->SetFont(StaticText3Font);
     BoxSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button1 = new wxButton(Panel3, ID_BUTTON1, _("All Lights Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     BoxSizer2->Add(Button1, 0, wxALIGN_LEFT|wxALIGN_TOP, 0);
@@ -302,7 +323,9 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));
     Menu2 = new wxMenu();
-    MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
+    MenuItemHelpContent = new wxMenuItem(Menu2, idMenuHelpContent, _("Content\tF1"), wxEmptyString, wxITEM_NORMAL);
+    Menu2->Append(MenuItemHelpContent);
+    MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About"), _("Show info about this application"), wxITEM_NORMAL);
     Menu2->Append(MenuItem2);
     MenuBar1->Append(Menu2, _("Help"));
     SetMenuBar(MenuBar1);
@@ -316,6 +339,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
 
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xTesterFrame::OnButton1Click);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnQuit);
+    Connect(idMenuHelpContent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnMenuItemHelpContentSelected);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnAbout);
     //*)
 
@@ -366,12 +390,11 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
     static wxArrayInt chArray;
     static int interval;
     static unsigned int seqidx=9999,alt=0;
-    int v,n,maxch,ch;
+    int v,n,ch;
     unsigned int i;
-    wxCheckListBox* lb;
     int netidx = Notebook2->GetSelection(); // which network
-    lb = Networks[netidx]->ListBox;
-    maxch = lb->GetCount();
+    wxCheckListBox* lb = Networks[netidx]->ListBox;
+    int maxch = lb->GetCount();
     wxTimeSpan ts = wxDateTime::UNow() - starttime;
     long curtime = ts.GetMilliseconds().ToLong();
     xout.TimerStart(curtime);
@@ -541,17 +564,18 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
 void xTesterFrame::LoadFile()
 {
     long MaxChan;
-    wxString tempstr;
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
-        for( wxXmlNode* e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
-            tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
-            tempstr.ToLong(&MaxChan);
-            if (e->GetName() == _("network")) {
-                AddNetwork(e->GetPropVal(wxT("NetworkType"), wxT("")),
-                           e->GetPropVal(wxT("ComPort"), wxT("")),
-                           e->GetPropVal(wxT("BaudRate"), wxT("")),
-                           MaxChan);
+        wxXmlNode* e=doc.GetRoot();
+        for( e=e->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            wxString tagname=e->GetName();
+            if (tagname == wxT("network")) {
+                wxString tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
+                tempstr.ToLong(&MaxChan);
+                wxString NetworkType=e->GetPropVal(wxT("NetworkType"), wxT(""));
+                wxString ComPort=e->GetPropVal(wxT("ComPort"), wxT(""));
+                wxString BaudRate=e->GetPropVal(wxT("BaudRate"), wxT(""));
+                AddNetwork(NetworkType,ComPort,BaudRate,MaxChan);
             }
         }
     } else {
@@ -589,15 +613,13 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
 
     wxString net3 = NetInfo->net3();
     int baud = atoi(BaudRate.mb_str(wxConvUTF8));
-    char port[20];
-    strcpy( port, (const char*)ComPort.mb_str(wxConvUTF8) );
     try {
         if (net3 == _("LOR")) {
-            xout.setnetwork(new xNetwork_LOR(),cnt,MaxChannels,port,baud);
+            xout.setnetwork(new xNetwork_LOR(),cnt,MaxChannels,ComPort,baud);
         } else if (net3 == _("Ren")) {
-            xout.setnetwork(new xNetwork_Renard(),cnt,MaxChannels,port,baud);
+            xout.setnetwork(new xNetwork_Renard(),cnt,MaxChannels,ComPort,baud);
         } else if (net3 == _("DMX")) {
-            xout.setnetwork(new xNetwork_DMXentec(),cnt,MaxChannels,port,baud);
+            xout.setnetwork(new xNetwork_DMXentec(),cnt,MaxChannels,ComPort,baud);
         }
     }
     catch (const char *str) {
@@ -632,9 +654,23 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
 
 void xTesterFrame::OnCheckboxToggle(wxCommandEvent& event)
 {
-    static int lastrow=0;
+    int netidx = Notebook2->GetSelection(); // which network
+    wxCheckListBox* lb = Networks[netidx]->ListBox;
+    int ChCount = lb->GetCount();
     int row=event.GetInt();
-    //StatusBar1->SetStatusText(wxString::Format(_("Row %d"),row));
+    bool newval=lb->IsChecked(row);
+    if (RadioButton16->GetValue()) {
+        for (int i=row+1; i <= row+15; i++) {
+            if (i >= ChCount) break;
+            lb->Check(i,newval);
+        }
+    } else if (RadioButtonAll->GetValue()) {
+        for (int i=0; i < ChCount; i++) {
+            lb->Check(i,newval);
+        }
+    }
+    //StatusBar1->SetStatusText(newval ? _("true") : _("false"));
+    //static int lastrow=0;
 
     // In wxWidgets 2.9/3.0:
     // test state of shift key using wxKeyboardState class
@@ -657,4 +693,12 @@ void xTesterFrame::OnButton1Click(wxCommandEvent& event)
 {
     alloff();
     StatusBar1->SetStatusText(_("All lights off"));
+}
+
+void xTesterFrame::OnMenuItemHelpContentSelected(wxCommandEvent& event)
+{
+    if (!wxLaunchDefaultBrowser(_(XLIGHTS_HELP_URL)))
+    {
+        wxMessageBox(_("Help requires Internet access. Unable to access help."), _("Error"));
+    }
 }

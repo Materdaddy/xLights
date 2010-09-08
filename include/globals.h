@@ -4,6 +4,7 @@
 #define XLIGHTS_VERSION "0.1"
 #define XLIGHTS_MAX_NETWORKS 10
 #define XLIGHTS_CONFIG_ID "xLights"
+#define XLIGHTS_HELP_URL "http://sourceforge.net/apps/mediawiki/xlights/index.php?title=Main_Page"
 
 #define XLIGHTS_ANIMATION_FILE "xlights_animation.xml"
 #define XLIGHTS_NETWORK_FILE   "xlights_networks.xml"

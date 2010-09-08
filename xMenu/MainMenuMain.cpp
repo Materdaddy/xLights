@@ -74,6 +74,7 @@ const long MainMenuFrame::ID_BUTTON_TEST = wxNewId();
 const long MainMenuFrame::ID_PANEL1 = wxNewId();
 const long MainMenuFrame::idMenuOpen = wxNewId();
 const long MainMenuFrame::idMenuQuit = wxNewId();
+const long MainMenuFrame::idMenuHelpContent = wxNewId();
 const long MainMenuFrame::idMenuAbout = wxNewId();
 const long MainMenuFrame::ID_STATUSBAR1 = wxNewId();
 //*)
@@ -89,6 +90,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     wxMenuItem* MenuItem2;
     wxMenuItem* MenuItem1;
     wxMenu* Menu1;
+    wxMenuItem* MenuItemHelpContent;
     wxBoxSizer* BoxSizer1;
     wxMenuBar* MenuBar1;
     wxStaticBoxSizer* StaticBoxSizer1;
@@ -108,8 +110,8 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     wxFont StaticText1Font(18,wxDEFAULT,wxFONTSTYLE_ITALIC,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText1->SetFont(StaticText1Font);
     FlexGridSizer1->Add(StaticText1, 0, wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 0);
-    StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel1, _("Show Directory"));
-    StaticTextDirName = new wxStaticText(Panel1, ID_STATICTEXT2, _("<No directory selected>"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel1, _("Show Folder"));
+    StaticTextDirName = new wxStaticText(Panel1, ID_STATICTEXT2, _("<No folder selected>"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     StaticTextDirName->SetMinSize(wxSize(300,0));
     StaticBoxSizer1->Add(StaticTextDirName, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonChangeDir = new wxButton(Panel1, ID_BUTTON5, _("Change"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
@@ -136,13 +138,15 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     SetSizer(BoxSizer1);
     MenuBar1 = new wxMenuBar();
     Menu1 = new wxMenu();
-    MenuItem3 = new wxMenuItem(Menu1, idMenuOpen, _("Open Folder"), _("Open show folder"), wxITEM_NORMAL);
+    MenuItem3 = new wxMenuItem(Menu1, idMenuOpen, _("Select Show Folder"), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(MenuItem3);
     MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(MenuItem1);
     MenuBar1->Append(Menu1, _("&File"));
     Menu2 = new wxMenu();
-    MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
+    MenuItemHelpContent = new wxMenuItem(Menu2, idMenuHelpContent, _("Content\tF1"), wxEmptyString, wxITEM_NORMAL);
+    Menu2->Append(MenuItemHelpContent);
+    MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About"), _("Show info about this application"), wxITEM_NORMAL);
     Menu2->Append(MenuItem2);
     MenuBar1->Append(Menu2, _("Help"));
     SetMenuBar(MenuBar1);
@@ -152,7 +156,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     StatusBar1->SetFieldsCount(1,__wxStatusBarWidths_1);
     StatusBar1->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(StatusBar1);
-    DirDialog1 = new wxDirDialog(this, _("Select Show Directory"), wxEmptyString, wxDD_DEFAULT_STYLE, wxDefaultPosition, wxDefaultSize, _T("wxDirDialog"));
+    DirDialog1 = new wxDirDialog(this, _("Select Show Folder"), wxEmptyString, wxDD_DEFAULT_STYLE, wxDefaultPosition, wxDefaultSize, _T("wxDirDialog"));
     BoxSizer1->SetSizeHints(this);
 
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
@@ -162,6 +166,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON_TEST,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonTestClick);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnQuit);
+    Connect(idMenuHelpContent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuItemHelpContentSelected);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnAbout);
     //*)
 
@@ -264,3 +269,11 @@ void MainMenuFrame::OnButtonTestClick(wxCommandEvent& event)
     Exec(_("xTester"));
 }
 
+
+void MainMenuFrame::OnMenuItemHelpContentSelected(wxCommandEvent& event)
+{
+    if (!wxLaunchDefaultBrowser(_(XLIGHTS_HELP_URL)))
+    {
+        wxMessageBox(_("Help requires Internet access. Unable to access help."), _("Error"));
+    }
+}

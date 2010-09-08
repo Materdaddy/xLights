@@ -23,7 +23,7 @@
     along with xLights.  If not, see <http://www.gnu.org/licenses/>.
  **************************************************************/
 
-#include "../serial/ctb.h"
+#include "serial/serport.cpp"
 #include <vector>
 #include <list>
 #include <time.h>
@@ -58,7 +58,7 @@ public:
   virtual ~xNetwork() {
     if (serptr) delete serptr;
   };
-  
+
   unsigned char MapIntensity(unsigned char intensity) {
     return IntensityMap[intensity];
   };
@@ -71,7 +71,7 @@ public:
 
   virtual void SetMaxIntensity(int maxintensity) = 0;
 
-  void InitSerialPort(const char* portname, int baudrate) {
+  void InitSerialPort(const wxString& portname, int baudrate) {
     static char errmsg[100];
     serptr=new ctb::SerialPort();
     int errcode=serptr->Open(portname, baudrate, SerialConfig);
@@ -655,7 +655,7 @@ public:
     }
   };
 
-  void setnetwork (xNetwork* netobj, int netnum, int chcount, const char* portname, int baudrate) {
+  void setnetwork (xNetwork* netobj, int netnum, int chcount, const wxString& portname, int baudrate) {
     if (networks[netnum]) throw "duplicate network defined";
     networks[netnum] = netobj;
     netobj->SetChannelCount(chcount);
@@ -663,7 +663,7 @@ public:
     if (netnum > lastnetnum) lastnetnum = netnum;
   };
 
-  int addnetwork (xNetwork* netobj, int chcount, const char* portname, int baudrate) {
+  int addnetwork (xNetwork* netobj, int chcount, const wxString& portname, int baudrate) {
     for (int i=0; i<MAXNETWORKS; i++) {
       if (networks[i] == 0) {
         setnetwork(netobj, i, chcount, portname, baudrate);
@@ -690,7 +690,7 @@ public:
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
   void SetIntensity (int netnum, int chindex, int intensity) {
-    if (netnum < 0 || netnum >= MAXNETWORKS) return; 
+    if (netnum < 0 || netnum >= MAXNETWORKS) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->SetIntensity(chindex, intensity);
   };

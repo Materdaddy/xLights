@@ -94,12 +94,16 @@ class xTesterFrame: public wxFrame
         void OnButtonSh10Click(wxCommandEvent& event);
         void OnButtonTw3Click(wxCommandEvent& event);
         void OnButtonTw10Click(wxCommandEvent& event);
+        void OnMenuItemHelpContentSelected(wxCommandEvent& event);
         //*)
 
         void LoadFile();
 
         //(*Identifiers(xTesterFrame)
         static const long ID_STATICTEXT1;
+        static const long ID_RADIOBUTTON_1;
+        static const long ID_RADIOBUTTON_16;
+        static const long ID_RADIOBUTTON_ALL;
         static const long ID_STATICTEXT3;
         static const long ID_BUTTON1;
         static const long ID_NOTEBOOK2;
@@ -141,6 +145,7 @@ class xTesterFrame: public wxFrame
         static const long ID_NOTEBOOK1;
         static const long ID_PANEL4;
         static const long idMenuQuit;
+        static const long idMenuHelpContent;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         //*)
@@ -151,11 +156,14 @@ class xTesterFrame: public wxFrame
         wxSlider* Slider1;
         wxPanel* Panel_Dim;
         wxStaticText* StaticText9;
+        wxRadioButton* RadioButtonAll;
+        wxRadioButton* RadioButton1;
         wxNotebook* Notebook1;
         wxCheckBox* CheckBoxRunSh;
         wxStaticText* StaticText13;
         wxStaticText* StaticText2;
         wxStaticText* StaticText14;
+        wxRadioButton* RadioButton16;
         wxRadioButton* RadioButtonTwNoFade;
         wxButton* Button1;
         wxStaticText* StaticText6;

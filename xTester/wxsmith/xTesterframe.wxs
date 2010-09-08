@@ -14,10 +14,49 @@
 						<growablecols>0,1</growablecols>
 						<growablerows>1</growablerows>
 						<object class="sizeritem">
-							<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-								<label>1. Select channels</label>
+							<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+								<cols>4</cols>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+										<label>Select channels</label>
+										<font>
+											<weight>bold</weight>
+											<face></face>
+										</font>
+									</object>
+									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxRadioButton" name="ID_RADIOBUTTON_1" variable="RadioButton1" member="yes">
+										<label>1</label>
+										<selected>1</selected>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxRadioButton" name="ID_RADIOBUTTON_16" variable="RadioButton16" member="yes">
+										<label>16</label>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxRadioButton" name="ID_RADIOBUTTON_ALL" variable="RadioButtonAll" member="yes">
+										<label>All</label>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
 							</object>
-							<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
 							<option>1</option>
 						</object>
@@ -25,7 +64,11 @@
 							<object class="wxBoxSizer" variable="BoxSizer2" member="no">
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>2. Select test</label>
+										<label>Select test</label>
+										<font>
+											<weight>bold</weight>
+											<face></face>
+										</font>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -449,9 +492,13 @@
 			</object>
 			<object class="wxMenu" variable="Menu2" member="no">
 				<label>Help</label>
+				<object class="wxMenuItem" name="idMenuHelpContent" variable="MenuItemHelpContent" member="yes">
+					<label>Content</label>
+					<accel>F1</accel>
+					<handler function="OnMenuItemHelpContentSelected" entry="EVT_MENU" />
+				</object>
 				<object class="wxMenuItem" name="idMenuAbout" variable="MenuItem2" member="no">
 					<label>About</label>
-					<accel>F1</accel>
 					<help>Show info about this application</help>
 					<handler function="OnAbout" entry="EVT_MENU" />
 				</object>

@@ -61,6 +61,7 @@ class MainMenuFrame: public wxFrame
         void OnButtonExportClick(wxCommandEvent& event);
         void OnButtonAnimationClick(wxCommandEvent& event);
         void OnButtonNetworkSetupClick(wxCommandEvent& event);
+        void OnMenuItemHelpContentSelected(wxCommandEvent& event);
         //*)
 
         void SetDir(const wxString& dirname);
@@ -76,6 +77,7 @@ class MainMenuFrame: public wxFrame
         static const long ID_PANEL1;
         static const long idMenuOpen;
         static const long idMenuQuit;
+        static const long idMenuHelpContent;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         //*)

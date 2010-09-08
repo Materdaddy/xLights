@@ -510,9 +510,9 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     MenuPlaylist->Append(MenuItemRefresh);
     MenuBar1->Append(MenuPlaylist, _("Playlist"));
     MenuHelp = new wxMenu();
-    MenuItem4 = new wxMenuItem(MenuHelp, idMenuHelpContent, _("Content"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem4 = new wxMenuItem(MenuHelp, idMenuHelpContent, _("Content\tF1"), wxEmptyString, wxITEM_NORMAL);
     MenuHelp->Append(MenuItem4);
-    MenuItem2 = new wxMenuItem(MenuHelp, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
+    MenuItem2 = new wxMenuItem(MenuHelp, idMenuAbout, _("About"), _("Show info about this application"), wxITEM_NORMAL);
     MenuHelp->Append(MenuItem2);
     MenuBar1->Append(MenuHelp, _("Help"));
     SetMenuBar(MenuBar1);
@@ -864,7 +864,9 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
                 StatusBar1->SetStatusText(wxString::Format(_("Next show will start in %ld seconds"),seconds), FldNum);
             } else if (minutes == 0 && v != LastSchedStart) {
                 int nbidx=FindNotebookPage(playlist);
-                if (nbidx > 0) {
+                if (!PortsOK) {
+                    StatusBar1->SetStatusText(_("ERROR: serial ports did not initialize at program startup, cannot start playlist ") + playlist, FldNum);
+                } else if (nbidx > 0) {
                     PlayMode=SCHEDULE;
                     RunPlaylist(nbidx);
                     LastSchedStart=v;
@@ -1019,15 +1021,13 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
     int netnum=-1;
     wxString net3 = NetworkType.Left(3);
     int baud = atoi(BaudRate.mb_str(wxConvUTF8));
-    char port[20];
-    strcpy( port, (const char*)ComPort.mb_str(wxConvUTF8) );
     try {
         if (net3 == _("LOR")) {
-            netnum=xout.addnetwork(new xNetwork_LOR(),MaxChannels,port,baud);
+            netnum=xout.addnetwork(new xNetwork_LOR(),MaxChannels,ComPort,baud);
         } else if (net3 == _("Ren")) {
-            netnum=xout.addnetwork(new xNetwork_Renard(),MaxChannels,port,baud);
+            netnum=xout.addnetwork(new xNetwork_Renard(),MaxChannels,ComPort,baud);
         } else if (net3 == _("DMX")) {
-            netnum=xout.addnetwork(new xNetwork_DMXentec(),MaxChannels,port,baud);
+            netnum=xout.addnetwork(new xNetwork_DMXentec(),MaxChannels,ComPort,baud);
         }
     }
     catch (const char *str) {
@@ -1187,12 +1187,18 @@ void xScheduleFrame::Play(wxString& filename) {
     }
 }
 
-void xScheduleFrame::PlayLorFile(wxString& FileName)
+// returns true if serial ports are ok, displays an error and returns false otherwise
+bool xScheduleFrame::CheckPorts()
 {
     if (!PortsOK) {
         PlayerError(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."));
-        return;
     }
+    return PortsOK;
+}
+
+void xScheduleFrame::PlayLorFile(wxString& FileName)
+{
+    if (!CheckPorts()) return;
     LorEvents.clear();
     wxXmlDocument doc;
     if (doc.Load( FileName )) {
@@ -1292,10 +1298,7 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
     wxFileName fn;
     wxXmlNode* xmlNode;
     fn.AssignDir(CurrentDir);
-    if (!PortsOK) {
-        PlayerError(_("Serial ports did not initialize at program startup.\nPlug in your dongles/adapters and restart the program."));
-        return;
-    }
+    if (!CheckPorts()) return;
     VixLastChannel = -1;
     VixEventPeriod=-1;
     wxXmlDocument doc( FileName );
@@ -1440,9 +1443,9 @@ void xScheduleFrame::OnMenuItemRenameListSelected(wxCommandEvent& event)
 
 void xScheduleFrame::OnAuiToolBarItemHelpClick(wxCommandEvent& event)
 {
-    if (!wxLaunchDefaultBrowser(_("http://sourceforge.net/apps/mediawiki/xlights/index.php?title=Main_Page")))
+    if (!wxLaunchDefaultBrowser(_(XLIGHTS_HELP_URL)))
     {
-        wxMessageBox(_("Unable to access help"), _("Error"));
+        wxMessageBox(_("Help requires Internet access. Unable to access help."), _("Error"));
     }
 }
 
@@ -1830,6 +1833,7 @@ void xScheduleFrame::SendToLogAndStatusBar(const wxString& msg)
 
 void xScheduleFrame::OnButtonRunPlaylistClick()
 {
+    if (!CheckPorts()) return;
     PlayMode=PLAYLIST;
     RunPlaylist(Notebook1->GetSelection());
 }

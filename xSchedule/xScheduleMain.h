@@ -255,6 +255,7 @@ class xScheduleFrame: public wxFrame
         void ScanForFiles();
         void AddPlaylist(const wxString& name);
         GridSelection getGridSelection(wxGrid & grid);
+        bool CheckPorts();
         void PlayLorFile(wxString& FileName);
         void PlayVixenFile(wxString& FileName);
         void LoadLorChannels(wxXmlNode* n);
