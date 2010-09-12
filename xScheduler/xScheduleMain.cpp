@@ -202,6 +202,7 @@ protected:
       bool answer = true;
       char msgbuf[100];
 
+      nfors = 0;
       runstate=1;
       haltflag=false;
       while(curline != -1) {
