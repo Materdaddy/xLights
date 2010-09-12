@@ -1,7 +1,6 @@
 #include "WizardDialog.h"
 
 //(*InternalHeaders(WizardDialog)
-#include <wx/font.h>
 #include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
@@ -34,8 +33,6 @@ WizardDialog::WizardDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Playlist:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticTextListName = new wxStaticText(this, ID_STATICTEXT_LISTNAME, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT_LISTNAME"));
-	wxFont StaticTextListNameFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-	StaticTextListName->SetFont(StaticTextListNameFont);
 	FlexGridSizer2->Add(StaticTextListName, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	CheckBoxFirstItem = new wxCheckBox(this, ID_CHECKBOX_FIRSTITEM, _("Play first item once at beginning"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_FIRSTITEM"));

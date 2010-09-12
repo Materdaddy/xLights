@@ -63,7 +63,7 @@ class NetworkInfo
         if (NetworkType.IsEmpty()) {
             return _("");
         } else {
-            return NetworkType+_("\n")+ComPort+_(" at ")+BaudRate+_(" baud");
+            return NetworkType+_("\n")+ComPort+_("\n")+BaudRate+_(" baud");
         }
     }
 
@@ -178,6 +178,7 @@ class xTesterFrame: public wxFrame
         wxStaticText* StaticText1;
         wxStaticText* StaticText3;
         wxPanel* Panel3;
+        wxMenuItem* MenuItemHelpContent;
         wxCheckBox* CheckBoxRunAlt;
         wxRadioButton* RadioButtonShFade;
         wxStaticText* StaticText5;

@@ -148,6 +148,7 @@ void NetworkDialog::LoadFile()
                 r++;
             }
         }
+        if (r > 0) GridNetwork->AutoSizeColumns();
     } else {
         wxMessageBox(_("Unable to load network definition file"), _("Error"));
     }
@@ -201,25 +202,43 @@ void NetworkDialog::OnButtonDelRowClick(wxCommandEvent& event)
 
 void NetworkDialog::PopulatePortChooser(wxArrayString *chooser)
 {
-#ifdef WIN32
-   chooser->Add(_("COM1"));
-   chooser->Add(_("COM2"));
-   chooser->Add(_("COM3"));
-   chooser->Add(_("COM4"));
-   chooser->Add(_("COM5"));
-   chooser->Add(_("COM6"));
-   chooser->Add(_("COM7"));
-   chooser->Add(_("COM8"));
-   chooser->Add(_("COM9"));
+#ifdef __WXMSW__
+  // Windows
+  chooser->Add(_("COM1"));
+  chooser->Add(_("COM2"));
+  chooser->Add(_("COM3"));
+  chooser->Add(_("COM4"));
+  chooser->Add(_("COM5"));
+  chooser->Add(_("COM6"));
+  chooser->Add(_("COM7"));
+  chooser->Add(_("COM8"));
+  chooser->Add(_("COM9"));
+#elif __WXMAC__
+  // no standard device names for USB-serial converters on OS/X
+  // scan /dev directory for candidates
+  wxArrayString output,errors;
+  wxExecute(_("ls -1 /dev"), output, errors, wxEXEC_SYNC);
+  if (!errors.IsEmpty()) {
+    wxMessageBox(errors.Last(), _("Error"));
+  } else if (output.IsEmpty()) {
+    wxMessageBox(_("no devices found"), _("Error"));
+  } else {
+    for (int i=0; i<output.Count(); i++) {
+      if (output[i].StartsWith(_("cu."))) {
+         chooser->Add(_("/dev/") + output[i]);
+      }
+    }
+  }
 #else
-   chooser->Add(_("/dev/ttyS0"));
-   chooser->Add(_("/dev/ttyS1"));
-   chooser->Add(_("/dev/ttyS2"));
-   chooser->Add(_("/dev/ttyS3"));
-   chooser->Add(_("/dev/ttyUSB0"));
-   chooser->Add(_("/dev/ttyUSB1"));
-   chooser->Add(_("/dev/ttyUSB2"));
-   chooser->Add(_("/dev/ttyUSB3"));
+  // Linux
+  chooser->Add(_("/dev/ttyS0"));
+  chooser->Add(_("/dev/ttyS1"));
+  chooser->Add(_("/dev/ttyS2"));
+  chooser->Add(_("/dev/ttyS3"));
+  chooser->Add(_("/dev/ttyUSB0"));
+  chooser->Add(_("/dev/ttyUSB1"));
+  chooser->Add(_("/dev/ttyUSB2"));
+  chooser->Add(_("/dev/ttyUSB3"));
 #endif
 }
 

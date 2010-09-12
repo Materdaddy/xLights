@@ -20,9 +20,6 @@
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT_LISTNAME" variable="StaticTextListName" member="yes">
 							<label></label>
-							<font>
-								<weight>bold</weight>
-							</font>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

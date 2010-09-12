@@ -1,5 +1,8 @@
-xLights can be built and run on Linux, Mac OS/X, or Windows.
-This document describes how develops should set up their tool chain to build xLights.
+xLights can be built and run on Linux, Mac OS/X, or Windows. This document
+describes how **developers** should set up their tool chain to build xLights.
+If you are a user, installation packages are available on the xLights
+web site for Windows and Mac OS/X -- you can ignore the rest of this document.
+Linux users will need to follow the instructions below to compile there own copy.
 
 
 
@@ -8,9 +11,9 @@ LINUX
 You will need (use either package manager or "sudo apt-get install xxx")
   a) From the Ubuntu repository: build-essential & gdb packages
 
-  b) Unforunately, the wxWidgets and code::blocks packages in the 
-     Ubuntu respositories are too far out of date for use. 
-     Therefore, you will need to follow the instructions at: 
+  b) Unforunately, the wxWidgets and code::blocks packages in the
+     Ubuntu respositories are too far out of date for use.
+     Therefore, you will need to follow the instructions at:
 
         http://apt.jenslody.de/
 
@@ -18,30 +21,61 @@ You will need (use either package manager or "sudo apt-get install xxx")
 
      Make sure you get these packages:
         libwxgtk2.xx
-        libwxgtk2.xx-dev 
+        libwxgtk2.xx-dev
         wx2.xx-headers
         wx-common
         wx2.xx-doc
         codeblocks
         codeblocks-contrib
 
-  c) after loading the packages and the xLights source, you will
-     need to compile the xLights serial port library:
-     1) cd to the xLights/serial directory
-     2) run: make -f makefile.linux
-
-  d) now you are ready to use code::blocks to build
+  c) Now you are ready to use Code::Blocks to build
      each of the binaries (xMenu, xTester, xSchedule)
+     by double-clicking on the cbp file in each directory.
+     In order for the double-click to work, you may need
+     to first right-click on the cbp file, select properties,
+     and uncheck the box indicating that the file is runnable.
 
 
 
-OS/X
+OS/X (Mac)
 
-You will need:
-  a) instructions for installing code::blocks are here:
-     http://wiki.codeblocks.org/index.php?title=Installing_Code::Blocks_from_source_on_Mac_OS_X
+On OS/X, compilation is done using Xcode. Code::Blocks is not used.
+Xcode can be downloaded from the Apple developer web site. Make
+sure you install the version of Xcode that matches your version of
+OS/X. For example, I use OS/X 10.4, so I installed Xcode 2.5.
+Instructions are here:
+
+  http://wiki.wxwidgets.org/Installing_Xcode
 
 
+OS/X comes with the wxWidgets libraries pre-installed. If you have
+OS/X version 10.5 or higher, then xLights can use the version
+of wxWidgets that comes with the OS and you can skip this step.
+If you are using 10.4 or earlier, then you will need an updated
+version of wxWidgets and this step is required. Note that after
+performing this step, you will have 2 copies of wxWidgets on your
+system and you will need to be very careful to access the correct one in
+later steps. Use "./wx-config --version" to check which one you are accessing.
+The instructions here suggest compiling with Xcode:
+  http://wiki.wxwidgets.org/Compiling_wxWidgets_with_Xcode
+
+However, I followed the method used for Linux from inside a Terminal window:
+  cd <wxMac base dir>
+  ./configure --disable-shared --enable-universal-binary --enable-mediactrl
+  make
+
+Next, you will use Xcode to compile each of the xLights modules
+(xMenu, xTester, xSchedule). You will need to treat each one
+as a separate project. Most of the steps are listed here:
+
+  http://wiki.wxwidgets.org/Creating_Xcode_projects_for_wxWidgets_applications
+
+In addition to the instructions on the wiki page above, you will also need to:
+  1) Fix the reference to the precompiled header file in each project. This can
+     be done by double-clicking on the xxxTarget.xcconfig file and then changing
+     the GCC_PREFIX_HEADER to wx_pch.h.
+  2) When configuring the project for xScheduler, set "Other Linker Flags" to
+     the output of: "./wx-config --libs std,media".
 
 
 WINDOWS
@@ -67,6 +101,10 @@ You will need:
      5) Make sure "wx" is defined under Settings > Global Variables
         as described in the Code::Blocks documentation. It should be
         set to your wxWidgets base directory.
+  e) Now you are ready to use Code::Blocks to build
+     each of the binaries (xMenu, xTester, xSchedule)
+     by double-clicking on the cbp file in each directory.
+
 
 
 SVN

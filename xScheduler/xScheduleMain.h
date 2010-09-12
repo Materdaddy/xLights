@@ -54,6 +54,7 @@
 #include <set>
 #include <map>
 #include <vector>
+#include <string>
 
 #include "PlayerFrame.h"
 #include "NewListDialog.h"

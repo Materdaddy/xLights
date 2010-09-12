@@ -15,7 +15,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define CMSPAR	  010000000000		/* mark or space (stick) parity */
 
 namespace ctb {
 
@@ -24,19 +23,18 @@ namespace ctb {
 
   \brief the linux and OS/X version
 */
-    class SerialPort : public SerialPort_x
-    {
-    protected:
+class SerialPort : public SerialPort_x
+{
+  protected:
      /*!
     \brief under Linux, the serial ports are normal file descriptor
      */
      int fd;
      /*!
     \brief Linux defines this struct termios for controling asynchronous
-    communication. t covered the active settings, save_t the original
-    settings.
+    communication.
      */
-     struct termios t, save_t;
+     struct termios t;
 
      /*!
     \brief adaptor member function, to convert the plattform independent
@@ -44,7 +42,7 @@ namespace ctb {
     \param baud the baudrate as wxBaud type
     \return speed_t linux specific data type, defined in termios.h
      */
-     speed_t AdaptBaudrate( int baud )
+    speed_t AdaptBaudrate( int baud )
     {
        switch(baud) {
        case 150: return B150;
@@ -58,14 +56,11 @@ namespace ctb {
        case 57600: return B57600;
        case 115200: return B115200;
        case 230400: return B230400;
-
-        // NOTE! The speed of 38400 is required, if you want to set
-        //       an non-standard baudrate. See below!
        default: return B38400;
        }
     };
 
-     int CloseDevice()
+    int CloseDevice()
     {
        int err = 0;
        // only close an open file handle
@@ -73,8 +68,6 @@ namespace ctb {
        // With some systems, it is recommended to flush the serial port's
        // Output before closing it, in order to avoid a possible hang of
        // the process...
-       // Thanks to Germain (I couldn't answer you, because your email
-       // address was invalid)
        tcflush(fd, TCOFLUSH);
 
        // Don't recover the orgin settings while the device is open. This
@@ -87,84 +80,60 @@ namespace ctb {
        return err;
     };
 
-     int OpenDevice(const wxString& devname, void* dcs)
+    int OpenDevice(const wxString& devname, int baudrate, const char* protocol)
     {
-       // if dcs isn't NULL, type cast
-       if(dcs) m_dcs = *(SerialPort_DCS*)dcs;
-       // open serial comport device for reading and writing,
-       // don't wait (O_NONBLOCK)
+       if (strlen(protocol) != 3) return -1;
+
+#ifdef __WXWINDOWS__
        fd = open(devname.fn_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-       if(fd >= 0) {
+#else
+       // for unit test (not a wxWidgets app)
+       fd = open(devname.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+#endif
+       if(fd < 0) return fd;
 
         // exclusive use
-        int dummy;
-
-        ioctl( fd, TIOCEXCL, &dummy );
+        if ( ioctl( fd, TIOCEXCL ) == -1 ) return -1;
 
         tcgetattr(fd,&t);
-        save_t = t;
 
         // save the device name
         m_devname = devname;
 
-        // Fill the internal terios struct.
-        // If the given baudrate is an non-standard one, the AdaptBaudrate
-        // call returns the linux specific value B38400 which is a
-        // condition for the later switch to an unusual baudrate!
-        cfsetspeed(&t, AdaptBaudrate( m_dcs.baud ) );
+        // Fill the internal termios struct.
+        cfsetspeed(&t, AdaptBaudrate( baudrate ) );
 
         // parity settings
-        switch( m_dcs.parity ) {
-
-        case ParityNone:
-         t.c_cflag &= ~PARENB; break;
-
-        case ParityOdd:
-         t.c_cflag |= PARENB;
-         t.c_cflag |= PARODD;
-         break;
-
-        case ParityEven:
-         t.c_cflag |= PARENB;
-         t.c_cflag &= ~PARODD;
-         break;
-
-        case ParityMark:
-         t.c_cflag |= PARENB | CMSPAR | PARODD;
-         break;
-
-        case ParitySpace:
-         t.c_cflag |= PARENB | CMSPAR;
-         t.c_cflag &= ~PARODD;
-         break;
+        switch( protocol[1] ) {
+          case 'N':
+            t.c_cflag &= ~PARENB; break;
+          case 'O':
+            t.c_cflag |= PARENB;
+            t.c_cflag |= PARODD;
+            break;
+          case 'E':
+            t.c_cflag |= PARENB;
+            t.c_cflag &= ~PARODD;
+            break;
         }
 
         // stopbits
-        if(m_dcs.stopbits == 2)
-         t.c_cflag |= CSTOPB;
+        if(protocol[2] == '2')
+          t.c_cflag |= CSTOPB;
         else
-         t.c_cflag &= ~CSTOPB;
+          t.c_cflag &= ~CSTOPB;
+
         // wordlen
         t.c_cflag &= ~CSIZE;
-        if(m_dcs.wordlen == 7) t.c_cflag |= CS7;
-        else if(m_dcs.wordlen == 6) t.c_cflag |= CS6;
-        else if(m_dcs.wordlen == 5) t.c_cflag |= CS5;
-        // this is the default
-        else t.c_cflag |= CS8;
-        // rts/cts
-        if(m_dcs.rtscts == false)
-         t.c_cflag &= ~CRTSCTS;
-        else
-         t.c_cflag |= CRTSCTS;
-
-        t.c_lflag &= ~(ICANON | ECHO | ISIG | IEXTEN);
-        t.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON | IXOFF | IXANY);
-        t.c_iflag |= IGNPAR;
-        t.c_oflag &= ~OPOST;
-
-        if(m_dcs.xonxoff == true) {
-         t.c_iflag |= (IXON | IXOFF);
+        switch( protocol[0] ) {
+          case '5': t.c_cflag |= CS5; break;
+          case '6': t.c_cflag |= CS6; break;
+          case '7': t.c_cflag |= CS7; break;
+          default:  t.c_cflag |= CS8; break;
         }
+
+        // this may overwrite the number of bits to 8
+        cfmakeraw(&t);
 
         // look out!
         // MIN = 1 means, in TIME (1/10 secs) defined timeout
@@ -176,33 +145,29 @@ namespace ctb {
         // no timeout for non blocked transfer
         t.c_cc[VTIME] = 0;
         // write the settings
-        tcsetattr(fd,TCSANOW,&t);
-        // it's careless, but in the moment we don't test
-        // the return of tcsetattr (normally there is no error)
+        if (tcsetattr(fd,TCSANOW,&t) == -1) return -1;
 
-        SetBaudrate( m_dcs.baud );
-
-       }
        return fd;
     };
 
-    public:
-     SerialPort()
+  public:
+
+    SerialPort()
     {
        fd = -1;
     };
 
-     ~SerialPort()
+    ~SerialPort()
     {
        Close();
     };
 
-     int IsOpen()
+    int IsOpen()
     {
        return (fd != -1);
     };
 
-     int Read(char* buf,size_t len)
+    int Read(char* buf,size_t len)
     {
        if(m_fifo->items() > 0) {
         return m_fifo->read(buf,len);
@@ -215,28 +180,7 @@ namespace ctb {
        return n;
     };
 
-     int SendBreak(int duration)
-    {
-       // the parameter is equal with linux
-       return tcsendbreak(fd,duration);
-    };
-
-     int SetBaudrate( int baudrate )
-    {
-       speed_t baud = AdaptBaudrate( baudrate );
-       // setting the input baudrate
-       if(cfsetspeed(&t,baud) < 0) {
-        return -1;
-       }
-       // take over
-       m_dcs.baud = baudrate;
-
-       tcsetattr(fd,TCSANOW,&t);
-
-       return tcgetattr( fd, &t );
-    };
-
-     int Write(char* buf,size_t len)
+    int Write(char* buf,size_t len)
     {
        // Write() (using write() ) will return an 'error' EAGAIN as it is
        // set to non-blocking. This is not a true error within the
@@ -246,8 +190,7 @@ namespace ctb {
        return n;
     };
 
-    };
-
+  }; // class SerialPort
 
 } // namespace ctb
 

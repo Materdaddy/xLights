@@ -896,7 +896,7 @@ int xScheduleFrame::FindNotebookPage(wxString& pagename)
 
 void xScheduleFrame::OnTimer(wxTimerEvent& event)
 {
-    long msec=0, lorintensity, startint, endint;
+    long msec=0;
     int startmsec, endmsec, duration, period;
     int netnum, chindex;
     static long lastmsec;
@@ -1211,7 +1211,8 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
         }
         xout.SetMaxIntensity(100);
 
-        wxFileName fn1(musicFilename);
+        wxPathFormat PathFmt = musicFilename.Contains(_("\\")) ? wxPATH_DOS : wxPATH_NATIVE;
+        wxFileName fn1(musicFilename, PathFmt);
         if (!fn1.FileExists()) {
             wxFileName fn2(CurrentDir,fn1.GetFullName());
             musicFilename=fn2.GetFullPath();
@@ -1296,7 +1297,6 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
     long toValue;
     wxString tag,tempstr;
     wxFileName fn;
-    wxXmlNode* xmlNode;
     fn.AssignDir(CurrentDir);
     if (!CheckPorts()) return;
     VixLastChannel = -1;

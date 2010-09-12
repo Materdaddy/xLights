@@ -1107,7 +1107,6 @@ double do_vallen() {
 */
 double factor() {
   double answer = 0;
-  char *str;
   int tnum=token->tokennum;
   TOKEN* lasttok=token;
 
@@ -1496,7 +1495,7 @@ void *getdimvar(DIMVAR *dv, ...) {
           + index[0] ];
         break;
     }
-  } else if(dv->type = STRID) {
+  } else if(dv->type == STRID) {
     switch(dv->ndims) {
       case 1:
         answer = &dv->str[ index[0] ];
@@ -2368,7 +2367,7 @@ int do_for(void) {
     return -1;
   }
 
-  if(stepval < 0 && initval < toval || stepval > 0 && initval > toval) {
+  if((stepval < 0 && initval < toval) || (stepval > 0 && initval > toval)) {
     savestring = string;
     while(string = strchr(string, '\n')) {
       errorflag = 0;
