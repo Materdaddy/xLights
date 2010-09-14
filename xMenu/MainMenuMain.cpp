@@ -256,12 +256,12 @@ void MainMenuFrame::OnButtonNetworkSetupClick(wxCommandEvent& event)
 
 void MainMenuFrame::OnButtonSequenceClick(wxCommandEvent& event)
 {
-    Exec(_("xSequence"));
+    Exec(_("xSequencer"));
 }
 
 void MainMenuFrame::OnButtonScheduleClick(wxCommandEvent& event)
 {
-    Exec(_("xSchedule"));
+    Exec(_("xScheduler"));
 }
 
 void MainMenuFrame::OnButtonTestClick(wxCommandEvent& event)

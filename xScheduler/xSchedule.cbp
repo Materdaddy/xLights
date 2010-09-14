@@ -2,12 +2,12 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="xSchedule" />
+		<Option title="xScheduler" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="DebugWindows">
-				<Option output="../bin/xSchedule" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/xScheduler" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -32,7 +32,7 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseWindows">
-				<Option output="../bin/xSchedule" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/xScheduler" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -57,7 +57,7 @@
 				</Linker>
 			</Target>
 			<Target title="DebugLinux">
-				<Option output="../bin/xSchedule" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/xScheduler" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -73,7 +73,7 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseLinux">
-				<Option output="../bin/xSchedule" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/xScheduler" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />

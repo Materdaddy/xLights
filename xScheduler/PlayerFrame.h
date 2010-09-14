@@ -5,7 +5,7 @@
 #include <wx/frame.h>
 //*)
 
-#include "wx/mediactrl.h"   //for wxMediaCtrl
+#include <wx/mediactrl.h>   //for wxMediaCtrl
 
 class PlayerFrame: public wxFrame
 {

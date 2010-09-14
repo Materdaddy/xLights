@@ -33,7 +33,8 @@ IMPLEMENT_APP(xScheduleApp);
 
 bool xScheduleApp::OnInit()
 {
-    m_checker = new wxSingleInstanceChecker(GetAppName());
+    wxString name = GetAppName() + wxT("-SingleInstanceCheck");
+	m_checker = new wxSingleInstanceChecker(name);
     if ( m_checker->IsAnotherRunning() )
     {
         wxMessageBox(_("Another program instance is already running"), _("Error"));
