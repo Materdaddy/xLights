@@ -204,41 +204,54 @@ void NetworkDialog::PopulatePortChooser(wxArrayString *chooser)
 {
 #ifdef __WXMSW__
   // Windows
-  chooser->Add(_("COM1"));
-  chooser->Add(_("COM2"));
-  chooser->Add(_("COM3"));
-  chooser->Add(_("COM4"));
-  chooser->Add(_("COM5"));
-  chooser->Add(_("COM6"));
-  chooser->Add(_("COM7"));
-  chooser->Add(_("COM8"));
-  chooser->Add(_("COM9"));
+  chooser->Add(wxT("COM1"));
+  chooser->Add(wxT("COM2"));
+  chooser->Add(wxT("COM3"));
+  chooser->Add(wxT("COM4"));
+  chooser->Add(wxT("COM5"));
+  chooser->Add(wxT("COM6"));
+  chooser->Add(wxT("COM7"));
+  chooser->Add(wxT("COM8"));
+  chooser->Add(wxT("COM9"));
+  chooser->Add(wxT("\\\\.\\COM10"));
+  chooser->Add(wxT("\\\\.\\COM11"));
+  chooser->Add(wxT("\\\\.\\COM12"));
+  chooser->Add(wxT("\\\\.\\COM13"));
+  chooser->Add(wxT("\\\\.\\COM14"));
+  chooser->Add(wxT("\\\\.\\COM15"));
+  chooser->Add(wxT("\\\\.\\COM16"));
+  chooser->Add(wxT("\\\\.\\COM17"));
+  chooser->Add(wxT("\\\\.\\COM18"));
+  chooser->Add(wxT("\\\\.\\COM19"));
+  chooser->Add(wxT("\\\\.\\COM20"));
 #elif __WXMAC__
   // no standard device names for USB-serial converters on OS/X
   // scan /dev directory for candidates
   wxArrayString output,errors;
-  wxExecute(_("ls -1 /dev"), output, errors, wxEXEC_SYNC);
+  wxExecute(wxT("ls -1 /dev"), output, errors, wxEXEC_SYNC);
   if (!errors.IsEmpty()) {
     wxMessageBox(errors.Last(), _("Error"));
   } else if (output.IsEmpty()) {
     wxMessageBox(_("no devices found"), _("Error"));
   } else {
     for (int i=0; i<output.Count(); i++) {
-      if (output[i].StartsWith(_("cu."))) {
-         chooser->Add(_("/dev/") + output[i]);
+      if (output[i].StartsWith(wxT("cu."))) {
+         chooser->Add(wxT("/dev/") + output[i]);
       }
     }
   }
 #else
   // Linux
-  chooser->Add(_("/dev/ttyS0"));
-  chooser->Add(_("/dev/ttyS1"));
-  chooser->Add(_("/dev/ttyS2"));
-  chooser->Add(_("/dev/ttyS3"));
-  chooser->Add(_("/dev/ttyUSB0"));
-  chooser->Add(_("/dev/ttyUSB1"));
-  chooser->Add(_("/dev/ttyUSB2"));
-  chooser->Add(_("/dev/ttyUSB3"));
+  chooser->Add(wxT("/dev/ttyS0"));
+  chooser->Add(wxT("/dev/ttyS1"));
+  chooser->Add(wxT("/dev/ttyS2"));
+  chooser->Add(wxT("/dev/ttyS3"));
+  chooser->Add(wxT("/dev/ttyUSB0"));
+  chooser->Add(wxT("/dev/ttyUSB1"));
+  chooser->Add(wxT("/dev/ttyUSB2"));
+  chooser->Add(wxT("/dev/ttyUSB3"));
+  chooser->Add(wxT("/dev/ttyUSB4"));
+  chooser->Add(wxT("/dev/ttyUSB5"));
 #endif
 }
 
