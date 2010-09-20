@@ -507,7 +507,7 @@ protected:
   };
 
   // shimmer or twinkle while ramping intensity up or down
-  void shimtwinkfade (unsigned char cmd, int chindex, int period, int duration, int startintensity, int endintensity) {
+  virtual void shimtwinkfade (unsigned char cmd, int chindex, int period, int duration, int startintensity, int endintensity) {
     unsigned char d[11];
     d[0]=0;
     d[1]=chindex >> 4;
@@ -611,7 +611,7 @@ public:
     shimtwink(6, chindex, period, intensity);
   };
 
-  void twinklefade (int chindex, int period, int duration, int startintensity, int endintensity) {
+  virtual void twinklefade (int chindex, int period, int duration, int startintensity, int endintensity) {
     shimtwinkfade(6, chindex, period, duration, startintensity, endintensity);
   };
 
@@ -619,7 +619,7 @@ public:
     shimtwink(7, chindex, period, intensity);
   };
 
-  void shimmerfade (int chindex, int period, int duration, int startintensity, int endintensity) {
+  virtual void shimmerfade (int chindex, int period, int duration, int startintensity, int endintensity) {
     shimtwinkfade(7, chindex, period, duration, startintensity, endintensity);
   };
 
@@ -631,6 +631,60 @@ public:
     for (int i=0; i<16; i++)
       off(0xFF * 16 + i);
   };
+};
+
+
+// Same as LOR except shimmer and twinkle
+class xNetwork_DLight: public xNetwork_LOR {
+
+  // shimmer or twinkle at constant intensity
+  void shimtwink (unsigned char cmd, int chindex, int period, int intensity) {
+    unsigned char d[8];
+    d[0]=0;
+    d[1]=chindex >> 4;
+    if (d[1] < 0xF0) d[1]++;
+    d[2]=cmd;
+    d[3]=0x80 | (chindex % 16);
+    if (intensity == max_intensity) {
+      d[4]=0;
+      serptr->Write((char *)d,5);
+    } else {
+      d[4]=IntensityMap[intensity];
+      d[5]=0;
+      serptr->Write((char *)d,6);
+    }
+  };
+
+  // shimmer or twinkle while ramping intensity up or down
+  virtual void shimtwinkfade (unsigned char cmd, int chindex, int period, int duration, int startintensity, int endintensity) {
+    unsigned char d[10];
+    d[3]=IntensityMap[startintensity];
+    d[4]=IntensityMap[endintensity];
+    if (d[3] == d[4]) {
+      shimtwink(cmd, chindex, period, startintensity);
+    } else {
+      d[0]=0;
+      d[1]=chindex >> 4;
+      if (d[1] < 0xF0) d[1]++;
+      d[2]=4;  // ramp command
+      int deltaInt=abs((int)d[3] - (int)d[4]);
+      int ramp=(int)((double)deltaInt/239.0*510.0*1000.0/(double)duration+0.5);
+      d[5]=ramp >> 8;
+      d[6]=ramp & 0xFF;
+      if (d[6] == 0) {
+        d[6]=1;
+        d[5] |= 0x40;
+      } else if (d[5] == 0) {
+        d[5] |= 0x80;
+      }
+      d[7]=0x80 | (chindex % 16);
+      d[8]=8-cmd; // 1=shimmer, 2=twinkle
+      d[9]=0;
+      //printf("D-Light shimtwinkfade 1=%02X 2=%02X 3=%02X 4=%02X 5=%02X 6=%02X 7=%02X\n",d[1],d[2],d[3],d[4],d[5],d[6],d[7]);
+      serptr->Write((char *)d,10);
+    }
+  };
+
 };
 
 
@@ -655,18 +709,30 @@ public:
     }
   };
 
-  void setnetwork (xNetwork* netobj, int netnum, int chcount, const wxString& portname, int baudrate) {
+  void setnetwork (const wxString& nettype3, int netnum, int chcount, const wxString& portname, int baudrate) {
+    xNetwork* netobj;
     if (networks[netnum]) throw "duplicate network defined";
+    if (nettype3 == wxT("LOR")) {
+        netobj = new xNetwork_LOR();
+    } else if (nettype3 == wxT("D-L")) {
+        netobj = new xNetwork_DLight();
+    } else if (nettype3 == wxT("Ren")) {
+        netobj = new xNetwork_Renard();
+    } else if (nettype3 == wxT("DMX")) {
+        netobj = new xNetwork_DMXentec();
+    } else {
+        throw "unknown network type";
+    }
     networks[netnum] = netobj;
     netobj->SetChannelCount(chcount);
     netobj->InitSerialPort(portname, baudrate);
     if (netnum > lastnetnum) lastnetnum = netnum;
   };
 
-  int addnetwork (xNetwork* netobj, int chcount, const wxString& portname, int baudrate) {
+  int addnetwork (const wxString& nettype3, int chcount, const wxString& portname, int baudrate) {
     for (int i=0; i<MAXNETWORKS; i++) {
       if (networks[i] == 0) {
-        setnetwork(netobj, i, chcount, portname, baudrate);
+        setnetwork(nettype3, i, chcount, portname, baudrate);
         return i;
       }
     }

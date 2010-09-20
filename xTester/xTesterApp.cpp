@@ -22,6 +22,7 @@
  **************************************************************/
 
 #include "xTesterApp.h"
+#include <wx/msgdlg.h>
 
 //(*AppHeaders
 #include "xTesterMain.h"
@@ -32,6 +33,14 @@ IMPLEMENT_APP(xTesterApp);
 
 bool xTesterApp::OnInit()
 {
+    wxString name = GetAppName() + wxT("-SingleInstanceCheck");
+    m_checker = new wxSingleInstanceChecker(name);
+    if ( m_checker->IsAnotherRunning() )
+    {
+        wxMessageBox(_("Another program instance is already running"), _("Error"));
+        return false;
+    }
+
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();
@@ -44,4 +53,10 @@ bool xTesterApp::OnInit()
     //*)
     return wxsOK;
 
+}
+
+int xTesterApp::OnExit()
+{
+    delete m_checker;
+    return 0;
 }

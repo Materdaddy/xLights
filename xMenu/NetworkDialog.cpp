@@ -77,7 +77,8 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 
     wxArrayString types;
     types.Add(_("DMX-Entec Pro/Lynx"));
-    types.Add(_("LOR/D-Light"));
+    types.Add(_("LOR"));
+    types.Add(_("D-Light"));
     types.Add(_("Renard"));
     wxGridCellAttr* col0=new wxGridCellAttr();
     col0->SetEditor(new wxGridCellChoiceEditor(types));

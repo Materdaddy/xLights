@@ -34,7 +34,7 @@ IMPLEMENT_APP(xScheduleApp);
 bool xScheduleApp::OnInit()
 {
     wxString name = GetAppName() + wxT("-SingleInstanceCheck");
-	m_checker = new wxSingleInstanceChecker(name);
+    m_checker = new wxSingleInstanceChecker(name);
     if ( m_checker->IsAnotherRunning() )
     {
         wxMessageBox(_("Another program instance is already running"), _("Error"));
@@ -46,9 +46,9 @@ bool xScheduleApp::OnInit()
     wxInitAllImageHandlers();
     if ( wxsOK )
     {
-    	xScheduleFrame* Frame = new xScheduleFrame(0);
-    	Frame->Show();
-    	SetTopWindow(Frame);
+      xScheduleFrame* Frame = new xScheduleFrame(0);
+      Frame->Show();
+      SetTopWindow(Frame);
     }
     //*)
     return wxsOK;

@@ -30,6 +30,7 @@
 #include <wx/stattext.h>
 #include <wx/menu.h>
 #include <wx/checkbox.h>
+#include <wx/listbox.h>
 #include <wx/radiobut.h>
 #include <wx/slider.h>
 #include <wx/panel.h>
@@ -125,23 +126,20 @@ class xTesterFrame: public wxFrame
         static const long ID_STATICTEXT9;
         static const long ID_PANEL3;
         static const long ID_CHECKBOX_RUNTW;
-        static const long ID_RADIOBUTTON_TWNOFADE;
-        static const long ID_RADIOBUTTON_TWFADE;
         static const long ID_STATICTEXT12;
-        static const long ID_STATICTEXT15;
         static const long ID_SLIDER_TWRATE;
         static const long ID_STATICTEXT13;
         static const long ID_STATICTEXT14;
         static const long ID_PANEL5;
         static const long ID_CHECKBOX_RUNSH;
-        static const long ID_RADIOBUTTON_SHNOFADE;
-        static const long ID_RADIOBUTTON_SHFADE;
         static const long ID_STATICTEXT16;
-        static const long ID_STATICTEXT17;
         static const long ID_SLIDER4;
         static const long ID_STATICTEXT18;
         static const long ID_STATICTEXT19;
         static const long ID_PANEL6;
+        static const long ID_CHECKBOX_AUTO;
+        static const long ID_LISTBOX_AUTOTEST;
+        static const long ID_PANEL7;
         static const long ID_NOTEBOOK1;
         static const long ID_PANEL4;
         static const long idMenuQuit;
@@ -162,12 +160,12 @@ class xTesterFrame: public wxFrame
         wxCheckBox* CheckBoxRunSh;
         wxStaticText* StaticText13;
         wxStaticText* StaticText2;
+        wxPanel* Panel4;
         wxStaticText* StaticText14;
         wxRadioButton* RadioButton16;
-        wxRadioButton* RadioButtonTwNoFade;
         wxButton* Button1;
         wxStaticText* StaticText6;
-        wxRadioButton* RadioButtonShNoFade;
+        wxSlider* SliderShIntensity;
         wxSlider* Slider3;
         wxStaticText* StaticText19;
         wxStaticText* StaticText8;
@@ -175,26 +173,23 @@ class xTesterFrame: public wxFrame
         wxStaticText* StaticText18;
         wxCheckBox* CheckBoxRunTw;
         wxPanel* Panel1;
+        wxCheckBox* CheckBoxRunAuto;
         wxStaticText* StaticText1;
         wxStaticText* StaticText3;
         wxPanel* Panel3;
         wxMenuItem* MenuItemHelpContent;
         wxCheckBox* CheckBoxRunAlt;
-        wxRadioButton* RadioButtonShFade;
         wxStaticText* StaticText5;
         wxStaticText* StaticText7;
         wxStatusBar* StatusBar1;
+        wxSlider* SliderTwIntensity;
         wxPanel* Panel_Seq;
-        wxSlider* SliderTwRate;
-        wxStaticText* StaticText15;
         wxStaticText* StaticText12;
-        wxRadioButton* RadioButtonTwFade;
+        wxListBox* ListBoxAutoTest;
         wxPanel* Panel2;
         wxSlider* SliderMasterDimmer;
         wxNotebook* Notebook2;
-        wxStaticText* StaticText17;
         wxStaticText* StaticText4;
-        wxSlider* SliderShRate;
         wxStaticText* StaticText16;
         wxPanel* Panel_Alt;
         wxCheckBox* CheckBoxRunSeq;

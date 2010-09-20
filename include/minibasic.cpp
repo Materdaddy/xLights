@@ -13,6 +13,8 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <iostream>
+#include <fstream>
 
 
 #define MINIBASIC_MAXFORS 16    /* maximum number of nested fors */
@@ -387,10 +389,10 @@ void reporterror(int lineno)
       sprintf(msgbuf, "Too many nested fors line %d\n", lineno);
       break;
     case ERR_NONEXT:
-      sprintf(msgbuf, "For without matching next line %d\n", lineno);
+      sprintf(msgbuf, "FOR without matching NEXT line %d\n", lineno);
       break;
     case ERR_NOFOR:
-      sprintf(msgbuf, "Next without matching for line %d\n", lineno);
+      sprintf(msgbuf, "Missing matching FOR line %d\n", lineno);
       break;
     case ERR_DIVIDEBYZERO:
       sprintf(msgbuf, "Divide by zero lne %d\n", lineno);
@@ -2325,6 +2327,46 @@ int do_goto(void)
 }
 
 /*
+*/
+int exitfor(char *id) {
+  char nextid[32];
+  int answer;
+  int len;
+  const char *savestring = string;
+  while(string = strchr(string, '\n')) {
+    errorflag = 0;
+    token = gettoken(string);
+    match(VALUE);
+    if(token->tokennum == NEXT) {
+      match(NEXT);
+      if(token->tokennum == FLTID || token->tokennum == DIMFLTID) {
+        getid(string, nextid, &len);
+        if(!id || !strcmp(id, nextid)) {
+          answer = getnextline(string);
+          string = savestring;
+          token = gettoken(string);
+          return answer ? answer : -1;
+        }
+      }
+    }
+  }
+
+  seterror(ERR_NONEXT);
+  return -1;
+}
+
+int do_exitfor(void) {
+  if (nfors) {
+    int nextline=exitfor(0);
+    if (nextline > 0) nfors--;
+    return nextline;
+  } else {
+    seterror(ERR_NOFOR);
+    return -1;
+  }
+}
+
+/*
   The FOR statement.
 
   Pushes the for stack.
@@ -2334,13 +2376,10 @@ int do_goto(void)
 int do_for(void) {
   LVALUE lv;
   char id[32];
-  char nextid[32];
   int len;
   double initval;
   double toval;
   double stepval;
-  const char *savestring;
-  int answer;
 
   getid(string, id, &len);
 
@@ -2368,27 +2407,7 @@ int do_for(void) {
   }
 
   if((stepval < 0 && initval < toval) || (stepval > 0 && initval > toval)) {
-    savestring = string;
-    while(string = strchr(string, '\n')) {
-      errorflag = 0;
-      token = gettoken(string);
-      match(VALUE);
-      if(token->tokennum == NEXT) {
-        match(NEXT);
-        if(token->tokennum == FLTID || token->tokennum == DIMFLTID) {
-          getid(string, nextid, &len);
-          if(!strcmp(id, nextid)) {
-            answer = getnextline(string);
-            string = savestring;
-            token = gettoken(string);
-            return answer ? answer : -1;
-          }
-        }
-      }
-    }
-
-    seterror(ERR_NONEXT);
-    return -1;
+    return exitfor(id);
   } else {
     strcpy(forstack[nfors].id, id);
     forstack[nfors].nextline = getnextline(string);
@@ -2475,6 +2494,47 @@ int do_input(void) {
       return -1;
     }
   }
+  return 0;
+}
+
+int do_readfile(void)
+{
+  char id[32];
+  int len;
+  char line[MINIBASIC_MAXPRINT];
+  char *filename = stringexpr();
+  match(COMMA);
+  getid(string, id, &len);
+  match(STRID);
+  strcat(id,"(");
+  DIMVAR* dimvar=finddimvar(id);
+  if (!dimvar) {
+      seterror(ERR_NOSUCHVARIABLE);
+      return -1;
+  }
+  if (dimvar->type != STRID) {
+      seterror(ERR_TYPEMISMATCH);
+      return -1;
+  }
+  int linecnt=0;
+  std::ifstream myfile(filename);
+  if (myfile.is_open()) {
+    while (!myfile.eof())
+    {
+      myfile.getline (line,MINIBASIC_MAXPRINT);
+      line[MINIBASIC_MAXPRINT-1]=0;
+      if (linecnt < dimvar->dim[0]) {
+        dimvar->str[linecnt] = mystrdup(line);
+        if(!dimvar->str[linecnt]) {
+          seterror(ERR_OUTOFMEMORY);
+          return -1;
+        }
+      }
+      linecnt++;
+    }
+    myfile.close();
+  }
+  free(filename);
   return 0;
 }
 
@@ -2666,6 +2726,8 @@ MiniBasicClass()
   AddCommand("REM",   &MiniBasicClass::do_rem);
   AddCommand("FOR",   &MiniBasicClass::do_for);
   NEXT=AddCommand("NEXT",  &MiniBasicClass::do_next);
+  AddCommand("EXITFOR",&MiniBasicClass::do_exitfor);
+  AddCommand("READFILE",&MiniBasicClass::do_readfile);
 
   THEN    =AddToken("THEN", TOK_OTHER);
   AND     =AddToken("AND",  TOK_OTHER);

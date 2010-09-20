@@ -1003,13 +1003,14 @@ void xScheduleFrame::LoadNetworkFile()
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
         for( wxXmlNode* e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
-            tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
-            tempstr.ToLong(&MaxChan);
-            if (e->GetName() == _("network")) {
-                AddNetwork(e->GetPropVal(wxT("NetworkType"), wxT("")),
-                           e->GetPropVal(wxT("ComPort"), wxT("")),
-                           e->GetPropVal(wxT("BaudRate"), wxT("")),
-                           MaxChan);
+            wxString tagname=e->GetName();
+            if (tagname == wxT("network")) {
+                wxString tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
+                tempstr.ToLong(&MaxChan);
+                wxString NetworkType=e->GetPropVal(wxT("NetworkType"), wxT(""));
+                wxString ComPort=e->GetPropVal(wxT("ComPort"), wxT(""));
+                wxString BaudRate=e->GetPropVal(wxT("BaudRate"), wxT(""));
+                AddNetwork(NetworkType,ComPort,BaudRate,MaxChan);
             }
         }
     } else {
@@ -1023,13 +1024,7 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
     wxString net3 = NetworkType.Left(3);
     int baud = atoi(BaudRate.mb_str(wxConvUTF8));
     try {
-        if (net3 == _("LOR")) {
-            netnum=xout.addnetwork(new xNetwork_LOR(),MaxChannels,ComPort,baud);
-        } else if (net3 == _("Ren")) {
-            netnum=xout.addnetwork(new xNetwork_Renard(),MaxChannels,ComPort,baud);
-        } else if (net3 == _("DMX")) {
-            netnum=xout.addnetwork(new xNetwork_DMXentec(),MaxChannels,ComPort,baud);
-        }
+        netnum=xout.addnetwork(net3,MaxChannels,ComPort,baud);
     }
     catch (const char *str) {
         wxString errmsg(str,wxConvUTF8);
