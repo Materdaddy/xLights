@@ -202,6 +202,7 @@ class xScheduleFrame: public wxFrame
             CHKBOX_MOVIEMODE,
             UP_BUTTON,
             DOWN_BUTTON,
+            INFO_BUTTON,
             PLAY_BUTTON,
             RUN_BUTTON,
             WIZARD_BUTTON,
@@ -243,6 +244,7 @@ class xScheduleFrame: public wxFrame
         long VixLastChannel;
         std::string VixEventData;
         VixChannelVector VixNetwork;
+        wxString mediaFilename;
 
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
         void ClearGridCell(const int& row, const int& col);
@@ -257,6 +259,8 @@ class xScheduleFrame: public wxFrame
         void AddPlaylist(const wxString& name);
         GridSelection getGridSelection(wxGrid & grid);
         bool CheckPorts();
+        bool LoadLorFile(wxString& FileName);
+        bool LoadVixenFile(wxString& FileName);
         void PlayLorFile(wxString& FileName);
         void PlayVixenFile(wxString& FileName);
         void LoadLorChannels(wxXmlNode* n);
@@ -279,6 +283,7 @@ class xScheduleFrame: public wxFrame
         void OnButtonPlayItemClick();
         void OnButtonUpClick();
         void OnButtonDownClick();
+        void OnButtonInfoClick();
         void OnButtonWizardClick();
         void OnMediaEnd( wxCommandEvent &event );
 

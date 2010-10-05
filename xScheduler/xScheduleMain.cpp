@@ -48,6 +48,7 @@
 #include "../include/up.xpm"
 #include "../include/down.xpm"
 #include "../include/play.xpm"
+#include "../include/info.xpm"
 
 
 /* ****************************************************
@@ -662,7 +663,7 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     wxFlexGridSizer* FlexGridSizer4 = new wxFlexGridSizer(3, 1, 0, 0);
     FlexGridSizer4->AddGrowableCol(0);
     FlexGridSizer4->AddGrowableRow(2);
-    wxFlexGridSizer* FlexGridSizer5 = new wxFlexGridSizer(0, 5, 0, 0);
+    wxFlexGridSizer* FlexGridSizer5 = new wxFlexGridSizer(0, 6, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
     wxStaticText* StaticText1 = new wxStaticText(PanelPlayList, -1, _("Play List"));
     wxFont StaticText1Font(10,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
@@ -687,6 +688,13 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     BitmapButtonDown->SetToolTip(_("Move Item Down"));
     FlexGridSizer5->Add(BitmapButtonDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonDownClick);
+
+    id=baseid+INFO_BUTTON;
+    wxBitmapButton* BitmapButtonInfo = new wxBitmapButton(PanelPlayList, id, wxBitmap(info_xpm));
+    BitmapButtonInfo->SetDefault();
+    BitmapButtonInfo->SetToolTip(_("Sequence Information"));
+    FlexGridSizer5->Add(BitmapButtonInfo, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonInfoClick);
 
     id=baseid+PLAY_BUTTON;
     wxBitmapButton* ButtonPlay = new wxBitmapButton(PanelPlayList, id, wxBitmap(play_xpm));
@@ -920,7 +928,7 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 endmsec=LorIter->second->EndCentiSec * 10;
                 netnum=LorIter->second->netnum;
                 chindex=LorIter->second->chindex;
-                TextCtrlLog->AppendText(wxString::Format(_(" LOR ms=%ld, ch=%d, st=%d, en=%d\n"),msec,chindex,startmsec,endmsec));
+                //TextCtrlLog->AppendText(wxString::Format(_(" LOR ms=%ld, ch=%d, st=%d, en=%d\n"),msec,chindex,startmsec,endmsec));
                 if (LorIter->second->EndIntesity == -1) {
                     switch (LorIter->second->action) {
                         case LOR_INTENSITY:
@@ -1109,7 +1117,7 @@ void xScheduleFrame::ScanForFiles()
 char xScheduleFrame::ExtType(const wxString& ext) {
     if (ext == _("vix")) {
         return 'V';
-    } else if (ext == _("lms")) {
+    } else if (ext == _("lms") || ext == _("las")) {
         return 'L';
     } else if (ext == _("wav") || ext == _("mp3") ||
                ext == _("wma") || ext == _("aac")) {
@@ -1195,33 +1203,42 @@ bool xScheduleFrame::CheckPorts()
 void xScheduleFrame::PlayLorFile(wxString& FileName)
 {
     if (!CheckPorts()) return;
+    if (!LoadLorFile(FileName)) return;
+    xout.SetMaxIntensity(100);
+    if (!wxFile::Exists(mediaFilename)) {
+        PlayerError(_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences."));
+    } else if (PlayerDlg->MediaCtrl->Load(mediaFilename)) {
+        ShowPlayerSingle();
+        ResetTimer(PAUSE_LOR);
+    } else {
+        PlayerError(_("Unable to play file:\n")+mediaFilename);
+    }
+}
+
+bool xScheduleFrame::LoadLorFile(wxString& FileName)
+{
     LorEvents.clear();
+    mediaFilename.clear();
     wxXmlDocument doc;
     if (doc.Load( FileName )) {
         wxXmlNode* root=doc.GetRoot();
-        wxString musicFilename=root->GetPropVal(wxT("musicFilename"), wxT(""));
+        mediaFilename=root->GetPropVal(wxT("musicFilename"), wxT(""));
         for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
             if (e->GetName() == _("channels")) {
                 LoadLorChannels(e);
             }
         }
-        xout.SetMaxIntensity(100);
-
-        wxPathFormat PathFmt = musicFilename.Contains(_("\\")) ? wxPATH_DOS : wxPATH_NATIVE;
-        wxFileName fn1(musicFilename, PathFmt);
+        wxPathFormat PathFmt = mediaFilename.Contains(_("\\")) ? wxPATH_DOS : wxPATH_NATIVE;
+        wxFileName fn1(mediaFilename, PathFmt);
         if (!fn1.FileExists()) {
             wxFileName fn2(CurrentDir,fn1.GetFullName());
-            musicFilename=fn2.GetFullPath();
+            mediaFilename=fn2.GetFullPath();
         }
-        if (wxFile::Exists(musicFilename) && PlayerDlg->MediaCtrl->Load(musicFilename)) {
-            ShowPlayerSingle();
-            ResetTimer(PAUSE_LOR);
-        } else {
-            PlayerError(_("Unable to play file:\n")+musicFilename);
-        }
+        return true;
     } else {
         PlayerError(_("Unable to load sequence:\n")+FileName);
     }
+    return false;
 }
 
 void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
@@ -1289,12 +1306,33 @@ void xScheduleFrame::LoadLorChannel(wxXmlNode* n, int netnum, int chindex)
 
 void xScheduleFrame::PlayVixenFile(wxString& FileName)
 {
+    if (!CheckPorts()) return;
+    if (!LoadVixenFile(FileName)) return;
+    if (VixEventPeriod < 0) {
+        PlayerError(_("EventPeriodInMilliseconds is undefined"));
+    } else if (VixLastChannel <= 0) {
+        PlayerError(_("Unable to determine number of channels"));
+    } else if (!wxFile::Exists(mediaFilename)) {
+        PlayerError(_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences."));
+    } else if (!PlayerDlg->MediaCtrl->Load(mediaFilename)) {
+        PlayerError(_("Unable to play file:\n")+mediaFilename);
+    } else {
+        VixNumPeriods = VixEventData.size() / VixLastChannel;
+        //wxString msg = wxString::Format(_("Data size=%d, Channel Count=%d, NumPeriods=%d, Period Len=%d, Media File=%s"),VixEventData.size(),VixLastChannel,VixNumPeriods,VixEventPeriod,fn.GetFullPath().c_str());
+        //StatusBar1->SetStatusText(msg);
+        ResetTimer(PAUSE_VIX);
+        ShowPlayerSingle();
+    }
+}
+
+bool xScheduleFrame::LoadVixenFile(wxString& FileName)
+{
     long MaxIntensity = 255;
     long toValue;
     wxString tag,tempstr;
     wxFileName fn;
     fn.AssignDir(CurrentDir);
-    if (!CheckPorts()) return;
+    mediaFilename.clear();
     VixLastChannel = -1;
     VixEventPeriod=-1;
     wxXmlDocument doc( FileName );
@@ -1311,6 +1349,7 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
             } else if (tag == _("Audio") || tag == _("Song")) {
                 wxString filename=e->GetPropVal(wxT("filename"), wxT(""));
                 fn.SetFullName(filename);
+                mediaFilename = fn.GetFullPath();
             } else if (tag == _("EventValues")) {
                 VixEventData = base64_decode(e->GetNodeContent());
             } else if (tag == _("PlugInData")) {
@@ -1327,25 +1366,11 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
             }
         }
         xout.SetMaxIntensity(MaxIntensity);
-
-        if (VixEventPeriod < 0) {
-            PlayerError(_("EventPeriodInMilliseconds is undefined"));
-        } else if (VixLastChannel <= 0) {
-            PlayerError(_("Unable to determine number of channels"));
-        } else if (!fn.FileExists()) {
-            PlayerError(_("No such file:\n")+fn.GetFullPath());
-        } else if (!PlayerDlg->MediaCtrl->Load(fn.GetFullPath())) {
-            PlayerError(_("Unable to play file:\n")+fn.GetFullPath());
-        } else {
-            VixNumPeriods = VixEventData.size() / VixLastChannel;
-            //wxString msg = wxString::Format(_("Data size=%d, Channel Count=%d, NumPeriods=%d, Period Len=%d, Media File=%s"),VixEventData.size(),VixLastChannel,VixNumPeriods,VixEventPeriod,fn.GetFullPath().c_str());
-            //StatusBar1->SetStatusText(msg);
-            ResetTimer(PAUSE_VIX);
-            ShowPlayerSingle();
-        }
+        return true;
     } else {
         PlayerError(_("Unable to load sequence:\n")+FileName);
     }
+    return false;
 }
 
 void xScheduleFrame::OnButtonUpClick()
@@ -1380,6 +1405,52 @@ void xScheduleFrame::OnButtonDownClick()
     CheckListBoxPlay->Check((unsigned int)idx, c);
     CheckListBoxPlay->Select(idx);
     UnsavedChanges=true;
+}
+
+void xScheduleFrame::OnButtonInfoClick()
+{
+    int baseid=1000*Notebook1->GetSelection();
+    wxCheckListBox* CheckListBoxPlay=(wxCheckListBox*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
+    int idx = CheckListBoxPlay->GetSelection();
+    if (idx == wxNOT_FOUND) return;
+    wxString filename = CheckListBoxPlay->GetString((unsigned int)idx);
+    wxString msg = _("Information for ") + filename + _("\n\n");
+
+    wxFileName oName(CurrentDir, filename);
+    wxString fullpath=oName.GetFullPath();
+    switch (ExtType(oName.GetExt())) {
+        case 'L':
+            if (LoadLorFile(fullpath)) {
+                if (mediaFilename.IsEmpty()) {
+                    msg+=_("Media file: none");
+                } else if (!wxFile::Exists(mediaFilename)) {
+                    msg+=_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences.");
+                } else {
+                    msg+=_("Media file:\n") + mediaFilename;
+                }
+            } else {
+                msg+=_("Unable to load sequence file:\n") + fullpath;
+            }
+            break;
+        case 'V':
+            if (LoadVixenFile(fullpath)) {
+                if (mediaFilename.IsEmpty()) {
+                    msg+=_("Media file: none");
+                } else if (!wxFile::Exists(mediaFilename)) {
+                    msg+=_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences.");
+                } else {
+                    msg+=_("Media file:\n") + mediaFilename;
+                }
+            } else {
+                msg+=_("Unable to load sequence file:\n") + fullpath;
+            }
+            break;
+        default:
+            msg+=_("Please select a Vixen or LOR sequence when using this command.");
+            break;
+    }
+
+    wxMessageBox(msg, _("Info"));
 }
 
 void xScheduleFrame::OnAuiToolBarItemAddClick(wxCommandEvent& event)

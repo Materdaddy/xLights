@@ -749,6 +749,7 @@ public:
   // duration is in milliseconds
   // intensity values are relative to the last SetMaxIntensity call
   void ramp (int netnum, int chindex, int duration, int startintensity, int endintensity) {
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->ramp(chindex, duration, startintensity, endintensity);
   };
@@ -756,7 +757,7 @@ public:
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
   void SetIntensity (int netnum, int chindex, int intensity) {
-    if (netnum < 0 || netnum >= MAXNETWORKS) return;
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->SetIntensity(chindex, intensity);
   };
@@ -764,26 +765,31 @@ public:
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
   void twinkle (int netnum, int chindex, int period, int intensity) {
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->twinkle(chindex, period, intensity);
   };
 
   void twinklefade (int netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->twinklefade(chindex, period, duration, startintensity, endintensity);
   };
 
   void shimmer (int netnum, int chindex, int period, int intensity) {
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->shimmer(chindex, period, intensity);
   };
 
   void shimmerfade (int netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->shimmerfade(chindex, period, duration, startintensity, endintensity);
   };
 
   void off (int netnum, int chindex) {
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->off(chindex);
   };
