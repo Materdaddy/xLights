@@ -52,7 +52,8 @@ enum ErrorCodes {
   ERR_TYPEMISMATCH,
   ERR_INPUTTOOLONG,
   ERR_BADVALUE,
-  ERR_NOTINT
+  ERR_NOTINT,
+  ERR_IO
 };
 
 enum RelationOps {
@@ -70,6 +71,12 @@ enum toktypes {
   TOK_SFUNC,
   TOK_CHAR,
   TOK_OTHER
+};
+
+enum ReturnCodes {
+  EXEC_PAUSE = -2,   // pause execution
+  EXEC_HALT = -1,    // halt execution
+  EXEC_NEXTLINE = 0  // execute next line in program
 };
 
 typedef struct {
@@ -423,6 +430,9 @@ void reporterror(int lineno)
       break;
     case ERR_NOTINT:
       sprintf(msgbuf, "Not an integer at line %d\n", lineno);
+      break;
+    case ERR_IO:
+      sprintf(msgbuf, "input/output error at line %d\n", lineno);
       break;
     default:
       sprintf(msgbuf, "ERROR line %d\n", lineno);
@@ -1772,7 +1782,7 @@ int do_print(void) {
     strncat(buff,"\n",remlen);
   }
   outfunc(buff);
-  return 0;
+  return EXEC_NEXTLINE;
 }
 
 /*
@@ -1953,7 +1963,7 @@ int do_let(void) {
     if(temp)
     free(temp);
   }
-  return 0;
+  return EXEC_NEXTLINE;
 }
 
 /*
@@ -2083,7 +2093,7 @@ int do_dim(void) {
       dims[ndims++] = expr();
       if(ndims > 5) {
         seterror(ERR_TOOMANYDIMS);
-        return -1;
+        return EXEC_HALT;
       }
     }
 
@@ -2092,7 +2102,7 @@ int do_dim(void) {
     for(i=0;i<ndims;i++) {
       if(dims[i] < 0 || dims[i] != (int) dims[i]) {
         seterror(ERR_BADSUBSCRIPT);
-        return -1;
+        return EXEC_HALT;
       }
     }
     switch(ndims) {
@@ -2114,13 +2124,13 @@ int do_dim(void) {
     }
   } else {
     seterror(ERR_SYNTAX);
-    return -1;
+    return EXEC_HALT;
   }
 
   if(dimvar == 0) {
     /* out of memory */
     seterror(ERR_OUTOFMEMORY);
-    return -1;
+    return EXEC_HALT;
   }
 
   if(token->tokennum == EQUALS) {
@@ -2155,10 +2165,10 @@ int do_dim(void) {
 
     if(token->tokennum == COMMA) {
       seterror(ERR_TOOMANYINITS);
-      return -1;
+      return EXEC_HALT;
     }
   }
-  return 0;
+  return EXEC_NEXTLINE;
 }
 
 /*
@@ -2314,7 +2324,7 @@ int do_if(void)
   if(condition)
     return jump;
   else
-    return 0;
+    return EXEC_NEXTLINE;
 }
 
 /*
@@ -2345,14 +2355,14 @@ int exitfor(char *id) {
           answer = getnextline(string);
           string = savestring;
           token = gettoken(string);
-          return answer ? answer : -1;
+          return answer ? answer : EXEC_HALT;
         }
       }
     }
   }
 
   seterror(ERR_NONEXT);
-  return -1;
+  return EXEC_HALT;
 }
 
 int do_exitfor(void) {
@@ -2362,7 +2372,7 @@ int do_exitfor(void) {
     return nextline;
   } else {
     seterror(ERR_NOFOR);
-    return -1;
+    return EXEC_HALT;
   }
 }
 
@@ -2370,7 +2380,7 @@ int do_exitfor(void) {
   The FOR statement.
 
   Pushes the for stack.
-  Returns line to jump to, or -1 to end program
+  Returns line to jump to, or EXEC_HALT to end program
 
 */
 int do_for(void) {
@@ -2386,7 +2396,7 @@ int do_for(void) {
   lvalue(&lv);
   if(lv.type != FLTID) {
     seterror(ERR_BADTYPE);
-    return -1;
+    return EXEC_HALT;
   }
   match(EQUALS);
   initval = expr();
@@ -2403,7 +2413,7 @@ int do_for(void) {
 
   if(nfors > MINIBASIC_MAXFORS - 1) {
     seterror(ERR_TOOMANYFORS);
-    return -1;
+    return EXEC_HALT;
   }
 
   if((stepval < 0 && initval < toval) || (stepval > 0 && initval > toval)) {
@@ -2414,7 +2424,7 @@ int do_for(void) {
     forstack[nfors].step = stepval;
     forstack[nfors].toval = toval;
     nfors++;
-    return 0;
+    return EXEC_NEXTLINE;
   }
 }
 
@@ -2432,19 +2442,19 @@ int do_next(void) {
     lvalue(&lv);
     if(lv.type != FLTID) {
       seterror(ERR_BADTYPE);
-      return -1;
+      return EXEC_HALT;
     }
     *lv.dval += forstack[nfors-1].step;
     if( (forstack[nfors-1].step < 0 && *lv.dval < forstack[nfors-1].toval) ||
       (forstack[nfors-1].step > 0 && *lv.dval > forstack[nfors-1].toval) ) {
       nfors--;
-      return 0;
+      return EXEC_NEXTLINE;
     } else {
         return forstack[nfors-1].nextline;
     }
   } else {
     seterror(ERR_NOFOR);
-    return -1;
+    return EXEC_HALT;
   }
 }
 
@@ -2469,7 +2479,7 @@ int do_input(void) {
     while(sscanf(end, "%lf", lv.dval) != 1) {
       if(!*end) {
         seterror(ERR_EOF);
-        return -1;
+        return EXEC_HALT;
       }
       end++;
     }
@@ -2480,21 +2490,21 @@ int do_input(void) {
     }
     if(!*end) {
       seterror(ERR_EOF);
-      return -1;
+      return EXEC_HALT;
     }
     end = strchr(buff, '\n');
     if(!end) {
       seterror(ERR_INPUTTOOLONG);
-      return -1;
+      return EXEC_HALT;
     }
     *end = 0;
     *lv.sval = mystrdup(buff);
     if(!*lv.sval) {
       seterror(ERR_OUTOFMEMORY);
-      return -1;
+      return EXEC_HALT;
     }
   }
-  return 0;
+  return EXEC_NEXTLINE;
 }
 
 int do_readfile(void)
@@ -2510,11 +2520,11 @@ int do_readfile(void)
   DIMVAR* dimvar=finddimvar(id);
   if (!dimvar) {
       seterror(ERR_NOSUCHVARIABLE);
-      return -1;
+      return EXEC_HALT;
   }
   if (dimvar->type != STRID) {
       seterror(ERR_TYPEMISMATCH);
-      return -1;
+      return EXEC_HALT;
   }
   int linecnt=0;
   std::ifstream myfile(filename);
@@ -2527,7 +2537,7 @@ int do_readfile(void)
         dimvar->str[linecnt] = mystrdup(line);
         if(!dimvar->str[linecnt]) {
           seterror(ERR_OUTOFMEMORY);
-          return -1;
+          return EXEC_HALT;
         }
       }
       linecnt++;
@@ -2535,7 +2545,7 @@ int do_readfile(void)
     myfile.close();
   }
   free(filename);
-  return 0;
+  return EXEC_NEXTLINE;
 }
 
 /*
@@ -2545,7 +2555,7 @@ int do_rem(void)
 {
   while (*string && *string != '\n')
     string++;
-  return 0;
+  return EXEC_NEXTLINE;
 }
 
 /*
@@ -2624,13 +2634,13 @@ virtual bool runFromLineIdx(int curline = 0) {
     if(errorflag) {
       reporterror(lines[curline].no);
       answer = false;
-      break;
+      nextline == EXEC_HALT;
     }
 
-    if(nextline == -1)
+    if(nextline == EXEC_HALT)
       break;
 
-    if(nextline == 0) {
+    if(nextline == EXEC_NEXTLINE) {
       curline++;
       if(curline == nlines) break;
     } else {

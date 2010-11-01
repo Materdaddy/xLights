@@ -84,12 +84,7 @@ class SerialPort : public SerialPort_x
     {
        if (strlen(protocol) != 3) return -1;
 
-#ifdef __WXWINDOWS__
        fd = open(devname.fn_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-#else
-       // for unit test (not a wxWidgets app)
-       fd = open(devname.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-#endif
        if(fd < 0) return fd;
 
         // exclusive use
@@ -167,11 +162,15 @@ class SerialPort : public SerialPort_x
        return (fd != -1);
     };
 
+    int AvailableToRead()
+    {
+      int bytes = 0;
+      ioctl(fd, FIONREAD, &bytes);
+      return bytes;
+    }
+
     int Read(char* buf,size_t len)
     {
-       if(m_fifo->items() > 0) {
-        return m_fifo->read(buf,len);
-       }
        // Read() (using read() ) will return an 'error' EAGAIN as it is
        // set to non-blocking. This is not a true error within the
        // functionality of Read, and thus should be handled by the caller.

@@ -90,6 +90,7 @@ You will need:
      2) cd to the build\msw directory under your wxWidgets base directory
      3) run: mingw32-make -f makefile.gcc MONOLITHIC=1 SHARED=1 UNICODE=1 BUILD=debug
      4) run: mingw32-make -f makefile.gcc MONOLITHIC=1 SHARED=1 UNICODE=1 BUILD=release
+        if you get errors then you need to update mingw binutils and make
   d) In Code::Blocks:
      1) select Settings > Compiler & Debugger
      2) click Search Directories tab

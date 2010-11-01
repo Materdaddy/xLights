@@ -15,13 +15,6 @@ class PlayerFrame: public wxFrame
 		virtual ~PlayerFrame();
         wxMediaCtrl* MediaCtrl;
 
-        // Media event handlers
-        //void OnMediaPlay(wxMediaEvent& event);
-        //void OnMediaPause(wxMediaEvent& event);
-        //void OnMediaStop(wxMediaEvent& event);
-        void OnMediaFinished(wxMediaEvent& event);
-        void OnMediaLoaded(wxMediaEvent& event);
-
 		//(*Declarations(PlayerFrame)
 		//*)
 

@@ -62,6 +62,7 @@
 #include "RenListDialog.h"
 #include "WizardDialog.h"
 #include "../include/globals.h"
+#include "../include/xlights_out.cpp"
 
 enum LOR_ACTIONS {
     LOR_INTENSITY,
@@ -109,6 +110,7 @@ class xScheduleFrame: public wxFrame
         void BasicError(const char *msg);
         char ExtType(const wxString& ext);
         void Play(wxString& filename);
+        void StopPlayback();
         void StartScript(const char *scriptname);
         void EndScript(const char *scriptname);
 
@@ -212,6 +214,10 @@ class xScheduleFrame: public wxFrame
 
         enum SeqPlayerStates {
             NO_SEQ,
+            STARTING_MEDIA,
+            STARTING_LOR,
+            STARTING_VIX,
+            PLAYING_MEDIA,
             PLAYING_LOR,
             PLAYING_VIX,
             PAUSE_LOR,
@@ -234,6 +240,7 @@ class xScheduleFrame: public wxFrame
         bool UnsavedChanges;
         bool PortsOK;
         LorEventMap LorEvents;
+        long LorLastUnit[MAXNETWORKS];
         wxTimer timer;
         wxTimer schedtimer;
         wxDateTime starttime;
@@ -249,6 +256,7 @@ class xScheduleFrame: public wxFrame
         void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
         void ClearGridCell(const int& row, const int& col);
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
+        wxString LorNetDesc(int netnum);
         void LoadNetworkFile();
         void LoadScheduleFile();
         void LoadSchedule(wxXmlNode* n);

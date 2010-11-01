@@ -35,7 +35,6 @@
 #include <wx/string.h>
 //*)
 
-#include "../include/xlights_out.cpp"
 #include "../include/minibasic.cpp"
 
 // image files
@@ -93,7 +92,6 @@ wxBitmap MyArtProvider::CreateBitmap(const wxArtID& id,
 };
 
 
-
 /* ****************************************************
  * Extend the MiniBasic script class
  * with customized commands for xLights
@@ -105,8 +103,10 @@ protected:
 
     xScheduleFrame* xsched;
     wxCheckListBox* playlist;
+    std::vector<ctb::SerialPort> SerialPorts;
     bool haltflag;
     int runstate;
+    int playbackend_goto;
 
     void infunc(char* prompt, char* buff, int size) {
     }
@@ -121,7 +121,62 @@ protected:
 
     // suspend script execution
     int do_wait(void) {
-        return -2;
+        return EXEC_PAUSE;
+    }
+
+    // LET handle=SERIALOPEN("COM1",9600,"8N1")
+    // returns a handle to the port
+    double do_serialopen(void) {
+        match(OPAREN);
+        wxString portname(stringexpr(),wxConvFile);
+        if(!portname) return 0;
+        match(COMMA);
+        int baudrate = integer( expr() );
+        match(COMMA);
+        char *SerialConfig = stringexpr();
+        if(!SerialConfig) return 0;
+        match(CPAREN);
+
+        ctb::SerialPort port;
+        SerialPorts.push_back(port);
+        int handle=SerialPorts.size()-1;
+        int errcode=SerialPorts[handle].Open(portname, baudrate, SerialConfig);
+        if (errcode < 0) {
+            seterror(ERR_IO);
+        }
+        return (double)handle;
+    }
+
+    // write to a serial port
+    int do_serialwrite(void) {
+        int handle = integer( expr() );
+        match(COMMA);
+        char *datastr = stringexpr();
+        if(!datastr) return 0;
+        if (handle >= 0 && handle < SerialPorts.size()) {
+            SerialPorts[handle].Write(datastr,strlen(datastr));
+        } else {
+            seterror(ERR_ILLEGALOFFSET);
+        }
+        return EXEC_NEXTLINE;
+    }
+
+    // reads data from a serial port
+    char* do_serialread(void) {
+        char *answer = 0;
+        char buf[100];
+        match(OPAREN);
+        int handle = integer( expr() );
+        match(CPAREN);
+        if (handle >= 0 && handle < SerialPorts.size()) {
+            int cnt = SerialPorts[handle].Read(buf,sizeof(buf)-1);
+            buf[cnt]=0;
+            answer = mystrdup(buf);
+            if(!answer) seterror(ERR_OUTOFMEMORY);
+        } else {
+            seterror(ERR_ILLEGALOFFSET);
+        }
+        return answer;
     }
 
     // returns the length of the playlist
@@ -129,7 +184,7 @@ protected:
         return playlist->GetCount();
     }
 
-    // returns the length of the playlist
+    // returns number of seconds remaining in scheduled play time
     double do_secondsremaining(void) {
         return xsched->SecondsRemaining;
     }
@@ -191,7 +246,28 @@ protected:
         } else {
             seterror(ERR_ILLEGALOFFSET);
         }
-        return 0;
+        return EXEC_NEXTLINE;
+    };
+
+    int do_StopPlayback(void)
+    {
+        xsched->StopPlayback();
+        return EXEC_NEXTLINE;
+    }
+
+    int do_OnPlaybackEnd(void)
+    {
+        playbackend_goto = integer( expr() );
+        return EXEC_NEXTLINE;
+    }
+
+    int do_OnSerialRx(void)
+    {
+        int handle = integer( expr() );
+        match(COMMA);
+        int rxgoto = integer( expr() );
+        SerialPorts[handle].SetCallback(rxgoto);
+        return EXEC_NEXTLINE;
     }
 
     /*
@@ -203,10 +279,13 @@ protected:
       bool answer = true;
       char msgbuf[100];
 
-      nfors = 0;
+      //nfors = 0;
       runstate=1;
       haltflag=false;
       while(curline != -1) {
+        // uncomment to trace
+        //sprintf(msgbuf, " at line %d\n", lines[curline].no);
+        //outfunc(msgbuf);
         string = lines[curline].str;
         token = gettoken(string);
         errorflag = 0;
@@ -223,7 +302,7 @@ protected:
 
         wxYield(); // allow the UI to process events while script is running
 
-        if(nextline == 0) {
+        if(nextline == EXEC_NEXTLINE) {
           curline++;
           if(curline == nlines) break;
         } else if (haltflag) {
@@ -242,11 +321,9 @@ protected:
         }
       }
 
-      if (nextline == -2 && answer) {
-          runstate=-1;  // suspended
-      } else {
-          runstate=0;
-          xsched->EndScript(scriptname);
+      runstate=-1;  // suspended
+      if (nextline != EXEC_PAUSE || answer == false) {
+          halt();
       }
       return answer;
     }
@@ -259,8 +336,14 @@ public:
         AddNumericFunction("PLAYLISTSIZE", static_cast<NumericFuncPtr>(&xlbasic::do_playlistsize));
         AddStringFunction("ITEMNAME$", static_cast<StringFuncPtr>(&xlbasic::do_itemname));
         AddStringFunction("ITEMTYPE$", static_cast<StringFuncPtr>(&xlbasic::do_itemtype));
+        AddStringFunction("SERIALREAD$", static_cast<StringFuncPtr>(&xlbasic::do_serialread));
         AddNumericFunction("ITEMCHECKED", static_cast<NumericFuncPtr>(&xlbasic::do_itemchecked));
+        AddNumericFunction("SERIALOPEN", static_cast<NumericFuncPtr>(&xlbasic::do_serialopen));
+        AddCommand("SERIALWRITE", static_cast<CommandPtr>(&xlbasic::do_serialwrite));
         AddCommand("PLAYITEM", static_cast<CommandPtr>(&xlbasic::do_PlayItem));
+        AddCommand("STOPPLAYBACK", static_cast<CommandPtr>(&xlbasic::do_StopPlayback));
+        AddCommand("ONPLAYBACKEND", static_cast<CommandPtr>(&xlbasic::do_OnPlaybackEnd));
+        AddCommand("ONSERIALRX", static_cast<CommandPtr>(&xlbasic::do_OnSerialRx));
         AddCommand("WAIT", static_cast<CommandPtr>(&xlbasic::do_wait));
     };
 
@@ -278,7 +361,30 @@ public:
             haltflag=true;
         } else if (runstate != 0) {
             runstate=0;
+            SerialPorts.clear();
             xsched->EndScript(scriptname);
+        }
+    }
+
+    void PlaybackEndCallback()
+    {
+        if (runstate==-1 && playbackend_goto > 0) {
+            if (!runat(playbackend_goto)) halt();
+        }
+    }
+
+    void SerialCallback()
+    {
+        //char msgbuf[100];
+        if (runstate!=-1) return;
+        for (int i=0; i < SerialPorts.size(); i++) {
+            int rxgoto = SerialPorts[i].GetCallback();
+            if (rxgoto > 0 && SerialPorts[i].AvailableToRead() > 0) {
+                //sprintf(msgbuf, "SerialCallback to line %d\n", rxgoto);
+                //outfunc(msgbuf);
+                if (!runat(rxgoto)) halt();
+                return;
+            }
         }
     }
 
@@ -291,6 +397,7 @@ public:
       Returns: true on success, false on error condition.
     */
     virtual bool run() {
+        playbackend_goto=-1;
         xsched->StartScript(scriptname);
         return runFromLineIdx(0);
     }
@@ -369,7 +476,6 @@ BEGIN_EVENT_TABLE(xScheduleFrame,wxFrame)
     //*)
     EVT_TIMER(ID_TIMER, xScheduleFrame::OnTimer)
     EVT_TIMER(ID_SCHED_TIMER, xScheduleFrame::OnSchedTimer)
-    EVT_COMMAND(ID_PLAYER_DIALOG, wxEVT_MEDIA_FINISHED, xScheduleFrame::OnMediaEnd)
 END_EVENT_TABLE()
 
 xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
@@ -914,9 +1020,46 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
     char vixintensity;
     wxTimeSpan ts;
     switch (SeqPlayerState) {
+        case STARTING_MEDIA:
+            TimerNoPlay();
+            if(PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING){
+                SeqPlayerState = PLAYING_MEDIA;
+            } else {
+                PlayerDlg->MediaCtrl->Play();
+            }
+            break;
+        case PLAYING_MEDIA:
+            if (PlayerDlg->MediaCtrl->GetState() != wxMEDIASTATE_PLAYING) {
+                ResetTimer(NO_SEQ);
+                // reached end of song/sequence, so execute callback (if defined)
+                basic.PlaybackEndCallback();
+                return;
+            } else {
+                TimerNoPlay();
+            }
+            break;
+        case STARTING_LOR:
+            if(PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING){
+                LorIter=LorEvents.begin();
+                ResetTimer(PLAYING_LOR);
+            } else {
+                PlayerDlg->MediaCtrl->Play();
+            }
+            break;
+        case STARTING_VIX:
+            if(PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING){
+                if (VixLastChannel > VixNetwork.size()) VixLastChannel=VixNetwork.size();
+                LastIntensity.resize(VixLastChannel,1);
+                ResetTimer(PLAYING_VIX);
+            } else {
+                PlayerDlg->MediaCtrl->Play();
+            }
+            break;
         case PLAYING_LOR:
             if (PlayerDlg->MediaCtrl->GetState() != wxMEDIASTATE_PLAYING) {
                 ResetTimer(PAUSE_LOR);
+                // reached end of song/sequence, so execute callback (if defined)
+                basic.PlaybackEndCallback();
                 return;
             }
             msec = PlayerDlg->MediaCtrl->Tell();
@@ -972,6 +1115,8 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
         case PLAYING_VIX:
             if (PlayerDlg->MediaCtrl->GetState() != wxMEDIASTATE_PLAYING) {
                 ResetTimer(PAUSE_VIX);
+                // reached end of song/sequence, so execute callback (if defined)
+                basic.PlaybackEndCallback();
                 return;
             }
             msec = PlayerDlg->MediaCtrl->Tell();
@@ -1002,6 +1147,7 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             break;
     }
     lastmsec=msec;
+    basic.SerialCallback();
 }
 
 void xScheduleFrame::LoadNetworkFile()
@@ -1120,7 +1266,8 @@ char xScheduleFrame::ExtType(const wxString& ext) {
     } else if (ext == _("lms") || ext == _("las")) {
         return 'L';
     } else if (ext == _("wav") || ext == _("mp3") ||
-               ext == _("wma") || ext == _("aac")) {
+               ext == _("wma") || ext == _("aac") ||
+               ext == _("mid")) {
         return 'a';
     } else if (ext == _("avi") || ext == _("mp4") ||
                ext == _("wmv") || ext == _("mov")) {
@@ -1169,6 +1316,12 @@ void xScheduleFrame::ShowPlayerSingle()
 }
 
 
+void xScheduleFrame::StopPlayback()
+{
+    ResetTimer(NO_SEQ);
+}
+
+
 void xScheduleFrame::Play(wxString& filename) {
     wxFileName oName(CurrentDir, filename);
     wxString fullpath=oName.GetFullPath();
@@ -1176,7 +1329,7 @@ void xScheduleFrame::Play(wxString& filename) {
         case 'a':
         case 'v':
             if (wxFile::Exists(fullpath) && PlayerDlg->MediaCtrl->Load(fullpath)) {
-                ResetTimer(NO_SEQ);
+                ResetTimer(STARTING_MEDIA);
                 ShowPlayerSingle();
             } else {
                 PlayerError(_("Unable to play file:\n")+filename);
@@ -1209,7 +1362,7 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
         PlayerError(_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences."));
     } else if (PlayerDlg->MediaCtrl->Load(mediaFilename)) {
         ShowPlayerSingle();
-        ResetTimer(PAUSE_LOR);
+        ResetTimer(STARTING_LOR);
     } else {
         PlayerError(_("Unable to play file:\n")+mediaFilename);
     }
@@ -1218,6 +1371,9 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
 bool xScheduleFrame::LoadLorFile(wxString& FileName)
 {
     LorEvents.clear();
+    for (int i=0; i<MAXNETWORKS; i++) {
+        LorLastUnit[i]=-1;
+    }
     mediaFilename.clear();
     wxXmlDocument doc;
     if (doc.Load( FileName )) {
@@ -1244,6 +1400,7 @@ bool xScheduleFrame::LoadLorFile(wxString& FileName)
 void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
 {
     long netnum, unit, circuit;
+    int chindex;
     wxString tempstr;
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() != _("channel")) continue;
@@ -1254,7 +1411,11 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
             tempstr.ToLong(&circuit);
             tempstr=e->GetPropVal(wxT("network"), wxT("0"));
             tempstr.ToLong(&netnum);
-            LoadLorChannel(e,netnum,(unit-1)*16+circuit-1);
+            if (netnum < MAXNETWORKS) {
+                chindex=(unit-1)*16+circuit-1;
+                LoadLorChannel(e,netnum,chindex);
+                if (unit > LorLastUnit[netnum]) LorLastUnit[netnum]=unit;
+            }
         }
     }
 }
@@ -1317,10 +1478,7 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
     } else if (!PlayerDlg->MediaCtrl->Load(mediaFilename)) {
         PlayerError(_("Unable to play file:\n")+mediaFilename);
     } else {
-        VixNumPeriods = VixEventData.size() / VixLastChannel;
-        //wxString msg = wxString::Format(_("Data size=%d, Channel Count=%d, NumPeriods=%d, Period Len=%d, Media File=%s"),VixEventData.size(),VixLastChannel,VixNumPeriods,VixEventPeriod,fn.GetFullPath().c_str());
-        //StatusBar1->SetStatusText(msg);
-        ResetTimer(PAUSE_VIX);
+        ResetTimer(STARTING_VIX);
         ShowPlayerSingle();
     }
 }
@@ -1366,6 +1524,7 @@ bool xScheduleFrame::LoadVixenFile(wxString& FileName)
             }
         }
         xout.SetMaxIntensity(MaxIntensity);
+        VixNumPeriods = VixEventData.size() / VixLastChannel;
         return true;
     } else {
         PlayerError(_("Unable to load sequence:\n")+FileName);
@@ -1407,6 +1566,19 @@ void xScheduleFrame::OnButtonDownClick()
     UnsavedChanges=true;
 }
 
+wxString xScheduleFrame::LorNetDesc(int netnum)
+{
+    wxString result;
+
+    if (netnum==0) {
+        result = _("default network");
+    } else {
+        char c = netnum - 1 + 'A';
+        result = wxString::Format(_("Aux %c network"),c);
+    }
+    return result;
+}
+
 void xScheduleFrame::OnButtonInfoClick()
 {
     int baseid=1000*Notebook1->GetSelection();
@@ -1428,6 +1600,15 @@ void xScheduleFrame::OnButtonInfoClick()
                 } else {
                     msg+=_("Media file:\n") + mediaFilename;
                 }
+                msg += _("\n\nChannel Map:");
+                for (int netidx=0; netidx<MAXNETWORKS; netidx++) {
+                    if (LorLastUnit[netidx] > 0) {
+                        int lastch = LorLastUnit[netidx]*16;
+                        int xch = xout.GetChannelCount(netidx);
+                        if (xch < lastch) lastch = xch;
+                        msg += wxString::Format(_("\nLOR sequence, ")+LorNetDesc(netidx)+_(", units 1-%d map to ")+xout.GetNetworkDesc(netidx)+_(" channels 1-%d"),LorLastUnit[netidx],lastch);
+                    }
+                }
             } else {
                 msg+=_("Unable to load sequence file:\n") + fullpath;
             }
@@ -1439,7 +1620,28 @@ void xScheduleFrame::OnButtonInfoClick()
                 } else if (!wxFile::Exists(mediaFilename)) {
                     msg+=_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences.");
                 } else {
-                    msg+=_("Media file:\n") + mediaFilename;
+                    msg+=_("Media file: ") + mediaFilename;
+                }
+                float seqlen = (float)VixNumPeriods*VixEventPeriod/1000.0;
+                msg += wxString::Format(_("\nSequence Length: %3.1f sec\nEvent Period: %d msec\nChannel Count: %d"),seqlen,VixEventPeriod,VixLastChannel);
+                if (VixLastChannel > 0) {
+                    msg += _("\n\nChannel Map:");
+                    int mapcnt = 0;
+                    int LeftToMap = VixLastChannel;
+                    int netidx = 0;
+                    while (mapcnt < VixLastChannel && netidx < MAXNETWORKS) {
+                        int chcnt = xout.GetChannelCount(netidx);
+                        if (chcnt > 0) {
+                            int mapcnt1 = chcnt < LeftToMap ? chcnt : LeftToMap;
+                            msg += wxString::Format(_("\nVixen channels %d-%d map to %s channels %d-%d"),mapcnt+1,mapcnt+mapcnt1,xout.GetNetworkDesc(netidx).c_str(),1,mapcnt1);
+                            mapcnt += mapcnt1;
+                            LeftToMap -= mapcnt1;
+                        }
+                        netidx++;
+                    }
+                    if (LeftToMap > 0) {
+                        msg += wxString::Format(_("\nVixen channels %d-%d are unmapped"),mapcnt+1,VixLastChannel);
+                    }
                 }
             } else {
                 msg+=_("Unable to load sequence file:\n") + fullpath;
@@ -1923,6 +2125,8 @@ void xScheduleFrame::OnButtonWizardClick()
     script.Append(_("10 REM *\n"));
     script.Append(_("20 REM * Created: ") + wxDateTime::Now().Format() + _("\n"));
     script.Append(_("30 REM *\n"));
+    script.Append(_("40 ONPLAYBACKEND 1000\n"));
+
     if (FirstItemOnce) {
         script.Append(_("50 LET NextItem=1\n"));
         script.Append(_("60 GOTO 1100\n"));
@@ -1933,15 +2137,21 @@ void xScheduleFrame::OnButtonWizardClick()
     script.Append(_("1001 REM * Jump here at end of song or sequence\n"));
     script.Append(_("1002 REM *\n"));
     script.Append(_("1005 IF SECONDSREMAINING <= 0 THEN 9000\n"));
+    script.Append(_("1008 LET NextItem=-1\n"));
     script.Append(_("1010 REM Find next checked item in playlist\n"));
-    script.Append(_("1020 FOR NextItem=LastItemPlayed+1 TO PLAYLISTSIZE") + loopend + _("\n"));
-    script.Append(_("1030 IF ITEMCHECKED(NextItem)=1 THEN 1100\n"));
-    script.Append(_("1040 NEXT NextItem\n"));
+    script.Append(_("1020 FOR Item=LastItemPlayed+1 TO PLAYLISTSIZE") + loopend + _("\n"));
+    script.Append(_("1030 IF ITEMCHECKED(Item)=0 THEN 1040\n"));
+    script.Append(_("1032 LET NextItem=Item\n"));
+    script.Append(_("1034 EXITFOR\n"));
+    script.Append(_("1040 NEXT Item\n"));
+    script.Append(_("1045 IF NextItem<>-1 THEN 1100\n"));
     script.Append(_("1050 REM Start over at beginning of list\n"));
-    script.Append(_("1060 FOR NextItem=") + loopstart + _(" TO PLAYLISTSIZE") + loopend + _("\n"));
-    script.Append(_("1070 IF ITEMCHECKED(NextItem)=1 THEN 1100\n"));
-    script.Append(_("1080 NEXT NextItem\n"));
-    script.Append(_("1090 GOTO 9000\n"));
+    script.Append(_("1060 FOR Item=") + loopstart + _(" TO PLAYLISTSIZE") + loopend + _("\n"));
+    script.Append(_("1070 IF ITEMCHECKED(Item)=0 THEN 1080\n"));
+    script.Append(_("1072 LET NextItem=Item\n"));
+    script.Append(_("1074 EXITFOR\n"));
+    script.Append(_("1080 NEXT Item\n"));
+    script.Append(_("1090 IF NextItem=-1 THEN 9000\n"));
     script.Append(_("1100 REM *\n"));
     script.Append(_("1101 REM * Play item NextItem\n"));
     script.Append(_("1102 REM *\n"));
@@ -1983,12 +2193,4 @@ void xScheduleFrame::OnButtonSaveLogClick(wxCommandEvent& event)
 void xScheduleFrame::OnButtonClearLogClick(wxCommandEvent& event)
 {
     TextCtrlLog->Clear();
-}
-
-void xScheduleFrame::OnMediaEnd( wxCommandEvent &event )
-{
-    if (basic.IsRunning()) {
-        // reached end of song/sequence, so start script at line 1000
-        basic.runat(1000);
-    }
 }

@@ -205,33 +205,45 @@ namespace ctb {
       return (fd != INVALID_HANDLE_VALUE);
     };
 
+
+    int AvailableToRead()
+    {
+      COMSTAT comStat;
+      DWORD   dwErrors;
+      // Get and clear current errors on the port.
+      if (!ClearCommError(fd, &dwErrors, &comStat))
+          // Report error in ClearCommError.
+          return 0;
+      return comStat.cbInQue;
+    };
+
+    int WaitingToWrite()
+    {
+      COMSTAT comStat;
+      DWORD   dwErrors;
+      // Get and clear current errors on the port.
+      if (!ClearCommError(fd, &dwErrors, &comStat))
+          // Report error in ClearCommError.
+          return 0;
+      return comStat.cbOutQue;
+    };
+
     int Read(char* buf,size_t len)
     {
-     DWORD read;
-     int m = m_fifo->items();
-     while(len) {
-      if(m_fifo->get(buf) == 1) {
-       len--;
-       buf++;
+      DWORD read;
+      if(!ReadFile(fd,buf,len,&read,&m_ov)) {
+        // if we use a asynchrone reading, ReadFile always gives FALSE
+        // ERROR_IO_PENDING means ok, other values show an error
+        if(GetLastError() != ERROR_IO_PENDING) {
+          // oops..., error in communication
+          return -1;
+        }
       }
       else {
-       break;
+        // ok, we have read all wanted bytes
+        return (int)read;
       }
-     }
-     if(!ReadFile(fd,buf,len,&read,&m_ov)) {
-      // if we use a asynchrone reading, ReadFile gives always
-      // FALSE
-      // ERROR_IO_PENDING means ok, other values show an error
-      if(GetLastError() != ERROR_IO_PENDING) {
-       // oops..., error in communication
-       return -1;
-      }
-     }
-     else {
-      // ok, we have read all wanted bytes
-      return (int)read + m;
-     }
-     return 0;
+      return 0;
     };
 
     int Write(char* buf,size_t len)

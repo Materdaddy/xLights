@@ -42,6 +42,7 @@ protected:
   long timer_msec;
   int max_intensity;
   int num_channels;
+  wxString netdesc;
   friend class xChannel_Dimmer;
 
   virtual void SetMappedIntensity (int chindex, unsigned char intensity) =0;
@@ -61,6 +62,14 @@ public:
 
   unsigned char MapIntensity(unsigned char intensity) {
     return IntensityMap[intensity];
+  };
+
+  void SetNetworkDesc(wxString& NetworkDesc) {
+    netdesc=NetworkDesc;
+  };
+
+  wxString GetNetworkDesc() {
+    return netdesc;
   };
 
   int GetChannelCount() {
@@ -725,10 +734,13 @@ public:
     }
     networks[netnum] = netobj;
     netobj->SetChannelCount(chcount);
-    netobj->InitSerialPort(portname, baudrate);
+    wxString description = nettype3 + _(" on ") + portname;
+    netobj->SetNetworkDesc(description);
     if (netnum > lastnetnum) lastnetnum = netnum;
+    netobj->InitSerialPort(portname, baudrate);
   };
 
+  // returns the network index, or -1 on failure
   int addnetwork (const wxString& nettype3, int chcount, const wxString& portname, int baudrate) {
     for (int i=0; i<MAXNETWORKS; i++) {
       if (networks[i] == 0) {
@@ -737,6 +749,16 @@ public:
       }
     }
     return -1;
+  };
+
+  int GetChannelCount(int netnum) {
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return 0;
+    return networks[netnum]->GetChannelCount();
+  };
+
+  wxString GetNetworkDesc(int netnum) {
+    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return wxT("");
+    return networks[netnum]->GetNetworkDesc();
   };
 
   void SetMaxIntensity(int maxintensity) {

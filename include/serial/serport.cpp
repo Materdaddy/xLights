@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sstream>
-#include "fifo.cpp"
 
 namespace ctb {
 
@@ -24,17 +23,6 @@ class SerialPort_x
 {
   protected:
      /*!
-    \brief internal fifo (first in, first out queue) to put back
-    already readed bytes into the reading stream. After put back a single
-    byte or sequence of characters, you can read them again with the
-    next Read call.
-     */
-     Fifo* m_fifo;
-     enum {
-      /// fifosize of the putback fifo
-      fifoSize = 256
-     };
-     /*!
     Close the interface (internally the file descriptor, which was
     connected with the interface).
     \return zero on success, otherwise -1.
@@ -45,19 +33,29 @@ class SerialPort_x
     \brief contains the internal (os specific) name of the serial
     device.
      */
-     wxString m_devname;
+    wxString m_devname;
+    int callback;  // used in basic script
 
   public:
 
     SerialPort_x() {
-      m_fifo = new Fifo(fifoSize);
       m_devname = wxT("");
+      callback = -1;
     };
 
     virtual ~SerialPort_x() {
-      delete m_fifo;
     };
 
+
+    void SetCallback(int cb) {
+        callback = cb;
+    }
+
+    int GetCallback() {
+        return callback;
+    }
+
+    virtual int AvailableToRead() = 0;
 
      /*!
     Closed the interface. Internally it calls the CloseDevice()
