@@ -65,6 +65,16 @@
 												<label>Stop Playlist</label>
 												<enabled>0</enabled>
 											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_PLAY" variable="AuiToolBarItemPlay" member="yes">
+													<bitmap stock_id="xlights_play" stock_client="wxART_TOOLBAR" />
+													<shorthelp>Start Playlist</shorthelp>
+													<dropdown>1</dropdown>
+													<handler function="OnAuiToolBarItemPlayClick" entry="EVT_TOOL" />
+												</object>
+												<label>Start Playlist</label>
+												<enabled>0</enabled>
+											</object>
 										</object>
 										<name>PaneName</name>
 										<standardpanetype>Toolbar</standardpanetype>
@@ -88,7 +98,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
-								<size>799,275</size>
+								<size>799,312</size>
 								<handler function="OnNotebook1PageChanged" entry="EVT_NOTEBOOK_PAGE_CHANGED" />
 								<object class="notebookpage">
 									<object class="wxPanel" name="ID_PANEL_CAL" variable="PanelCal" member="yes">
@@ -206,7 +216,7 @@
 																<item>Fri</item>
 																<item>Sat</item>
 															</collabels>
-															<size>696,176</size>
+															<size>771,206</size>
 														</object>
 														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 														<border>5</border>

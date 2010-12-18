@@ -20,6 +20,7 @@ class WizardDialog: public wxDialog
 		wxStaticText* StaticText1;
 		wxStaticText* StaticTextListName;
 		wxCheckBox* CheckBoxLastItem;
+		wxCheckBox* CheckBoxLightsOff;
 		//*)
 
 	protected:
@@ -29,6 +30,7 @@ class WizardDialog: public wxDialog
 		static const long ID_STATICTEXT_LISTNAME;
 		static const long ID_CHECKBOX_FIRSTITEM;
 		static const long ID_CHECKBOX_LASTITEM;
+		static const long ID_CHECKBOX_LIGHTSOFF;
 		//*)
 
 	private:

@@ -68,6 +68,7 @@ class MainMenuFrame: public wxFrame
 
         //(*Identifiers(MainMenuFrame)
         static const long ID_STATICTEXT1;
+        static const long ID_STATICTEXT3;
         static const long ID_STATICTEXT2;
         static const long ID_BUTTON5;
         static const long ID_BUTTON_NETWORK_SETUP;
@@ -84,6 +85,7 @@ class MainMenuFrame: public wxFrame
 
         //(*Declarations(MainMenuFrame)
         wxButton* ButtonSequence;
+        wxStaticText* StaticText2;
         wxPanel* Panel1;
         wxStaticText* StaticText1;
         wxButton* ButtonChangeDir;

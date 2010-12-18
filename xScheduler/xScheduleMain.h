@@ -133,6 +133,7 @@ class xScheduleFrame: public wxFrame
         void OnAuiToolBarItemStopClick(wxCommandEvent& event);
         void OnButtonSaveLogClick(wxCommandEvent& event);
         void OnButtonClearLogClick(wxCommandEvent& event);
+        void OnAuiToolBarItemPlayClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -141,6 +142,7 @@ class xScheduleFrame: public wxFrame
         static const long ID_AUITOOLBARITEM_HELP;
         static const long ID_AUITOOLBARITEM_SAVE;
         static const long ID_AUITOOLBARITEM_STOP;
+        static const long ID_AUITOOLBARITEM_PLAY;
         static const long ID_AUITOOLBAR1;
         static const long ID_PANEL2;
         static const long ID_CHOICE_PLAYLIST;

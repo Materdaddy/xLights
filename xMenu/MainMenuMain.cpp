@@ -65,6 +65,7 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 
 //(*IdInit(MainMenuFrame)
 const long MainMenuFrame::ID_STATICTEXT1 = wxNewId();
+const long MainMenuFrame::ID_STATICTEXT3 = wxNewId();
 const long MainMenuFrame::ID_STATICTEXT2 = wxNewId();
 const long MainMenuFrame::ID_BUTTON5 = wxNewId();
 const long MainMenuFrame::ID_BUTTON_NETWORK_SETUP = wxNewId();
@@ -111,8 +112,13 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     StaticText1->SetFont(StaticText1Font);
     FlexGridSizer1->Add(StaticText1, 0, wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 0);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel1, _("Show Directory"));
+    StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT3, _("All sequences and media files must be in this directory"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    StaticText2->SetFont(StaticText2Font);
+    StaticBoxSizer1->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticTextDirName = new wxStaticText(Panel1, ID_STATICTEXT2, _("<No directory selected>"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     StaticTextDirName->SetMinSize(wxSize(300,0));
+    StaticTextDirName->SetForegroundColour(wxColour(0,0,255));
     StaticBoxSizer1->Add(StaticTextDirName, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonChangeDir = new wxButton(Panel1, ID_BUTTON5, _("Change"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     StaticBoxSizer1->Add(ButtonChangeDir, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

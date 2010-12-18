@@ -29,8 +29,23 @@
 								<label>Show Directory</label>
 								<orient>wxVERTICAL</orient>
 								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText2" member="yes">
+										<label>All sequences and media files must be in this directory</label>
+										<font>
+											<style>italic</style>
+											<weight>normal</weight>
+											<underlined>0</underlined>
+											<face></face>
+										</font>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticTextDirName" member="yes">
 										<label>&lt;No directory selected&gt;</label>
+										<fg>#0000FF</fg>
 										<minsize>300,0</minsize>
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

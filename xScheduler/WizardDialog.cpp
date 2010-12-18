@@ -11,6 +11,7 @@ const long WizardDialog::ID_STATICTEXT1 = wxNewId();
 const long WizardDialog::ID_STATICTEXT_LISTNAME = wxNewId();
 const long WizardDialog::ID_CHECKBOX_FIRSTITEM = wxNewId();
 const long WizardDialog::ID_CHECKBOX_LASTITEM = wxNewId();
+const long WizardDialog::ID_CHECKBOX_LIGHTSOFF = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(WizardDialog,wxDialog)
@@ -41,6 +42,9 @@ WizardDialog::WizardDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	CheckBoxLastItem = new wxCheckBox(this, ID_CHECKBOX_LASTITEM, _("Play last item once at end"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_LASTITEM"));
 	CheckBoxLastItem->SetValue(false);
 	FlexGridSizer1->Add(CheckBoxLastItem, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	CheckBoxLightsOff = new wxCheckBox(this, ID_CHECKBOX_LIGHTSOFF, _("Turn lights off between each sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_LIGHTSOFF"));
+	CheckBoxLightsOff->SetValue(false);
+	FlexGridSizer1->Add(CheckBoxLightsOff, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StdDialogButtonSizer1 = new wxStdDialogButtonSizer();
 	StdDialogButtonSizer1->AddButton(new wxButton(this, wxID_OK, wxEmptyString));
 	StdDialogButtonSizer1->AddButton(new wxButton(this, wxID_CANCEL, wxEmptyString));

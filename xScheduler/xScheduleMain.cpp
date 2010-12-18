@@ -26,6 +26,7 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/filedlg.h>
+#include <wx/choicdlg.h>
 
 //(*InternalHeaders(xScheduleFrame)
 #include <wx/artprov.h>
@@ -47,8 +48,17 @@
 #include "../include/up.xpm"
 #include "../include/down.xpm"
 #include "../include/play.xpm"
+#include "../include/play24.xpm"
 #include "../include/info.xpm"
 
+
+
+/* ****************************************************
+ * Define the number of fixed notebook pages
+ * 2 = 1 for calendar and 1 for log
+ */
+
+#define FixedPages 2
 
 /* ****************************************************
  * Define xlights output object
@@ -88,6 +98,8 @@ wxBitmap MyArtProvider::CreateBitmap(const wxArtID& id,
         return wxBitmap(stop_sign_xpm);
     if (id == _("xlights_help"))
         return wxBitmap(help_xpm);
+    if (id == _("xlights_play"))
+        return wxBitmap(play24_xpm);
     return wxNullBitmap;
 };
 
@@ -236,6 +248,13 @@ protected:
         return answer;
     };
 
+    // all lights off
+    int do_lightsoff(void)
+    {
+        xout.alloff();
+        return EXEC_NEXTLINE;
+    };
+
     // play item in playlist
     int do_PlayItem(void)
     {
@@ -339,6 +358,7 @@ public:
         AddStringFunction("SERIALREAD$", static_cast<StringFuncPtr>(&xlbasic::do_serialread));
         AddNumericFunction("ITEMCHECKED", static_cast<NumericFuncPtr>(&xlbasic::do_itemchecked));
         AddNumericFunction("SERIALOPEN", static_cast<NumericFuncPtr>(&xlbasic::do_serialopen));
+        AddCommand("LIGHTSOFF", static_cast<CommandPtr>(&xlbasic::do_lightsoff));
         AddCommand("SERIALWRITE", static_cast<CommandPtr>(&xlbasic::do_serialwrite));
         AddCommand("PLAYITEM", static_cast<CommandPtr>(&xlbasic::do_PlayItem));
         AddCommand("STOPPLAYBACK", static_cast<CommandPtr>(&xlbasic::do_StopPlayback));
@@ -439,6 +459,7 @@ const long xScheduleFrame::ID_AUITOOLBARITEM_DEL = wxNewId();
 const long xScheduleFrame::ID_AUITOOLBARITEM_HELP = wxNewId();
 const long xScheduleFrame::ID_AUITOOLBARITEM_SAVE = wxNewId();
 const long xScheduleFrame::ID_AUITOOLBARITEM_STOP = wxNewId();
+const long xScheduleFrame::ID_AUITOOLBARITEM_PLAY = wxNewId();
 const long xScheduleFrame::ID_AUITOOLBAR1 = wxNewId();
 const long xScheduleFrame::ID_PANEL2 = wxNewId();
 const long xScheduleFrame::ID_CHOICE_PLAYLIST = wxNewId();
@@ -524,11 +545,14 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     AuiToolBar1->AddTool(ID_AUITOOLBARITEM_SAVE, _("Save"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("xlights_floppy_disc")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Save schedule"), wxEmptyString, NULL);
     AuiToolBar1->AddTool(ID_AUITOOLBARITEM_STOP, _("Stop Playlist"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("xlights_stop_sign")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Stop Playlist"), wxEmptyString, NULL);
     AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, false);
+    AuiToolBar1->AddTool(ID_AUITOOLBARITEM_PLAY, _("Start Playlist"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("xlights_play")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Start Playlist"), wxEmptyString, NULL);
+    AuiToolBar1->SetToolDropDown(ID_AUITOOLBARITEM_PLAY, true);
+    AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_PLAY, false);
     AuiToolBar1->Realize();
     AuiManager1->AddPane(AuiToolBar1, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper());
     AuiManager1->Update();
     FlexGridSizer2->Add(Panel2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Notebook1 = new wxNotebook(Panel1, ID_NOTEBOOK1, wxDefaultPosition, wxSize(799,275), 0, _T("ID_NOTEBOOK1"));
+    Notebook1 = new wxNotebook(Panel1, ID_NOTEBOOK1, wxDefaultPosition, wxSize(799,312), 0, _T("ID_NOTEBOOK1"));
     PanelCal = new wxPanel(Notebook1, ID_PANEL_CAL, wxPoint(49,10), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_CAL"));
     FlexGridSizer8 = new wxFlexGridSizer(2, 1, 0, 0);
     FlexGridSizer8->AddGrowableCol(0);
@@ -556,7 +580,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     BoxSizer2->Add(FlexGridSizer11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(BoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-    Grid1 = new wxGrid(PanelCal, ID_GRID1, wxDefaultPosition, wxSize(696,176), 0, _T("ID_GRID1"));
+    Grid1 = new wxGrid(PanelCal, ID_GRID1, wxDefaultPosition, wxSize(771,206), 0, _T("ID_GRID1"));
     Grid1->CreateGrid(26,7);
     Grid1->EnableEditing(false);
     Grid1->EnableGridLines(true);
@@ -637,6 +661,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_AUITOOLBARITEM_HELP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemHelpClick);
     Connect(ID_AUITOOLBARITEM_SAVE,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemSaveClick);
     Connect(ID_AUITOOLBARITEM_STOP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemStopClick);
+    Connect(ID_AUITOOLBARITEM_PLAY,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemPlayClick);
     Connect(ID_BUTTON_SET,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonSetClick);
     Connect(ID_BUTTON_CLEAR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonClearClick);
     Connect(ID_BUTTON_CLEARLOG,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xScheduleFrame::OnButtonClearLogClick);
@@ -715,6 +740,8 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     if (PortsOK) {
         timer.Start(XTIMER_INTERVAL, wxTIMER_CONTINUOUS);
         schedtimer.Start(1000, wxTIMER_CONTINUOUS);
+        AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_PLAY, true);
+        AuiToolBar1->Realize();
     } else {
         schedtimer.Start(1000, wxTIMER_CONTINUOUS);
     }
@@ -726,6 +753,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     }
 
     basic.setFrame(this);
+    Notebook1->ChangeSelection(0);
 }
 
 void xScheduleFrame::BasicPrompt(char* prompt, char* buff, int size) {
@@ -745,6 +773,7 @@ void xScheduleFrame::BasicError(const char *msg) {
 
 void xScheduleFrame::StartScript(const char *scriptname) {
     AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, true);
+    AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_PLAY, false);
     AuiToolBar1->Realize();
     wxString wxname(scriptname, wxConvUTF8);
     StatusBar1->SetStatusText(_("Playing playlist: ")+wxname);
@@ -752,6 +781,7 @@ void xScheduleFrame::StartScript(const char *scriptname) {
 
 void xScheduleFrame::EndScript(const char *scriptname) {
     AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_STOP, false);
+    AuiToolBar1->EnableTool(ID_AUITOOLBARITEM_PLAY, true);
     AuiToolBar1->Realize();
     PlayerDlg->MediaCtrl->Stop();
     ResetTimer(NO_SEQ);
@@ -864,12 +894,14 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     FlexGridSizer7->Add(ButtonWizard, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonWizardClick);
 
+/*
     id=baseid+RUN_BUTTON;
     wxBitmapButton* ButtonRun = new wxBitmapButton(PanelPlayList, id, wxBitmap(play_xpm));
     ButtonRun->SetToolTip(_("Run Player Script"));
     ButtonRun->SetHelpText(_("Plays the play list"));
     FlexGridSizer7->Add(ButtonRun, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonRunPlaylistClick);
+*/
 
     id=baseid+PLAYLIST_LOGIC;
     FlexGridSizer6->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -1001,7 +1033,7 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
 
 int xScheduleFrame::FindNotebookPage(wxString& pagename)
 {
-    for (int i=2; i < Notebook1->GetPageCount(); i++) {
+    for (int i=FixedPages; i < Notebook1->GetPageCount(); i++) {
         if (Notebook1->GetPageText(i) == pagename) {
             return i;
         }
@@ -1676,14 +1708,14 @@ void xScheduleFrame::OnAuiToolBarItemDelClick(wxCommandEvent& event)
 {
     DelListDialog dialog(this);
     int idx=Notebook1->GetSelection();
-    if (idx  < 2) {
+    if (idx  < FixedPages) {
         wxMessageBox(_("Can't delete this page!"), _("Error"));
         return;
     }
     dialog.StaticTextDelName->SetLabel(Notebook1->GetPageText(idx));
     if (dialog.ShowModal() != wxID_OK) return;
     Notebook1->DeletePage(idx);
-    ChoicePlayList->Delete(idx-2);
+    ChoicePlayList->Delete(idx-FixedPages);
     UnsavedChanges=true;
 }
 
@@ -1706,7 +1738,7 @@ void xScheduleFrame::OnMenuItemRenameListSelected(wxCommandEvent& event)
         }
     }
     Notebook1->SetPageText(idx,name);
-    ChoicePlayList->SetString(idx-2,name);
+    ChoicePlayList->SetString(idx-FixedPages,name);
     UnsavedChanges=true;
 }
 
@@ -1765,7 +1797,7 @@ void xScheduleFrame::SaveFile()
     root->AddChild(lists);
 
     int cnt=Notebook1->GetPageCount();
-    for (int pagenum=2; pagenum < cnt; pagenum++) {
+    for (int pagenum=FixedPages; pagenum < cnt; pagenum++) {
         plist = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("playlist") );
         plist->AddProperty( wxT("name"), Notebook1->GetPageText(pagenum) );
         baseid=1000*pagenum;
@@ -2100,12 +2132,14 @@ void xScheduleFrame::SendToLogAndStatusBar(const wxString& msg)
     StatusBar1->SetStatusText(msg);
 }
 
+/*
 void xScheduleFrame::OnButtonRunPlaylistClick()
 {
     if (!CheckPorts()) return;
     PlayMode=PLAYLIST;
     RunPlaylist(Notebook1->GetSelection());
 }
+*/
 
 void xScheduleFrame::OnButtonWizardClick()
 {
@@ -2116,6 +2150,8 @@ void xScheduleFrame::OnButtonWizardClick()
 
     bool FirstItemOnce = dialog.CheckBoxFirstItem->GetValue();
     bool LastItemOnce = dialog.CheckBoxLastItem->GetValue();
+    bool LightsOff = dialog.CheckBoxLightsOff->GetValue();
+
     int baseid=1000*nbidx;
     wxTextCtrl* LogicCtl=(wxTextCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LOGIC,Notebook1);
     wxString script;
@@ -2136,6 +2172,9 @@ void xScheduleFrame::OnButtonWizardClick()
     script.Append(_("1000 REM *\n"));
     script.Append(_("1001 REM * Jump here at end of song or sequence\n"));
     script.Append(_("1002 REM *\n"));
+    if (LightsOff) {
+        script.Append(_("1003 LIGHTSOFF\n"));
+    }
     script.Append(_("1005 IF SECONDSREMAINING <= 0 THEN 9000\n"));
     script.Append(_("1008 LET NextItem=-1\n"));
     script.Append(_("1010 REM Find next checked item in playlist\n"));
@@ -2193,4 +2232,29 @@ void xScheduleFrame::OnButtonSaveLogClick(wxCommandEvent& event)
 void xScheduleFrame::OnButtonClearLogClick(wxCommandEvent& event)
 {
     TextCtrlLog->Clear();
+}
+
+void xScheduleFrame::OnAuiToolBarItemPlayClick(wxCommandEvent& event)
+{
+    if (!CheckPorts()) return;
+    int selidx = Notebook1->GetSelection();
+    int cnt = Notebook1->GetPageCount();
+    if (cnt < FixedPages) {
+        wxMessageBox(_("Nothing to play. Create a playlist first."), _("Error"));
+        return;
+    } else if (cnt == FixedPages+1) {
+        // only one playlist, so play that one
+        selidx = FixedPages;
+    } else if (selidx < FixedPages) {
+        // more than one playlist, so ask user which one to play
+        wxArrayString listnames;
+        for (int i=FixedPages; i < cnt; i++) {
+            listnames.Add(Notebook1->GetPageText(i));
+        }
+        wxSingleChoiceDialog dialog(this, _("Choose the playlist to be played:"), _("Playlist Selection"), listnames);
+        if (dialog.ShowModal() != wxID_OK) return;
+        selidx = dialog.GetSelection() + FixedPages;
+    }
+    PlayMode=PLAYLIST;
+    RunPlaylist(selidx);
 }
