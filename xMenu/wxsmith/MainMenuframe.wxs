@@ -35,7 +35,6 @@
 											<style>italic</style>
 											<weight>normal</weight>
 											<underlined>0</underlined>
-											<face></face>
 										</font>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -80,16 +79,6 @@
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON_SEQUENCE" variable="ButtonSequence" member="yes">
-										<label>Sequencer</label>
-										<enabled>0</enabled>
-										<handler function="OnButtonSequenceClick" entry="EVT_BUTTON" />
-									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON_SCHEDULE" variable="ButtonSchedule" member="yes">
 										<label>Scheduler</label>
 										<enabled>0</enabled>
@@ -104,6 +93,27 @@
 										<label>Lighting Test</label>
 										<enabled>0</enabled>
 										<handler function="OnButtonTestClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_TESTRGB" variable="ButtonTestRGB" member="yes">
+										<label>RGB Lighting Test</label>
+										<enabled>0</enabled>
+										<handler function="OnButtonTestRGBClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_SEQUENCE" variable="ButtonSequence" member="yes">
+										<label>Sequencer</label>
+										<enabled>0</enabled>
+										<hidden>1</hidden>
+										<handler function="OnButtonSequenceClick" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>

@@ -5,6 +5,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/checkbox.h>
+#include <wx/choice.h>
 #include <wx/dialog.h>
 //*)
 
@@ -17,17 +18,19 @@ class WizardDialog: public wxDialog
 
 		//(*Declarations(WizardDialog)
 		wxCheckBox* CheckBoxFirstItem;
+		wxCheckBox* CheckBoxRepeat;
 		wxStaticText* StaticText1;
-		wxStaticText* StaticTextListName;
 		wxCheckBox* CheckBoxLastItem;
 		wxCheckBox* CheckBoxLightsOff;
+		wxChoice* ChoicePlayList;
 		//*)
 
 	protected:
 
 		//(*Identifiers(WizardDialog)
 		static const long ID_STATICTEXT1;
-		static const long ID_STATICTEXT_LISTNAME;
+		static const long ID_CHOICE_PLAYLIST;
+		static const long ID_CHECKBOX_REPEAT;
 		static const long ID_CHECKBOX_FIRSTITEM;
 		static const long ID_CHECKBOX_LASTITEM;
 		static const long ID_CHECKBOX_LIGHTSOFF;

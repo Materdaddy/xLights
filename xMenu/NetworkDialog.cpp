@@ -6,13 +6,23 @@
 //*)
 
 #include <wx/msgdlg.h>
+#include "SerialPortWithRate.h"
+#include "E131Dialog.h"
 
 
 //(*IdInit(NetworkDialog)
 const long NetworkDialog::ID_BUTTON_SAVE = wxNewId();
-const long NetworkDialog::ID_BUTTON_ADDROW = wxNewId();
-const long NetworkDialog::ID_BUTTON_DELROW = wxNewId();
 const long NetworkDialog::ID_BUTTON_NETCLOSE = wxNewId();
+const long NetworkDialog::ID_BUTTON_EDIT_ROW = wxNewId();
+const long NetworkDialog::ID_BUTTON_DELROW = wxNewId();
+const long NetworkDialog::ID_BUTTON_MOVE_UP = wxNewId();
+const long NetworkDialog::ID_BUTTON_MOVE_DOWN = wxNewId();
+const long NetworkDialog::ID_BUTTON_ADD_LOR = wxNewId();
+const long NetworkDialog::ID_BUTTON_ADD_DLIGHT = wxNewId();
+const long NetworkDialog::ID_BUTTON_ADD_RENARD = wxNewId();
+const long NetworkDialog::ID_BUTTON_ADD_DMX = wxNewId();
+const long NetworkDialog::ID_BUTTON_ADD_PIXELNET = wxNewId();
+const long NetworkDialog::ID_BUTTON_ADD_E131 = wxNewId();
 const long NetworkDialog::ID_GRID_NETWORK = wxNewId();
 const long NetworkDialog::ID_PANEL1 = wxNewId();
 //*)
@@ -25,13 +35,13 @@ END_EVENT_TABLE()
 NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(NetworkDialog)
+	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxBoxSizer* BoxSizer1;
+	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, id, _("Define Lighting Networks"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
-	SetClientSize(wxDefaultSize);
-	Move(wxDefaultPosition);
+	Create(parent, wxID_ANY, _("Define Lighting Networks"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer2 = new wxFlexGridSizer(2, 1, 0, 0);
@@ -40,16 +50,36 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	ButtonSave = new wxButton(Panel1, ID_BUTTON_SAVE, _("Save"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SAVE"));
 	BoxSizer1->Add(ButtonSave, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonAddRow = new wxButton(Panel1, ID_BUTTON_ADDROW, _("Add Row"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADDROW"));
-	BoxSizer1->Add(ButtonAddRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonDelRow = new wxButton(Panel1, ID_BUTTON_DELROW, _("Delete Row"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_DELROW"));
-	BoxSizer1->Add(ButtonDelRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonNetClose = new wxButton(Panel1, ID_BUTTON_NETCLOSE, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_NETCLOSE"));
 	BoxSizer1->Add(ButtonNetClose, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(BoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(BoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Select a row by clicking on the row number"));
+	ButtonEditRow = new wxButton(Panel1, ID_BUTTON_EDIT_ROW, _("Change"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_EDIT_ROW"));
+	StaticBoxSizer1->Add(ButtonEditRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonDelRow = new wxButton(Panel1, ID_BUTTON_DELROW, _("Delete"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_DELROW"));
+	StaticBoxSizer1->Add(ButtonDelRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonMoveUp = new wxButton(Panel1, ID_BUTTON_MOVE_UP, _("Move Up"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_MOVE_UP"));
+	StaticBoxSizer1->Add(ButtonMoveUp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonMoveDown = new wxButton(Panel1, ID_BUTTON_MOVE_DOWN, _("Move Down"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_MOVE_DOWN"));
+	StaticBoxSizer1->Add(ButtonMoveDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Add a new lighting network"));
+	ButtonAddLOR = new wxButton(Panel1, ID_BUTTON_ADD_LOR, _("LOR"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_LOR"));
+	StaticBoxSizer2->Add(ButtonAddLOR, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonAddDLight = new wxButton(Panel1, ID_BUTTON_ADD_DLIGHT, _("D-Light"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_DLIGHT"));
+	StaticBoxSizer2->Add(ButtonAddDLight, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonAddRenard = new wxButton(Panel1, ID_BUTTON_ADD_RENARD, _("Renard"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_RENARD"));
+	StaticBoxSizer2->Add(ButtonAddRenard, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonAddDMX = new wxButton(Panel1, ID_BUTTON_ADD_DMX, _("DMX Dongle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_DMX"));
+	StaticBoxSizer2->Add(ButtonAddDMX, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonAddPixelnet = new wxButton(Panel1, ID_BUTTON_ADD_PIXELNET, _("PixelNet Dongle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_PIXELNET"));
+	StaticBoxSizer2->Add(ButtonAddPixelnet, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonAddE131 = new wxButton(Panel1, ID_BUTTON_ADD_E131, _("E1.31"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_E131"));
+	StaticBoxSizer2->Add(ButtonAddE131, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(StaticBoxSizer2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	GridNetwork = new wxGrid(Panel1, ID_GRID_NETWORK, wxDefaultPosition, wxSize(530,139), 0, _T("ID_GRID_NETWORK"));
 	GridNetwork->CreateGrid(0,4);
-	GridNetwork->EnableEditing(true);
+	GridNetwork->EnableEditing(false);
 	GridNetwork->EnableGridLines(true);
 	GridNetwork->SetRowLabelSize(50);
 	GridNetwork->SetDefaultColSize(120, true);
@@ -69,36 +99,20 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	FlexGridSizer1->SetSizeHints(this);
 
 	Connect(ID_BUTTON_SAVE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonSaveClick);
-	Connect(ID_BUTTON_ADDROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddRowClick);
-	Connect(ID_BUTTON_DELROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonDelRowClick);
 	Connect(ID_BUTTON_NETCLOSE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonNetCloseClick);
-	Connect(ID_GRID_NETWORK,wxEVT_GRID_EDITOR_SHOWN,(wxObjectEventFunction)&NetworkDialog::OnGridNetworkEditorShown);
+	Connect(ID_BUTTON_EDIT_ROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonEditRowClick);
+	Connect(ID_BUTTON_DELROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonDelRowClick);
+	Connect(ID_BUTTON_MOVE_UP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonMoveUpClick);
+	Connect(ID_BUTTON_MOVE_DOWN,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonMoveDownClick);
+	Connect(ID_BUTTON_ADD_LOR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddLORClick);
+	Connect(ID_BUTTON_ADD_DLIGHT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddDLightClick);
+	Connect(ID_BUTTON_ADD_RENARD,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddRenardClick);
+	Connect(ID_BUTTON_ADD_DMX,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddDMXClick);
+	Connect(ID_BUTTON_ADD_PIXELNET,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddPixelnetClick);
+	Connect(ID_BUTTON_ADD_E131,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddE131Click);
 	//*)
 
-    wxArrayString types;
-    types.Add(_("DMX-Entec Pro/Lynx"));
-    types.Add(_("LOR"));
-    types.Add(_("D-Light"));
-    types.Add(_("Renard"));
-    wxGridCellAttr* col0=new wxGridCellAttr();
-    col0->SetEditor(new wxGridCellChoiceEditor(types));
-    GridNetwork->SetColAttr(0,col0);
-
-    wxArrayString ports;
-    PopulatePortChooser(&ports);
-    wxGridCellAttr* col1=new wxGridCellAttr();
-    col1->SetEditor(new wxGridCellChoiceEditor(ports));
-    GridNetwork->SetColAttr(1,col1);
-
-    wxArrayString rates;
-    rates.Add(_("115200"));
-    rates.Add(_("57600"));
-    rates.Add(_("38400"));
-    rates.Add(_("19200"));
-    rates.Add(_("9600"));
-    wxGridCellAttr* col2=new wxGridCellAttr();
-    col2->SetEditor(new wxGridCellChoiceEditor(rates));
-    GridNetwork->SetColAttr(2,col2);
+    GridNetwork->SetSelectionMode(wxGrid::wxGridSelectRows);
 
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
@@ -112,8 +126,6 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
     UnsavedChanges=false;
     if (networkFile.FileExists()) {
         LoadFile();
-    } else {
-        GridNetwork->AppendRows(1);
     }
 }
 
@@ -127,11 +139,6 @@ NetworkDialog::~NetworkDialog()
     }
 	//(*Destroy(NetworkDialog)
 	//*)
-}
-
-void NetworkDialog::OnGridNetworkEditorShown(wxGridEvent& event)
-{
-    UnsavedChanges=true;
 }
 
 void NetworkDialog::LoadFile()
@@ -195,68 +202,218 @@ void NetworkDialog::OnButtonAddRowClick(wxCommandEvent& event)
 void NetworkDialog::OnButtonDelRowClick(wxCommandEvent& event)
 {
     wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
-    for(size_t i = 0; i < selectedRows.GetCount(); i++)
-    {
-        GridNetwork->DeleteRows(selectedRows[i]);
+    int cnt = selectedRows.GetCount();
+    if (cnt == 0) {
+        wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
+    } else {
+        for(size_t i = 0; i < cnt; i++)
+        {
+            GridNetwork->DeleteRows(selectedRows[i]);
+        }
     }
-}
-
-void NetworkDialog::PopulatePortChooser(wxArrayString *chooser)
-{
-#ifdef __WXMSW__
-  // Windows
-  chooser->Add(wxT("COM1"));
-  chooser->Add(wxT("COM2"));
-  chooser->Add(wxT("COM3"));
-  chooser->Add(wxT("COM4"));
-  chooser->Add(wxT("COM5"));
-  chooser->Add(wxT("COM6"));
-  chooser->Add(wxT("COM7"));
-  chooser->Add(wxT("COM8"));
-  chooser->Add(wxT("COM9"));
-  chooser->Add(wxT("\\\\.\\COM10"));
-  chooser->Add(wxT("\\\\.\\COM11"));
-  chooser->Add(wxT("\\\\.\\COM12"));
-  chooser->Add(wxT("\\\\.\\COM13"));
-  chooser->Add(wxT("\\\\.\\COM14"));
-  chooser->Add(wxT("\\\\.\\COM15"));
-  chooser->Add(wxT("\\\\.\\COM16"));
-  chooser->Add(wxT("\\\\.\\COM17"));
-  chooser->Add(wxT("\\\\.\\COM18"));
-  chooser->Add(wxT("\\\\.\\COM19"));
-  chooser->Add(wxT("\\\\.\\COM20"));
-#elif __WXMAC__
-  // no standard device names for USB-serial converters on OS/X
-  // scan /dev directory for candidates
-  wxArrayString output,errors;
-  wxExecute(wxT("ls -1 /dev"), output, errors, wxEXEC_SYNC);
-  if (!errors.IsEmpty()) {
-    wxMessageBox(errors.Last(), _("Error"));
-  } else if (output.IsEmpty()) {
-    wxMessageBox(_("no devices found"), _("Error"));
-  } else {
-    for (int i=0; i<output.Count(); i++) {
-      if (output[i].StartsWith(wxT("cu."))) {
-         chooser->Add(wxT("/dev/") + output[i]);
-      }
-    }
-  }
-#else
-  // Linux
-  chooser->Add(wxT("/dev/ttyS0"));
-  chooser->Add(wxT("/dev/ttyS1"));
-  chooser->Add(wxT("/dev/ttyS2"));
-  chooser->Add(wxT("/dev/ttyS3"));
-  chooser->Add(wxT("/dev/ttyUSB0"));
-  chooser->Add(wxT("/dev/ttyUSB1"));
-  chooser->Add(wxT("/dev/ttyUSB2"));
-  chooser->Add(wxT("/dev/ttyUSB3"));
-  chooser->Add(wxT("/dev/ttyUSB4"));
-  chooser->Add(wxT("/dev/ttyUSB5"));
-#endif
 }
 
 void NetworkDialog::OnButtonNetCloseClick(wxCommandEvent& event)
 {
     EndModal(0);
+}
+
+void NetworkDialog::MoveRowData(int fromRow, int toRow)
+{
+    int colcnt=GridNetwork->GetCols();
+    for (int c=0; c < colcnt; c++)
+    {
+        GridNetwork->SetCellValue(toRow,c,GridNetwork->GetCellValue(fromRow,c));
+    }
+    GridNetwork->DeleteRows(fromRow);
+}
+
+void NetworkDialog::OnButtonMoveUpClick(wxCommandEvent& event)
+{
+    wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
+    int cnt = selectedRows.GetCount();
+    if (cnt == 1) {
+        int r=selectedRows[0];
+        if (r > 0)
+        {
+            GridNetwork->InsertRows(r-1);
+            MoveRowData(r+1,r-1);
+            GridNetwork->SelectRow(r-1);
+        }
+    } else {
+        wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
+    }
+}
+
+void NetworkDialog::OnButtonMoveDownClick(wxCommandEvent& event)
+{
+    wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
+    int cnt = selectedRows.GetCount();
+    if (cnt == 1) {
+        int r=selectedRows[0];
+        int lastrow = GridNetwork->GetRows()-1;
+        if (r < lastrow)
+        {
+            GridNetwork->InsertRows(r+2);
+            MoveRowData(r,r+2);
+            GridNetwork->SelectRow(r+1);
+        }
+    } else {
+        wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
+    }
+}
+
+void NetworkDialog::OnButtonEditRowClick(wxCommandEvent& event)
+{
+    wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
+    int cnt = selectedRows.GetCount();
+    if (cnt == 1) {
+        int r=selectedRows[0];
+        if (GridNetwork->GetCellValue(r,0) == wxT("E131")) {
+            AddE131(r);
+        } else {
+            AddSerial(wxT(""), r);
+        }
+    } else {
+        wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
+    }
+}
+
+bool NetworkDialog::EnableRate(const wxString& NetName)
+{
+    return (NetName!=wxT("DMX") && NetName!=wxT("PixelNet"));
+}
+
+void NetworkDialog::AddSerial(wxString NetName, int r)
+{
+	int DlgResult;
+	bool ok=true;
+	wxString Port,BaudRate,LastChannel;
+	wxString action=_("Add ");
+
+	if (r >= 0)
+	{
+	    action=_("Change ");
+        NetName=GridNetwork->GetCellValue(r,0);
+        Port=GridNetwork->GetCellValue(r,1);
+        BaudRate=GridNetwork->GetCellValue(r,2);
+        LastChannel=GridNetwork->GetCellValue(r,3);
+	}
+
+	bool RateEnabled = EnableRate(NetName);
+	wxString title = action + NetName + _(" Network");
+	SerialPortWithRate SerialDlg(this,title);
+	SerialDlg.ChoiceBaudRate->Enable(RateEnabled);
+	if (r >= 0)
+	{
+        SerialDlg.ChoicePort->SetStringSelection(Port);
+        if (RateEnabled) SerialDlg.ChoiceBaudRate->SetStringSelection(BaudRate);
+        SerialDlg.TextCtrlLastChannel->SetValue(LastChannel);
+	}
+	do {
+	    DlgResult=SerialDlg.ShowModal();
+	    if (DlgResult == wxID_OK) {
+            Port=SerialDlg.ChoicePort->GetStringSelection();
+            BaudRate=SerialDlg.ChoiceBaudRate->GetStringSelection();
+            LastChannel=SerialDlg.TextCtrlLastChannel->GetValue();
+            ok=!Port.IsEmpty() && (!RateEnabled || !BaudRate.IsEmpty()) && !LastChannel.IsEmpty();
+            if (ok) {
+                if (r < 0)
+                {
+                    GridNetwork->AppendRows(1);
+                    r=GridNetwork->GetRows()-1;
+                }
+                GridNetwork->SetCellValue(r,0,NetName);
+                GridNetwork->SetCellValue(r,1,Port);
+                if (RateEnabled)
+                    GridNetwork->SetCellValue(r,2,BaudRate);
+                else
+                    GridNetwork->SetCellValue(r,2,_("n/a"));
+                GridNetwork->SetCellValue(r,3,LastChannel);
+                UnsavedChanges=true;
+            } else {
+                wxMessageBox(_("All fields must be filled in!"), _("ERROR"));
+            }
+	    }
+	} while (!ok);
+}
+
+void NetworkDialog::OnButtonAddLORClick(wxCommandEvent& event)
+{
+    AddSerial(wxT("LOR"));
+}
+
+void NetworkDialog::OnButtonAddDLightClick(wxCommandEvent& event)
+{
+    AddSerial(wxT("D-Light"));
+}
+
+void NetworkDialog::OnButtonAddRenardClick(wxCommandEvent& event)
+{
+    AddSerial(wxT("Renard"));
+}
+
+void NetworkDialog::OnButtonAddDMXClick(wxCommandEvent& event)
+{
+    AddSerial(wxT("DMX"));
+}
+
+void NetworkDialog::OnButtonAddPixelnetClick(wxCommandEvent& event)
+{
+    AddSerial(wxT("PixelNet"));
+}
+
+void NetworkDialog::AddE131(int r)
+{
+	int DlgResult;
+	bool ok=true;
+	wxString IpAddr,Universe,LastChannel;
+	wxString action=_("Add ");
+	wxString NetName=wxT("E131");
+
+	if (r >= 0)
+	{
+	    action=_("Change ");
+        //NetName=GridNetwork->GetCellValue(r,0);
+        IpAddr=GridNetwork->GetCellValue(r,1);
+        Universe=GridNetwork->GetCellValue(r,2);
+        LastChannel=GridNetwork->GetCellValue(r,3);
+	}
+
+	wxString title = action + NetName + _(" Network");
+	E131Dialog E131Dlg(this,title);
+	if (r >= 0)
+	{
+        E131Dlg.TextCtrlIpAddr->SetValue(IpAddr);
+        E131Dlg.TextCtrlUniverse->SetValue(Universe);
+        E131Dlg.TextCtrlLastChannel->SetValue(LastChannel);
+	}
+	do {
+	    DlgResult=E131Dlg.ShowModal();
+	    if (DlgResult == wxID_OK) {
+            IpAddr=E131Dlg.TextCtrlIpAddr->GetValue();
+            Universe=E131Dlg.TextCtrlUniverse->GetValue();
+            LastChannel=E131Dlg.TextCtrlLastChannel->GetValue();
+            ok=!IpAddr.IsEmpty() && !Universe.IsEmpty() && !LastChannel.IsEmpty();
+            if (ok) {
+                if (r < 0)
+                {
+                    GridNetwork->AppendRows(1);
+                    r=GridNetwork->GetRows()-1;
+                }
+                GridNetwork->SetCellValue(r,0,NetName);
+                GridNetwork->SetCellValue(r,1,IpAddr);
+                GridNetwork->SetCellValue(r,2,Universe);
+                GridNetwork->SetCellValue(r,3,LastChannel);
+                UnsavedChanges=true;
+            } else {
+                wxMessageBox(_("All fields must be filled in!"), _("ERROR"));
+            }
+	    }
+	} while (!ok);
+}
+
+void NetworkDialog::OnButtonAddE131Click(wxCommandEvent& event)
+{
+    AddE131();
 }

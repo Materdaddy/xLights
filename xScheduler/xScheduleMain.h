@@ -30,10 +30,11 @@
 #include <wx/stattext.h>
 #include <wx/menu.h>
 #include <wx/textctrl.h>
+#include <wx/checkbox.h>
+#include <wx/listbox.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
-#include <wx/grid.h>
-#include <wx/choice.h>
+#include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
@@ -57,10 +58,9 @@
 #include <string>
 
 #include "PlayerFrame.h"
-#include "NewListDialog.h"
 #include "DelListDialog.h"
-#include "RenListDialog.h"
 #include "WizardDialog.h"
+#include "AddShowDialog.h"
 #include "../include/globals.h"
 #include "../include/xlights_out.cpp"
 
@@ -101,6 +101,29 @@ class xScheduleFrame: public wxFrame
 {
     public:
 
+        // these are added to 1000*pagenum to get the control id
+        enum PlayListIds {
+            CHKBOX_AUDIO,
+            CHKBOX_VIDEO,
+            CHKBOX_LOR,
+            CHKBOX_VIXEN,
+            CHKBOX_MOVIEMODE,
+            UP_BUTTON,
+            DOWN_BUTTON,
+            INFO_BUTTON,
+            PLAY_BUTTON,
+            CREATE_SCRIPT,
+            PLAYLIST_LISTBOX,
+            PLAYLIST_FILES,
+            PLAYLIST_ADD,
+            PLAYLIST_ADD_ALL,
+            PLAYLIST_DELETE,
+            PLAYLIST_DELETE_ALL,
+            SCRIPT_HELP,
+            PLAYLIST_LOGIC,
+            REMOVE_SCRIPT_BUTTON
+        };
+
         xScheduleFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~xScheduleFrame();
 
@@ -109,10 +132,12 @@ class xScheduleFrame: public wxFrame
         void BasicOutput(char *msg);
         void BasicError(const char *msg);
         char ExtType(const wxString& ext);
-        void Play(wxString& filename);
+        void Play(wxString& filename, long delay);
         void StopPlayback();
         void StartScript(const char *scriptname);
         void EndScript(const char *scriptname);
+        int  FindNotebookPage(wxString& pagename);
+        wxWindow* FindNotebookControl(int nbidx, PlayListIds id);
 
     private:
 
@@ -134,6 +159,17 @@ class xScheduleFrame: public wxFrame
         void OnButtonSaveLogClick(wxCommandEvent& event);
         void OnButtonClearLogClick(wxCommandEvent& event);
         void OnAuiToolBarItemPlayClick(wxCommandEvent& event);
+        void OnTextCtrl1Text(wxCommandEvent& event);
+        void OnChoice1Select(wxCommandEvent& event);
+        void OnButtonAddShowClick(wxCommandEvent& event);
+        void OnButtonUpdateShowClick(wxCommandEvent& event);
+        void OnButtonDeleteShowClick(wxCommandEvent& event);
+        void OnButtonDeselectClick(wxCommandEvent& event);
+        void OnCheckBoxRunScheduleClick(wxCommandEvent& event);
+        void OnBitmapButtonSchedInfoClick(wxCommandEvent& event);
+        void OnMenuItemCustomScriptSelected(wxCommandEvent& event);
+        void OnMenuItemConvert2VixenSelected(wxCommandEvent& event);
+        void OnMenuItemSave2ConductorSelected(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -145,17 +181,17 @@ class xScheduleFrame: public wxFrame
         static const long ID_AUITOOLBARITEM_PLAY;
         static const long ID_AUITOOLBAR1;
         static const long ID_PANEL2;
-        static const long ID_CHOICE_PLAYLIST;
-        static const long ID_STATICTEXT5;
-        static const long ID_CHOICE_STARTTIME;
-        static const long ID_STATICTEXT6;
-        static const long ID_CHOICE_ENDTIME;
-        static const long ID_BUTTON_SET;
-        static const long ID_BUTTON_CLEAR;
-        static const long ID_GRID1;
+        static const long ID_LISTBOX_SCHED;
+        static const long ID_BITMAPBUTTON_SCHED_INFO;
+        static const long ID_CHECKBOX_RUN_SCHEDULE;
+        static const long ID_BUTTON_ADD_SHOW;
+        static const long ID_BUTTON2;
+        static const long ID_BUTTON_DELETE_SHOW;
+        static const long ID_BUTTON_DESELECT;
         static const long ID_PANEL_CAL;
         static const long ID_BUTTON_CLEARLOG;
         static const long ID_BUTTON_SAVELOG;
+        static const long ID_STATICTEXT1;
         static const long ID_TEXTCTRL_LOG;
         static const long ID_PANEL_LOG;
         static const long ID_NOTEBOOK1;
@@ -166,6 +202,7 @@ class xScheduleFrame: public wxFrame
         static const long idMenuRenameList;
         static const long idMenuDelList;
         static const long ID_MENUITEM1;
+        static const long idCustomScript;
         static const long idMenuHelpContent;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
@@ -177,42 +214,25 @@ class xScheduleFrame: public wxFrame
         //(*Declarations(xScheduleFrame)
         wxAuiManager* AuiManager1;
         wxAuiToolBar* AuiToolBar1;
+        wxCheckBox* CheckBoxRunSchedule;
         wxNotebook* Notebook1;
         wxButton* ButtonClearLog;
         wxPanel* PanelLog;
         wxTextCtrl* TextCtrlLog;
-        wxStaticText* StaticText6;
         wxMenuItem* MenuItemRefresh;
-        wxButton* ButtonSet;
         wxPanel* Panel1;
-        wxButton* ButtonClear;
-        wxGrid* Grid1;
+        wxStaticText* StaticText1;
         wxButton* ButtonSaveLog;
-        wxChoice* ChoiceStartTime;
-        wxStaticText* StaticText5;
+        wxButton* ButtonDeselect;
+        wxListBox* ListBoxSched;
         wxPanel* PanelCal;
         wxStatusBar* StatusBar1;
+        wxButton* ButtonDeleteShow;
         wxPanel* Panel2;
-        wxChoice* ChoicePlayList;
-        wxChoice* ChoiceEndTime;
+        wxButton* ButtonUpdateShow;
+        wxBitmapButton* BitmapButtonSchedInfo;
+        wxButton* ButtonAddShow;
         //*)
-
-        // these are added to 1000*pagenum to get the control id
-        enum PlayListIds {
-            CHKBOX_AUDIO,
-            CHKBOX_VIDEO,
-            CHKBOX_LOR,
-            CHKBOX_VIXEN,
-            CHKBOX_MOVIEMODE,
-            UP_BUTTON,
-            DOWN_BUTTON,
-            INFO_BUTTON,
-            PLAY_BUTTON,
-            RUN_BUTTON,
-            WIZARD_BUTTON,
-            PLAYLIST_LISTBOX,
-            PLAYLIST_LOGIC
-        };
 
         enum SeqPlayerStates {
             NO_SEQ,
@@ -222,8 +242,13 @@ class xScheduleFrame: public wxFrame
             PLAYING_MEDIA,
             PLAYING_LOR,
             PLAYING_VIX,
+            STARTING_LOR_ANIM,
+            STARTING_VIX_ANIM,
+            PLAYING_LOR_ANIM,
+            PLAYING_VIX_ANIM,
             PAUSE_LOR,
-            PAUSE_VIX
+            PAUSE_VIX,
+            DELAY_AFTER_PLAY
         };
 
         enum PlayModes {
@@ -236,8 +261,7 @@ class xScheduleFrame: public wxFrame
         wxString CurrentDir;
         wxFileName networkFile;
         wxFileName scheduleFile;
-        wxDateTime CalStart,CalEnd;
-        wxString datefmt, timefmt, LastSchedStart;
+        wxString datefmt, timefmt;
         PlayerFrame* PlayerDlg;
         bool UnsavedChanges;
         bool PortsOK;
@@ -246,17 +270,18 @@ class xScheduleFrame: public wxFrame
         wxTimer timer;
         wxTimer schedtimer;
         wxDateTime starttime;
+        wxDateTime::WeekDay LastWkDay;
         PlayModes PlayMode;
         SeqPlayerStates SeqPlayerState;
         long VixEventPeriod;
         int VixNumPeriods;
         long VixLastChannel;
+        long DelayAfterPlayMSEC;
         std::string VixEventData;
         VixChannelVector VixNetwork;
         wxString mediaFilename;
+        wxArrayString ShowEvents;
 
-        void SetGridCell(const int& row, const int& col, wxString& playlist, wxString& timestart, wxString& timeend);
-        void ClearGridCell(const int& row, const int& col);
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         wxString LorNetDesc(int netnum);
         void LoadNetworkFile();
@@ -267,7 +292,7 @@ class xScheduleFrame: public wxFrame
         void SaveFile();
         void ScanForFiles();
         void AddPlaylist(const wxString& name);
-        GridSelection getGridSelection(wxGrid & grid);
+        wxString CreateScript(wxString ListName, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff);
         bool CheckPorts();
         bool LoadLorFile(wxString& FileName);
         bool LoadVixenFile(wxString& FileName);
@@ -278,12 +303,20 @@ class xScheduleFrame: public wxFrame
         long DiffSeconds(wxString& strTime, wxTimeSpan& tsCurrent);
         void ResetTimer(SeqPlayerStates newstate);
         void TimerNoPlay();
-        int  FindNotebookPage(wxString& pagename);
-        void RunPlaylist(int nbidx);
+        void RunPlaylist(int nbidx, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff);
         void ShowPlayerSingle();
         void PlayerError(const wxString& msg);
         void SendToLogAndStatusBar(const wxString& msg);
         std::string base64_decode(const wxString& encoded_string);
+        int TimeIdx2Time(int TimeIdx);
+        int Time2TimeIdx(const wxString& hhmm);
+        int Time2Seconds(const wxString& hhmm);
+        void AddShow(wxDateTime::WeekDay wkday, const wxString& StartStop, const wxString& Playlist);
+        void DisplaySchedule();
+        int DisplayScheduleOneDay(wxDateTime::WeekDay wkday);
+        void PopulateShowDialog(AddShowDialog& dialog);
+        void UnpackSchedCode(const wxString& SchedCode, int* WkDay, wxString& StartTime, wxString& EndTime, wxString& RepeatOptions, wxString& Playlist);
+        void ForceScheduleCheck();
 
         void OnTimer(wxTimerEvent& event);
         void OnSchedTimer(wxTimerEvent& event);
@@ -291,10 +324,16 @@ class xScheduleFrame: public wxFrame
         void OnPlaylistToggle();
         void OnButtonRunPlaylistClick();
         void OnButtonPlayItemClick();
+        void OnScriptHelpClick(wxCommandEvent& event);
         void OnButtonUpClick();
         void OnButtonDownClick();
         void OnButtonInfoClick();
-        void OnButtonWizardClick();
+        //void OnButtonWizardClick();
+        void OnButtonPlaylistAddClick();
+        void OnButtonPlaylistAddAllClick();
+        void OnButtonPlaylistDeleteClick();
+        void OnButtonPlaylistDeleteAllClick();
+        void OnButtonRemoveScriptClick(wxCommandEvent& event);
         void OnMediaEnd( wxCommandEvent &event );
 
         DECLARE_EVENT_TABLE()

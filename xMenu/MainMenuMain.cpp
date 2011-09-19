@@ -3,7 +3,7 @@
  * Purpose:   Code for Application Frame
  * Author:    Matt Brown (dowdybrown@yahoo.com)
  * Created:   2010-02-27
- * Copyright: 2010 by Matt Brown
+ * Copyright: 2010-2011 by Matt Brown
  * License:
      This file is part of xLights.
 
@@ -69,9 +69,10 @@ const long MainMenuFrame::ID_STATICTEXT3 = wxNewId();
 const long MainMenuFrame::ID_STATICTEXT2 = wxNewId();
 const long MainMenuFrame::ID_BUTTON5 = wxNewId();
 const long MainMenuFrame::ID_BUTTON_NETWORK_SETUP = wxNewId();
-const long MainMenuFrame::ID_BUTTON_SEQUENCE = wxNewId();
 const long MainMenuFrame::ID_BUTTON_SCHEDULE = wxNewId();
 const long MainMenuFrame::ID_BUTTON_TEST = wxNewId();
+const long MainMenuFrame::ID_BUTTON_TESTRGB = wxNewId();
+const long MainMenuFrame::ID_BUTTON_SEQUENCE = wxNewId();
 const long MainMenuFrame::ID_PANEL1 = wxNewId();
 const long MainMenuFrame::idMenuOpen = wxNewId();
 const long MainMenuFrame::idMenuQuit = wxNewId();
@@ -127,15 +128,19 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     ButtonNetworkSetup = new wxButton(Panel1, ID_BUTTON_NETWORK_SETUP, _("Network Setup"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_NETWORK_SETUP"));
     ButtonNetworkSetup->Disable();
     BoxSizer3->Add(ButtonNetworkSetup, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonSequence = new wxButton(Panel1, ID_BUTTON_SEQUENCE, _("Sequencer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SEQUENCE"));
-    ButtonSequence->Disable();
-    BoxSizer3->Add(ButtonSequence, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonSchedule = new wxButton(Panel1, ID_BUTTON_SCHEDULE, _("Scheduler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SCHEDULE"));
     ButtonSchedule->Disable();
     BoxSizer3->Add(ButtonSchedule, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonTest = new wxButton(Panel1, ID_BUTTON_TEST, _("Lighting Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEST"));
     ButtonTest->Disable();
     BoxSizer3->Add(ButtonTest, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonTestRGB = new wxButton(Panel1, ID_BUTTON_TESTRGB, _("RGB Lighting Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TESTRGB"));
+    ButtonTestRGB->Disable();
+    BoxSizer3->Add(ButtonTestRGB, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonSequence = new wxButton(Panel1, ID_BUTTON_SEQUENCE, _("Sequencer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SEQUENCE"));
+    ButtonSequence->Disable();
+    ButtonSequence->Hide();
+    BoxSizer3->Add(ButtonSequence, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(BoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel1->SetSizer(FlexGridSizer1);
     FlexGridSizer1->Fit(Panel1);
@@ -167,9 +172,10 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
 
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(ID_BUTTON_NETWORK_SETUP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonNetworkSetupClick);
-    Connect(ID_BUTTON_SEQUENCE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonSequenceClick);
     Connect(ID_BUTTON_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonScheduleClick);
     Connect(ID_BUTTON_TEST,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonTestClick);
+    Connect(ID_BUTTON_TESTRGB,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonTestRGBClick);
+    Connect(ID_BUTTON_SEQUENCE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonSequenceClick);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnQuit);
     Connect(idMenuHelpContent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuItemHelpContentSelected);
@@ -223,6 +229,7 @@ void MainMenuFrame::SetButtonEnable() {
     //ButtonSequence->Enable(FileExists);
     ButtonSchedule->Enable(FileExists);
     ButtonTest->Enable(FileExists);
+    ButtonTestRGB->Enable(FileExists);
 }
 
 void MainMenuFrame::OnMenuOpenFolderSelected(wxCommandEvent& event)
@@ -237,7 +244,7 @@ void MainMenuFrame::OnMenuOpenFolderSelected(wxCommandEvent& event)
     }
 }
 
-void MainMenuFrame::Exec(wxString program)
+void MainMenuFrame::Exec(const wxString& program)
 {
     wxString NewExe=ThisExe;
     NewExe.Replace(_("xMenu"), program);
@@ -282,4 +289,9 @@ void MainMenuFrame::OnMenuItemHelpContentSelected(wxCommandEvent& event)
     {
         wxMessageBox(_("Help requires Internet access. Unable to access help."), _("Error"));
     }
+}
+
+void MainMenuFrame::OnButtonTestRGBClick(wxCommandEvent& event)
+{
+    Exec(_("xTesterRGB"));
 }

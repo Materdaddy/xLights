@@ -25,7 +25,6 @@
 #include <wx/msgdlg.h>
 #include <wx/config.h>
 #include <wx/icon.h>
-
 // For wxWidgets 2.9/3.0
 //#include <wx/kbdstate.h>
 
@@ -77,9 +76,7 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 
 //(*IdInit(xTesterFrame)
 const long xTesterFrame::ID_STATICTEXT1 = wxNewId();
-const long xTesterFrame::ID_RADIOBUTTON_1 = wxNewId();
-const long xTesterFrame::ID_RADIOBUTTON_16 = wxNewId();
-const long xTesterFrame::ID_RADIOBUTTON_ALL = wxNewId();
+const long xTesterFrame::ID_CHOICE_NUMSELECT = wxNewId();
 const long xTesterFrame::ID_STATICTEXT3 = wxNewId();
 const long xTesterFrame::ID_BUTTON1 = wxNewId();
 const long xTesterFrame::ID_NOTEBOOK2 = wxNewId();
@@ -105,16 +102,18 @@ const long xTesterFrame::ID_STATICTEXT12 = wxNewId();
 const long xTesterFrame::ID_SLIDER_TWRATE = wxNewId();
 const long xTesterFrame::ID_STATICTEXT13 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT14 = wxNewId();
-const long xTesterFrame::ID_PANEL5 = wxNewId();
+const long xTesterFrame::ID_PANEL_TWINKLE = wxNewId();
 const long xTesterFrame::ID_CHECKBOX_RUNSH = wxNewId();
 const long xTesterFrame::ID_STATICTEXT16 = wxNewId();
 const long xTesterFrame::ID_SLIDER4 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT18 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT19 = wxNewId();
-const long xTesterFrame::ID_PANEL6 = wxNewId();
+const long xTesterFrame::ID_PANEL_SHIMMER = wxNewId();
 const long xTesterFrame::ID_CHECKBOX_AUTO = wxNewId();
 const long xTesterFrame::ID_LISTBOX_AUTOTEST = wxNewId();
-const long xTesterFrame::ID_PANEL7 = wxNewId();
+const long xTesterFrame::ID_PANEL_AUTOTEST = wxNewId();
+const long xTesterFrame::ID_TEXTCTRL_LOG = wxNewId();
+const long xTesterFrame::ID_PANEL_LOG = wxNewId();
 const long xTesterFrame::ID_NOTEBOOK1 = wxNewId();
 const long xTesterFrame::ID_PANEL4 = wxNewId();
 const long xTesterFrame::idMenuQuit = wxNewId();
@@ -141,6 +140,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     wxFlexGridSizer* FlexGridSizer3;
     wxMenuItem* MenuItem1;
     wxFlexGridSizer* FlexGridSizer5;
+    wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
     wxBoxSizer* BoxSizer11;
@@ -167,14 +167,19 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     FlexGridSizer7->AddGrowableRow(0);
     StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("Selection mode:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     FlexGridSizer7->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    RadioButton1 = new wxRadioButton(Panel3, ID_RADIOBUTTON_1, _("1"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_1"));
-    RadioButton1->SetValue(true);
-    FlexGridSizer7->Add(RadioButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    RadioButton16 = new wxRadioButton(Panel3, ID_RADIOBUTTON_16, _("16"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_16"));
-    FlexGridSizer7->Add(RadioButton16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    RadioButtonAll = new wxRadioButton(Panel3, ID_RADIOBUTTON_ALL, _("All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_ALL"));
-    FlexGridSizer7->Add(RadioButtonAll, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ChoiceNumSelect = new wxChoice(Panel3, ID_CHOICE_NUMSELECT, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_NUMSELECT"));
+    ChoiceNumSelect->SetSelection( ChoiceNumSelect->Append(_("1")) );
+    ChoiceNumSelect->Append(_("16"));
+    ChoiceNumSelect->Append(_("32"));
+    ChoiceNumSelect->Append(_("60"));
+    ChoiceNumSelect->Append(_("64"));
+    ChoiceNumSelect->Append(_("100"));
+    ChoiceNumSelect->Append(_("150"));
+    ChoiceNumSelect->Append(_("225"));
+    ChoiceNumSelect->Append(_("300"));
+    ChoiceNumSelect->Append(_("All"));
+    FlexGridSizer7->Add(ChoiceNumSelect, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
     StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Available Tests"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     BoxSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -240,55 +245,55 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     FlexGridSizer4->Add(BoxSizer5, 1, wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
     Panel_Alt->SetSizer(FlexGridSizer4);
     FlexGridSizer4->SetSizeHints(Panel_Alt);
-    Panel1 = new wxPanel(Notebook1, ID_PANEL5, wxPoint(119,15), wxSize(271,194), wxTAB_TRAVERSAL, _T("ID_PANEL5"));
+    PanelTwinkle = new wxPanel(Notebook1, ID_PANEL_TWINKLE, wxPoint(119,15), wxSize(271,194), wxTAB_TRAVERSAL, _T("ID_PANEL_TWINKLE"));
     FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
-    CheckBoxRunTw = new wxCheckBox(Panel1, ID_CHECKBOX_RUNTW, _("Twinkle selected lights"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RUNTW"));
+    CheckBoxRunTw = new wxCheckBox(PanelTwinkle, ID_CHECKBOX_RUNTW, _("Twinkle selected lights"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RUNTW"));
     CheckBoxRunTw->SetValue(false);
     FlexGridSizer5->Add(CheckBoxRunTw, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 10);
-    StaticText12 = new wxStaticText(Panel1, ID_STATICTEXT12, _("Twinkle Dimmer"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT12"));
+    StaticText12 = new wxStaticText(PanelTwinkle, ID_STATICTEXT12, _("Twinkle Dimmer"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT12"));
     wxFont StaticText12Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText12->SetFont(StaticText12Font);
     FlexGridSizer5->Add(StaticText12, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    SliderTwIntensity = new wxSlider(Panel1, ID_SLIDER_TWRATE, 255, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER_TWRATE"));
+    SliderTwIntensity = new wxSlider(PanelTwinkle, ID_SLIDER_TWRATE, 255, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER_TWRATE"));
     FlexGridSizer5->Add(SliderTwIntensity, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
     BoxSizer7 = new wxBoxSizer(wxHORIZONTAL);
-    StaticText13 = new wxStaticText(Panel1, ID_STATICTEXT13, _("Off"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
+    StaticText13 = new wxStaticText(PanelTwinkle, ID_STATICTEXT13, _("Off"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
     BoxSizer7->Add(StaticText13, 1, wxALL|wxSHAPED|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText14 = new wxStaticText(Panel1, ID_STATICTEXT14, _("On"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+    StaticText14 = new wxStaticText(PanelTwinkle, ID_STATICTEXT14, _("On"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     BoxSizer7->Add(StaticText14, 1, wxALL|wxSHAPED|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(BoxSizer7, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
-    Panel1->SetSizer(FlexGridSizer5);
-    FlexGridSizer5->SetSizeHints(Panel1);
-    Panel2 = new wxPanel(Notebook1, ID_PANEL6, wxPoint(91,12), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL6"));
+    PanelTwinkle->SetSizer(FlexGridSizer5);
+    FlexGridSizer5->SetSizeHints(PanelTwinkle);
+    PanelShimmer = new wxPanel(Notebook1, ID_PANEL_SHIMMER, wxPoint(91,12), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_SHIMMER"));
     FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer6->AddGrowableCol(0);
-    CheckBoxRunSh = new wxCheckBox(Panel2, ID_CHECKBOX_RUNSH, _("Shimmer selected lights"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RUNSH"));
+    CheckBoxRunSh = new wxCheckBox(PanelShimmer, ID_CHECKBOX_RUNSH, _("Shimmer selected lights"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RUNSH"));
     CheckBoxRunSh->SetValue(false);
     FlexGridSizer6->Add(CheckBoxRunSh, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 10);
-    StaticText16 = new wxStaticText(Panel2, ID_STATICTEXT16, _("Shimmer Dimmer"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
+    StaticText16 = new wxStaticText(PanelShimmer, ID_STATICTEXT16, _("Shimmer Dimmer"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
     wxFont StaticText16Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText16->SetFont(StaticText16Font);
     FlexGridSizer6->Add(StaticText16, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    SliderShIntensity = new wxSlider(Panel2, ID_SLIDER4, 255, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER4"));
+    SliderShIntensity = new wxSlider(PanelShimmer, ID_SLIDER4, 255, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSTATIC_BORDER, wxDefaultValidator, _T("ID_SLIDER4"));
     FlexGridSizer6->Add(SliderShIntensity, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
     BoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
-    StaticText18 = new wxStaticText(Panel2, ID_STATICTEXT18, _("Off"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
+    StaticText18 = new wxStaticText(PanelShimmer, ID_STATICTEXT18, _("Off"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
     BoxSizer11->Add(StaticText18, 1, wxALL|wxSHAPED|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText19 = new wxStaticText(Panel2, ID_STATICTEXT19, _("On"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT19"));
+    StaticText19 = new wxStaticText(PanelShimmer, ID_STATICTEXT19, _("On"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT19"));
     BoxSizer11->Add(StaticText19, 1, wxALL|wxSHAPED|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer6->Add(BoxSizer11, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
-    Panel2->SetSizer(FlexGridSizer6);
-    FlexGridSizer6->Fit(Panel2);
-    FlexGridSizer6->SetSizeHints(Panel2);
-    Panel4 = new wxPanel(Notebook1, ID_PANEL7, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL7"));
+    PanelShimmer->SetSizer(FlexGridSizer6);
+    FlexGridSizer6->Fit(PanelShimmer);
+    FlexGridSizer6->SetSizeHints(PanelShimmer);
+    PanelAutoTest = new wxPanel(Notebook1, ID_PANEL_AUTOTEST, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_AUTOTEST"));
     FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer8->AddGrowableCol(0);
     FlexGridSizer8->AddGrowableRow(1);
-    CheckBoxRunAuto = new wxCheckBox(Panel4, ID_CHECKBOX_AUTO, _("Run Automated Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_AUTO"));
+    CheckBoxRunAuto = new wxCheckBox(PanelAutoTest, ID_CHECKBOX_AUTO, _("Run Automated Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_AUTO"));
     CheckBoxRunAuto->SetValue(false);
     FlexGridSizer8->Add(CheckBoxRunAuto, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 10);
-    ListBoxAutoTest = new wxListBox(Panel4, ID_LISTBOX_AUTOTEST, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_LISTBOX_AUTOTEST"));
+    ListBoxAutoTest = new wxListBox(PanelAutoTest, ID_LISTBOX_AUTOTEST, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_LISTBOX_AUTOTEST"));
     ListBoxAutoTest->Append(_("Intensity 100%"));
     ListBoxAutoTest->Append(_("Intensity 50%"));
     ListBoxAutoTest->Append(_("Twinkle 100%"));
@@ -303,15 +308,27 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     ListBoxAutoTest->Append(_("Shimmer Ramp 100% to 0%"));
     ListBoxAutoTest->Disable();
     FlexGridSizer8->Add(ListBoxAutoTest, 1, wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 10);
-    Panel4->SetSizer(FlexGridSizer8);
-    FlexGridSizer8->Fit(Panel4);
-    FlexGridSizer8->SetSizeHints(Panel4);
+    PanelAutoTest->SetSizer(FlexGridSizer8);
+    FlexGridSizer8->Fit(PanelAutoTest);
+    FlexGridSizer8->SetSizeHints(PanelAutoTest);
+    PanelLog = new wxPanel(Notebook1, ID_PANEL_LOG, wxDefaultPosition, wxDefaultSize, 0, _T("ID_PANEL_LOG"));
+    PanelLog->Disable();
+    PanelLog->Hide();
+    FlexGridSizer9 = new wxFlexGridSizer(1, 1, 0, 0);
+    FlexGridSizer9->AddGrowableCol(0);
+    FlexGridSizer9->AddGrowableRow(0);
+    TextCtrlLog = new wxTextCtrl(PanelLog, ID_TEXTCTRL_LOG, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_LOG"));
+    FlexGridSizer9->Add(TextCtrlLog, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    PanelLog->SetSizer(FlexGridSizer9);
+    FlexGridSizer9->Fit(PanelLog);
+    FlexGridSizer9->SetSizeHints(PanelLog);
     Notebook1->AddPage(Panel_Dim, _("Dim"), false);
     Notebook1->AddPage(Panel_Seq, _("Sequence"), false);
     Notebook1->AddPage(Panel_Alt, _("Alternate"), false);
-    Notebook1->AddPage(Panel1, _("Twinkle"), false);
-    Notebook1->AddPage(Panel2, _("Shimmer"), false);
-    Notebook1->AddPage(Panel4, _("Automated"), false);
+    Notebook1->AddPage(PanelTwinkle, _("Twinkle"), false);
+    Notebook1->AddPage(PanelShimmer, _("Shimmer"), false);
+    Notebook1->AddPage(PanelAutoTest, _("Automated"), false);
+    Notebook1->AddPage(PanelLog, _("Log"), false);
     FlexGridSizer2->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel3->SetSizer(FlexGridSizer2);
     FlexGridSizer2->Fit(Panel3);
@@ -345,6 +362,12 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     //*)
 
     SetIcon(wxIcon(xlights_xpm));
+
+    /*
+    wxLog *logger=new wxLogTextCtrl(TextCtrlLog);
+    wxLog::SetActiveTarget(logger);
+    Notebook1->AddPage(PanelLog, _("Log"), false);
+    */
 
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
@@ -394,6 +417,14 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
     static unsigned int seqidx=9999,alt=0;
     int v,n,ch;
     unsigned int i;
+    /*
+    static bool loggingEnabled=false;
+    if (CheckBoxRunSh->IsChecked() && !loggingEnabled) {
+        wxLog::AddTraceMask(wxT("xout"));
+        loggingEnabled=true;
+    }
+    wxLogTrace(wxT("xout"),wxT("Starting OnTimer"));
+    */
     int netidx = Notebook2->GetSelection(); // which network
     wxCheckListBox* lb = Networks[netidx]->ListBox;
     int maxch = lb->GetCount();
@@ -654,6 +685,7 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
             break;
     }
     xout.TimerEnd();
+    wxLogTrace(wxT("xout"),wxT("Ending OnTimer"));
     //StatusBar1->SetStatusText(ts.Format(_("%S.%l")));
 }
 
@@ -708,7 +740,7 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
     Networks.Add(NetInfo);
 
     wxString net3 = NetInfo->net3();
-    int baud = atoi(BaudRate.mb_str(wxConvUTF8));
+    int baud = (BaudRate == _("n/a")) ? 230400 : atoi(BaudRate.mb_str(wxConvUTF8));
     try {
         xout.setnetwork(net3,cnt,MaxChannels,ComPort,baud);
     }
@@ -749,13 +781,17 @@ void xTesterFrame::OnCheckboxToggle(wxCommandEvent& event)
     int ChCount = lb->GetCount();
     int row=event.GetInt();
     bool newval=lb->IsChecked(row);
-    if (RadioButton16->GetValue()) {
-        for (int i=row+1; i <= row+15; i++) {
-            if (i >= ChCount) break;
+    long SelectCount;
+    wxString SelectString = ChoiceNumSelect->GetStringSelection();
+    if (SelectString == wxT("All")) {
+        for (int i=0; i < ChCount; i++) {
             lb->Check(i,newval);
         }
-    } else if (RadioButtonAll->GetValue()) {
-        for (int i=0; i < ChCount; i++) {
+    } else {
+        SelectString.ToLong(&SelectCount);
+        int lastrow = row+SelectCount;
+        for (int i=row+1; i < lastrow; i++) {
+            if (i >= ChCount) break;
             lb->Check(i,newval);
         }
     }
@@ -783,6 +819,7 @@ void xTesterFrame::OnButton1Click(wxCommandEvent& event)
 {
     alloff();
     StatusBar1->SetStatusText(_("All lights off"));
+    wxLog::ClearTraceMasks();
 }
 
 void xTesterFrame::OnMenuItemHelpContentSelected(wxCommandEvent& event)

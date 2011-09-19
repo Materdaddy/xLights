@@ -1,11 +1,12 @@
 /***************************************************************
  * Name:      xlights_out.cpp
  * Purpose:
-    Defines a common API for LOR, DMX, and Renard networks
+    Defines a common API for LOR, D-Light, DMX, Renard, Pixelnet, and E1.31 networks
     All calls should be made to xOutput class
+ *
  * Author:    Matt Brown (dowdybrown@yahoo.com)
  * Created:   2010-05-07
- * Copyright: 2010 by Matt Brown
+ * Copyright: 2010-2011 by Matt Brown
  * License:
      This file is part of xLights.
 
@@ -27,8 +28,9 @@
 #include <vector>
 #include <list>
 #include <time.h>
+#include <wx/socket.h>
 
-#define MAXNETWORKS 10
+#define MAXNETWORKS 16
 
 
 // *************************************************
@@ -37,7 +39,7 @@
 class xNetwork {
 protected:
   ctb::SerialPort* serptr;
-  unsigned char IntensityMap[256];
+  wxByte IntensityMap[256];
   char SerialConfig[4];
   long timer_msec;
   int max_intensity;
@@ -45,7 +47,7 @@ protected:
   wxString netdesc;
   friend class xChannel_Dimmer;
 
-  virtual void SetMappedIntensity (int chindex, unsigned char intensity) =0;
+  virtual void SetMappedIntensity (int chindex, wxByte intensity) =0;
 
 public:
 
@@ -60,7 +62,7 @@ public:
     if (serptr) delete serptr;
   };
 
-  unsigned char MapIntensity(unsigned char intensity) {
+  wxByte MapIntensity(wxByte intensity) {
     return IntensityMap[intensity];
   };
 
@@ -90,6 +92,9 @@ public:
     }
   };
 
+  virtual void InitNetwork(const wxString& ipaddr, wxUint16 UniverseNumber, wxUint16 NetNum) {
+  };
+
   virtual void TimerStart(long msec) {
     timer_msec=msec;
   };
@@ -103,7 +108,7 @@ public:
   virtual void ResetTimer() {
   };
 
-  virtual void SetIntensity (int chindex, unsigned char intensity) {
+  virtual void SetIntensity (int chindex, wxByte intensity) {
     SetMappedIntensity(chindex, IntensityMap[intensity]);
   };
 
@@ -135,7 +140,7 @@ protected:
   int myindex, twinklestate, effectperiod;
   char optype;
   long optimestart, optimeend, periodend;
-  unsigned char rampstart,rampend;
+  wxByte rampstart,rampend;
   double opduration, rampdiff;
 
   // returns a random value between 100 and 1100 (0.1 - 1.1 seconds)
@@ -155,7 +160,7 @@ public:
     optype=' ';
   };
 
-  void ramp (int duration, unsigned char startintensity, unsigned char endintensity) {
+  void ramp (int duration, wxByte startintensity, wxByte endintensity) {
     optype='R';
     opduration=duration;
     rampstart=mynet->MapIntensity(startintensity);
@@ -167,7 +172,7 @@ public:
   };
 
   // period - sets the upper bound on an individual twinkle (msec)
-  void twinkle (int period, unsigned char intensity) {
+  void twinkle (int period, wxByte intensity) {
     optype='T';
     optimestart=mynet->GetTimer();
     effectperiod=period;
@@ -179,7 +184,7 @@ public:
 
   // duration - total duration of the effect (msec)
   // period - sets the upper bound on an individual twinkle (msec)
-  void twinklefade (int period, int duration, unsigned char startintensity, unsigned char endintensity) {
+  void twinklefade (int period, int duration, wxByte startintensity, wxByte endintensity) {
     optype='t';
     opduration=duration;
     rampstart=mynet->MapIntensity(startintensity);
@@ -194,7 +199,7 @@ public:
   };
 
   // period - sets the length of each shimmer, typically 50-100 (msec)
-  void shimmer (int period, unsigned char intensity) {
+  void shimmer (int period, wxByte intensity) {
     optype='S';
     optimestart=mynet->GetTimer();
     effectperiod=period;
@@ -206,7 +211,7 @@ public:
 
   // duration - total duration of the effect (msec)
   // period - sets the length of each shimmer, typically 50-100 (msec)
-  void shimmerfade (int period, int duration, unsigned char startintensity, unsigned char endintensity) {
+  void shimmerfade (int period, int duration, wxByte startintensity, wxByte endintensity) {
     optype='s';
     opduration=duration;
     rampstart=mynet->MapIntensity(startintensity);
@@ -304,6 +309,13 @@ public:
     }
   };
 
+  void SetMaxIntensity(int maxintensity) {
+    max_intensity=maxintensity;
+    for (int i=0; i<=maxintensity; i++) {
+      IntensityMap[i]=(int)(255.0*(double)i/(double)maxintensity+0.5);
+    }
+  };
+
   void ResetTimer() {
     timerCallbackList.clear();
   };
@@ -311,9 +323,11 @@ public:
   // callbacks return true if they are finished, false if they will continue to run
   virtual void TimerStart(long msec) {
     timer_msec=msec;
+    int cnt=0;
     // process list of channels needing callbacks
     std::list<int>::iterator temp,it = timerCallbackList.begin();
     while (it != timerCallbackList.end()) {
+      cnt++;
       if (channels[*it]->ChannelCallback(msec)) {
         temp=it;
         ++it; // move past the one we are about to erase
@@ -322,6 +336,9 @@ public:
         ++it;
       }
     }
+#ifdef _WX_LOG_H_
+    wxLogTrace(wxT("xout"),wxT("xNetwork_Dimmer TimerStart %d chan"),cnt);
+#endif
   };
 
   void CreateChannels(int numchannels) {
@@ -361,7 +378,7 @@ public:
     AddChannelCallback(chindex);
   };
 
-  virtual void SetIntensity (int chindex, unsigned char intensity) {
+  virtual void SetIntensity (int chindex, wxByte intensity) {
     timerCallbackList.remove(chindex);  // ensure there are no lingering callbacks for this channel
     SetMappedIntensity(chindex, IntensityMap[intensity]);
   };
@@ -385,9 +402,9 @@ public:
 // ******************************************************
 class xNetwork_DMXentec: public xNetwork_Dimmer {
 protected:
-  unsigned char data[518];
+  wxByte data[518];
 
-  void SetMappedIntensity(int chindex, unsigned char mappedintensity) {
+  void SetMappedIntensity(int chindex, wxByte mappedintensity) {
     data[chindex+5]=mappedintensity;
     //printf("DMXentec::SetMappedIntensity channel=%d mapped-value=%d\n",chindex,(int)mappedintensity);
     changed=1;
@@ -410,13 +427,6 @@ public:
     CreateChannels(numchannels);
   };
 
-  void SetMaxIntensity(int maxintensity) {
-    max_intensity=maxintensity;
-    for (int i=0; i<=maxintensity; i++) {
-      IntensityMap[i]=(int)(255.0*(double)i/(double)maxintensity+0.5);
-    }
-  };
-
   void TimerEnd() {
     if (changed && serptr) {
       serptr->Write((char *)data,datalen);
@@ -426,14 +436,214 @@ public:
 };
 
 
+#define E131_PACKET_LEN 638
+#define E131_PORT 5568
+#define XLIGHTS_UUID "c0de0080-c69b-11e0-9572-0800200c9a66"
+
+// ******************************************************
+// * This class represents a single universe for E1.31
+// * Methods should be called with: 0 <= chindex <= 511
+// ******************************************************
+class xNetwork_E131: public xNetwork_Dimmer {
+protected:
+  wxByte data[E131_PACKET_LEN];
+  wxByte SequenceNum;
+  int SkipCount;
+  wxIPV4address remoteAddr;
+  wxDatagramSocket *datagram;
+
+  void SetMappedIntensity(int chindex, wxByte mappedintensity) {
+    data[chindex+126]=mappedintensity;
+    changed=1;
+  };
+
+public:
+  void InitNetwork(const wxString& ipaddr, wxUint16 UniverseNumber, wxUint16 NetNum) {
+    if (UniverseNumber == 0 || UniverseNumber >= 64000) {
+      throw "universe number must be between 1 and 63999";
+    }
+    SequenceNum=0;
+    SkipCount=0;
+
+    data[0]=0x00;   // RLP preamble size (high)
+    data[1]=0x10;   // RLP preamble size (low)
+    data[2]=0x00;   // RLP postamble size (high)
+    data[3]=0x00;   // RLP postamble size (low)
+    data[4]=0x41;   // ACN Packet Identifier (12 bytes)
+    data[5]=0x53;
+    data[6]=0x43;
+    data[7]=0x2d;
+    data[8]=0x45;
+    data[9]=0x31;
+    data[10]=0x2e;
+    data[11]=0x31;
+    data[12]=0x37;
+    data[13]=0x00;
+    data[14]=0x00;
+    data[15]=0x00;
+    data[16]=0x72;  // RLP Protocol flags and length (high)
+    data[17]=0x6e;  // 0x26e = 638 - 16
+    data[18]=0x00;  // RLP Vector (Identifies RLP Data as 1.31 Protocol PDU)
+    data[19]=0x00;
+    data[20]=0x00;
+    data[21]=0x04;
+
+    // CID/UUID
+
+    wxChar msb,lsb;
+    wxString id=wxT(XLIGHTS_UUID);
+    id.Replace(wxT("-"), wxT(""));
+    id.MakeLower();
+    if (id.Len() != 32) throw "invalid CID";
+    for (int i=0,j=22; i < 32; i+=2) {
+      msb=id.GetChar(i);
+      lsb=id.GetChar(i+1);
+      msb -= isdigit(msb) ? 0x30 : 0x57;
+      lsb -= isdigit(lsb) ? 0x30 : 0x57;
+      data[j++] = (wxByte)((msb << 4) | lsb);
+    }
+
+    data[38]=0x72;  // Framing Protocol flags and length (high)
+    data[39]=0x58;  // 0x258 = 638 - 38
+    data[40]=0x00;  // Framing Vector (indicates that the E1.31 framing layer is wrapping a DMP PDU)
+    data[41]=0x00;
+    data[42]=0x00;
+    data[43]=0x02;
+    data[44]='x';   // Source Name (64 bytes)
+    data[45]='L';
+    data[46]='i';
+    data[47]='g';
+    data[48]='h';
+    data[49]='t';
+    data[50]='s';
+    data[51]=0x00;
+    data[52]=0x00;
+    data[53]=0x00;
+    data[54]=0x00;
+    data[55]=0x00;
+    data[56]=0x00;
+    data[57]=0x00;
+    data[58]=0x00;
+    data[59]=0x00;
+    data[60]=0x00;
+    data[61]=0x00;
+    data[61]=0x00;
+    data[62]=0x00;
+    data[63]=0x00;
+    data[64]=0x00;
+    data[65]=0x00;
+    data[66]=0x00;
+    data[67]=0x00;
+    data[68]=0x00;
+    data[69]=0x00;
+    data[70]=0x00;
+    data[71]=0x00;
+    data[71]=0x00;
+    data[72]=0x00;
+    data[73]=0x00;
+    data[74]=0x00;
+    data[75]=0x00;
+    data[76]=0x00;
+    data[77]=0x00;
+    data[78]=0x00;
+    data[79]=0x00;
+    data[80]=0x00;
+    data[81]=0x00;
+    data[81]=0x00;
+    data[82]=0x00;
+    data[83]=0x00;
+    data[84]=0x00;
+    data[85]=0x00;
+    data[86]=0x00;
+    data[87]=0x00;
+    data[88]=0x00;
+    data[89]=0x00;
+    data[90]=0x00;
+    data[91]=0x00;
+    data[91]=0x00;
+    data[92]=0x00;
+    data[93]=0x00;
+    data[94]=0x00;
+    data[95]=0x00;
+    data[96]=0x00;
+    data[97]=0x00;
+    data[98]=0x00;
+    data[99]=0x00;
+    data[100]=0x00;
+    data[101]=0x00;
+    data[101]=0x00;
+    data[102]=0x00;
+    data[103]=0x00;
+    data[104]=0x00;
+    data[105]=0x00;
+    data[106]=0x00;
+    data[107]=0x00;
+    data[108]=100;  // Priority
+    data[109]=0x00; // Reserved
+    data[110]=0x00; // Reserved
+    data[111]=0x00; // Sequence Number
+    data[112]=0x00; // Framing Options Flags
+    data[113]=UniverseNumber >> 8;   // Universe Number (high)
+    data[114]=UniverseNumber & 0xff; // Universe Number (low)
+
+    data[115]=0x72;  // DMP Protocol flags and length (high)
+    data[116]=0x0b;  // 0x20b = 638 - 115
+    data[117]=0x00;  // DMP Vector (Identifies DMP Set Property Message PDU)
+    data[118]=0xa1;  // DMP Address Type & Data Type
+    data[119]=0x00;  // First Property Address (high)
+    data[120]=0x00;  // First Property Address (low)
+    data[121]=0x00;  // Address Increment (high)
+    data[122]=0x01;  // Address Increment (low)
+    data[123]=0x02;  // Property value count (high)
+    data[124]=0x01;  // Property value count (low)
+    data[125]=0x00;  // DMX512-A START Code
+
+    wxIPV4address localaddr;
+    localaddr.AnyAddress();
+    localaddr.Service(0x8000 | NetNum);
+    datagram = new wxDatagramSocket(localaddr, wxSOCKET_NOWAIT);
+
+    remoteAddr.Hostname (ipaddr);
+    remoteAddr.Service (E131_PORT);
+  };
+
+  void SetChannelCount(int numchannels) {
+    if (numchannels > 512) {
+      throw "max channels on DMX is 512";
+    }
+    changed=0;
+    CreateChannels(numchannels);
+  };
+
+  void TimerEnd() {
+    if (changed || SkipCount > 10) {
+      data[111]=SequenceNum;
+      datagram->SendTo(remoteAddr, data, E131_PACKET_LEN);
+      SequenceNum= SequenceNum==255 ? 0 : SequenceNum+1;
+      changed=0;
+      SkipCount=0;
+    } else {
+      SkipCount++;
+    }
+  };
+};
+
+
 
 // Should be called with: 0 <= chindex <= 1015 (max channels=127*8)
 class xNetwork_Renard: public xNetwork_Dimmer {
 protected:
-  unsigned char data[1024];
+  wxByte data[1024];
 
-  void SetMappedIntensity (int chindex, unsigned char mappedintensity) {
-    data[chindex+2]=mappedintensity;
+  void SetMappedIntensity (int chindex, wxByte mappedintensity) {
+    wxByte RenIntensity;
+    switch (mappedintensity) {
+      case 0x7D:
+      case 0x7E: RenIntensity=0x7C; break;
+      case 0x7F: RenIntensity=0x80; break;
+      default: RenIntensity=mappedintensity;
+    }
+    data[chindex+2]=RenIntensity;
     changed=1;
   };
 
@@ -453,23 +663,41 @@ public:
     SerialConfig[2]='2'; // use 2 stop bits so padding chars are not required
   };
 
-  void SetMaxIntensity(int maxintensity) {
-    max_intensity=maxintensity;
-    for (int temp,i=0; i<=maxintensity; i++) {
-      temp=(int)(255.0*(double)i/(double)maxintensity+0.5);
-      switch (temp) {
-        case 0x7D:
-        case 0x7E: temp=0x7C; break;
-        case 0x7F: temp=0x80; break;
-      }
-      IntensityMap[i]=temp;
-    }
-  };
-
   void TimerEnd() {
     if (changed && serptr) {
       serptr->Write((char *)data,datalen);
       changed=0;
+    }
+  };
+};
+
+
+
+// Should be called with: 0 <= chindex <= 4095
+class xNetwork_PixelNet: public xNetwork_Dimmer {
+protected:
+  wxByte data[4096];
+  wxByte SerialBuffer[4097];
+
+  void SetMappedIntensity (int chindex, wxByte mappedintensity) {
+    data[chindex]=mappedintensity==170 ? 171 : mappedintensity;
+  };
+
+public:
+  void SetChannelCount(int numchannels) {
+    if (numchannels > 4096) {
+      throw "max channels on a PixelNet network is 4096";
+    }
+    datalen=numchannels;
+    CreateChannels(numchannels);
+    memset(data,0,sizeof(data));
+  };
+
+  void TimerEnd() {
+    if (serptr && serptr->WaitingToWrite()==0) {
+      memcpy(&SerialBuffer[1],data,sizeof(data));
+      SerialBuffer[0]=170;    // start of message
+      serptr->Write((char *)SerialBuffer,sizeof(SerialBuffer));
     }
   };
 };
@@ -482,8 +710,8 @@ protected:
   long lastheartbeat;
 
   // set intensity to a value that has already been mapped
-  void SetMappedIntensity (int chindex, unsigned char intensity) {
-    unsigned char d[6];
+  void SetMappedIntensity (int chindex, wxByte intensity) {
+    wxByte d[6];
     d[0]=0;
     d[1]=chindex >> 4;
     if (d[1] < 0xF0) d[1]++;
@@ -496,8 +724,8 @@ protected:
   };
 
   // shimmer or twinkle at constant intensity
-  void shimtwink (unsigned char cmd, int chindex, int period, int intensity) {
-    unsigned char d[8];
+  void shimtwink (wxByte cmd, int chindex, int period, int intensity) {
+    wxByte d[8];
     d[0]=0;
     d[1]=chindex >> 4;
     if (d[1] < 0xF0) d[1]++;
@@ -516,8 +744,8 @@ protected:
   };
 
   // shimmer or twinkle while ramping intensity up or down
-  virtual void shimtwinkfade (unsigned char cmd, int chindex, int period, int duration, int startintensity, int endintensity) {
-    unsigned char d[11];
+  virtual void shimtwinkfade (wxByte cmd, int chindex, int period, int duration, int startintensity, int endintensity) {
+    wxByte d[11];
     d[0]=0;
     d[1]=chindex >> 4;
     if (d[1] < 0xF0) d[1]++;
@@ -549,7 +777,7 @@ protected:
 
 public:
   void SendHeartbeat () {
-    unsigned char d[5];
+    wxByte d[5];
     d[0]=0;
     d[1]=0xFF;
     d[2]=0x81;
@@ -589,7 +817,7 @@ public:
   };
 
   void ramp (int chindex, int duration, int startintensity, int endintensity) {
-    unsigned char d[9];
+    wxByte d[9];
     d[3]=IntensityMap[startintensity];
     d[4]=IntensityMap[endintensity];
     if (d[3] == d[4]) {
@@ -647,8 +875,8 @@ public:
 class xNetwork_DLight: public xNetwork_LOR {
 
   // shimmer or twinkle at constant intensity
-  void shimtwink (unsigned char cmd, int chindex, int period, int intensity) {
-    unsigned char d[8];
+  void shimtwink (wxByte cmd, int chindex, int period, int intensity) {
+    wxByte d[8];
     d[0]=0;
     d[1]=chindex >> 4;
     if (d[1] < 0xF0) d[1]++;
@@ -665,8 +893,8 @@ class xNetwork_DLight: public xNetwork_LOR {
   };
 
   // shimmer or twinkle while ramping intensity up or down
-  virtual void shimtwinkfade (unsigned char cmd, int chindex, int period, int duration, int startintensity, int endintensity) {
-    unsigned char d[10];
+  virtual void shimtwinkfade (wxByte cmd, int chindex, int period, int duration, int startintensity, int endintensity) {
+    wxByte d[10];
     d[3]=IntensityMap[startintensity];
     d[4]=IntensityMap[endintensity];
     if (d[3] == d[4]) {
@@ -729,6 +957,10 @@ public:
         netobj = new xNetwork_Renard();
     } else if (nettype3 == wxT("DMX")) {
         netobj = new xNetwork_DMXentec();
+    } else if (nettype3 == wxT("Pix")) {
+        netobj = new xNetwork_PixelNet();
+    } else if (nettype3 == wxT("E13")) {
+        netobj = new xNetwork_E131();
     } else {
         throw "unknown network type";
     }
@@ -737,7 +969,11 @@ public:
     wxString description = nettype3 + _(" on ") + portname;
     netobj->SetNetworkDesc(description);
     if (netnum > lastnetnum) lastnetnum = netnum;
-    netobj->InitSerialPort(portname, baudrate);
+    if (nettype3 == wxT("E13")) {
+      netobj->InitNetwork(portname, baudrate, (wxUint16) netnum);  // portname is ip address and baudrate is universe number
+    } else {
+      netobj->InitSerialPort(portname, baudrate);
+    }
   };
 
   // returns the network index, or -1 on failure

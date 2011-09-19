@@ -2,8 +2,7 @@
 <wxsmith>
 	<object class="wxDialog" name="NetworkDialog">
 		<title>Define Lighting Networks</title>
-		<pos_arg>1</pos_arg>
-		<size_arg>1</size_arg>
+		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>3</cols>
 			<object class="sizeritem">
@@ -25,24 +24,6 @@
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON_ADDROW" variable="ButtonAddRow" member="yes">
-										<label>Add Row</label>
-										<handler function="OnButtonAddRowClick" entry="EVT_BUTTON" />
-									</object>
-									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON_DELROW" variable="ButtonDelRow" member="yes">
-										<label>Delete Row</label>
-										<handler function="OnButtonDelRowClick" entry="EVT_BUTTON" />
-									</object>
-									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON_NETCLOSE" variable="ButtonNetClose" member="yes">
 										<label>Cancel</label>
 										<handler function="OnButtonNetCloseClick" entry="EVT_BUTTON" />
@@ -52,13 +33,120 @@
 									<option>1</option>
 								</object>
 							</object>
-							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
+								<label>Select a row by clicking on the row number</label>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_EDIT_ROW" variable="ButtonEditRow" member="yes">
+										<label>Change</label>
+										<handler function="OnButtonEditRowClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_DELROW" variable="ButtonDelRow" member="yes">
+										<label>Delete</label>
+										<handler function="OnButtonDelRowClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_MOVE_UP" variable="ButtonMoveUp" member="yes">
+										<label>Move Up</label>
+										<handler function="OnButtonMoveUpClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_MOVE_DOWN" variable="ButtonMoveDown" member="yes">
+										<label>Move Down</label>
+										<handler function="OnButtonMoveDownClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+							<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
+								<label>Add a new lighting network</label>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_ADD_LOR" variable="ButtonAddLOR" member="yes">
+										<label>LOR</label>
+										<handler function="OnButtonAddLORClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_ADD_DLIGHT" variable="ButtonAddDLight" member="yes">
+										<label>D-Light</label>
+										<handler function="OnButtonAddDLightClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_ADD_RENARD" variable="ButtonAddRenard" member="yes">
+										<label>Renard</label>
+										<handler function="OnButtonAddRenardClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_ADD_DMX" variable="ButtonAddDMX" member="yes">
+										<label>DMX Dongle</label>
+										<handler function="OnButtonAddDMXClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_ADD_PIXELNET" variable="ButtonAddPixelnet" member="yes">
+										<label>PixelNet Dongle</label>
+										<handler function="OnButtonAddPixelnetClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_ADD_E131" variable="ButtonAddE131" member="yes">
+										<label>E1.31</label>
+										<handler function="OnButtonAddE131Click" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+							<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
 							<option>1</option>
 						</object>
 						<object class="sizeritem">
 							<object class="wxGrid" name="ID_GRID_NETWORK" variable="GridNetwork" member="yes">
 								<cols>4</cols>
+								<readonly>1</readonly>
 								<labelcolwidth>50</labelcolwidth>
 								<defaultcolsize>120</defaultcolsize>
 								<collabels>
@@ -68,7 +156,6 @@
 									<item>Last Channel</item>
 								</collabels>
 								<size>530,139</size>
-								<handler function="OnGridNetworkEditorShown" entry="EVT_CMD_GRID_EDITOR_SHOWN" />
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>

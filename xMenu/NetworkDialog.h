@@ -24,21 +24,37 @@ class NetworkDialog: public wxDialog
 		virtual ~NetworkDialog();
 
 		//(*Declarations(NetworkDialog)
+		wxButton* ButtonMoveUp;
+		wxButton* ButtonAddE131;
+		wxButton* ButtonAddDLight;
 		wxButton* ButtonNetClose;
+		wxButton* ButtonAddRenard;
+		wxButton* ButtonAddDMX;
+		wxButton* ButtonMoveDown;
 		wxPanel* Panel1;
 		wxGrid* GridNetwork;
+		wxButton* ButtonAddLOR;
 		wxButton* ButtonSave;
-		wxButton* ButtonAddRow;
+		wxButton* ButtonAddPixelnet;
 		wxButton* ButtonDelRow;
+		wxButton* ButtonEditRow;
 		//*)
 
 	protected:
 
 		//(*Identifiers(NetworkDialog)
 		static const long ID_BUTTON_SAVE;
-		static const long ID_BUTTON_ADDROW;
-		static const long ID_BUTTON_DELROW;
 		static const long ID_BUTTON_NETCLOSE;
+		static const long ID_BUTTON_EDIT_ROW;
+		static const long ID_BUTTON_DELROW;
+		static const long ID_BUTTON_MOVE_UP;
+		static const long ID_BUTTON_MOVE_DOWN;
+		static const long ID_BUTTON_ADD_LOR;
+		static const long ID_BUTTON_ADD_DLIGHT;
+		static const long ID_BUTTON_ADD_RENARD;
+		static const long ID_BUTTON_ADD_DMX;
+		static const long ID_BUTTON_ADD_PIXELNET;
+		static const long ID_BUTTON_ADD_E131;
 		static const long ID_GRID_NETWORK;
 		static const long ID_PANEL1;
 		//*)
@@ -52,6 +68,15 @@ class NetworkDialog: public wxDialog
 		void OnGridNetworkEditorShown(wxGridEvent& event);
 		void OnGridNetworkCellLeftClick(wxGridEvent& event);
 		void OnButtonNetCloseClick(wxCommandEvent& event);
+		void OnButtonMoveUpClick(wxCommandEvent& event);
+		void OnButtonMoveDownClick(wxCommandEvent& event);
+		void OnButtonEditRowClick(wxCommandEvent& event);
+		void OnButtonAddLORClick(wxCommandEvent& event);
+		void OnButtonAddDLightClick(wxCommandEvent& event);
+		void OnButtonAddRenardClick(wxCommandEvent& event);
+		void OnButtonAddDMXClick(wxCommandEvent& event);
+		void OnButtonAddPixelnetClick(wxCommandEvent& event);
+		void OnButtonAddE131Click(wxCommandEvent& event);
 		//*)
 
         wxFileName networkFile;
@@ -59,7 +84,10 @@ class NetworkDialog: public wxDialog
 
         void SaveFile();
         void LoadFile();
-        void PopulatePortChooser(wxArrayString *chooser);
+        void MoveRowData(int fromRow, int toRow);
+        void AddSerial(wxString NetName, int r=-1);
+        bool EnableRate(const wxString& NetName);
+        void AddE131(int r=-1);
 
 		DECLARE_EVENT_TABLE()
 };
