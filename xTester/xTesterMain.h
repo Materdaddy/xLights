@@ -29,7 +29,6 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
-#include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/listbox.h>
 #include <wx/slider.h>
@@ -140,8 +139,6 @@ class xTesterFrame: public wxFrame
         static const long ID_CHECKBOX_AUTO;
         static const long ID_LISTBOX_AUTOTEST;
         static const long ID_PANEL_AUTOTEST;
-        static const long ID_TEXTCTRL_LOG;
-        static const long ID_PANEL_LOG;
         static const long ID_NOTEBOOK1;
         static const long ID_PANEL4;
         static const long idMenuQuit;
@@ -158,14 +155,12 @@ class xTesterFrame: public wxFrame
         wxStaticText* StaticText9;
         wxNotebook* Notebook1;
         wxPanel* PanelAutoTest;
-        wxPanel* PanelLog;
         wxCheckBox* CheckBoxRunSh;
         wxStaticText* StaticText13;
         wxStaticText* StaticText2;
         wxStaticText* StaticText14;
         wxButton* Button1;
         wxPanel* PanelTwinkle;
-        wxTextCtrl* TextCtrlLog;
         wxStaticText* StaticText6;
         wxSlider* SliderShIntensity;
         wxSlider* Slider3;
