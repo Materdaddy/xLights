@@ -113,8 +113,17 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON_ADD_DMX" variable="ButtonAddDMX" member="yes">
-										<label>DMX Dongle</label>
+										<label>DMX Pro/Lynx</label>
 										<handler function="OnButtonAddDMXClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_ADD_OPEN_DMX" variable="ButtonAddOpenDMX" member="yes">
+										<label>Open DMX</label>
+										<handler function="OnButtonAddOpenDMXClick" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>

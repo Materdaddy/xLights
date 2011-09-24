@@ -21,6 +21,7 @@ const long NetworkDialog::ID_BUTTON_ADD_LOR = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_DLIGHT = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_RENARD = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_DMX = wxNewId();
+const long NetworkDialog::ID_BUTTON_ADD_OPEN_DMX = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_PIXELNET = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_E131 = wxNewId();
 const long NetworkDialog::ID_GRID_NETWORK = wxNewId();
@@ -70,8 +71,10 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	StaticBoxSizer2->Add(ButtonAddDLight, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonAddRenard = new wxButton(Panel1, ID_BUTTON_ADD_RENARD, _("Renard"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_RENARD"));
 	StaticBoxSizer2->Add(ButtonAddRenard, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonAddDMX = new wxButton(Panel1, ID_BUTTON_ADD_DMX, _("DMX Dongle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_DMX"));
+	ButtonAddDMX = new wxButton(Panel1, ID_BUTTON_ADD_DMX, _("DMX Pro/Lynx"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_DMX"));
 	StaticBoxSizer2->Add(ButtonAddDMX, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonAddOpenDMX = new wxButton(Panel1, ID_BUTTON_ADD_OPEN_DMX, _("Open DMX"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_OPEN_DMX"));
+	StaticBoxSizer2->Add(ButtonAddOpenDMX, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonAddPixelnet = new wxButton(Panel1, ID_BUTTON_ADD_PIXELNET, _("PixelNet Dongle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_PIXELNET"));
 	StaticBoxSizer2->Add(ButtonAddPixelnet, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonAddE131 = new wxButton(Panel1, ID_BUTTON_ADD_E131, _("E1.31"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_E131"));
@@ -108,11 +111,14 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	Connect(ID_BUTTON_ADD_DLIGHT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddDLightClick);
 	Connect(ID_BUTTON_ADD_RENARD,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddRenardClick);
 	Connect(ID_BUTTON_ADD_DMX,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddDMXClick);
+	Connect(ID_BUTTON_ADD_OPEN_DMX,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddOpenDMXClick);
 	Connect(ID_BUTTON_ADD_PIXELNET,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddPixelnetClick);
 	Connect(ID_BUTTON_ADD_E131,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddE131Click);
 	//*)
 
     GridNetwork->SetSelectionMode(wxGrid::wxGridSelectRows);
+	GridNetwork->SetColLabelValue(2, _("Baud Rate or\nE1.31 Univ"));
+
 
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
@@ -156,7 +162,7 @@ void NetworkDialog::LoadFile()
                 r++;
             }
         }
-        if (r > 0) GridNetwork->AutoSizeColumns();
+        //if (r > 0) GridNetwork->AutoSizeColumns();
     } else {
         wxMessageBox(_("Unable to load network definition file"), _("Error"));
     }
@@ -281,7 +287,7 @@ void NetworkDialog::OnButtonEditRowClick(wxCommandEvent& event)
 
 bool NetworkDialog::EnableRate(const wxString& NetName)
 {
-    return (NetName!=wxT("DMX") && NetName!=wxT("PixelNet"));
+    return (NetName!=wxT("DMX") && NetName!=wxT("OpenDMX") && NetName!=wxT("PixelNet"));
 }
 
 void NetworkDialog::AddSerial(wxString NetName, int r)
@@ -325,7 +331,9 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
                 }
                 GridNetwork->SetCellValue(r,0,NetName);
                 GridNetwork->SetCellValue(r,1,Port);
-                if (RateEnabled)
+                if (NetName==wxT("OpenDMX"))
+                    GridNetwork->SetCellValue(r,2,wxT("250000"));
+                else if (RateEnabled)
                     GridNetwork->SetCellValue(r,2,BaudRate);
                 else
                     GridNetwork->SetCellValue(r,2,_("n/a"));
@@ -416,4 +424,9 @@ void NetworkDialog::AddE131(int r)
 void NetworkDialog::OnButtonAddE131Click(wxCommandEvent& event)
 {
     AddE131();
+}
+
+void NetworkDialog::OnButtonAddOpenDMXClick(wxCommandEvent& event)
+{
+    AddSerial(wxT("OpenDMX"));
 }

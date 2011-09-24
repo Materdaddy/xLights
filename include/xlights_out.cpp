@@ -436,6 +436,44 @@ public:
 };
 
 
+// ******************************************************
+// * This class represents a single DMX universe
+// * Compatible with Entec Open DMX, LOR dongle, D-Light dongle, 
+// * and any other FTDI-based USB to RS-485 converter
+// * Methods should be called with: 0 <= chindex <= 511
+// ******************************************************
+class xNetwork_DMXopen: public xNetwork_Dimmer {
+protected:
+  wxByte data[513];
+
+  void SetMappedIntensity(int chindex, wxByte mappedintensity) {
+    data[chindex+1]=mappedintensity;
+    //printf("DMXentec::SetMappedIntensity channel=%d mapped-value=%d\n",chindex,(int)mappedintensity);
+    changed=1;
+  };
+
+public:
+  void SetChannelCount(int numchannels) {
+    if (numchannels > 512) {
+      throw "max channels on DMX is 512";
+    }
+    data[0]=0;   // dmx start code
+    changed=0;
+    CreateChannels(numchannels);
+    SerialConfig[2]='2'; // use 2 stop bits so padding chars are not required
+  };
+
+  void TimerEnd() {
+    if (serptr) {
+      serptr->SendBreak();  // sends a 1 millisecond break
+      wxMilliSleep(1);      // mark after break (MAB) - 1 millisecond is overkill (8 microseconds is the minimum dmx requirement)
+      serptr->Write((char *)data,513);
+      changed=0;
+    }
+  };
+};
+
+
 #define E131_PACKET_LEN 638
 #define E131_PORT 5568
 #define XLIGHTS_UUID "c0de0080-c69b-11e0-9572-0800200c9a66"
@@ -957,6 +995,8 @@ public:
         netobj = new xNetwork_Renard();
     } else if (nettype3 == wxT("DMX")) {
         netobj = new xNetwork_DMXentec();
+    } else if (nettype3 == wxT("Ope")) {
+        netobj = new xNetwork_DMXopen();
     } else if (nettype3 == wxT("Pix")) {
         netobj = new xNetwork_PixelNet();
     } else if (nettype3 == wxT("E13")) {

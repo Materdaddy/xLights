@@ -38,6 +38,7 @@ class NetworkDialog: public wxDialog
 		wxButton* ButtonAddPixelnet;
 		wxButton* ButtonDelRow;
 		wxButton* ButtonEditRow;
+		wxButton* ButtonAddOpenDMX;
 		//*)
 
 	protected:
@@ -53,6 +54,7 @@ class NetworkDialog: public wxDialog
 		static const long ID_BUTTON_ADD_DLIGHT;
 		static const long ID_BUTTON_ADD_RENARD;
 		static const long ID_BUTTON_ADD_DMX;
+		static const long ID_BUTTON_ADD_OPEN_DMX;
 		static const long ID_BUTTON_ADD_PIXELNET;
 		static const long ID_BUTTON_ADD_E131;
 		static const long ID_GRID_NETWORK;
@@ -77,6 +79,7 @@ class NetworkDialog: public wxDialog
 		void OnButtonAddDMXClick(wxCommandEvent& event);
 		void OnButtonAddPixelnetClick(wxCommandEvent& event);
 		void OnButtonAddE131Click(wxCommandEvent& event);
+		void OnButtonAddOpenDMXClick(wxCommandEvent& event);
 		//*)
 
         wxFileName networkFile;

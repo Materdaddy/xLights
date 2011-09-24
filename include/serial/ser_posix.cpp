@@ -165,9 +165,24 @@ class SerialPort : public SerialPort_x
     int AvailableToRead()
     {
       int bytes = 0;
-      ioctl(fd, FIONREAD, &bytes);
+      ioctl(fd, TIOCINQ, &bytes);
       return bytes;
     }
+
+    int WaitingToWrite()
+    {
+      int bytes = 0;
+      ioctl(fd, TIOCOUTQ, &bytes);
+      return bytes;
+    }
+
+    int SendBreak()
+    {
+     ioctl(fd, TIOCSBRK);
+     wxMilliSleep(1);
+     ioctl(fd, TIOCCBRK);
+     return 0;
+    };
 
     int Read(char* buf,size_t len)
     {

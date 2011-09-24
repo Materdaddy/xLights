@@ -268,6 +268,15 @@ namespace ctb {
      return write;
     };
 
+    int SendBreak()
+    {
+     if(!SetCommBreak(fd)) return -1;
+     wxMilliSleep(1);
+     if(!ClearCommBreak(fd)) return -1;
+     // no error
+     return 0;
+    };
+
   }; // class SerialPort
 
 } // namespace ctb

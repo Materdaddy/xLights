@@ -55,7 +55,19 @@ class SerialPort_x
         return callback;
     }
 
+    /* returns the number of bytes available in the receive buffer */
     virtual int AvailableToRead() = 0;
+
+    /* returns the number of unsent bytes in the transmit buffer */
+    virtual int WaitingToWrite() = 0;
+
+     /*!
+    \brief Sendbreak transmits a continuous stream of zero-valued
+    bits for 1 millisecond.
+    \return zero on success, -1 if an error occurs.
+     */
+     virtual int SendBreak() = 0;
+
 
      /*!
     Closed the interface. Internally it calls the CloseDevice()
