@@ -2,11 +2,11 @@
 #define SERIALPORTWITHRATE_H
 
 //(*Headers(SerialPortWithRate)
+#include <wx/dialog.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/choice.h>
-#include <wx/dialog.h>
 //*)
 
 class SerialPortWithRate: public wxDialog
@@ -17,12 +17,12 @@ class SerialPortWithRate: public wxDialog
 		virtual ~SerialPortWithRate();
 
 		//(*Declarations(SerialPortWithRate)
-		wxStaticText* StaticTextRate;
-		wxChoice* ChoicePort;
+		wxStaticText* StaticTextPort;
 		wxStaticText* StaticText3;
 		wxTextCtrl* TextCtrlLastChannel;
+		wxChoice* ChoicePort;
+		wxStaticText* StaticTextRate;
 		wxChoice* ChoiceBaudRate;
-		wxStaticText* StaticTextPort;
 		//*)
 
 	protected:

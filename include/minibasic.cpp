@@ -118,7 +118,7 @@ typedef double (MiniBasicClass::*NumericFuncPtr)(void);
 typedef char* (MiniBasicClass::*StringFuncPtr)(void);
 
 typedef struct {
-  char name[16];
+  char name[20];
   int length;
   int tokennum;
   int tokentype;
@@ -2634,7 +2634,7 @@ virtual bool runFromLineIdx(int curline = 0) {
     if(errorflag) {
       reporterror(lines[curline].no);
       answer = false;
-      nextline == EXEC_HALT;
+      nextline = EXEC_HALT;
     }
 
     if(nextline == EXEC_HALT)

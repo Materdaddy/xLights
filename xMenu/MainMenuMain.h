@@ -26,13 +26,13 @@
 
 //(*Headers(MainMenuFrame)
 #include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/menu.h>
-#include <wx/panel.h>
 #include <wx/button.h>
+#include <wx/menu.h>
 #include <wx/dirdlg.h>
-#include <wx/frame.h>
+#include <wx/panel.h>
 #include <wx/statusbr.h>
+#include <wx/frame.h>
+#include <wx/stattext.h>
 //*)
 
 #include <wx/config.h>
@@ -86,18 +86,18 @@ class MainMenuFrame: public wxFrame
         //*)
 
         //(*Declarations(MainMenuFrame)
-        wxButton* ButtonSequence;
-        wxStaticText* StaticText2;
-        wxPanel* Panel1;
-        wxStaticText* StaticText1;
-        wxButton* ButtonChangeDir;
         wxStaticText* StaticTextDirName;
-        wxButton* ButtonNetworkSetup;
-        wxMenuItem* MenuItem3;
+        wxPanel* Panel1;
         wxStatusBar* StatusBar1;
         wxDirDialog* DirDialog1;
-        wxButton* ButtonSchedule;
+        wxStaticText* StaticText1;
+        wxMenuItem* MenuItem3;
+        wxButton* ButtonNetworkSetup;
+        wxButton* ButtonSequence;
         wxButton* ButtonTest;
+        wxButton* ButtonChangeDir;
+        wxStaticText* StaticText2;
+        wxButton* ButtonSchedule;
         wxButton* ButtonTestRGB;
         //*)
 

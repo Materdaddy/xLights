@@ -14,7 +14,9 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-
+#ifndef __WXOSX__
+#include <linux/serial.h>
+#endif
 
 namespace ctb {
 
@@ -96,7 +98,8 @@ class SerialPort : public SerialPort_x
         m_devname = devname;
 
         // Fill the internal termios struct.
-        cfsetspeed(&t, AdaptBaudrate( baudrate ) );
+        speed_t adBaudrate=AdaptBaudrate( baudrate );
+        cfsetspeed(&t, adBaudrate);
 
         // parity settings
         switch( protocol[1] ) {
@@ -141,6 +144,40 @@ class SerialPort : public SerialPort_x
         t.c_cc[VTIME] = 0;
         // write the settings
         if (tcsetattr(fd,TCSANOW,&t) == -1) return -1;
+
+        if (adBaudrate==B38400 && baudrate!=38400) {
+
+          // custom baud rate
+
+#ifdef __WXOSX__
+
+          // OS/X version
+          if ( ioctl( fd, IOSSIOSPEED, &baudrate ) == -1 ) {
+              //printf( "Error %d calling ioctl( ..., IOSSIOSPEED, ... )\n", errno );
+              return -1;
+          }
+
+#else
+
+          // Linux version
+
+          struct serial_struct sstruct;
+          if(ioctl(fd, TIOCGSERIAL, &sstruct) < 0){
+              //printf("Error: could not get comm ioctl\n");
+              return -1;
+          }
+          sstruct.custom_divisor = sstruct.baud_base / baudrate;
+          sstruct.flags &= ~ASYNC_SPD_MASK;
+          sstruct.flags |= ASYNC_SPD_CUST;
+          if(ioctl(fd, TIOCSSERIAL, &sstruct) < 0){
+              //printf("Error: could not set custom comm baud divisor\n");
+              return -1;
+          }
+
+#endif
+
+        }
+
 
        return fd;
     };

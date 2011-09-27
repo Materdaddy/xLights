@@ -96,7 +96,7 @@ class SerialPort_x
   }; // class SerialPort_x
 } // namespace ctb
 
-#if defined (WIN32)
+#ifdef __WXMSW__
 # include "ser_win32.cpp"
 #else
 # include "ser_posix.cpp"

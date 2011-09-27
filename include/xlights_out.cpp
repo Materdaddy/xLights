@@ -984,8 +984,9 @@ public:
     }
   };
 
-  void setnetwork (const wxString& nettype3, int netnum, int chcount, const wxString& portname, int baudrate) {
+  void setnetwork (const wxString& NetworkType, int netnum, int chcount, const wxString& portname, int baudrate) {
     xNetwork* netobj;
+    wxString nettype3 = NetworkType.Left(3);
     if (networks[netnum]) throw "duplicate network defined";
     if (nettype3 == wxT("LOR")) {
         netobj = new xNetwork_LOR();
@@ -1006,7 +1007,7 @@ public:
     }
     networks[netnum] = netobj;
     netobj->SetChannelCount(chcount);
-    wxString description = nettype3 + _(" on ") + portname;
+    wxString description = NetworkType + _(" on ") + portname;
     netobj->SetNetworkDesc(description);
     if (netnum > lastnetnum) lastnetnum = netnum;
     if (nettype3 == wxT("E13")) {
@@ -1017,10 +1018,10 @@ public:
   };
 
   // returns the network index, or -1 on failure
-  int addnetwork (const wxString& nettype3, int chcount, const wxString& portname, int baudrate) {
+  int addnetwork (const wxString& NetworkType, int chcount, const wxString& portname, int baudrate) {
     for (int i=0; i<MAXNETWORKS; i++) {
       if (networks[i] == 0) {
-        setnetwork(nettype3, i, chcount, portname, baudrate);
+        setnetwork(NetworkType, i, chcount, portname, baudrate);
         return i;
       }
     }

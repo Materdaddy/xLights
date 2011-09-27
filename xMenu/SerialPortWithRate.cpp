@@ -1,9 +1,9 @@
 #include "SerialPortWithRate.h"
 
 //(*InternalHeaders(SerialPortWithRate)
-#include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
+#include <wx/intl.h>
 //*)
 #include <wx/valtext.h>
 
@@ -24,8 +24,8 @@ END_EVENT_TABLE()
 SerialPortWithRate::SerialPortWithRate(wxWindow* parent,const wxString& title)
 {
 	//(*Initialize(SerialPortWithRate)
-	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer2;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
 
 	Create(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
@@ -33,7 +33,7 @@ SerialPortWithRate::SerialPortWithRate(wxWindow* parent,const wxString& title)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticTextPort = new wxStaticText(this, ID_STATICTEXT_PORT, _("Port"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT_PORT"));
 	FlexGridSizer2->Add(StaticTextPort, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	ChoicePort = new wxChoice(this, ID_CHOICE_PORT, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_PORT"));
+	ChoicePort = new wxChoice(this, ID_CHOICE_PORT, wxDefaultPosition, wxSize(127,29), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_PORT"));
 	FlexGridSizer2->Add(ChoicePort, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticTextRate = new wxStaticText(this, ID_STATICTEXT_RATE, _("Baud Rate"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT_RATE"));
 	FlexGridSizer2->Add(StaticTextRate, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);

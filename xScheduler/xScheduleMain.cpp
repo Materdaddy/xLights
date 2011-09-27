@@ -217,6 +217,7 @@ protected:
         int nbidx=xsched->FindNotebookPage(name);
         if (nbidx < FixedPages) return 0;
         playlist = (wxGrid*)xsched->FindNotebookControl(nbidx,xsched->PLAYLIST_LISTBOX);
+        return EXEC_NEXTLINE;
     }
 
     char* do_itemname(void) {
@@ -1408,11 +1409,10 @@ void xScheduleFrame::LoadNetworkFile()
 void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels)
 {
     int netnum=-1;
-    wxString net3 = NetworkType.Left(3);
     int baud = (BaudRate == _("n/a")) ? 115200 : atoi(BaudRate.mb_str(wxConvUTF8));
     wxString msg = _("Error occurred while connecting to ") + NetworkType+ _(" network on ") + ComPort + _("\n\n");
     try {
-        netnum=xout.addnetwork(net3,MaxChannels,ComPort,baud);
+        netnum=xout.addnetwork(NetworkType,MaxChannels,ComPort,baud);
     }
     catch (const char *str) {
         wxString errmsg(str,wxConvUTF8);
@@ -2081,7 +2081,6 @@ void xScheduleFrame::LoadScheduleFile()
 void xScheduleFrame::LoadSchedule(wxXmlNode* n)
 {
     wxDateTime d,t1,t2;
-    int days,r,c;
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == _("event")) {
             wxString schedcode = e->GetPropVal( wxT("schedcode"), wxT(""));
@@ -2409,7 +2408,7 @@ void xScheduleFrame::PopulateShowDialog(AddShowDialog& dialog) {
 
 void xScheduleFrame::OnButtonAddShowClick(wxCommandEvent& event)
 {
-    int i, StartTimeIdx, EndTimeIdx;
+    int StartTimeIdx, EndTimeIdx;
     wxString Playlist, PartialCode;
     int cnt = Notebook1->GetPageCount();
     if (cnt < FixedPages) {
@@ -2523,7 +2522,7 @@ void xScheduleFrame::AddShow(wxDateTime::WeekDay wkday, const wxString& StartSto
 
 void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
 {
-    int i, StartTimeIdx, EndTimeIdx;
+    int StartTimeIdx, EndTimeIdx;
     wxString SchedCode, StartTime, EndTime, RepeatOptions, Playlist, PartialCode;
     int WkDay;
     wxArrayInt selections;

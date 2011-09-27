@@ -32,9 +32,9 @@
 
 
 //(*InternalHeaders(MainMenuFrame)
-#include <wx/font.h>
-#include <wx/intl.h>
 #include <wx/string.h>
+#include <wx/intl.h>
+#include <wx/font.h>
 //*)
 
 //helper functions
@@ -91,15 +91,15 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     //(*Initialize(MainMenuFrame)
     wxMenuItem* MenuItem2;
     wxMenuItem* MenuItem1;
+    wxFlexGridSizer* FlexGridSizer1;
+    wxBoxSizer* BoxSizer3;
     wxMenu* Menu1;
     wxMenuItem* MenuItemHelpContent;
     wxBoxSizer* BoxSizer1;
     wxMenuBar* MenuBar1;
-    wxStaticBoxSizer* StaticBoxSizer1;
-    wxFlexGridSizer* FlexGridSizer1;
-    wxBoxSizer* BoxSizer3;
     wxMenu* Menu2;
-
+    wxStaticBoxSizer* StaticBoxSizer1;
+    
     Create(parent, wxID_ANY, _("xLights"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(204,368));
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
@@ -169,7 +169,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     SetStatusBar(StatusBar1);
     DirDialog1 = new wxDirDialog(this, _("Select Show Directory"), wxEmptyString, wxDD_DEFAULT_STYLE, wxDefaultPosition, wxDefaultSize, _T("wxDirDialog"));
     BoxSizer1->SetSizeHints(this);
-
+    
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(ID_BUTTON_NETWORK_SETUP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonNetworkSetupClick);
     Connect(ID_BUTTON_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonScheduleClick);

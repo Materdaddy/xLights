@@ -212,7 +212,7 @@ void NetworkDialog::OnButtonDelRowClick(wxCommandEvent& event)
     if (cnt == 0) {
         wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
     } else {
-        for(size_t i = 0; i < cnt; i++)
+        for(int i = 0; i < cnt; i++)
         {
             GridNetwork->DeleteRows(selectedRows[i]);
         }
@@ -343,7 +343,7 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
                 wxMessageBox(_("All fields must be filled in!"), _("ERROR"));
             }
 	    }
-	} while (!ok);
+	} while (DlgResult == wxID_OK && !ok);
 }
 
 void NetworkDialog::OnButtonAddLORClick(wxCommandEvent& event)
@@ -418,7 +418,7 @@ void NetworkDialog::AddE131(int r)
                 wxMessageBox(_("All fields must be filled in!"), _("ERROR"));
             }
 	    }
-	} while (!ok);
+	} while (DlgResult == wxID_OK && !ok);
 }
 
 void NetworkDialog::OnButtonAddE131Click(wxCommandEvent& event)
