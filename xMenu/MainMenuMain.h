@@ -26,19 +26,21 @@
 
 //(*Headers(MainMenuFrame)
 #include <wx/sizer.h>
-#include <wx/button.h>
-#include <wx/menu.h>
-#include <wx/dirdlg.h>
-#include <wx/panel.h>
-#include <wx/statusbr.h>
-#include <wx/frame.h>
 #include <wx/stattext.h>
+#include <wx/menu.h>
+#include <wx/panel.h>
+#include <wx/button.h>
+#include <wx/dirdlg.h>
+#include <wx/frame.h>
+#include <wx/statusbr.h>
 //*)
 
 #include <wx/config.h>
 #include <wx/stdpaths.h>
 #include "NetworkDialog.h"
 #include "../include/globals.h"
+
+#define MRU_LENGTH 4
 
 class MainMenuFrame: public wxFrame
 {
@@ -86,25 +88,31 @@ class MainMenuFrame: public wxFrame
         //*)
 
         //(*Declarations(MainMenuFrame)
-        wxStaticText* StaticTextDirName;
+        wxButton* ButtonSequence;
+        wxStaticText* StaticText2;
         wxPanel* Panel1;
+        wxStaticText* StaticText1;
+        wxButton* ButtonChangeDir;
+        wxStaticText* StaticTextDirName;
+        wxButton* ButtonNetworkSetup;
+        wxMenuItem* MenuItem3;
         wxStatusBar* StatusBar1;
         wxDirDialog* DirDialog1;
-        wxStaticText* StaticText1;
-        wxMenuItem* MenuItem3;
-        wxButton* ButtonNetworkSetup;
-        wxButton* ButtonSequence;
-        wxButton* ButtonTest;
-        wxButton* ButtonChangeDir;
-        wxStaticText* StaticText2;
         wxButton* ButtonSchedule;
+        wxButton* ButtonTest;
         wxButton* ButtonTestRGB;
         //*)
 
         wxString CurrentDir;
         wxString ThisExe;
+        wxArrayString mru;  // most recently used directories
+        wxMenuItem* mru_MenuItem[MRU_LENGTH];
+        wxMenu* mru_Menu;
+        int mru_MenuLength;
         void Exec(const wxString& program);
         void SetButtonEnable();
+        void UpdateMRU(const wxString& newdir);
+        void OnMenuMRU(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 };

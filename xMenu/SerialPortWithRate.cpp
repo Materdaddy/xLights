@@ -6,6 +6,7 @@
 #include <wx/intl.h>
 //*)
 #include <wx/valtext.h>
+#include <wx/msgdlg.h>
 
 //(*IdInit(SerialPortWithRate)
 const long SerialPortWithRate::ID_STATICTEXT_PORT = wxNewId();

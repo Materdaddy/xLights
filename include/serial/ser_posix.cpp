@@ -14,7 +14,9 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-#ifndef __WXOSX__
+#ifdef __WXOSX__
+#include <IOKit/serial/ioss.h>
+#else
 #include <linux/serial.h>
 #endif
 
@@ -202,7 +204,7 @@ class SerialPort : public SerialPort_x
     int AvailableToRead()
     {
       int bytes = 0;
-      ioctl(fd, TIOCINQ, &bytes);
+      ioctl(fd, FIONREAD, &bytes);
       return bytes;
     }
 

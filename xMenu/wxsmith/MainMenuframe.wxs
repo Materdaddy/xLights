@@ -32,6 +32,7 @@
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText2" member="yes">
 										<label>All sequences and media files must be in this directory</label>
 										<font>
+											<size>10</size>
 											<style>italic</style>
 											<weight>normal</weight>
 											<underlined>0</underlined>

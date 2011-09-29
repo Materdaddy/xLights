@@ -30,11 +30,10 @@
 
 #include "../include/xlights.xpm"
 
-
 //(*InternalHeaders(MainMenuFrame)
-#include <wx/string.h>
-#include <wx/intl.h>
 #include <wx/font.h>
+#include <wx/intl.h>
+#include <wx/string.h>
 //*)
 
 //helper functions
@@ -91,15 +90,15 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     //(*Initialize(MainMenuFrame)
     wxMenuItem* MenuItem2;
     wxMenuItem* MenuItem1;
-    wxFlexGridSizer* FlexGridSizer1;
-    wxBoxSizer* BoxSizer3;
     wxMenu* Menu1;
     wxMenuItem* MenuItemHelpContent;
     wxBoxSizer* BoxSizer1;
     wxMenuBar* MenuBar1;
-    wxMenu* Menu2;
     wxStaticBoxSizer* StaticBoxSizer1;
-    
+    wxFlexGridSizer* FlexGridSizer1;
+    wxBoxSizer* BoxSizer3;
+    wxMenu* Menu2;
+
     Create(parent, wxID_ANY, _("xLights"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(204,368));
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
@@ -114,7 +113,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer1->Add(StaticText1, 0, wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 0);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel1, _("Show Directory"));
     StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT3, _("All sequences and media files must be in this directory"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-    wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    wxFont StaticText2Font(10,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText2->SetFont(StaticText2Font);
     StaticBoxSizer1->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticTextDirName = new wxStaticText(Panel1, ID_STATICTEXT2, _("<No directory selected>"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
@@ -169,7 +168,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     SetStatusBar(StatusBar1);
     DirDialog1 = new wxDirDialog(this, _("Select Show Directory"), wxEmptyString, wxDD_DEFAULT_STYLE, wxDefaultPosition, wxDefaultSize, _T("wxDirDialog"));
     BoxSizer1->SetSizeHints(this);
-    
+
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(ID_BUTTON_NETWORK_SETUP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonNetworkSetupClick);
     Connect(ID_BUTTON_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonScheduleClick);
@@ -186,9 +185,71 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     wxStandardPathsBase& stdp = wxStandardPaths::Get();
     ThisExe = stdp.GetExecutablePath();
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
-    wxString lastdir;
-    if ( config->Read(_("LastDir"), &lastdir) ) {
-        SetDir(lastdir);
+
+    // get list of most recently used directories
+    wxString dir,mru_name;
+    mru_Menu = Menu1;
+    mru_MenuLength = 0;
+    int menuID, idx;
+    for (int i=0; i<MRU_LENGTH; i++) {
+        mru_name=wxString::Format(wxT("mru%d"),i);
+        if ( config->Read(mru_name, &dir) ) {
+            idx=mru.Index(dir);
+            if (idx == wxNOT_FOUND && !dir.IsEmpty()) mru.Add(dir);
+        }
+        menuID = wxNewId();
+        mru_MenuItem[i] = new wxMenuItem(mru_Menu, menuID);
+        Connect(menuID,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuMRU);
+    }
+    if ( config->Read(_("LastDir"), &dir) ) {
+        idx=mru.Index(dir);
+        if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
+        SetDir(dir);
+    }
+    delete config;
+}
+
+void MainMenuFrame::OnMenuMRU(wxCommandEvent& event)
+{
+    int id = event.GetId();
+    wxString newdir = mru_Menu->GetLabel(id);
+    UpdateMRU(newdir);
+    SetDir(newdir);
+}
+
+void MainMenuFrame::UpdateMRU(const wxString& newdir)
+{
+    // update most recently used array
+    int idx;
+    idx=mru.Index(newdir);
+    if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
+    idx=mru.Index(CurrentDir);
+    if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
+    mru.Insert(CurrentDir,0);
+    int cnt=mru.GetCount();
+    if (cnt > MRU_LENGTH) {
+        mru.RemoveAt(MRU_LENGTH, cnt - MRU_LENGTH);
+        cnt = MRU_LENGTH;
+    }
+
+    /*
+    wxString msg=wxT("UpdateMRU:\n");
+    for (int i=0; i<mru.GetCount(); i++) msg+=wxT("\n") + mru[i];
+    wxMessageBox(msg);
+    */
+
+    // save config
+    wxString mru_name, value;
+    wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
+    config->Write(_("LastDir"), newdir);
+    for (int i=0; i<MRU_LENGTH; i++) {
+        mru_name=wxString::Format(wxT("mru%d"),i);
+        if (i < cnt) {
+            value = mru[i];
+        } else {
+            value = wxEmptyString;
+        }
+        config->Write(mru_name, value);
     }
     delete config;
 }
@@ -217,6 +278,29 @@ void MainMenuFrame::SetDir(const wxString& dirname)
     StaticTextDirName->SetLabel(CurrentDir);
     ButtonNetworkSetup->Enable();
     SetButtonEnable();
+
+    /*
+    wxString msg=wxString::Format(wxT("SetDir %d:\n"),mru.GetCount());;
+    for (int i=0; i<mru.GetCount(); i++) msg+=wxT("\n") + mru[i];
+    wxMessageBox(msg);
+    */
+
+    // clear mru items from menu
+    /*
+    for (int i=0; i<MRU_LENGTH; i++) {
+        mru_Menu->Remove(mru_MenuItem[i]);
+    }
+    */
+
+    // append mru items to menu
+    int cnt=mru.GetCount();
+    for (int i=0; i<cnt; i++) {
+        mru_MenuItem[i]->SetItemLabel(mru[i]);
+        if (i >= mru_MenuLength) {
+            mru_Menu->Append(mru_MenuItem[i]);
+            mru_MenuLength++;
+        }
+    }
 }
 
 void MainMenuFrame::SetButtonEnable() {
@@ -237,10 +321,9 @@ void MainMenuFrame::OnMenuOpenFolderSelected(wxCommandEvent& event)
     wxString newdir;
     if (DirDialog1->ShowModal() == wxID_OK) {
         newdir=DirDialog1->GetPath();
+        if (newdir == CurrentDir) return;
+        UpdateMRU(newdir);
         SetDir(newdir);
-        wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
-        config->Write(_("LastDir"), newdir);
-        delete config;
     }
 }
 
