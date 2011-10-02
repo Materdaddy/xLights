@@ -7,6 +7,10 @@
 #define XLIGHTS_HELP_URL        "http://sourceforge.net/apps/mediawiki/xlights/index.php?title=Main_Page"
 #define XLIGHTS_SCRIPT_HELP_URL "http://sourceforge.net/apps/mediawiki/xlights/index.php?title=XScheduler_Script_Reference"
 
+#define XLIGHTS_LORMAP_SINGLE 1
+#define XLIGHTS_LORMAP_MULTI  2
+#define XLIGHTS_LORMAP_STRICT 3
+
 #define XLIGHTS_ANIMATION_FILE "xlights_animation.xml"
 #define XLIGHTS_NETWORK_FILE   "xlights_networks.xml"
 #define XLIGHTS_CHANNEL_FILE   "xlights_channels.csv"

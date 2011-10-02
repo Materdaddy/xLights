@@ -400,7 +400,7 @@ public:
 // * Compatible with Entec Pro, Lynx DMX, and DIYC RPM dongles
 // * Methods should be called with: 0 <= chindex <= 511
 // ******************************************************
-class xNetwork_DMXentec: public xNetwork_Dimmer {
+class xNetwork_DMXpro: public xNetwork_Dimmer {
 protected:
   wxByte data[518];
 
@@ -712,7 +712,7 @@ public:
 
 
 // Should be called with: 0 <= chindex <= 4095
-class xNetwork_PixelNet: public xNetwork_Dimmer {
+class xNetwork_Pixelnet: public xNetwork_Dimmer {
 protected:
   wxByte data[4096];
   wxByte SerialBuffer[4097];
@@ -724,7 +724,7 @@ protected:
 public:
   void SetChannelCount(int numchannels) {
     if (numchannels > 4096) {
-      throw "max channels on a PixelNet network is 4096";
+      throw "max channels on a Pixelnet network is 4096";
     }
     datalen=numchannels;
     CreateChannels(numchannels);
@@ -986,20 +986,20 @@ public:
 
   void setnetwork (const wxString& NetworkType, int netnum, int chcount, const wxString& portname, int baudrate) {
     xNetwork* netobj;
-    wxString nettype3 = NetworkType.Left(3);
+    wxString nettype3 = NetworkType.Upper().Left(3);
     if (networks[netnum]) throw "duplicate network defined";
     if (nettype3 == wxT("LOR")) {
         netobj = new xNetwork_LOR();
     } else if (nettype3 == wxT("D-L")) {
         netobj = new xNetwork_DLight();
-    } else if (nettype3 == wxT("Ren")) {
+    } else if (nettype3 == wxT("REN")) {
         netobj = new xNetwork_Renard();
     } else if (nettype3 == wxT("DMX")) {
-        netobj = new xNetwork_DMXentec();
-    } else if (nettype3 == wxT("Ope")) {
+        netobj = new xNetwork_DMXpro();
+    } else if (nettype3 == wxT("OPE")) {
         netobj = new xNetwork_DMXopen();
-    } else if (nettype3 == wxT("Pix")) {
-        netobj = new xNetwork_PixelNet();
+    } else if (nettype3 == wxT("PIX")) {
+        netobj = new xNetwork_Pixelnet();
     } else if (nettype3 == wxT("E13")) {
         netobj = new xNetwork_E131();
     } else {

@@ -11,12 +11,7 @@
 
 
 //(*IdInit(NetworkDialog)
-const long NetworkDialog::ID_BUTTON_SAVE = wxNewId();
-const long NetworkDialog::ID_BUTTON_NETCLOSE = wxNewId();
-const long NetworkDialog::ID_BUTTON_EDIT_ROW = wxNewId();
-const long NetworkDialog::ID_BUTTON_DELROW = wxNewId();
-const long NetworkDialog::ID_BUTTON_MOVE_UP = wxNewId();
-const long NetworkDialog::ID_BUTTON_MOVE_DOWN = wxNewId();
+const long NetworkDialog::ID_BUTTON_LOR_MAP = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_LOR = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_DLIGHT = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_RENARD = wxNewId();
@@ -24,6 +19,11 @@ const long NetworkDialog::ID_BUTTON_ADD_DMX = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_OPEN_DMX = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_PIXELNET = wxNewId();
 const long NetworkDialog::ID_BUTTON_ADD_E131 = wxNewId();
+const long NetworkDialog::ID_STATICTEXT1 = wxNewId();
+const long NetworkDialog::ID_BUTTON_EDIT_ROW = wxNewId();
+const long NetworkDialog::ID_BUTTON_DELROW = wxNewId();
+const long NetworkDialog::ID_BUTTON_MOVE_UP = wxNewId();
+const long NetworkDialog::ID_BUTTON_MOVE_DOWN = wxNewId();
 const long NetworkDialog::ID_GRID_NETWORK = wxNewId();
 const long NetworkDialog::ID_PANEL1 = wxNewId();
 //*)
@@ -37,10 +37,13 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 {
 	//(*Initialize(NetworkDialog)
 	wxStaticBoxSizer* StaticBoxSizer2;
+	wxFlexGridSizer* FlexGridSizer4;
+	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer2;
-	wxBoxSizer* BoxSizer1;
+	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxStdDialogButtonSizer* StdDialogButtonSizer1;
 
 	Create(parent, wxID_ANY, _("Define Lighting Networks"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -48,22 +51,17 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	FlexGridSizer2 = new wxFlexGridSizer(2, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer2->AddGrowableRow(1);
-	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	ButtonSave = new wxButton(Panel1, ID_BUTTON_SAVE, _("Save"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SAVE"));
-	BoxSizer1->Add(ButtonSave, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonNetClose = new wxButton(Panel1, ID_BUTTON_NETCLOSE, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_NETCLOSE"));
-	BoxSizer1->Add(ButtonNetClose, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(BoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Select a row by clicking on the row number"));
-	ButtonEditRow = new wxButton(Panel1, ID_BUTTON_EDIT_ROW, _("Change"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_EDIT_ROW"));
-	StaticBoxSizer1->Add(ButtonEditRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonDelRow = new wxButton(Panel1, ID_BUTTON_DELROW, _("Delete"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_DELROW"));
-	StaticBoxSizer1->Add(ButtonDelRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonMoveUp = new wxButton(Panel1, ID_BUTTON_MOVE_UP, _("Move Up"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_MOVE_UP"));
-	StaticBoxSizer1->Add(ButtonMoveUp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonMoveDown = new wxButton(Panel1, ID_BUTTON_MOVE_DOWN, _("Move Down"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_MOVE_DOWN"));
-	StaticBoxSizer1->Add(ButtonMoveDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer6->AddGrowableCol(0);
+	FlexGridSizer6->AddGrowableRow(0);
+	StdDialogButtonSizer1 = new wxStdDialogButtonSizer();
+	StdDialogButtonSizer1->AddButton(new wxButton(Panel1, wxID_CANCEL, wxEmptyString));
+	StdDialogButtonSizer1->AddButton(new wxButton(Panel1, wxID_SAVE, wxEmptyString));
+	StdDialogButtonSizer1->Realize();
+	FlexGridSizer6->Add(StdDialogButtonSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonLorMap = new wxButton(Panel1, ID_BUTTON_LOR_MAP, _("LOR Sequence Channel Mapping"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_LOR_MAP"));
+	FlexGridSizer6->Add(ButtonLorMap, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Add a new lighting network"));
 	ButtonAddLOR = new wxButton(Panel1, ID_BUTTON_ADD_LOR, _("LOR"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_LOR"));
 	StaticBoxSizer2->Add(ButtonAddLOR, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -75,24 +73,42 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	StaticBoxSizer2->Add(ButtonAddDMX, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonAddOpenDMX = new wxButton(Panel1, ID_BUTTON_ADD_OPEN_DMX, _("Open DMX"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_OPEN_DMX"));
 	StaticBoxSizer2->Add(ButtonAddOpenDMX, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonAddPixelnet = new wxButton(Panel1, ID_BUTTON_ADD_PIXELNET, _("PixelNet Dongle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_PIXELNET"));
+	ButtonAddPixelnet = new wxButton(Panel1, ID_BUTTON_ADD_PIXELNET, _("Pixelnet Dongle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_PIXELNET"));
 	StaticBoxSizer2->Add(ButtonAddPixelnet, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonAddE131 = new wxButton(Panel1, ID_BUTTON_ADD_E131, _("E1.31"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_ADD_E131"));
 	StaticBoxSizer2->Add(ButtonAddE131, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(StaticBoxSizer2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	GridNetwork = new wxGrid(Panel1, ID_GRID_NETWORK, wxDefaultPosition, wxSize(530,139), 0, _T("ID_GRID_NETWORK"));
+	FlexGridSizer3 = new wxFlexGridSizer(1, 2, 0, 0);
+	FlexGridSizer3->AddGrowableCol(1);
+	FlexGridSizer3->AddGrowableRow(0);
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Row Commands"));
+	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Select a row by\nclicking on the\nrow number"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer4->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonEditRow = new wxButton(Panel1, ID_BUTTON_EDIT_ROW, _("Change"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_EDIT_ROW"));
+	FlexGridSizer4->Add(ButtonEditRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonDelRow = new wxButton(Panel1, ID_BUTTON_DELROW, _("Delete"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_DELROW"));
+	FlexGridSizer4->Add(ButtonDelRow, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonMoveUp = new wxButton(Panel1, ID_BUTTON_MOVE_UP, _("Move Up"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_MOVE_UP"));
+	FlexGridSizer4->Add(ButtonMoveUp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonMoveDown = new wxButton(Panel1, ID_BUTTON_MOVE_DOWN, _("Move Down"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_MOVE_DOWN"));
+	FlexGridSizer4->Add(ButtonMoveDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer1->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer3->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridNetwork = new wxGrid(Panel1, ID_GRID_NETWORK, wxDefaultPosition, wxSize(592,203), 0, _T("ID_GRID_NETWORK"));
 	GridNetwork->CreateGrid(0,4);
 	GridNetwork->EnableEditing(false);
 	GridNetwork->EnableGridLines(true);
 	GridNetwork->SetRowLabelSize(50);
-	GridNetwork->SetDefaultColSize(120, true);
+	GridNetwork->SetDefaultColSize(135, true);
 	GridNetwork->SetColLabelValue(0, _("Network Type"));
 	GridNetwork->SetColLabelValue(1, _("Port"));
 	GridNetwork->SetColLabelValue(2, _("Baud Rate"));
 	GridNetwork->SetColLabelValue(3, _("Last Channel"));
 	GridNetwork->SetDefaultCellFont( GridNetwork->GetFont() );
 	GridNetwork->SetDefaultCellTextColour( GridNetwork->GetForegroundColour() );
-	FlexGridSizer2->Add(GridNetwork, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(GridNetwork, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(Panel1);
 	FlexGridSizer2->SetSizeHints(Panel1);
@@ -101,12 +117,7 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
-	Connect(ID_BUTTON_SAVE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonSaveClick);
-	Connect(ID_BUTTON_NETCLOSE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonNetCloseClick);
-	Connect(ID_BUTTON_EDIT_ROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonEditRowClick);
-	Connect(ID_BUTTON_DELROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonDelRowClick);
-	Connect(ID_BUTTON_MOVE_UP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonMoveUpClick);
-	Connect(ID_BUTTON_MOVE_DOWN,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonMoveDownClick);
+	Connect(ID_BUTTON_LOR_MAP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonLorMapClick);
 	Connect(ID_BUTTON_ADD_LOR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddLORClick);
 	Connect(ID_BUTTON_ADD_DLIGHT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddDLightClick);
 	Connect(ID_BUTTON_ADD_RENARD,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddRenardClick);
@@ -114,11 +125,16 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	Connect(ID_BUTTON_ADD_OPEN_DMX,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddOpenDMXClick);
 	Connect(ID_BUTTON_ADD_PIXELNET,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddPixelnetClick);
 	Connect(ID_BUTTON_ADD_E131,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonAddE131Click);
+	Connect(ID_BUTTON_EDIT_ROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonEditRowClick);
+	Connect(ID_BUTTON_DELROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonDelRowClick);
+	Connect(ID_BUTTON_MOVE_UP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonMoveUpClick);
+	Connect(ID_BUTTON_MOVE_DOWN,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonMoveDownClick);
 	//*)
 
+    SetAffirmativeId(wxID_SAVE);
     GridNetwork->SetSelectionMode(wxGrid::wxGridSelectRows);
 	GridNetwork->SetColLabelValue(2, _("Baud Rate or\nE1.31 Univ"));
-
+    LorMapping = XLIGHTS_LORMAP_MULTI;
 
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
@@ -152,8 +168,11 @@ void NetworkDialog::LoadFile()
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
         int r=0;
-        for( wxXmlNode* e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
-            if (e->GetName() == _("network")) {
+        wxXmlNode* e=doc.GetRoot();
+        wxString LorMappingStr=e->GetPropVal(wxT("LorMapping"), wxT("2"));
+        LorMappingStr.ToLong(&LorMapping);
+        for( e=e->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            if (e->GetName() == wxT("network")) {
                 GridNetwork->AppendRows(1);
                 GridNetwork->SetCellValue(r,0,e->GetPropVal(wxT("NetworkType"), wxT("")));
                 GridNetwork->SetCellValue(r,1,e->GetPropVal(wxT("ComPort"), wxT("")));
@@ -173,8 +192,11 @@ void NetworkDialog::SaveFile()
     int RowCount;
     wxXmlNode* net;
     wxXmlDocument doc;
+    wxString LorMappingStr;
+    LorMappingStr.Printf(wxT("%d"),(int)LorMapping);
     wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Networks") );
     root->AddProperty( wxT("computer"), wxGetHostName());
+    root->AddProperty( wxT("LorMapping"), LorMappingStr);
     doc.SetRoot( root );
 
     RowCount=GridNetwork->GetNumberRows();
@@ -194,12 +216,6 @@ void NetworkDialog::SaveFile()
     }
 }
 
-void NetworkDialog::OnButtonSaveClick(wxCommandEvent& event)
-{
-    SaveFile();
-    EndModal(1);
-}
-
 void NetworkDialog::OnButtonAddRowClick(wxCommandEvent& event)
 {
     GridNetwork->AppendRows(1);
@@ -217,11 +233,6 @@ void NetworkDialog::OnButtonDelRowClick(wxCommandEvent& event)
             GridNetwork->DeleteRows(selectedRows[i]);
         }
     }
-}
-
-void NetworkDialog::OnButtonNetCloseClick(wxCommandEvent& event)
-{
-    EndModal(0);
 }
 
 void NetworkDialog::MoveRowData(int fromRow, int toRow)
@@ -287,7 +298,7 @@ void NetworkDialog::OnButtonEditRowClick(wxCommandEvent& event)
 
 bool NetworkDialog::EnableRate(const wxString& NetName)
 {
-    return (NetName!=wxT("DMX") && NetName!=wxT("OpenDMX") && NetName!=wxT("PixelNet"));
+    return (NetName!=wxT("DMX") && NetName!=wxT("OpenDMX") && NetName!=wxT("Pixelnet"));
 }
 
 void NetworkDialog::AddSerial(wxString NetName, int r)
@@ -315,6 +326,15 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
         SerialDlg.ChoicePort->SetStringSelection(Port);
         if (RateEnabled) SerialDlg.ChoiceBaudRate->SetStringSelection(BaudRate);
         SerialDlg.TextCtrlLastChannel->SetValue(LastChannel);
+	}
+	if (NetName == _("LOR")) {
+	    SerialDlg.SetLabel(_("LOR controllers attached\nto any LOR dongle"));
+	} else if (NetName == _("OpenDMX")) {
+	    SerialDlg.SetLabel(_("LOR or DMX controllers attached\nto an LOR dongle, D-Light dongle,\nHolidayCoro programming cable,\nor Entec Open DMX dongle"));
+	} else if (NetName == _("DMX")) {
+	    SerialDlg.SetLabel(_("LOR or DMX controllers attached to an\nEntec DMX USB Pro, Lynx DMX dongle,\nor DIYC RPM dongle"));
+	} else if (NetName == _("Pixelnet")) {
+	    SerialDlg.SetLabel(_("Pixelnet hub attached to a\nLynx Pixelnet dongle"));
 	}
 	do {
 	    DlgResult=SerialDlg.ShowModal();
@@ -368,7 +388,7 @@ void NetworkDialog::OnButtonAddDMXClick(wxCommandEvent& event)
 
 void NetworkDialog::OnButtonAddPixelnetClick(wxCommandEvent& event)
 {
-    AddSerial(wxT("PixelNet"));
+    AddSerial(wxT("Pixelnet"));
 }
 
 void NetworkDialog::AddE131(int r)
@@ -429,4 +449,18 @@ void NetworkDialog::OnButtonAddE131Click(wxCommandEvent& event)
 void NetworkDialog::OnButtonAddOpenDMXClick(wxCommandEvent& event)
 {
     AddSerial(wxT("OpenDMX"));
+}
+
+void NetworkDialog::OnButtonLorMapClick(wxCommandEvent& event)
+{
+    LorMapDialog MapDlg(this);
+    MapDlg.RadioButtonSingleNetwork->SetValue(LorMapping == XLIGHTS_LORMAP_SINGLE);
+    MapDlg.RadioButtonMultiNetwork->SetValue(LorMapping == XLIGHTS_LORMAP_MULTI);
+    MapDlg.RadioButtonStrictMap->SetValue(LorMapping == XLIGHTS_LORMAP_STRICT);
+    if (MapDlg.ShowModal() > 0) {
+        // ok was pressed
+        if (MapDlg.RadioButtonSingleNetwork->GetValue()) LorMapping=XLIGHTS_LORMAP_SINGLE;
+        if (MapDlg.RadioButtonMultiNetwork->GetValue()) LorMapping=XLIGHTS_LORMAP_MULTI;
+        if (MapDlg.RadioButtonStrictMap->GetValue()) LorMapping=XLIGHTS_LORMAP_STRICT;
+    }
 }

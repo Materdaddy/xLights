@@ -341,8 +341,9 @@ void MainMenuFrame::Exec(const wxString& program)
 void MainMenuFrame::OnButtonNetworkSetupClick(wxCommandEvent& event)
 {
 	NetworkDialog NetDlg(this);
-    if (NetDlg.ShowModal() > 0) {
+    if (NetDlg.ShowModal() == wxID_SAVE) {
         // save was pressed
+        NetDlg.SaveFile();
         StatusBar1->SetStatusText(_("Network settings saved"));
     } else {
         StatusBar1->SetStatusText(_(""));
@@ -378,3 +379,4 @@ void MainMenuFrame::OnButtonTestRGBClick(wxCommandEvent& event)
 {
     Exec(_("xTesterRGB"));
 }
+

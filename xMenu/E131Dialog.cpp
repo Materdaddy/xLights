@@ -28,11 +28,11 @@ E131Dialog::E131Dialog(wxWindow* parent,const wxString& title)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
 
-	Create(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
+	Create(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxDefaultSize);
 	Move(wxDefaultPosition);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Sets up an E1.31 connection over ethernet.\nxLights communicates directly with your\nE1.31 device (aka Unicast), so you need to\nenter your device\'s IP address here.\n\nThe Universe # should match one of\nthe universe numbers you have set up\non your E1.31 device."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Sets up an E1.31 connection over ethernet.\n\nSupported devices include those made\nby j1sys, the Lynx EtherDongle, and \nE1.31 projects on DIYC.\n\nEither enter your device\'s IP address\nhere for direct (unicast) communication,\nor use 239.255.x.y for multicast\n(where x is the high byte of the\nuniverse #, and y is the low byte\nof the universe #).\n\nThe Universe # should match one of\nthe universe numbers you have set up\non your E1.31 device."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer1->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("IP Address"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));

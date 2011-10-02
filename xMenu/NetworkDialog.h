@@ -3,6 +3,7 @@
 
 //(*Headers(NetworkDialog)
 #include <wx/sizer.h>
+#include <wx/stattext.h>
 #include <wx/panel.h>
 #include <wx/grid.h>
 #include <wx/button.h>
@@ -13,6 +14,7 @@
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 #include <wx/xml/xml.h>
+#include "LorMapDialog.h"
 #include "../include/globals.h"
 
 
@@ -22,34 +24,31 @@ class NetworkDialog: public wxDialog
 
 		NetworkDialog(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
 		virtual ~NetworkDialog();
+        bool UnsavedChanges;
+        void SaveFile();
 
 		//(*Declarations(NetworkDialog)
 		wxButton* ButtonMoveUp;
 		wxButton* ButtonAddE131;
 		wxButton* ButtonAddDLight;
-		wxButton* ButtonNetClose;
 		wxButton* ButtonAddRenard;
 		wxButton* ButtonAddDMX;
 		wxButton* ButtonMoveDown;
 		wxPanel* Panel1;
 		wxGrid* GridNetwork;
+		wxStaticText* StaticText1;
 		wxButton* ButtonAddLOR;
-		wxButton* ButtonSave;
 		wxButton* ButtonAddPixelnet;
 		wxButton* ButtonDelRow;
 		wxButton* ButtonEditRow;
 		wxButton* ButtonAddOpenDMX;
+		wxButton* ButtonLorMap;
 		//*)
 
 	protected:
 
 		//(*Identifiers(NetworkDialog)
-		static const long ID_BUTTON_SAVE;
-		static const long ID_BUTTON_NETCLOSE;
-		static const long ID_BUTTON_EDIT_ROW;
-		static const long ID_BUTTON_DELROW;
-		static const long ID_BUTTON_MOVE_UP;
-		static const long ID_BUTTON_MOVE_DOWN;
+		static const long ID_BUTTON_LOR_MAP;
 		static const long ID_BUTTON_ADD_LOR;
 		static const long ID_BUTTON_ADD_DLIGHT;
 		static const long ID_BUTTON_ADD_RENARD;
@@ -57,6 +56,11 @@ class NetworkDialog: public wxDialog
 		static const long ID_BUTTON_ADD_OPEN_DMX;
 		static const long ID_BUTTON_ADD_PIXELNET;
 		static const long ID_BUTTON_ADD_E131;
+		static const long ID_STATICTEXT1;
+		static const long ID_BUTTON_EDIT_ROW;
+		static const long ID_BUTTON_DELROW;
+		static const long ID_BUTTON_MOVE_UP;
+		static const long ID_BUTTON_MOVE_DOWN;
 		static const long ID_GRID_NETWORK;
 		static const long ID_PANEL1;
 		//*)
@@ -80,12 +84,12 @@ class NetworkDialog: public wxDialog
 		void OnButtonAddPixelnetClick(wxCommandEvent& event);
 		void OnButtonAddE131Click(wxCommandEvent& event);
 		void OnButtonAddOpenDMXClick(wxCommandEvent& event);
+		void OnButtonLorMapClick(wxCommandEvent& event);
 		//*)
 
         wxFileName networkFile;
-        bool UnsavedChanges;
+        long LorMapping;
 
-        void SaveFile();
         void LoadFile();
         void MoveRowData(int fromRow, int toRow);
         void AddSerial(wxString NetName, int r=-1);

@@ -5,6 +5,14 @@
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<object class="sizeritem">
+				<object class="wxStaticText" name="ID_STATICTEXT_EXPLANATION" variable="StaticTextExplanation" member="yes">
+					<label>Serial port or USB dongle&#x0A;with virtual comm port</label>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 					<cols>2</cols>
 					<object class="sizeritem">

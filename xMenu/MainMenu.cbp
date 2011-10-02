@@ -97,6 +97,8 @@
 		</Compiler>
 		<Unit filename="E131Dialog.cpp" />
 		<Unit filename="E131Dialog.h" />
+		<Unit filename="LorMapDialog.cpp" />
+		<Unit filename="LorMapDialog.h" />
 		<Unit filename="MainMenuApp.cpp" />
 		<Unit filename="MainMenuApp.h" />
 		<Unit filename="MainMenuMain.cpp" />
@@ -121,6 +123,7 @@
 					<wxDialog wxs="wxsmith/NetworkDialog.wxs" src="NetworkDialog.cpp" hdr="NetworkDialog.h" name="NetworkDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/SerialPortWithRate.wxs" src="SerialPortWithRate.cpp" hdr="SerialPortWithRate.h" name="SerialPortWithRate" language="CPP" />
 					<wxDialog wxs="wxsmith/E131Dialog.wxs" src="E131Dialog.cpp" hdr="E131Dialog.h" name="E131Dialog" language="CPP" />
+					<wxDialog wxs="wxsmith/LorMapDialog.wxs" src="LorMapDialog.cpp" hdr="LorMapDialog.h" name="LorMapDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

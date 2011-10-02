@@ -65,6 +65,7 @@ class MainMenuFrame: public wxFrame
         void OnButtonNetworkSetupClick(wxCommandEvent& event);
         void OnMenuItemHelpContentSelected(wxCommandEvent& event);
         void OnButtonTestRGBClick(wxCommandEvent& event);
+        void OnButtonLorMapClick(wxCommandEvent& event);
         //*)
 
         void SetDir(const wxString& dirname);
