@@ -40,6 +40,7 @@
 #include <wx/statusbr.h>
 //*)
 
+#include <wx/msgdlg.h>
 #include <wx/config.h>
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
@@ -127,6 +128,7 @@ class xScheduleFrame: public wxFrame
         xScheduleFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~xScheduleFrame();
 
+        xOutput* xout;
         long SecondsRemaining;
         void BasicPrompt(char* prompt, char* buff, int size);
         void BasicOutput(char *msg);
@@ -170,6 +172,7 @@ class xScheduleFrame: public wxFrame
         void OnMenuItemCustomScriptSelected(wxCommandEvent& event);
         void OnMenuItemConvert2VixenSelected(wxCommandEvent& event);
         void OnMenuItemSave2ConductorSelected(wxCommandEvent& event);
+        void OnClose(wxCloseEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -267,6 +270,7 @@ class xScheduleFrame: public wxFrame
         bool PortsOK;
         LorEventMap LorEvents;
         long LorLastUnit[MAXNETWORKS];
+        long LorMapping;
         wxTimer timer;
         wxTimer schedtimer;
         wxDateTime starttime;

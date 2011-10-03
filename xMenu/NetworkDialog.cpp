@@ -453,6 +453,7 @@ void NetworkDialog::OnButtonAddOpenDMXClick(wxCommandEvent& event)
 
 void NetworkDialog::OnButtonLorMapClick(wxCommandEvent& event)
 {
+    long PreviousMapValue = LorMapping;
     LorMapDialog MapDlg(this);
     MapDlg.RadioButtonSingleNetwork->SetValue(LorMapping == XLIGHTS_LORMAP_SINGLE);
     MapDlg.RadioButtonMultiNetwork->SetValue(LorMapping == XLIGHTS_LORMAP_MULTI);
@@ -462,5 +463,6 @@ void NetworkDialog::OnButtonLorMapClick(wxCommandEvent& event)
         if (MapDlg.RadioButtonSingleNetwork->GetValue()) LorMapping=XLIGHTS_LORMAP_SINGLE;
         if (MapDlg.RadioButtonMultiNetwork->GetValue()) LorMapping=XLIGHTS_LORMAP_MULTI;
         if (MapDlg.RadioButtonStrictMap->GetValue()) LorMapping=XLIGHTS_LORMAP_STRICT;
+        if (LorMapping != PreviousMapValue) UnsavedChanges=true;
     }
 }

@@ -61,6 +61,10 @@ public:
   virtual ~xNetwork() {
     if (serptr) delete serptr;
   };
+  
+  void CloseSerialPort() {
+    if (serptr) serptr->Close();
+  };
 
   wxByte MapIntensity(wxByte intensity) {
     return IntensityMap[intensity];
@@ -1114,6 +1118,12 @@ public:
   void TimerEnd() {
     for(int i=0; i <= lastnetnum; ++i) {
       if (networks[i]) networks[i]->TimerEnd();
+    }
+  };
+  
+  void ClosePorts() {
+    for(int i=0; i <= lastnetnum; ++i) {
+      if (networks[i]) networks[i]->CloseSerialPort();
     }
   };
 };

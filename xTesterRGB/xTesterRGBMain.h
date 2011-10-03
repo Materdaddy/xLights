@@ -192,6 +192,7 @@ class xTesterRGBFrame: public wxFrame
         //*)
 
         wxFileName networkFile;
+        long LorMapping;
         WX_DEFINE_ARRAY(NetworkInfo*, NetworkArray);
         NetworkArray Networks;
         NetworkInfo* AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);

@@ -10,7 +10,7 @@
 #include <string.h>
 #include <windows.h>
 
-#define SERIALPORT_BUFSIZE 4096
+#define SERIALPORT_BUFSIZE 6144
 
 namespace ctb {
 
@@ -64,6 +64,7 @@ namespace ctb {
     int CloseDevice()
     {
       if (fd != INVALID_HANDLE_VALUE) {
+        //::wxMessageBox(_("CloseDevice(): ") + m_devname, _("Debug"));
         CloseHandle(m_ov.hEvent);
         CloseHandle(fd);
         fd = INVALID_HANDLE_VALUE;
@@ -133,11 +134,11 @@ namespace ctb {
       // default character for XON is 0x11 (hex 11)
       dcb.XonChar = 0x11;
       // set the minimum number of bytes allowed in the input buffer before
-      // the XON character is sent (3/4 of full size)
-      dcb.XonLim = (SERIALPORT_BUFSIZE >> 2) * 3;
+      // the XON character is sent (1/4 of full size)
+      dcb.XonLim = (SERIALPORT_BUFSIZE >> 2);
       // set the maximum number of free bytes in the input buffer, before the
-      // XOFF character is sent (3/4 of full size)
-      dcb.XoffLim = (SERIALPORT_BUFSIZE >> 2) * 3;
+      // XOFF character is sent (1/4 of full size)
+      dcb.XoffLim = (SERIALPORT_BUFSIZE >> 2);
 
       // parity settings
       switch( protocol[1] ) {
@@ -181,7 +182,7 @@ namespace ctb {
       // for a better performance with win95/98 I increased the internal
       // buffer to SERIALPORT_BUFSIZE (normal size is 1024, but this can
       // be a little bit to small, if you use a higher baudrate like 115200)
-      if(!SetupComm(fd,SERIALPORT_BUFSIZE,SERIALPORT_BUFSIZE)) return -6;
+      if(!SetupComm(fd,SERIALPORT_BUFSIZE/2,SERIALPORT_BUFSIZE)) return -6;
 
       return 0;
     };
@@ -256,13 +257,13 @@ namespace ctb {
       else {
        // VERY IMPORTANT to flush the data out of the internal
        // buffer
-       FlushFileBuffers(fd);
+       //FlushFileBuffers(fd);
        // first you must call GetOverlappedResult, then you
        // get the REALLY transmitted count of bytes
-       if(!GetOverlappedResult(fd,&m_ov,&write,TRUE)) {
+       //if(!GetOverlappedResult(fd,&m_ov,&write,TRUE)) {
       // ooops... something is going wrong
-      return (int)write;
-       }
+      //return (int)write;
+       //}
       }
      }
      return write;

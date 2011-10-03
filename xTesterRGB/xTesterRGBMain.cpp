@@ -502,17 +502,20 @@ void xTesterRGBFrame::OnTimer(wxTimerEvent& event) {
 void xTesterRGBFrame::LoadFile()
 {
     long MaxChan;
+    wxString tempstr,tagname,NetworkType,ComPort,BaudRate;
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
         wxXmlNode* e=doc.GetRoot();
+        tempstr=e->GetPropVal(wxT("LorMapping"), wxT("2"));
+        tempstr.ToLong(&LorMapping);
         for( e=e->GetChildren(); e!=NULL; e=e->GetNext() ) {
-            wxString tagname=e->GetName();
+            tagname=e->GetName();
             if (tagname == wxT("network")) {
-                wxString tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
+                tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
                 tempstr.ToLong(&MaxChan);
-                wxString NetworkType=e->GetPropVal(wxT("NetworkType"), wxT(""));
-                wxString ComPort=e->GetPropVal(wxT("ComPort"), wxT(""));
-                wxString BaudRate=e->GetPropVal(wxT("BaudRate"), wxT(""));
+                NetworkType=e->GetPropVal(wxT("NetworkType"), wxT(""));
+                ComPort=e->GetPropVal(wxT("ComPort"), wxT(""));
+                BaudRate=e->GetPropVal(wxT("BaudRate"), wxT(""));
                 AddNetwork(NetworkType,ComPort,BaudRate,MaxChan);
             }
         }

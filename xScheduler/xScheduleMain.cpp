@@ -65,14 +65,10 @@
 #define FixedPages 2
 
 /* ****************************************************
- * Define xlights output object
- * All of the light control commands flow through here
+ * Define the output interval in milliseconds
  */
 
 #define XTIMER_INTERVAL 50
-
-xOutput xout;
-
 
 
 /* ****************************************************
@@ -257,7 +253,7 @@ protected:
     // all lights off
     int do_lightsoff(void)
     {
-        xout.alloff();
+        xsched->xout->alloff();
         return EXEC_NEXTLINE;
     };
 
@@ -668,11 +664,13 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     Connect(idCustomScript,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnMenuItemCustomScriptSelected);
     Connect(idMenuHelpContent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAuiToolBarItemHelpClick);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xScheduleFrame::OnAbout);
+    Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&xScheduleFrame::OnClose);
     //*)
 
     SetIcon(wxIcon(xlights_xpm));
     PlayerDlg = new PlayerFrame(this, ID_PLAYER_DIALOG);
     PlayMode=NO_PLAY;
+    xout = new xOutput();
     ResetTimer(NO_SEQ);
 
     // set time format
@@ -749,7 +747,7 @@ void xScheduleFrame::EndScript(const char *scriptname) {
     PlayerDlg->MediaCtrl->Stop();
     ResetTimer(NO_SEQ);
     PlayerDlg->Show(false);
-    xout.alloff();
+    xout->alloff();
     wxString wxname(scriptname, wxConvUTF8);
     SendToLogAndStatusBar(_("Ended playlist: ")+wxname);
 }
@@ -991,15 +989,6 @@ void xScheduleFrame::OnButtonPlaylistDeleteAllClick() {
 
 xScheduleFrame::~xScheduleFrame()
 {
-    if (schedtimer.IsRunning()) schedtimer.Stop();
-    if (timer.IsRunning()) timer.Stop();
-    delete PlayerDlg;
-    if (UnsavedChanges) {
-        wxMessageDialog confirm(this, _("Save changes?"), _("Confirm"), wxYES|wxNO);
-        if (confirm.ShowModal() == wxID_YES) {
-            SaveFile();
-        }
-    }
     //(*Destroy(xScheduleFrame)
     //*)
 }
@@ -1019,15 +1008,15 @@ void xScheduleFrame::OnAbout(wxCommandEvent& event)
 void xScheduleFrame::TimerNoPlay() {
     wxTimeSpan ts = wxDateTime::UNow() - starttime;
     long msec = ts.GetMilliseconds().ToLong();
-    xout.TimerStart(msec);
-    xout.TimerEnd();
+    xout->TimerStart(msec);
+    xout->TimerEnd();
     //wxString msg = wxString::Format(_("TimerNoPlay %d"),msec);
     //StatusBar1->SetStatusText(msg);
 }
 
 void xScheduleFrame::ResetTimer(SeqPlayerStates newstate) {
     SeqPlayerState = newstate;
-    xout.ResetTimer();
+    xout->ResetTimer();
     starttime = wxDateTime::UNow();
 }
 
@@ -1218,7 +1207,7 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             }
             ts = wxDateTime::UNow() - starttime;
             msec = ts.GetMilliseconds().ToLong();
-            xout.TimerStart(msec);
+            xout->TimerStart(msec);
             while (LorIter != LorEvents.end()) {
 
                 startmsec=LorIter->first * 10;
@@ -1230,48 +1219,48 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 if (LorIter->second->EndIntesity == -1) {
                     switch (LorIter->second->action) {
                         case LOR_INTENSITY:
-                            xout.SetIntensity(netnum,chindex,LorIter->second->StartIntensity);
+                            xout->SetIntensity(netnum,chindex,LorIter->second->StartIntensity);
                             break;
                         case LOR_TWINKLE:
-                            xout.twinkle(netnum,chindex,400,LorIter->second->StartIntensity);
+                            xout->twinkle(netnum,chindex,400,LorIter->second->StartIntensity);
                             break;
                         case LOR_SHIMMER:
-                            xout.shimmer(netnum,chindex,100,LorIter->second->StartIntensity);
+                            xout->shimmer(netnum,chindex,100,LorIter->second->StartIntensity);
                             break;
                     }
                 } else {
                     duration = endmsec - startmsec;
                     switch (LorIter->second->action) {
                         case LOR_INTENSITY:
-                            xout.ramp(netnum,chindex,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            xout->ramp(netnum,chindex,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
                             break;
                         case LOR_TWINKLE:
-                            xout.twinklefade(netnum,chindex,400,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            xout->twinklefade(netnum,chindex,400,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
                             break;
                         case LOR_SHIMMER:
-                            xout.shimmerfade(netnum,chindex,100,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            xout->shimmerfade(netnum,chindex,100,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
                             break;
                     }
                 }
 
                 LorIter++;
             }
-            xout.TimerEnd();
+            xout->TimerEnd();
             break;
         case PLAYING_VIX_ANIM:
             ts = wxDateTime::UNow() - starttime;
             msec = ts.GetMilliseconds().ToLong();
             period = msec / VixEventPeriod;
             if (period < VixNumPeriods) {
-                xout.TimerStart(msec);
+                xout->TimerStart(msec);
                 for (chindex=0; chindex<VixLastChannel; chindex++) {
                     vixintensity=VixEventData[chindex*VixNumPeriods+period];
                     if (vixintensity != LastIntensity[chindex]) {
-                        xout.SetIntensity(VixNetwork[chindex].first, VixNetwork[chindex].second, vixintensity);
+                        xout->SetIntensity(VixNetwork[chindex].first, VixNetwork[chindex].second, vixintensity);
                         LastIntensity[chindex]=vixintensity;
                     }
                 }
-                xout.TimerEnd();
+                xout->TimerEnd();
             } else {
                 ResetTimer(basic.IsRunning() ? DELAY_AFTER_PLAY : NO_SEQ);
             }
@@ -1299,7 +1288,7 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 return;
             }
             msec = PlayerDlg->MediaCtrl->Tell();
-            xout.TimerStart(msec);
+            xout->TimerStart(msec);
             while (LorIter != LorEvents.end()) {
 
                 startmsec=LorIter->first * 10;
@@ -1311,33 +1300,33 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                 if (LorIter->second->EndIntesity == -1) {
                     switch (LorIter->second->action) {
                         case LOR_INTENSITY:
-                            xout.SetIntensity(netnum,chindex,LorIter->second->StartIntensity);
+                            xout->SetIntensity(netnum,chindex,LorIter->second->StartIntensity);
                             break;
                         case LOR_TWINKLE:
-                            xout.twinkle(netnum,chindex,400,LorIter->second->StartIntensity);
+                            xout->twinkle(netnum,chindex,400,LorIter->second->StartIntensity);
                             break;
                         case LOR_SHIMMER:
-                            xout.shimmer(netnum,chindex,100,LorIter->second->StartIntensity);
+                            xout->shimmer(netnum,chindex,100,LorIter->second->StartIntensity);
                             break;
                     }
                 } else {
                     duration = endmsec - startmsec;
                     switch (LorIter->second->action) {
                         case LOR_INTENSITY:
-                            xout.ramp(netnum,chindex,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            xout->ramp(netnum,chindex,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
                             break;
                         case LOR_TWINKLE:
-                            xout.twinklefade(netnum,chindex,400,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            xout->twinklefade(netnum,chindex,400,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
                             break;
                         case LOR_SHIMMER:
-                            xout.shimmerfade(netnum,chindex,100,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            xout->shimmerfade(netnum,chindex,100,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
                             break;
                     }
                 }
 
                 LorIter++;
             }
-            xout.TimerEnd();
+            xout->TimerEnd();
             break;
         case PAUSE_LOR:
             if (PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING) {
@@ -1355,17 +1344,17 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             }
             msec = PlayerDlg->MediaCtrl->Tell();
             period = msec / VixEventPeriod;
-            xout.TimerStart(msec);
+            xout->TimerStart(msec);
             if (period < VixNumPeriods) {
                 for (chindex=0; chindex<VixLastChannel; chindex++) {
                     vixintensity=VixEventData[chindex*VixNumPeriods+period];
                     if (vixintensity != LastIntensity[chindex]) {
-                        xout.SetIntensity(VixNetwork[chindex].first, VixNetwork[chindex].second, vixintensity);
+                        xout->SetIntensity(VixNetwork[chindex].first, VixNetwork[chindex].second, vixintensity);
                         LastIntensity[chindex]=vixintensity;
                     }
                 }
             }
-            xout.TimerEnd();
+            xout->TimerEnd();
             break;
         case PAUSE_VIX:
             if (PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING) {
@@ -1390,7 +1379,10 @@ void xScheduleFrame::LoadNetworkFile()
     wxString tempstr;
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
-        for( wxXmlNode* e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        wxXmlNode* e=doc.GetRoot();
+        tempstr=e->GetPropVal(wxT("LorMapping"), wxT("2"));
+        tempstr.ToLong(&LorMapping);
+        for( e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
             wxString tagname=e->GetName();
             if (tagname == wxT("network")) {
                 wxString tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
@@ -1412,7 +1404,7 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
     int baud = (BaudRate == _("n/a")) ? 115200 : atoi(BaudRate.mb_str(wxConvUTF8));
     wxString msg = _("Error occurred while connecting to ") + NetworkType+ _(" network on ") + ComPort + _("\n\n");
     try {
-        netnum=xout.addnetwork(NetworkType,MaxChannels,ComPort,baud);
+        netnum=xout->addnetwork(NetworkType,MaxChannels,ComPort,baud);
     }
     catch (const char *str) {
         wxString errmsg(str,wxConvUTF8);
@@ -1599,7 +1591,7 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
 {
     if (!CheckPorts()) return;
     if (!LoadLorFile(FileName)) return;
-    xout.SetMaxIntensity(100);
+    xout->SetMaxIntensity(100);
     if (mediaFilename.IsEmpty()) {
         ResetTimer(STARTING_LOR_ANIM);
     } else if (!wxFile::Exists(mediaFilename)) {
@@ -1651,7 +1643,7 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() != _("channel")) continue;
         if (e->HasProp(_("unit")) && e->HasProp(_("circuit"))) {
-            tempstr=e->GetPropVal(wxT("unit"), wxT("0"));
+            tempstr=e->GetPropVal(wxT("unit"), wxT("1"));
             tempstr.ToLong(&unit);
             tempstr=e->GetPropVal(wxT("circuit"), wxT("0"));
             tempstr.ToLong(&circuit);
@@ -1659,7 +1651,21 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
             tempstr.ToLong(&netnum);
             if (netnum < MAXNETWORKS) {
                 chindex=(unit-1)*16+circuit-1;
-                LoadLorChannel(e,netnum,chindex);
+                switch (LorMapping) {
+                    case XLIGHTS_LORMAP_SINGLE:
+                        if (chindex < VixNetwork.size()) {
+                            LoadLorChannel(e, VixNetwork[chindex].first, VixNetwork[chindex].second);
+                        }
+                        break;
+                    case XLIGHTS_LORMAP_MULTI:
+                        if (chindex < xout->GetChannelCount(netnum)) {
+                            LoadLorChannel(e,netnum,chindex);
+                        }
+                        break;
+                    case XLIGHTS_LORMAP_STRICT:
+                        LoadLorChannel(e,netnum,chindex);
+                        break;
+                }
                 if (unit > LorLastUnit[netnum]) LorLastUnit[netnum]=unit;
             }
         }
@@ -1771,7 +1777,7 @@ bool xScheduleFrame::LoadVixenFile(wxString& FileName)
                 }
             }
         }
-        xout.SetMaxIntensity(MaxIntensity);
+        xout->SetMaxIntensity(MaxIntensity);
         VixNumPeriods = VixEventData.size() / VixLastChannel;
         return true;
     } else {
@@ -1857,6 +1863,19 @@ void xScheduleFrame::OnButtonInfoClick()
     switch (ExtType(oName.GetExt())) {
         case 'L':
             if (LoadLorFile(fullpath)) {
+                msg+=_("LOR channel mapping mode: ");
+                switch (LorMapping) {
+                    case XLIGHTS_LORMAP_SINGLE:
+                        msg+=_("single network");
+                        break;
+                    case XLIGHTS_LORMAP_MULTI:
+                        msg+=_("multi network");
+                        break;
+                    case XLIGHTS_LORMAP_STRICT:
+                        msg+=_("strict");
+                        break;
+                }
+                msg+=_("\n");
                 if (mediaFilename.IsEmpty()) {
                     msg+=_("Media file: none");
                 } else if (!wxFile::Exists(mediaFilename)) {
@@ -1868,9 +1887,9 @@ void xScheduleFrame::OnButtonInfoClick()
                 for (int netidx=0; netidx<MAXNETWORKS; netidx++) {
                     if (LorLastUnit[netidx] > 0) {
                         int lastch = LorLastUnit[netidx]*16;
-                        int xch = xout.GetChannelCount(netidx);
+                        int xch = xout->GetChannelCount(netidx);
                         if (xch < lastch) lastch = xch;
-                        msg += wxString::Format(_("\nLOR sequence, ")+LorNetDesc(netidx)+_(", units 1-%d map to ")+xout.GetNetworkDesc(netidx)+_(" channels 1-%d"),LorLastUnit[netidx],lastch);
+                        msg += wxString::Format(_("\nLOR sequence, ")+LorNetDesc(netidx)+_(", units 1-%d map to ")+xout->GetNetworkDesc(netidx)+_(" channels 1-%d"),LorLastUnit[netidx],lastch);
                     }
                 }
             } else {
@@ -1894,10 +1913,10 @@ void xScheduleFrame::OnButtonInfoClick()
                     int LeftToMap = VixLastChannel;
                     int netidx = 0;
                     while (mapcnt < VixLastChannel && netidx < MAXNETWORKS) {
-                        int chcnt = xout.GetChannelCount(netidx);
+                        int chcnt = xout->GetChannelCount(netidx);
                         if (chcnt > 0) {
                             int mapcnt1 = chcnt < LeftToMap ? chcnt : LeftToMap;
-                            msg += wxString::Format(_("\nVixen channels %d-%d map to %s channels %d-%d"),mapcnt+1,mapcnt+mapcnt1,xout.GetNetworkDesc(netidx).c_str(),1,mapcnt1);
+                            msg += wxString::Format(_("\nVixen channels %d-%d map to %s channels %d-%d"),mapcnt+1,mapcnt+mapcnt1,xout->GetNetworkDesc(netidx).c_str(),1,mapcnt1);
                             mapcnt += mapcnt1;
                             LeftToMap -= mapcnt1;
                         }
@@ -2348,9 +2367,11 @@ void xScheduleFrame::OnAuiToolBarItemPlayClick(wxCommandEvent& event)
     }
     dialog.ChoicePlayList->SetSelection(selidx >= FixedPages ? selidx-FixedPages : 0);
     if (dialog.ShowModal() != wxID_OK) return;
+    //wxMessageBox(_("OnAuiToolBarItemPlayClick: GetSelection"));
     selidx = dialog.ChoicePlayList->GetSelection() + FixedPages;
     PlayMode=PLAYLIST;
     SecondsRemaining=1;
+    //wxMessageBox(_("OnAuiToolBarItemPlayClick: RunPlaylist"));
     RunPlaylist(selidx,dialog.CheckBoxRepeat->IsChecked(),dialog.CheckBoxFirstItem->IsChecked(),dialog.CheckBoxLastItem->IsChecked(),dialog.CheckBoxLightsOff->IsChecked());
 }
 
@@ -2685,4 +2706,26 @@ void xScheduleFrame::OnButtonRemoveScriptClick(wxCommandEvent& event)
         ButtonRemoveScript->Hide();
         UnsavedChanges=true;
     }
+}
+
+void xScheduleFrame::OnClose(wxCloseEvent& event)
+{
+    if (UnsavedChanges) {
+        wxMessageDialog confirm(this, _("Save changes?"), _("Confirm"), wxYES|wxNO);
+        if (confirm.ShowModal() == wxID_YES) {
+            SaveFile();
+        }
+    }
+    StatusBar1->SetStatusText(_("Turning lights off"));
+    xout->alloff();
+    wxMilliSleep(XTIMER_INTERVAL * 2);
+    StatusBar1->SetStatusText(_("Stopping schedtimer"));
+    if (schedtimer.IsRunning()) schedtimer.Stop();
+    StatusBar1->SetStatusText(_("Stopping main timer"));
+    if (timer.IsRunning()) timer.Stop();
+    StatusBar1->SetStatusText(_("Closing ports"));
+    xout->ClosePorts();
+    if (PlayerDlg) PlayerDlg->Destroy();
+    if (xout) delete xout;
+    this->Destroy();
 }

@@ -2663,6 +2663,16 @@ public:
 
 MiniBasicClass()
 {
+  lines = 0;
+  nlines = 0;
+  scriptname = 0;
+  script = 0;
+  ntokens = 0;
+  variables = 0;
+  nvariables = 0;
+  dimvariables = 0;
+  ndimvariables = 0;
+
   emptystring[0]='\0';
 
   ERRORTOK=AddToken("", TOK_OTHER);
