@@ -376,8 +376,7 @@ void xTesterRGBFrame::OnTimer(wxTimerEvent& event) {
     static long SeqNum=0, NextSequenceStart = -1;
     static int interval, rgbCycle=0, alt=0;
     static float frequency;
-    int v,n,ch,color[3];
-    unsigned int i, rgbChannel;
+    int v,n,ch,rgbChannel,color[3];
     /*
     static bool loggingEnabled=false;
     if (CheckBoxRunSh->IsChecked() && !loggingEnabled) {

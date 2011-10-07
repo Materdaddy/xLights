@@ -288,6 +288,7 @@ class xScheduleFrame: public wxFrame
 
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         wxString LorNetDesc(int netnum);
+        wxString LorChDesc(int ch);
         void LoadNetworkFile();
         void LoadScheduleFile();
         void LoadSchedule(wxXmlNode* n);
@@ -296,7 +297,8 @@ class xScheduleFrame: public wxFrame
         void SaveFile();
         void ScanForFiles();
         void AddPlaylist(const wxString& name);
-        wxString CreateScript(wxString ListName, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff);
+        wxString OnOffString(bool b);
+        wxString CreateScript(wxString ListName, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff, bool Random);
         bool CheckPorts();
         bool LoadLorFile(wxString& FileName);
         bool LoadVixenFile(wxString& FileName);
@@ -307,7 +309,7 @@ class xScheduleFrame: public wxFrame
         long DiffSeconds(wxString& strTime, wxTimeSpan& tsCurrent);
         void ResetTimer(SeqPlayerStates newstate);
         void TimerNoPlay();
-        void RunPlaylist(int nbidx, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff);
+        void RunPlaylist(int nbidx, wxString& script);
         void ShowPlayerSingle();
         void PlayerError(const wxString& msg);
         void SendToLogAndStatusBar(const wxString& msg);
@@ -332,7 +334,6 @@ class xScheduleFrame: public wxFrame
         void OnButtonUpClick();
         void OnButtonDownClick();
         void OnButtonInfoClick();
-        //void OnButtonWizardClick();
         void OnButtonPlaylistAddClick();
         void OnButtonPlaylistAddAllClick();
         void OnButtonPlaylistDeleteClick();

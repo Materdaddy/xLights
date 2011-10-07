@@ -68,6 +68,7 @@ SerialPortWithRate::SerialPortWithRate(wxWindow* parent,const wxString& title)
     wxArrayString ports;
     PopulatePortChooser(&ports);
     ChoicePort->Append(ports);
+	FlexGridSizer1->Fit(this);
 }
 
 SerialPortWithRate::~SerialPortWithRate()

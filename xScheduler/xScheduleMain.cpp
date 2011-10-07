@@ -1035,9 +1035,10 @@ void xScheduleFrame::ForceScheduleCheck() {
 
 void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
 {
-    wxString WkDayStr,StartTime, EndTime;
+    wxString WkDayStr, StartTime, EndTime, userscript;
     int SchedDay,i,cnt;
     bool CheckSchedule = false;
+    wxTextCtrl* LogicCtl;
 
     static wxString RepeatOptions, Playlist, strStartTime, strEndTime;
     static wxDateTime LastTime = wxDateTime::Now();  // last time this method was called
@@ -1130,7 +1131,15 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
                     StatusBar1->SetStatusText(_("ERROR: serial ports did not initialize at program startup, cannot start playlist ") + Playlist, 1);
                 } else if (nbidx > 0) {
                     PlayMode=SCHEDULE;
-                    RunPlaylist(nbidx,RepeatOptions[0]=='R',RepeatOptions[1]=='F',RepeatOptions[2]=='L',false);
+                    LogicCtl=(wxTextCtrl*)FindNotebookControl(nbidx,PLAYLIST_LOGIC);
+                    if (LogicCtl && LogicCtl->IsShown()) {
+                        // run custom script
+                        userscript=LogicCtl->GetValue();
+                    } else {
+                        // this is a playlist page, run generic script
+                        userscript=CreateScript(Notebook1->GetPageText(nbidx),RepeatOptions[0]=='R',RepeatOptions[1]=='F',RepeatOptions[2]=='L',false,RepeatOptions[3]=='X');
+                    }
+                    RunPlaylist(nbidx,userscript);
                 } else {
                     StatusBar1->SetStatusText(_("ERROR: cannot find playlist ") + Playlist, 1);
                 }
@@ -1653,7 +1662,7 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
                 chindex=(unit-1)*16+circuit-1;
                 switch (LorMapping) {
                     case XLIGHTS_LORMAP_SINGLE:
-                        if (chindex < VixNetwork.size()) {
+                        if (netnum==0 && chindex < VixNetwork.size()) {
                             LoadLorChannel(e, VixNetwork[chindex].first, VixNetwork[chindex].second);
                         }
                         break;
@@ -1845,6 +1854,12 @@ wxString xScheduleFrame::LorNetDesc(int netnum)
     return result;
 }
 
+wxString xScheduleFrame::LorChDesc(int ch)
+{
+    wxString result = wxString::Format(_("[unit %d/chan %d]"),ch / 16 + 1, ch % 16 + 1);
+    return result;
+}
+
 void xScheduleFrame::OnButtonInfoClick()
 {
     int baseid=1000*Notebook1->GetSelection();
@@ -1860,37 +1875,54 @@ void xScheduleFrame::OnButtonInfoClick()
 
     wxFileName oName(CurrentDir, filename);
     wxString fullpath=oName.GetFullPath();
+    int netidx,startch,endch,chcnt,lastch,mapcnt,LeftToMap,mapcnt1;
     switch (ExtType(oName.GetExt())) {
         case 'L':
             if (LoadLorFile(fullpath)) {
-                msg+=_("LOR channel mapping mode: ");
-                switch (LorMapping) {
-                    case XLIGHTS_LORMAP_SINGLE:
-                        msg+=_("single network");
-                        break;
-                    case XLIGHTS_LORMAP_MULTI:
-                        msg+=_("multi network");
-                        break;
-                    case XLIGHTS_LORMAP_STRICT:
-                        msg+=_("strict");
-                        break;
-                }
-                msg+=_("\n");
                 if (mediaFilename.IsEmpty()) {
                     msg+=_("Media file: none");
                 } else if (!wxFile::Exists(mediaFilename)) {
-                    msg+=_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences.");
+                    msg+=_("Cannot locate media file: ") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences.");
                 } else {
-                    msg+=_("Media file:\n") + mediaFilename;
+                    msg+=_("Media file: ") + mediaFilename;
                 }
-                msg += _("\n\nChannel Map:");
-                for (int netidx=0; netidx<MAXNETWORKS; netidx++) {
-                    if (LorLastUnit[netidx] > 0) {
-                        int lastch = LorLastUnit[netidx]*16;
-                        int xch = xout->GetChannelCount(netidx);
-                        if (xch < lastch) lastch = xch;
-                        msg += wxString::Format(_("\nLOR sequence, ")+LorNetDesc(netidx)+_(", units 1-%d map to ")+xout->GetNetworkDesc(netidx)+_(" channels 1-%d"),LorLastUnit[netidx],lastch);
-                    }
+                msg+=_("\n\nLOR channel mapping mode: ");
+                switch (LorMapping) {
+                    case XLIGHTS_LORMAP_SINGLE:
+                        msg += _("single network\n\nChannel Map:");
+                        startch = 0;
+                        for (netidx=0; netidx<MAXNETWORKS; netidx++) {
+                            chcnt = xout->GetChannelCount(netidx);
+                            if (chcnt > 0) {
+                                endch = startch + chcnt - 1;
+                                msg += wxString::Format(_("\nLOR sequence ")+LorNetDesc(0)+_(", ")+LorChDesc(startch)+_(" to ")+LorChDesc(endch)+_(" map to ")+xout->GetNetworkDesc(netidx)+_(" channels 1-%d"),chcnt);
+                                startch = endch + 1;
+                            }
+                        }
+                        for (netidx=1; netidx<MAXNETWORKS; netidx++) {
+                            if (LorLastUnit[netidx] > 0) {
+                                msg += wxString::Format(_("\nLOR sequence ")+LorNetDesc(netidx)+_(", units 1-%d are unmapped"),LorLastUnit[netidx]);
+                            }
+                        }
+                        break;
+                    case XLIGHTS_LORMAP_MULTI:
+                        msg += _("multi network\n\nChannel Map:");
+                        for (netidx=0; netidx<MAXNETWORKS; netidx++) {
+                            if (LorLastUnit[netidx] > 0) {
+                                lastch = LorLastUnit[netidx]*16;
+                                chcnt = xout->GetChannelCount(netidx);
+                                if (chcnt == 0) {
+                                    msg += wxString::Format(_("\nLOR sequence ")+LorNetDesc(netidx)+_(", units 1-%d are unmapped"),LorLastUnit[netidx]);
+                                } else {
+                                    if (chcnt < lastch) lastch = chcnt;
+                                    msg += wxString::Format(_("\nLOR sequence ")+LorNetDesc(netidx)+_(", units 1-%d map to ")+xout->GetNetworkDesc(netidx)+_(" channels 1-%d"),LorLastUnit[netidx],lastch);
+                                }
+                            }
+                        }
+                        break;
+                    case XLIGHTS_LORMAP_STRICT:
+                        msg += _("strict\n\nChannel Map:");
+                        break;
                 }
             } else {
                 msg+=_("Unable to load sequence file:\n") + fullpath;
@@ -1909,13 +1941,13 @@ void xScheduleFrame::OnButtonInfoClick()
                 msg += wxString::Format(_("\nSequence Length: %3.1f sec\nEvent Period: %d msec\nChannel Count: %d"),seqlen,VixEventPeriod,VixLastChannel);
                 if (VixLastChannel > 0) {
                     msg += _("\n\nChannel Map:");
-                    int mapcnt = 0;
-                    int LeftToMap = VixLastChannel;
-                    int netidx = 0;
+                    mapcnt = 0;
+                    LeftToMap = VixLastChannel;
+                    netidx = 0;
                     while (mapcnt < VixLastChannel && netidx < MAXNETWORKS) {
-                        int chcnt = xout->GetChannelCount(netidx);
+                        chcnt = xout->GetChannelCount(netidx);
                         if (chcnt > 0) {
-                            int mapcnt1 = chcnt < LeftToMap ? chcnt : LeftToMap;
+                            mapcnt1 = chcnt < LeftToMap ? chcnt : LeftToMap;
                             msg += wxString::Format(_("\nVixen channels %d-%d map to %s channels %d-%d"),mapcnt+1,mapcnt+mapcnt1,xout->GetNetworkDesc(netidx).c_str(),1,mapcnt1);
                             mapcnt += mapcnt1;
                             LeftToMap -= mapcnt1;
@@ -2223,31 +2255,22 @@ wxWindow* xScheduleFrame::FindNotebookControl(int nbidx, PlayListIds id) {
     return wxWindow::FindWindowById(1000*nbidx+id, Notebook1);
 }
 
-void xScheduleFrame::RunPlaylist(int nbidx, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff)
+void xScheduleFrame::RunPlaylist(int nbidx, wxString& script)
 {
-    wxString userscript;
     wxString PageName=Notebook1->GetPageText(nbidx);
     TextCtrlLog->AppendText(_("At: ") + wxDateTime::Now().FormatTime() + _("\n"));
     TextCtrlLog->AppendText(_("Starting playlist ") + PageName + _("\n"));
     if (basic.IsRunning()) {
-        SendToLogAndStatusBar(_("WARNING: another playlist is already running!"));
+        SendToLogAndStatusBar(_("ERROR: unable to start - another playlist is already running!"));
         return;
     }
     wxCheckBox* MovieMode=(wxCheckBox*)FindNotebookControl(nbidx,CHKBOX_MOVIEMODE);
-    wxTextCtrl* LogicCtl=(wxTextCtrl*)FindNotebookControl(nbidx,PLAYLIST_LOGIC);
-    if (LogicCtl && LogicCtl->IsShown()) {
-        // run custom script
-        userscript=LogicCtl->GetValue();
-    } else {
-        // this is a playlist page, run generic script
-        userscript=CreateScript(PageName,Repeat,FirstItemOnce,LastItemOnce,LightsOff);
-    }
-    if (userscript.IsEmpty()) {
+    if (script.IsEmpty()) {
         SendToLogAndStatusBar(_("ERROR: no script to run!"));
         return;
     }
-    if (!userscript.EndsWith(_("\n"))) userscript += _("\n"); // ensure script ends with a newline
-    if (basic.setScript(PageName.mb_str(wxConvUTF8), userscript.mb_str(wxConvUTF8))) {
+    if (!script.EndsWith(_("\n"))) script += _("\n"); // ensure script ends with a newline
+    if (basic.setScript(PageName.mb_str(wxConvUTF8), script.mb_str(wxConvUTF8))) {
         basic.run();
         if (MovieMode->GetValue()) {
             PlayerDlg->MediaCtrl->ShowPlayerControls(wxMEDIACTRLPLAYERCONTROLS_NONE);
@@ -2264,58 +2287,98 @@ void xScheduleFrame::SendToLogAndStatusBar(const wxString& msg)
     TextCtrlLog->AppendText(msg + _("\n"));
     StatusBar1->SetStatusText(msg);
 }
-/*
-void xScheduleFrame::OnButtonWizardClick()
-{
-    WizardDialog dialog(this);
-    int nbidx=Notebook1->GetSelection();
-    dialog.StaticTextListName->SetLabel(Notebook1->GetPageText(nbidx));
-    if (dialog.ShowModal() != wxID_OK) return;
 
-    bool FirstItemOnce = dialog.CheckBoxFirstItem->GetValue();
-    bool LastItemOnce = dialog.CheckBoxLastItem->GetValue();
-    bool LightsOff = dialog.CheckBoxLightsOff->GetValue();
-    wxTextCtrl* LogicCtl=(wxTextCtrl*)FindNotebookControl(nbidx,PLAYLIST_LOGIC);
-    wxStaticText* PriNameCtl=(wxStaticText*)FindNotebookControl(nbidx,PRIMARY_NAME);
-    wxString PlaylistName = PriNameCtl->GetLabel();
-    LogicCtl->SetValue( CreateScript(PlaylistName,FirstItemOnce,LastItemOnce,LightsOff) );
-    UnsavedChanges=true;
-}
-*/
-wxString xScheduleFrame::CreateScript(wxString ListName, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff)
+wxString xScheduleFrame::OnOffString(bool b)
 {
-    wxString script;
-    wxString loopstart = Repeat && FirstItemOnce ? _("2") : _("1");
-    wxString loopend = Repeat && LastItemOnce ? _("PLAYLISTSIZE-1") : _("PLAYLISTSIZE");
+    return b ? wxT("on") : wxT("off");
+}
+
+wxString xScheduleFrame::CreateScript(wxString ListName, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff, bool Random)
+{
+    wxString script,loopsize;
+    wxString endoflist = Repeat ? wxT("180") : wxT("400");
+    wxString loopstart = FirstItemOnce ? wxT("2") : wxT("1");
+    wxString loopend = LastItemOnce ? wxT("PLAYLISTSIZE-1") : wxT("PLAYLISTSIZE");
+    if (FirstItemOnce && LastItemOnce) {
+        loopsize=wxT("PLAYLISTSIZE-2");
+    } else if (FirstItemOnce || LastItemOnce) {
+        loopsize=wxT("PLAYLISTSIZE-1");
+    } else {
+        loopsize=wxT("PLAYLISTSIZE");
+    }
 
     script.Append(_("100 REM *\n"));
-    script.Append(_("120 REM * Created: ") + wxDateTime::Now().Format() + _("\n"));
-    script.Append(_("130 REM *\n"));
-    script.Append(_("140 LET ListName$=\"") + ListName + _("\"\n"));
-    script.Append(_("150 SETPLAYLIST ListName$\n"));
-    script.Append(_("160 ONPLAYBACKEND 300\n"));
-    script.Append(_("170 LET NextItem=1\n"));
-    script.Append(_("200 REM *\n"));
-    script.Append(_("201 REM * Play item NextItem\n"));
-    script.Append(_("202 REM *\n"));
-    script.Append(_("210 LET LastItemPlayed=NextItem\n"));
-    script.Append(_("215 PRINT \"At:\", FORMATDATETIME$(NOW,5)\n"));
-    script.Append(_("220 PRINT \"Playing:\",ITEMNAME$(NextItem)\n"));
-    script.Append(_("230 PLAYITEM NextItem\n"));
-    script.Append(_("240 WAIT\n"));
-    script.Append(_("300 REM *\n"));
-    script.Append(_("301 REM * Jump here at end of song or sequence\n"));
-    script.Append(_("302 REM *\n"));
-    if (LightsOff) script.Append(_("305 LIGHTSOFF\n"));
-    //script.Append(_("303 PRINT \"SECONDSREMAINING:\",SECONDSREMAINING\n"));
-    script.Append(_("310 IF SECONDSREMAINING <= 0 THEN 400\n"));
-    script.Append(_("320 LET NextItem=LastItemPlayed+1\n"));
-    script.Append(_("330 IF NextItem <= ") + loopend + _(" THEN 200\n"));
-    if (Repeat) {
-        script.Append(_("340 LET NextItem=") + loopstart + _("\n"));
-        script.Append(_("350 GOTO 200\n"));
+    script.Append(_("101 REM * Created: ") + wxDateTime::Now().Format() + _("\n"));
+    script.Append(_("102 REM * Random: ") + OnOffString(Random) + _("\n"));
+    script.Append(_("103 REM * Repeat: ") + OnOffString(Repeat) + _("\n"));
+    script.Append(_("104 REM * First Item Once: ") + OnOffString(FirstItemOnce) + _("\n"));
+    script.Append(_("105 REM * Last Item Once: ") + OnOffString(LastItemOnce) + _("\n"));
+    script.Append(_("106 REM *\n"));
+    script.Append(_("110 LET ListName$=\"") + ListName + _("\"\n"));
+    script.Append(_("120 SETPLAYLIST ListName$\n"));
+    if (FirstItemOnce) {
+        script.Append(_("130 ONPLAYBACKEND 140\n"));
+        script.Append(_("131 PRINT \"At:\", FORMATDATETIME$(NOW,5)\n"));
+        script.Append(_("132 PRINT \"Playing:\",ITEMNAME$(1)\n"));
+        script.Append(_("133 PLAYITEM 1\n"));
+        script.Append(_("134 WAIT\n"));
     }
-    script.Append(_("400 REM Reached scheduled end time\n"));
+    script.Append(_("140 ONPLAYBACKEND 300\n"));
+
+    if (Random) {
+        script.Append(_("170 IF ") + loopsize + _(">1 THEN 176\n"));
+        script.Append(_("172 PRINT \"ERROR: not enough items in playlist to support random playback\"\n"));
+        script.Append(_("174 GOTO 400\n"));
+        script.Append(_("176 LET LastItemPlayed=-1\n"));
+        script.Append(_("178 DIM PLAYED(PLAYLISTSIZE)\n"));
+        script.Append(_("180 FOR I=1 TO PLAYLISTSIZE\n"));
+        script.Append(_("182 LET PLAYED(I)=0\n"));
+        script.Append(_("184 NEXT I\n"));
+        script.Append(_("186 LET PlayCount=0\n"));
+        script.Append(_("188 GOTO 300\n"));
+        script.Append(_("200 REM *\n"));
+        script.Append(_("201 REM * Play item NextItem\n"));
+        script.Append(_("202 REM *\n"));
+        script.Append(_("210 LET LastItemPlayed=NextItem\n"));
+        script.Append(_("215 PRINT \"At:\", FORMATDATETIME$(NOW,5)\n"));
+        script.Append(_("220 PRINT \"Playing:\",ITEMNAME$(NextItem)\n"));
+        script.Append(_("230 PLAYITEM NextItem\n"));
+        script.Append(_("240 WAIT\n"));
+        script.Append(_("300 REM *\n"));
+        script.Append(_("301 REM * Jump here at end of song or sequence\n"));
+        script.Append(_("302 REM *\n"));
+        if (LightsOff) script.Append(_("305 LIGHTSOFF\n"));
+        script.Append(_("310 IF SECONDSREMAINING <= 0 THEN 400\n"));
+        script.Append(_("320 IF PlayCount>=") + loopsize + _(" THEN ") + endoflist + _("\n"));
+        script.Append(_("330 LET NextItem=RND(") + loopsize + _(")+") + loopstart + _("\n"));
+        script.Append(_("340 IF PLAYED(NextItem)>0 THEN 330\n"));
+        script.Append(_("345 IF LastItemPlayed=NextItem THEN 330\n"));
+        script.Append(_("350 LET PLAYED(NextItem)=1\n"));
+        script.Append(_("360 LET PlayCount=PlayCount+1\n"));
+        script.Append(_("370 GOTO 200\n"));
+    } else {
+        script.Append(_("180 LET NextItem=") + loopstart + _("\n"));
+        script.Append(_("200 REM *\n"));
+        script.Append(_("201 REM * Play item NextItem\n"));
+        script.Append(_("202 REM *\n"));
+        script.Append(_("210 LET LastItemPlayed=NextItem\n"));
+        script.Append(_("215 PRINT \"At:\", FORMATDATETIME$(NOW,5)\n"));
+        script.Append(_("220 PRINT \"Playing:\",ITEMNAME$(NextItem)\n"));
+        script.Append(_("230 PLAYITEM NextItem\n"));
+        script.Append(_("240 WAIT\n"));
+        script.Append(_("300 REM *\n"));
+        script.Append(_("301 REM * Jump here at end of song or sequence\n"));
+        script.Append(_("302 REM *\n"));
+        if (LightsOff) script.Append(_("305 LIGHTSOFF\n"));
+        script.Append(_("310 IF SECONDSREMAINING <= 0 THEN 400\n"));
+        script.Append(_("320 LET NextItem=LastItemPlayed+1\n"));
+        script.Append(_("330 IF NextItem <= ") + loopend + _(" THEN 200\n"));
+        if (Repeat) script.Append(_("340 GOTO 180\n"));
+    }
+
+    script.Append(_("400 REM *\n"));
+    script.Append(_("401 REM Reached scheduled end time\n"));
+    script.Append(_("402 REM *\n"));
     if (LastItemOnce) {
         script.Append(_("410 ONPLAYBACKEND 490\n"));
         script.Append(_("415 PRINT \"At:\", FORMATDATETIME$(NOW,5)\n"));
@@ -2356,30 +2419,35 @@ void xScheduleFrame::OnAuiToolBarItemPlayClick(wxCommandEvent& event)
     if (!CheckPorts()) return;
     int selidx = Notebook1->GetSelection();
     int cnt = Notebook1->GetPageCount();
-    if (cnt < FixedPages) {
+    if (cnt <= FixedPages) {
         wxMessageBox(_("Nothing to play. Create a playlist first."), _("Error"));
         return;
     }
-    // get playback options
-    WizardDialog dialog(this);
-    for (int i=FixedPages; i < cnt; i++) {
-        dialog.ChoicePlayList->Append(Notebook1->GetPageText(i));
+    if (selidx < FixedPages) {
+        wxMessageBox(_("Click on the desired playlist tab first."), _("Error"));
+        return;
     }
-    dialog.ChoicePlayList->SetSelection(selidx >= FixedPages ? selidx-FixedPages : 0);
-    if (dialog.ShowModal() != wxID_OK) return;
-    //wxMessageBox(_("OnAuiToolBarItemPlayClick: GetSelection"));
-    selidx = dialog.ChoicePlayList->GetSelection() + FixedPages;
+    wxString userscript;
+    wxTextCtrl* LogicCtl=(wxTextCtrl*)FindNotebookControl(selidx,PLAYLIST_LOGIC);
+    if (LogicCtl && LogicCtl->IsShown()) {
+        // run custom script
+        userscript=LogicCtl->GetValue();
+    } else {
+        // get playback options, run generic script
+        WizardDialog dialog(this);
+        if (dialog.ShowModal() != wxID_OK) return;
+        userscript=CreateScript(Notebook1->GetPageText(selidx),dialog.CheckBoxRepeat->IsChecked(),dialog.CheckBoxFirstItem->IsChecked(),dialog.CheckBoxLastItem->IsChecked(),false,dialog.CheckBoxRandom->IsChecked());
+    }
     PlayMode=PLAYLIST;
     SecondsRemaining=1;
     //wxMessageBox(_("OnAuiToolBarItemPlayClick: RunPlaylist"));
-    RunPlaylist(selidx,dialog.CheckBoxRepeat->IsChecked(),dialog.CheckBoxFirstItem->IsChecked(),dialog.CheckBoxLastItem->IsChecked(),dialog.CheckBoxLightsOff->IsChecked());
+    RunPlaylist(selidx,userscript);
 }
 
 // convert ChoiceBox index to hhmm
 int xScheduleFrame::TimeIdx2Time(int TimeIdx) {
     return (TimeIdx / 4) * 100 + (TimeIdx % 4) * 15;
 }
-
 
 // convert hhmm string to seconds past midnight
 int xScheduleFrame::Time2Seconds(const wxString& hhmm) {
@@ -2481,7 +2549,7 @@ void xScheduleFrame::UnpackSchedCode(const wxString& SchedCode, int* WkDay, wxSt
     *WkDay=WkDayChar - '0';
     StartTime=SchedCode(1,4);
     EndTime=SchedCode(6,4);
-    RepeatOptions=SchedCode(11,3);
+    RepeatOptions=SchedCode(11,4);
     Playlist=SchedCode.Mid(15);
 }
 
@@ -2500,7 +2568,10 @@ int xScheduleFrame::DisplayScheduleOneDay(wxDateTime::WeekDay wkday) {
                 RepeatDesc=_("  (repeat");
                 if (RepeatOptions[1]=='F') RepeatDesc+=_(", first once");
                 if (RepeatOptions[2]=='L') RepeatDesc+=_(", last once");
+                if (RepeatOptions[3]=='X') RepeatDesc+=_(", random");
                 RepeatDesc+=_(")");
+            } else if (RepeatOptions[3]=='X') {
+                RepeatDesc=_("  (random)");
             } else {
                 RepeatDesc.clear();
             }
@@ -2573,6 +2644,7 @@ void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
     dialog.CheckBoxRepeat->SetValue(RepeatOptions[0]=='R');
     dialog.CheckBoxFirstItem->SetValue(RepeatOptions[1]=='F');
     dialog.CheckBoxLastItem->SetValue(RepeatOptions[2]=='L');
+    dialog.CheckBoxRandom->SetValue(RepeatOptions[3]=='X');
     dialog.CheckBoxSu->SetValue(wxDateTime::Sun==WkDay);
     dialog.CheckBoxMo->SetValue(wxDateTime::Mon==WkDay);
     dialog.CheckBoxTu->SetValue(wxDateTime::Tue==WkDay);
@@ -2605,10 +2677,11 @@ void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
         }
 
         ShowEvents.Remove(SchedCode);
-        PartialCode.Printf(wxT("%04d-%04d %c%c%c "),TimeIdx2Time(StartTimeIdx+1),TimeIdx2Time(EndTimeIdx+2),
+        PartialCode.Printf(wxT("%04d-%04d %c%c%c%c"),TimeIdx2Time(StartTimeIdx+1),TimeIdx2Time(EndTimeIdx+2),
                          dialog.CheckBoxRepeat->IsChecked() ? 'R' : '-',
                          dialog.CheckBoxFirstItem->IsChecked() ? 'F' : '-',
-                         dialog.CheckBoxLastItem->IsChecked() ? 'L' : '-');
+                         dialog.CheckBoxLastItem->IsChecked() ? 'L' : '-',
+                         dialog.CheckBoxRandom->IsChecked() ? 'X' : '-');
         //wxMessageBox(PartialCode, _("SchedCode"));
         if (dialog.CheckBoxSu->IsChecked()) AddShow(wxDateTime::Sun,PartialCode,Playlist);
         if (dialog.CheckBoxMo->IsChecked()) AddShow(wxDateTime::Mon,PartialCode,Playlist);
@@ -2685,10 +2758,8 @@ void xScheduleFrame::OnMenuItemCustomScriptSelected(wxCommandEvent& event)
     // get playback options
     WizardDialog dialog(this);
     wxString nbName=Notebook1->GetPageText(nbIdx);
-    dialog.ChoicePlayList->Append(nbName);
-    dialog.ChoicePlayList->SetSelection(0);
     if (dialog.ShowModal() != wxID_OK) return;
-    TextCtrlLogic->ChangeValue(CreateScript(nbName,dialog.CheckBoxRepeat->IsChecked(),dialog.CheckBoxFirstItem->IsChecked(),dialog.CheckBoxLastItem->IsChecked(),dialog.CheckBoxLightsOff->IsChecked()));
+    TextCtrlLogic->ChangeValue(CreateScript(nbName,dialog.CheckBoxRepeat->IsChecked(),dialog.CheckBoxFirstItem->IsChecked(),dialog.CheckBoxLastItem->IsChecked(),false,dialog.CheckBoxRandom->IsChecked()));
     TextCtrlLogic->Show();
     wxButton* ButtonRemoveScript=(wxButton*)FindNotebookControl(nbIdx,REMOVE_SCRIPT_BUTTON);
     ButtonRemoveScript->Show();

@@ -31,8 +31,10 @@ class AddShowDialog: public wxDialog
 		wxCheckBox* CheckBoxMo;
 		wxCheckBox* CheckBoxSa;
 		wxStaticText* StaticText5;
+		wxStaticText* StaticText7;
 		wxCheckBox* CheckBoxTh;
 		wxCheckBox* CheckBoxLastItem;
+		wxCheckBox* CheckBoxRandom;
 		wxChoice* ChoicePlayList;
 		wxStaticText* StaticText4;
 		wxChoice* ChoiceEndTime;
@@ -53,6 +55,8 @@ class AddShowDialog: public wxDialog
 		static const long ID_CHECKBOX_FIRST_ITEM;
 		static const long ID_STATICTEXT4;
 		static const long ID_CHECKBOX_LAST_ITEM;
+		static const long ID_STATICTEXT7;
+		static const long ID_CHECKBOX_RANDOM;
 		static const long ID_CHECKBOX4;
 		static const long ID_CHECKBOX5;
 		static const long ID_CHECKBOX6;
