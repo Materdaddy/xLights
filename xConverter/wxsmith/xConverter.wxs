@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="xConverter">
+		<title>xLights File Converter</title>
+		<pos_arg>1</pos_arg>
+		<size_arg>1</size_arg>
+		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
+			<object class="sizeritem">
+				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+					<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+						<cols>1</cols>
+						<growablecols>0</growablecols>
+						<growablerows>1</growablerows>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+								<label>xLights File Converter</label>
+								<font>
+									<size>12</size>
+									<style>normal</style>
+									<weight>bold</weight>
+									<underlined>0</underlined>
+									<family>swiss</family>
+								</font>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxBoxSizer" variable="BoxSizer2" member="no">
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+										<cols>2</cols>
+										<object class="sizeritem">
+											<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+												<label>Sequence file to convert:</label>
+											</object>
+											<flag>wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="spacer">
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxTextCtrl" name="ID_TEXTCTRL_FILENAME" variable="TextCtrlFilename" member="yes" />
+											<flag>wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON_CHOOSE_FILE" variable="ButtonChooseFile" member="yes">
+												<label>Choose File</label>
+												<handler function="OnButtonChooseFileClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+												<label>Output Format:</label>
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxChoice" name="ID_CHOICE_OUTPUT_FORMAT" variable="ChoiceOutputFormat" member="yes">
+												<content>
+													<item>xLights Sequence</item>
+													<item>Lynx Conductor</item>
+													<item>Vixen</item>
+												</content>
+											</object>
+											<flag>wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON_START" variable="ButtonStart" member="yes">
+												<label>Start Conversion</label>
+												<handler function="OnButtonStartClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>10</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
+										<label>Conversion Status</label>
+										<object class="sizeritem">
+											<object class="wxTextCtrl" name="ID_TEXTCTRL_STATUS" variable="TextCtrlStatus" member="yes">
+												<bg>#F0F0F0</bg>
+												<style>wxTE_MULTILINE|wxTE_READONLY</style>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>2</option>
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+		<object class="wxFileDialog" variable="FileDialog1" member="yes">
+			<message>Select file</message>
+			<wildcard>LOR Music Sequences (*.lms)|*.lms|LOR Animation Sequences (*.las)|*.las|Vixen Sequences (*.vix)|*.vix</wildcard>
+			<style>wxFD_OPEN|wxFD_FILE_MUST_EXIST</style>
+		</object>
+	</object>
+</wxsmith>

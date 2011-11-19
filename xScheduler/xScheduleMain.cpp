@@ -178,6 +178,14 @@ protected:
         return EXEC_NEXTLINE;
     }
 
+    int do_exec(void) {
+        char *execstr = stringexpr();
+        if(!execstr) return 0;
+        wxString wxexecstr(execstr,wxConvUTF8);
+        wxExecute(wxexecstr);
+        return EXEC_NEXTLINE;
+    }
+
     // reads data from a serial port
     char* do_serialread(void) {
         char *answer = 0;
@@ -369,6 +377,7 @@ public:
         AddCommand("STOPPLAYBACK", static_cast<CommandPtr>(&xlbasic::do_StopPlayback));
         AddCommand("ONPLAYBACKEND", static_cast<CommandPtr>(&xlbasic::do_OnPlaybackEnd));
         AddCommand("ONSERIALRX", static_cast<CommandPtr>(&xlbasic::do_OnSerialRx));
+        AddCommand("EXEC", static_cast<CommandPtr>(&xlbasic::do_exec));
         AddCommand("WAIT", static_cast<CommandPtr>(&xlbasic::do_wait));
     };
 
@@ -690,6 +699,10 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
         Close();
     }
 
+    // Check if schedule should be running
+    long RunFlag=0;
+    config->Read(_("RunSchedule"), &RunFlag);
+
     // Load files
     PortsOK=true;
     networkFile.AssignDir( CurrentDir );
@@ -715,6 +728,10 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     basic.setFrame(this);
     DisplaySchedule();
     Notebook1->ChangeSelection(0);
+    if (RunFlag) {
+        CheckBoxRunSchedule->SetValue(true);
+        CheckRunSchedule();
+    }
 }
 
 void xScheduleFrame::BasicPrompt(char* prompt, char* buff, int size) {
@@ -1205,8 +1222,8 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             ResetTimer(PLAYING_LOR_ANIM);
             break;
         case STARTING_VIX_ANIM:
-            if (VixLastChannel > VixNetwork.size()) VixLastChannel=VixNetwork.size();
-            LastIntensity.resize(VixLastChannel,1);
+            if (VixNumChannels > VixNetwork2.size()) VixNumChannels=VixNetwork2.size();
+            LastIntensity.resize(VixNumChannels,1);
             ResetTimer(PLAYING_VIX_ANIM);
             break;
         case PLAYING_LOR_ANIM:
@@ -1262,10 +1279,10 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             period = msec / VixEventPeriod;
             if (period < VixNumPeriods) {
                 xout->TimerStart(msec);
-                for (chindex=0; chindex<VixLastChannel; chindex++) {
+                for (chindex=0; chindex<VixNumChannels; chindex++) {
                     vixintensity=VixEventData[chindex*VixNumPeriods+period];
                     if (vixintensity != LastIntensity[chindex]) {
-                        xout->SetIntensity(VixNetwork[chindex].first, VixNetwork[chindex].second, vixintensity);
+                        xout->SetIntensity(VixNetwork2[chindex].first, VixNetwork2[chindex].second, vixintensity);
                         LastIntensity[chindex]=vixintensity;
                     }
                 }
@@ -1284,8 +1301,8 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             break;
         case STARTING_VIX:
             if(PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING){
-                if (VixLastChannel > VixNetwork.size()) VixLastChannel=VixNetwork.size();
-                LastIntensity.resize(VixLastChannel,1);
+                if (VixNumChannels > VixNetwork2.size()) VixNumChannels=VixNetwork2.size();
+                LastIntensity.resize(VixNumChannels,1);
                 ResetTimer(PLAYING_VIX);
             } else {
                 PlayerDlg->MediaCtrl->Play();
@@ -1355,10 +1372,10 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             period = msec / VixEventPeriod;
             xout->TimerStart(msec);
             if (period < VixNumPeriods) {
-                for (chindex=0; chindex<VixLastChannel; chindex++) {
+                for (chindex=0; chindex<VixNumChannels; chindex++) {
                     vixintensity=VixEventData[chindex*VixNumPeriods+period];
                     if (vixintensity != LastIntensity[chindex]) {
-                        xout->SetIntensity(VixNetwork[chindex].first, VixNetwork[chindex].second, vixintensity);
+                        xout->SetIntensity(VixNetwork2[chindex].first, VixNetwork2[chindex].second, vixintensity);
                         LastIntensity[chindex]=vixintensity;
                     }
                 }
@@ -1367,8 +1384,8 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
             break;
         case PAUSE_VIX:
             if (PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING) {
-                if (VixLastChannel > VixNetwork.size()) VixLastChannel=VixNetwork.size();
-                LastIntensity.resize(VixLastChannel,1);
+                if (VixNumChannels > VixNetwork2.size()) VixNumChannels=VixNetwork2.size();
+                LastIntensity.resize(VixNumChannels,1);
                 ResetTimer(PLAYING_VIX);
             } else {
                 TimerNoPlay();
@@ -1654,6 +1671,7 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
         if (e->HasProp(_("unit")) && e->HasProp(_("circuit"))) {
             tempstr=e->GetPropVal(wxT("unit"), wxT("1"));
             tempstr.ToLong(&unit);
+            if (unit < 0) unit+=256;
             tempstr=e->GetPropVal(wxT("circuit"), wxT("0"));
             tempstr.ToLong(&circuit);
             tempstr=e->GetPropVal(wxT("network"), wxT("0"));
@@ -1732,7 +1750,7 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
     if (!LoadVixenFile(FileName)) return;
     if (VixEventPeriod < 0) {
         PlayerError(_("EventPeriodInMilliseconds is undefined"));
-    } else if (VixLastChannel <= 0) {
+    } else if (VixNumChannels <= 0) {
         PlayerError(_("Unable to determine number of channels"));
     } else if (mediaFilename.IsEmpty()) {
         ResetTimer(STARTING_VIX_ANIM);
@@ -1749,13 +1767,14 @@ void xScheduleFrame::PlayVixenFile(wxString& FileName)
 bool xScheduleFrame::LoadVixenFile(wxString& FileName)
 {
     long MaxIntensity = 255;
-    long toValue;
+    long OutputChannel;
     wxString tag,tempstr;
     wxFileName fn;
     fn.AssignDir(CurrentDir);
     mediaFilename.clear();
-    VixLastChannel = -1;
+    VixNumChannels = 0;
     VixEventPeriod=-1;
+    VixNetwork2.clear();
     wxXmlDocument doc( FileName );
     if (doc.IsOk()) {
         wxXmlNode* root=doc.GetRoot();
@@ -1771,26 +1790,72 @@ bool xScheduleFrame::LoadVixenFile(wxString& FileName)
                 wxString filename=e->GetPropVal(wxT("filename"), wxT(""));
                 fn.SetFullName(filename);
                 mediaFilename = fn.GetFullPath();
-            } else if (tag == _("EventValues")) {
-                VixEventData = base64_decode(e->GetNodeContent());
-            } else if (tag == _("PlugInData")) {
+            } else if (tag == _("Channels")) {
                 for( wxXmlNode* p=e->GetChildren(); p!=NULL; p=p->GetNext() ) {
-                    if (p->GetName() == _("PlugIn")) {
-                        if (p->HasProp(wxT("to"))) {
-                            tempstr=p->GetPropVal(wxT("to"), wxT("0"));
-                            tempstr.ToLong(&toValue);
-                            if (toValue > VixLastChannel) VixLastChannel=toValue;
+                    if (p->GetName() == _("Channel")) {
+                        VixNumChannels++;
+                        if (p->HasProp(wxT("output"))) {
+                            tempstr=p->GetPropVal(wxT("output"), wxT("0"));
+                            tempstr.ToLong(&OutputChannel);
+                            VixNetwork2.push_back(VixNetwork[OutputChannel]);
                         }
                     }
-                    break;
+                }
+            } else if (tag == _("Profile")) {
+                tempstr=e->GetNodeContent();
+                if (!tempstr.IsEmpty() && VixNumChannels==0) {
+                    if (!LoadVixenProfile(tempstr)) return false;
+                }
+            } else if (tag == _("EventValues")) {
+                VixEventData = base64_decode(e->GetNodeContent());
+            }
+        }
+        if (VixNumChannels > 0) {
+            xout->SetMaxIntensity(MaxIntensity);
+            VixNumPeriods = VixEventData.size() / VixNumChannels;
+            return true;
+        } else {
+            PlayerError(_("No channels in this sequence or its profile:\n")+FileName);
+        }
+    } else {
+        PlayerError(_("Unable to load sequence:\n")+FileName);
+    }
+    return false;
+}
+
+// return true on success
+bool xScheduleFrame::LoadVixenProfile(const wxString& ProfileName)
+{
+    wxString tag,tempstr;
+    long OutputChannel;
+    wxFileName fn;
+    fn.AssignDir(CurrentDir);
+    fn.SetFullName(ProfileName + wxT(".pro"));
+    if (!fn.FileExists()) {
+        PlayerError(_("Unable to find Vixen profile: ")+ProfileName+_("\n\nMake sure a copy is in your xLights directory"));
+        return false;
+    }
+    wxXmlDocument doc( fn.GetFullPath() );
+    if (doc.IsOk()) {
+        wxXmlNode* root=doc.GetRoot();
+        for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
+            tag = e->GetName();
+            if (tag == _("ChannelObjects")) {
+                for( wxXmlNode* p=e->GetChildren(); p!=NULL; p=p->GetNext() ) {
+                    if (p->GetName() == _("Channel")) {
+                        VixNumChannels++;
+                        if (p->HasProp(wxT("output"))) {
+                            tempstr=p->GetPropVal(wxT("output"), wxT("0"));
+                            tempstr.ToLong(&OutputChannel);
+                            VixNetwork2.push_back(VixNetwork[OutputChannel]);
+                        }
+                    }
                 }
             }
         }
-        xout->SetMaxIntensity(MaxIntensity);
-        VixNumPeriods = VixEventData.size() / VixLastChannel;
         return true;
     } else {
-        PlayerError(_("Unable to load sequence:\n")+FileName);
+        PlayerError(_("Unable to load Vixen profile: ")+ProfileName);
     }
     return false;
 }
@@ -1938,13 +2003,13 @@ void xScheduleFrame::OnButtonInfoClick()
                     msg+=_("Media file: ") + mediaFilename;
                 }
                 float seqlen = (float)VixNumPeriods*VixEventPeriod/1000.0;
-                msg += wxString::Format(_("\nSequence Length: %3.1f sec\nEvent Period: %d msec\nChannel Count: %d"),seqlen,VixEventPeriod,VixLastChannel);
-                if (VixLastChannel > 0) {
+                msg += wxString::Format(_("\nSequence Length: %3.1f sec\nEvent Period: %d msec\nChannel Count: %d"),seqlen,VixEventPeriod,VixNumChannels);
+                if (VixNumChannels > 0) {
                     msg += _("\n\nChannel Map:");
                     mapcnt = 0;
-                    LeftToMap = VixLastChannel;
+                    LeftToMap = VixNumChannels;
                     netidx = 0;
-                    while (mapcnt < VixLastChannel && netidx < MAXNETWORKS) {
+                    while (mapcnt < VixNumChannels && netidx < MAXNETWORKS) {
                         chcnt = xout->GetChannelCount(netidx);
                         if (chcnt > 0) {
                             mapcnt1 = chcnt < LeftToMap ? chcnt : LeftToMap;
@@ -1955,7 +2020,7 @@ void xScheduleFrame::OnButtonInfoClick()
                         netidx++;
                     }
                     if (LeftToMap > 0) {
-                        msg += wxString::Format(_("\nVixen channels %d-%d are unmapped"),mapcnt+1,VixLastChannel);
+                        msg += wxString::Format(_("\nVixen channels %d-%d are unmapped"),mapcnt+1,VixNumChannels);
                     }
                 }
             } else {
@@ -2723,7 +2788,7 @@ void xScheduleFrame::OnButtonDeselectClick(wxCommandEvent& event)
     ListBoxSched->DeselectAll();
 }
 
-void xScheduleFrame::OnCheckBoxRunScheduleClick(wxCommandEvent& event)
+void xScheduleFrame::CheckRunSchedule()
 {
     basic.halt();
     bool notrunning=!CheckBoxRunSchedule->IsChecked();
@@ -2739,6 +2804,15 @@ void xScheduleFrame::OnCheckBoxRunScheduleClick(wxCommandEvent& event)
     } else {
         StatusBar1->SetStatusText(_("Scheduler not running"), 1);
     }
+}
+
+void xScheduleFrame::OnCheckBoxRunScheduleClick(wxCommandEvent& event)
+{
+    CheckRunSchedule();
+    long RunFlag=CheckBoxRunSchedule->IsChecked() ? 1 : 0;
+    // Get CurrentDir
+    wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
+    config->Write(_("RunSchedule"), RunFlag);
 }
 
 

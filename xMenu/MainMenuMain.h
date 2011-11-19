@@ -66,6 +66,7 @@ class MainMenuFrame: public wxFrame
         void OnMenuItemHelpContentSelected(wxCommandEvent& event);
         void OnButtonTestRGBClick(wxCommandEvent& event);
         void OnButtonLorMapClick(wxCommandEvent& event);
+        void OnButtonFileConversionClick(wxCommandEvent& event);
         //*)
 
         void SetDir(const wxString& dirname);
@@ -79,6 +80,7 @@ class MainMenuFrame: public wxFrame
         static const long ID_BUTTON_SCHEDULE;
         static const long ID_BUTTON_TEST;
         static const long ID_BUTTON_TESTRGB;
+        static const long ID_BUTTON_FILE_CONVERSION;
         static const long ID_BUTTON_SEQUENCE;
         static const long ID_PANEL1;
         static const long idMenuOpen;
@@ -90,6 +92,7 @@ class MainMenuFrame: public wxFrame
 
         //(*Declarations(MainMenuFrame)
         wxButton* ButtonSequence;
+        wxButton* ButtonFileConversion;
         wxStaticText* StaticText2;
         wxPanel* Panel1;
         wxStaticText* StaticText1;

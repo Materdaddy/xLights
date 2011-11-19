@@ -279,10 +279,11 @@ class xScheduleFrame: public wxFrame
         SeqPlayerStates SeqPlayerState;
         long VixEventPeriod;
         int VixNumPeriods;
-        long VixLastChannel;
+        long VixNumChannels;
         long DelayAfterPlayMSEC;
         std::string VixEventData;
-        VixChannelVector VixNetwork;
+        VixChannelVector VixNetwork;  // maps channel# to net#/netch#
+        VixChannelVector VixNetwork2; // accounts for channel re-ordering in Vixen
         wxString mediaFilename;
         wxArrayString ShowEvents;
 
@@ -302,6 +303,7 @@ class xScheduleFrame: public wxFrame
         bool CheckPorts();
         bool LoadLorFile(wxString& FileName);
         bool LoadVixenFile(wxString& FileName);
+        bool LoadVixenProfile(const wxString& ProfileName);
         void PlayLorFile(wxString& FileName);
         void PlayVixenFile(wxString& FileName);
         void LoadLorChannels(wxXmlNode* n);
@@ -323,6 +325,7 @@ class xScheduleFrame: public wxFrame
         void PopulateShowDialog(AddShowDialog& dialog);
         void UnpackSchedCode(const wxString& SchedCode, int* WkDay, wxString& StartTime, wxString& EndTime, wxString& RepeatOptions, wxString& Playlist);
         void ForceScheduleCheck();
+        void CheckRunSchedule();
 
         void OnTimer(wxTimerEvent& event);
         void OnSchedTimer(wxTimerEvent& event);

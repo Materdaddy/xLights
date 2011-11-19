@@ -88,6 +88,7 @@ public:
 
   void InitSerialPort(const wxString& portname, int baudrate) {
     static char errmsg[100];
+    if (portname == wxT("NotConnected")) return;
     serptr=new ctb::SerialPort();
     int errcode=serptr->Open(portname, baudrate, SerialConfig);
     if (errcode < 0) {
@@ -762,7 +763,7 @@ protected:
     d[4]=0x80 | (chindex % 16);
     d[5]=0;
     //printf("LOR SetMappedIntensity 1=%02X 2=%02X 3=%02X 4=%02X\n",d[1],d[2],d[3],d[4]);
-    serptr->Write((char *)d,6);
+    if (serptr) serptr->Write((char *)d,6);
   };
 
   // shimmer or twinkle at constant intensity
@@ -775,13 +776,13 @@ protected:
     d[3]=0x80 | (chindex % 16);
     if (intensity == max_intensity) {
       d[4]=0;
-      serptr->Write((char *)d,5);
+      if (serptr) serptr->Write((char *)d,5);
     } else {
       d[4]=0x81;
       d[5]=3;  // intensity command
       d[6]=IntensityMap[intensity];
       d[7]=0;
-      serptr->Write((char *)d,8);
+      if (serptr) serptr->Write((char *)d,8);
     }
   };
 
@@ -799,7 +800,7 @@ protected:
     if (d[6] == d[7]) {
       d[5]=3;  // intensity command
       d[7]=0;
-      serptr->Write((char *)d,8);
+      if (serptr) serptr->Write((char *)d,8);
     } else {
       d[5]=4;  // ramp command
       int deltaInt=abs((int)d[6] - (int)d[7]);
@@ -813,7 +814,7 @@ protected:
         d[8] |= 0x80;
       }
       d[10]=0;
-      serptr->Write((char *)d,11);
+      if (serptr) serptr->Write((char *)d,11);
     }
   };
 
@@ -825,7 +826,7 @@ public:
     d[2]=0x81;
     d[3]=0x56;
     d[4]=0;
-    serptr->Write((char *)d,5);
+    if (serptr) serptr->Write((char *)d,5);
   };
 
   void TimerEnd() {
@@ -882,7 +883,7 @@ public:
       d[7]=0x80 | (chindex % 16);
       d[8]=0;
       //printf("LOR ramp 1=%02X 2=%02X 3=%02X 4=%02X 5=%02X 6=%02X 7=%02X\n",d[1],d[2],d[3],d[4],d[5],d[6],d[7]);
-      serptr->Write((char *)d,9);
+      if (serptr) serptr->Write((char *)d,9);
     }
   };
 
@@ -926,11 +927,11 @@ class xNetwork_DLight: public xNetwork_LOR {
     d[3]=0x80 | (chindex % 16);
     if (intensity == max_intensity) {
       d[4]=0;
-      serptr->Write((char *)d,5);
+      if (serptr) serptr->Write((char *)d,5);
     } else {
       d[4]=IntensityMap[intensity];
       d[5]=0;
-      serptr->Write((char *)d,6);
+      if (serptr) serptr->Write((char *)d,6);
     }
   };
 
@@ -960,7 +961,7 @@ class xNetwork_DLight: public xNetwork_LOR {
       d[8]=8-cmd; // 1=shimmer, 2=twinkle
       d[9]=0;
       //printf("D-Light shimtwinkfade 1=%02X 2=%02X 3=%02X 4=%02X 5=%02X 6=%02X 7=%02X\n",d[1],d[2],d[3],d[4],d[5],d[6],d[7]);
-      serptr->Write((char *)d,10);
+      if (serptr) serptr->Write((char *)d,10);
     }
   };
 

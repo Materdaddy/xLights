@@ -85,6 +85,7 @@ void SerialPortWithRate::SetLabel(const wxString& newlabel)
 
 void SerialPortWithRate::PopulatePortChooser(wxArrayString *chooser)
 {
+  chooser->Add(wxT("NotConnected"));
 #ifdef __WXMSW__
   // Windows
   chooser->Add(wxT("COM1"));

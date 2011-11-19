@@ -71,6 +71,7 @@ const long MainMenuFrame::ID_BUTTON_NETWORK_SETUP = wxNewId();
 const long MainMenuFrame::ID_BUTTON_SCHEDULE = wxNewId();
 const long MainMenuFrame::ID_BUTTON_TEST = wxNewId();
 const long MainMenuFrame::ID_BUTTON_TESTRGB = wxNewId();
+const long MainMenuFrame::ID_BUTTON_FILE_CONVERSION = wxNewId();
 const long MainMenuFrame::ID_BUTTON_SEQUENCE = wxNewId();
 const long MainMenuFrame::ID_PANEL1 = wxNewId();
 const long MainMenuFrame::idMenuOpen = wxNewId();
@@ -136,6 +137,10 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     ButtonTestRGB = new wxButton(Panel1, ID_BUTTON_TESTRGB, _("RGB Lighting Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TESTRGB"));
     ButtonTestRGB->Disable();
     BoxSizer3->Add(ButtonTestRGB, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonFileConversion = new wxButton(Panel1, ID_BUTTON_FILE_CONVERSION, _("File Conversion"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_FILE_CONVERSION"));
+    ButtonFileConversion->Disable();
+    ButtonFileConversion->Hide();
+    BoxSizer3->Add(ButtonFileConversion, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonSequence = new wxButton(Panel1, ID_BUTTON_SEQUENCE, _("Sequencer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SEQUENCE"));
     ButtonSequence->Disable();
     ButtonSequence->Hide();
@@ -174,6 +179,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonScheduleClick);
     Connect(ID_BUTTON_TEST,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonTestClick);
     Connect(ID_BUTTON_TESTRGB,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonTestRGBClick);
+    Connect(ID_BUTTON_FILE_CONVERSION,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonFileConversionClick);
     Connect(ID_BUTTON_SEQUENCE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonSequenceClick);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnQuit);
@@ -314,6 +320,7 @@ void MainMenuFrame::SetButtonEnable() {
     ButtonSchedule->Enable(FileExists);
     ButtonTest->Enable(FileExists);
     ButtonTestRGB->Enable(FileExists);
+    ButtonFileConversion->Enable(FileExists);
 }
 
 void MainMenuFrame::OnMenuOpenFolderSelected(wxCommandEvent& event)
@@ -380,3 +387,8 @@ void MainMenuFrame::OnButtonTestRGBClick(wxCommandEvent& event)
     Exec(_("xTesterRGB"));
 }
 
+
+void MainMenuFrame::OnButtonFileConversionClick(wxCommandEvent& event)
+{
+    Exec(_("xConverter"));
+}

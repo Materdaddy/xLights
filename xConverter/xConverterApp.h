@@ -1,8 +1,8 @@
 /***************************************************************
- * Name:      xTesterRGBApp.h
+ * Name:      xConverterApp.h
  * Purpose:   Defines Application Class
  * Author:    Matt Brown (dowdybrown@yahoo.com)
- * Created:   2011-09-18
+ * Created:   2011-11-18
  * Copyright: 2011 by Matt Brown
  * License:
      This file is part of xLights.
@@ -21,13 +21,13 @@
     along with xLights.  If not, see <http://www.gnu.org/licenses/>.
  **************************************************************/
 
-#ifndef XTESTERRGBAPP_H
-#define XTESTERRGBAPP_H
+#ifndef XCONVERTERAPP_H
+#define XCONVERTERAPP_H
 
 #include <wx/app.h>
 #include <wx/snglinst.h>
 
-class xTesterRGBApp : public wxApp
+class xConverterApp : public wxApp
 {
     public:
         virtual bool OnInit();
@@ -37,4 +37,4 @@ class xTesterRGBApp : public wxApp
         wxSingleInstanceChecker* m_checker;
 };
 
-#endif // XTESTERRGBAPP_H
+#endif // XCONVERTERAPP_H
