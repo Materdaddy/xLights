@@ -869,28 +869,28 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
 
     id=baseid+PLAYLIST_ADD;
     wxButton* Button2 = new wxButton(PanelPlayList, id, _(">"));
-    Button2->SetMinSize(wxSize(30,20));
+    Button2->SetMinSize(wxSize(35,20));
     Button2->SetToolTip(_("Add selected file"));
     BoxSizer5->Add(Button2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonPlaylistAddClick);
 
     id=baseid+PLAYLIST_ADD_ALL;
     wxButton* Button3 = new wxButton(PanelPlayList, id, _(">>"));
-    Button3->SetMinSize(wxSize(30,20));
+    Button3->SetMinSize(wxSize(35,20));
     Button3->SetToolTip(_("Add all files"));
     BoxSizer5->Add(Button3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonPlaylistAddAllClick);
 
     id=baseid+PLAYLIST_DELETE;
     wxButton* Button4 = new wxButton(PanelPlayList, id, _("<"));
-    Button4->SetMinSize(wxSize(30,20));
+    Button4->SetMinSize(wxSize(35,20));
     Button4->SetToolTip(_("Delete selected item"));
     BoxSizer5->Add(Button4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonPlaylistDeleteClick);
 
     id=baseid+PLAYLIST_DELETE_ALL;
     wxButton* Button5 = new wxButton(PanelPlayList, id, _("<<"));
-    Button5->SetMinSize(wxSize(30,20));
+    Button5->SetMinSize(wxSize(35,20));
     Button5->SetToolTip(_("Delete all items"));
     BoxSizer5->Add(Button5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, (wxObjectEventFunction)&xScheduleFrame::OnButtonPlaylistDeleteAllClick);
@@ -1637,28 +1637,32 @@ void xScheduleFrame::PlayLorFile(wxString& FileName)
     }
 }
 
+void xScheduleFrame::SetMediaFilename(const wxString& filename)
+{
+    mediaFilename=filename;
+    if (mediaFilename.IsEmpty()) return;
+    wxPathFormat PathFmt = mediaFilename.Contains(_("\\")) ? wxPATH_DOS : wxPATH_NATIVE;
+    wxFileName fn1(mediaFilename, PathFmt);
+    if (!fn1.FileExists()) {
+        wxFileName fn2(CurrentDir,fn1.GetFullName());
+        mediaFilename=fn2.GetFullPath();
+    }
+}
+
 bool xScheduleFrame::LoadLorFile(wxString& FileName)
 {
     LorEvents.clear();
-    for (int i=0; i<MAXNETWORKS; i++) {
+    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++) {
         LorLastUnit[i]=-1;
     }
     mediaFilename.clear();
     wxXmlDocument doc;
     if (doc.Load( FileName )) {
         wxXmlNode* root=doc.GetRoot();
-        mediaFilename=root->GetPropVal(wxT("musicFilename"), wxT(""));
+        SetMediaFilename(root->GetPropVal(wxT("musicFilename"), wxT("")));
         for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
             if (e->GetName() == _("channels")) {
                 LoadLorChannels(e);
-            }
-        }
-        if (!mediaFilename.IsEmpty()) {
-            wxPathFormat PathFmt = mediaFilename.Contains(_("\\")) ? wxPATH_DOS : wxPATH_NATIVE;
-            wxFileName fn1(mediaFilename, PathFmt);
-            if (!fn1.FileExists()) {
-                wxFileName fn2(CurrentDir,fn1.GetFullName());
-                mediaFilename=fn2.GetFullPath();
             }
         }
         return true;
@@ -1683,7 +1687,7 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
             tempstr.ToLong(&circuit);
             tempstr=e->GetPropVal(wxT("network"), wxT("0"));
             tempstr.ToLong(&netnum);
-            if (netnum < MAXNETWORKS) {
+            if (netnum < XLIGHTS_MAX_NETWORKS) {
                 chindex=(unit-1)*16+circuit-1;
                 switch (LorMapping) {
                     case XLIGHTS_LORMAP_SINGLE:
@@ -1796,10 +1800,7 @@ bool xScheduleFrame::LoadXlightsFile(wxString& FileName)
             VixNumChannels=numch;
             SeqDataLen=VixNumPeriods * VixNumChannels;
             wxString filename=wxString::FromAscii(hdr+32);
-            if (!filename.IsEmpty()) {
-                fn.SetFullName(filename);
-                mediaFilename = fn.GetFullPath();
-            }
+            SetMediaFilename(filename);
             VixEventData = new wxUint8[SeqDataLen];
             readcnt = f.Read(VixEventData,SeqDataLen);
             if (readcnt < SeqDataLen) {
@@ -1865,10 +1866,7 @@ bool xScheduleFrame::LoadVixenFile(wxString& FileName)
                 tempstr.ToLong(&MaxIntensity);
             } else if (tag == _("Audio") || tag == _("Song")) {
                 wxString filename=e->GetPropVal(wxT("filename"), wxT(""));
-                if (!filename.IsEmpty()) {
-                    fn.SetFullName(filename);
-                    mediaFilename = fn.GetFullPath();
-                }
+                SetMediaFilename(filename);
             } else if (tag == _("Channels")) {
                 for( wxXmlNode* p=e->GetChildren(); p!=NULL; p=p->GetNext() ) {
                     if (p->GetName() == _("Channel")) {
@@ -2022,7 +2020,7 @@ wxString xScheduleFrame::VixenInfo()
         mapcnt = 0;
         LeftToMap = VixNumChannels;
         netidx = 0;
-        while (mapcnt < VixNumChannels && netidx < MAXNETWORKS) {
+        while (mapcnt < VixNumChannels && netidx < XLIGHTS_MAX_NETWORKS) {
             chcnt = xout->GetChannelCount(netidx);
             if (chcnt > 0) {
                 mapcnt1 = chcnt < LeftToMap ? chcnt : LeftToMap;
@@ -2054,7 +2052,7 @@ void xScheduleFrame::OnButtonInfoClick()
 
     wxFileName oName(CurrentDir, filename);
     wxString fullpath=oName.GetFullPath();
-    int netidx,startch,endch,chcnt,lastch,mapcnt,LeftToMap,mapcnt1;
+    int netidx,startch,endch,chcnt,lastch;
     switch (ExtType(oName.GetExt())) {
         case 'L':
             if (LoadLorFile(fullpath)) {
@@ -2070,7 +2068,7 @@ void xScheduleFrame::OnButtonInfoClick()
                     case XLIGHTS_LORMAP_SINGLE:
                         msg += _("single network\n\nChannel Map:");
                         startch = 0;
-                        for (netidx=0; netidx<MAXNETWORKS; netidx++) {
+                        for (netidx=0; netidx<XLIGHTS_MAX_NETWORKS; netidx++) {
                             chcnt = xout->GetChannelCount(netidx);
                             if (chcnt > 0) {
                                 endch = startch + chcnt - 1;
@@ -2078,7 +2076,7 @@ void xScheduleFrame::OnButtonInfoClick()
                                 startch = endch + 1;
                             }
                         }
-                        for (netidx=1; netidx<MAXNETWORKS; netidx++) {
+                        for (netidx=1; netidx<XLIGHTS_MAX_NETWORKS; netidx++) {
                             if (LorLastUnit[netidx] > 0) {
                                 msg += wxString::Format(_("\nLOR sequence ")+LorNetDesc(netidx)+_(", units 1-%d are unmapped"),LorLastUnit[netidx]);
                             }
@@ -2086,7 +2084,7 @@ void xScheduleFrame::OnButtonInfoClick()
                         break;
                     case XLIGHTS_LORMAP_MULTI:
                         msg += _("multi network\n\nChannel Map:");
-                        for (netidx=0; netidx<MAXNETWORKS; netidx++) {
+                        for (netidx=0; netidx<XLIGHTS_MAX_NETWORKS; netidx++) {
                             if (LorLastUnit[netidx] > 0) {
                                 lastch = LorLastUnit[netidx]*16;
                                 chcnt = xout->GetChannelCount(netidx);
@@ -2361,12 +2359,12 @@ wxUint8 *xScheduleFrame::base64_decode(const wxString& data, long *output_length
 
     for (int i = 0, j = 0; i < input_length;) {
 
-        uint32_t sextet_a = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
-        uint32_t sextet_b = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
-        uint32_t sextet_c = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
-        uint32_t sextet_d = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
+        wxUint32 sextet_a = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
+        wxUint32 sextet_b = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
+        wxUint32 sextet_c = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
+        wxUint32 sextet_d = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
 
-        uint32_t triple = (sextet_a << 3 * 6)
+        wxUint32 triple = (sextet_a << 3 * 6)
                         + (sextet_b << 2 * 6)
                         + (sextet_c << 1 * 6)
                         + (sextet_d << 0 * 6);

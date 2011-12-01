@@ -270,7 +270,7 @@ class xScheduleFrame: public wxFrame
         bool UnsavedChanges;
         bool PortsOK;
         LorEventMap LorEvents;
-        long LorLastUnit[MAXNETWORKS];
+        long LorLastUnit[XLIGHTS_MAX_NETWORKS];
         long LorMapping;
         wxTimer timer;
         wxTimer schedtimer;
@@ -313,6 +313,7 @@ class xScheduleFrame: public wxFrame
         void PlayXlightsFile(wxString& FileName);
         void LoadLorChannels(wxXmlNode* n);
         void LoadLorChannel(wxXmlNode* n, int netnum, int chindex);
+        void SetMediaFilename(const wxString& filename);
         long DiffSeconds(wxString& strTime, wxTimeSpan& tsCurrent);
         void ResetTimer(SeqPlayerStates newstate);
         void TimerNoPlay();

@@ -5,8 +5,8 @@
 #include <wx/file.h>
 
 #include "../include/xlights.xpm"
-#include "../../xml-irr-1.2/src/irrXML.h"
-#include "../../xml-irr-1.2/src/irrXML.cpp"
+#include "../include/xml-irr-1.2/irrXML.h"
+#include "../include/xml-irr-1.2/irrXML.cpp"
 using namespace irr;
 using namespace io;
 
