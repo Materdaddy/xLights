@@ -24,13 +24,12 @@
     along with xLights.  If not, see <http://www.gnu.org/licenses/>.
  **************************************************************/
 
+#include "globals.h"
 #include "serial/serport.cpp"
 #include <vector>
 #include <list>
 #include <time.h>
 #include <wx/socket.h>
-
-#define MAXNETWORKS 16
 
 
 // *************************************************
@@ -972,19 +971,19 @@ class xNetwork_DLight: public xNetwork_LOR {
 // It contains references to all of the networks
 class xOutput {
 protected:
-  xNetwork* networks[MAXNETWORKS];
+  xNetwork* networks[XLIGHTS_MAX_NETWORKS];
   int lastnetnum;
 
 public:
   xOutput() {
     srand((unsigned)time(NULL));
     lastnetnum = -1;
-    for (int i=0; i<MAXNETWORKS; i++)
+    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++)
       networks[i]=0;
   };
 
   ~xOutput() {
-    for (int i=0; i<MAXNETWORKS; i++) {
+    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++) {
       if (networks[i]) delete networks[i];
     }
   };
@@ -1024,7 +1023,7 @@ public:
 
   // returns the network index, or -1 on failure
   int addnetwork (const wxString& NetworkType, int chcount, const wxString& portname, int baudrate) {
-    for (int i=0; i<MAXNETWORKS; i++) {
+    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++) {
       if (networks[i] == 0) {
         setnetwork(NetworkType, i, chcount, portname, baudrate);
         return i;
@@ -1034,17 +1033,17 @@ public:
   };
 
   int GetChannelCount(int netnum) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return 0;
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return 0;
     return networks[netnum]->GetChannelCount();
   };
 
   wxString GetNetworkDesc(int netnum) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return wxT("");
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return wxT("");
     return networks[netnum]->GetNetworkDesc();
   };
 
   void SetMaxIntensity(int maxintensity) {
-    for (int i=0; i<MAXNETWORKS; i++) {
+    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++) {
       if (networks[i]) networks[i]->SetMaxIntensity(maxintensity);
     }
   };
@@ -1053,7 +1052,7 @@ public:
   // duration is in milliseconds
   // intensity values are relative to the last SetMaxIntensity call
   void ramp (int netnum, int chindex, int duration, int startintensity, int endintensity) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->ramp(chindex, duration, startintensity, endintensity);
   };
@@ -1061,7 +1060,7 @@ public:
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
   void SetIntensity (int netnum, int chindex, int intensity) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->SetIntensity(chindex, intensity);
   };
@@ -1069,31 +1068,31 @@ public:
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
   void twinkle (int netnum, int chindex, int period, int intensity) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->twinkle(chindex, period, intensity);
   };
 
   void twinklefade (int netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->twinklefade(chindex, period, duration, startintensity, endintensity);
   };
 
   void shimmer (int netnum, int chindex, int period, int intensity) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->shimmer(chindex, period, intensity);
   };
 
   void shimmerfade (int netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->shimmerfade(chindex, period, duration, startintensity, endintensity);
   };
 
   void off (int netnum, int chindex) {
-    if (netnum < 0 || netnum >= MAXNETWORKS || !networks[netnum]) return;
+    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->off(chindex);
   };

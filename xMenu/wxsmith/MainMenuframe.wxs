@@ -113,7 +113,6 @@
 									<object class="wxButton" name="ID_BUTTON_FILE_CONVERSION" variable="ButtonFileConversion" member="yes">
 										<label>File Conversion</label>
 										<enabled>0</enabled>
-										<hidden>1</hidden>
 										<handler function="OnButtonFileConversionClick" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

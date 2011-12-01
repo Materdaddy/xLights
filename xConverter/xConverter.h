@@ -14,6 +14,7 @@
 
 #include <wx/xml/xml.h>
 #include <wx/filename.h>
+#include <vector>
 #include "../include/globals.h"
 
 class xConverter: public wxFrame
@@ -57,9 +58,32 @@ class xConverter: public wxFrame
 		void OnButtonStartClick(wxCommandEvent& event);
 		//*)
 
-        void LoadFile();
+        void LoadNetworkFile();
         wxFileName networkFile;
+        bool LoadVixenProfile(const wxString& ProfileName);
+        void ReadVixFile(const char* filename);
+        void ReadLorFile(const char* filename);
+        void WriteVixenFile(const wxString& filename);
+        void WriteXLightsFile(const wxString& filename);
+        void WriteConductorFile(const wxString& filename);
+        void DoConversion();
+        void ConversionError(const wxString& msg);
+        wxString base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
+        std::string base64_decode(const wxString& encoded_string);
+        double rand01();
+
+        wxString CurrentDir;
+        wxString mediaFilename;
         long LorMapping;
+        wxUint8 * SeqData;
+        long SeqDataLen;
+        long SeqNumPeriods;
+        int SeqNumChannels;
+        int TotChannels;
+        wxArrayString ChannelNames;
+        wxArrayInt ChannelColors;
+        std::vector<int> VixChannels;
+        std::vector<int> NetMaxChannel;
 
 		DECLARE_EVENT_TABLE()
 };

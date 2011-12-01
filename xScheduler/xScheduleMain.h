@@ -108,6 +108,7 @@ class xScheduleFrame: public wxFrame
             CHKBOX_VIDEO,
             CHKBOX_LOR,
             CHKBOX_VIXEN,
+            CHKBOX_XLIGHTS,
             CHKBOX_MOVIEMODE,
             UP_BUTTON,
             DOWN_BUTTON,
@@ -281,11 +282,12 @@ class xScheduleFrame: public wxFrame
         int VixNumPeriods;
         long VixNumChannels;
         long DelayAfterPlayMSEC;
-        std::string VixEventData;
         VixChannelVector VixNetwork;  // maps channel# to net#/netch#
         VixChannelVector VixNetwork2; // accounts for channel re-ordering in Vixen
         wxString mediaFilename;
         wxArrayString ShowEvents;
+        wxUint8* VixEventData;
+        wxUint8 decoding_table[256];
 
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         wxString LorNetDesc(int netnum);
@@ -301,11 +303,14 @@ class xScheduleFrame: public wxFrame
         wxString OnOffString(bool b);
         wxString CreateScript(wxString ListName, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff, bool Random);
         bool CheckPorts();
+        wxString VixenInfo();
         bool LoadLorFile(wxString& FileName);
+        bool LoadXlightsFile(wxString& FileName);
         bool LoadVixenFile(wxString& FileName);
         bool LoadVixenProfile(const wxString& ProfileName);
         void PlayLorFile(wxString& FileName);
         void PlayVixenFile(wxString& FileName);
+        void PlayXlightsFile(wxString& FileName);
         void LoadLorChannels(wxXmlNode* n);
         void LoadLorChannel(wxXmlNode* n, int netnum, int chindex);
         long DiffSeconds(wxString& strTime, wxTimeSpan& tsCurrent);
@@ -315,7 +320,9 @@ class xScheduleFrame: public wxFrame
         void ShowPlayerSingle();
         void PlayerError(const wxString& msg);
         void SendToLogAndStatusBar(const wxString& msg);
-        std::string base64_decode(const wxString& encoded_string);
+        //std::string base64_decode(const wxString& encoded_string);
+        void build_decoding_table();
+        wxUint8 *base64_decode(const wxString& data, long *output_length);
         int TimeIdx2Time(int TimeIdx);
         int Time2TimeIdx(const wxString& hhmm);
         int Time2Seconds(const wxString& hhmm);

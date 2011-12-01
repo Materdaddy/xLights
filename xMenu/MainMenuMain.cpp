@@ -139,7 +139,6 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     BoxSizer3->Add(ButtonTestRGB, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonFileConversion = new wxButton(Panel1, ID_BUTTON_FILE_CONVERSION, _("File Conversion"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_FILE_CONVERSION"));
     ButtonFileConversion->Disable();
-    ButtonFileConversion->Hide();
     BoxSizer3->Add(ButtonFileConversion, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonSequence = new wxButton(Panel1, ID_BUTTON_SEQUENCE, _("Sequencer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SEQUENCE"));
     ButtonSequence->Disable();
