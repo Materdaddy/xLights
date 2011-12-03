@@ -525,7 +525,34 @@ void xConverter::ReadVixFile(const char* filename)
 double xConverter::rand01()
 {
     return (double)rand()/(double)RAND_MAX;
-};
+}
+
+// returns length of first track in centiseconds
+int xConverter::GetLorTrack1Length(const char* filename)
+{
+	int centisec = -1;
+	wxString NodeName;
+	IrrXMLReader* xml = createIrrXMLReader(filename);
+
+	// parse the file until end reached
+	while(xml && xml->read() && centisec < 0)
+	{
+		switch(xml->getNodeType())
+		{
+		case EXN_TEXT:
+			break;
+		case EXN_ELEMENT:
+            NodeName = wxString::FromAscii( xml->getNodeName() );
+            if (NodeName == _("track")) {
+                centisec = xml->getAttributeValueAsInt("totalCentiseconds");
+            }
+			break;
+		}
+	}
+	delete xml;
+    TextCtrlStatus->AppendText(wxString::Format(_("Track 1 length = %d centiseconds\n"),centisec));
+    return centisec;
+}
 
 void xConverter::ReadLorFile(const char* filename)
 {
@@ -535,23 +562,30 @@ void xConverter::ReadLorFile(const char* filename)
 	int startper,endper,perdiff,twinklestate,nexttwinkle;
 	int twinkleperiod = 400;
 	int curchannel = -1;
-	int centisec = -1;
-	SeqNumPeriods = 0;
-	SeqDataLen = 0;
 	int MappedChannelCnt = 0;
 	int MaxIntensity = 100;
 	int EffectCnt = 0;
 	size_t cnt = 0;
 
+    TextCtrlStatus->AppendText(_("Reading LOR sequence\n"));
     mediaFilename.clear();
     ChannelNames.Clear();
     ChannelNames.Add(wxEmptyString, TotChannels);
     ChannelColors.Clear();
     ChannelColors.Add(0, TotChannels);
-    delete SeqData;
-    SeqData = 0;
     SeqNumChannels=TotChannels;
-    TextCtrlStatus->AppendText(_("Reading LOR sequence\n"));
+    delete SeqData;
+    int centisec = GetLorTrack1Length(filename);
+    if (centisec > 0) {
+        SeqNumPeriods = centisec * 10 / XTIMER_INTERVAL;
+        if (SeqNumPeriods == 0) SeqNumPeriods=1;
+        SeqDataLen = SeqNumPeriods * SeqNumChannels;
+        SeqData = new wxUint8[SeqDataLen];
+        memset(SeqData,0,SeqDataLen);
+    } else {
+        ConversionError(_("Unable to determine the length of this LOR sequence (looked for length of track 1)"));
+        return;
+    }
 	IrrXMLReader* xml = createIrrXMLReader(filename);
 
 	// parse the file until end reached
@@ -575,17 +609,7 @@ void xConverter::ReadLorFile(const char* filename)
                 unit = xml->getAttributeValueAsInt("unit");
                 if (unit < 0) unit+=256;
                 circuit = xml->getAttributeValueAsInt("circuit");
-                if (centisec <= 0) {
-                    // get length of sequence
-                    centisec = xml->getAttributeValueAsInt("centiseconds");
-                }
-                if (unit > 0 && circuit > 0 && centisec > 0 && network < NetMaxChannel.size()) {
-                    if (!SeqData) {
-                        SeqNumPeriods = centisec * 10 / XTIMER_INTERVAL;
-                        SeqDataLen = SeqNumPeriods * SeqNumChannels;
-                        SeqData = new wxUint8[SeqDataLen];
-                        memset(SeqData,0,SeqDataLen);
-                    }
+                if (unit > 0 && circuit > 0 && network < NetMaxChannel.size()) {
                     chindex=(unit-1)*16+circuit-1;
                     switch (LorMapping) {
                         case XLIGHTS_LORMAP_SINGLE:

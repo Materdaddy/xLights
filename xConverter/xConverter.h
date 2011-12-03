@@ -63,6 +63,7 @@ class xConverter: public wxFrame
         bool LoadVixenProfile(const wxString& ProfileName);
         void ReadVixFile(const char* filename);
         void ReadLorFile(const char* filename);
+        int GetLorTrack1Length(const char* filename);
         void WriteVixenFile(const wxString& filename);
         void WriteXLightsFile(const wxString& filename);
         void WriteConductorFile(const wxString& filename);
