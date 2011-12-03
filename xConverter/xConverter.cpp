@@ -409,6 +409,7 @@ bool xConverter::LoadVixenProfile(const wxString& ProfileName)
     }
     wxXmlDocument doc( fn.GetFullPath() );
     if (doc.IsOk()) {
+        VixChannels.clear();
         wxXmlNode* root=doc.GetRoot();
         for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
             tag = e->GetName();
@@ -461,7 +462,7 @@ void xConverter::ReadVixFile(const char* filename)
                 if (context[1] == _("MaximumLevel")) NodeValue.ToLong(&MaxIntensity);
                 if (context[1] == _("EventPeriodInMilliseconds")) NodeValue.ToLong(&VixEventPeriod);
                 if (context[1] == _("EventValues")) VixSeqData=base64_decode(NodeValue);
-                if (context[1] == _("Profile") && VixChannels.size() == 0) LoadVixenProfile(NodeValue);
+                if (context[1] == _("Profile")) LoadVixenProfile(NodeValue);
 			}
 			break;
 		case EXN_ELEMENT:
@@ -607,6 +608,7 @@ void xConverter::ReadLorFile(const char* filename)
                             }
                             break;
                     }
+                    //TextCtrlStatus->AppendText(wxString::Format(_("curchannel %d\n"),curchannel));
                     if (curchannel < TotChannels) {
                         ChannelName = wxString::FromAscii( xml->getAttributeValueSafe("name") );
                         ChannelNames[curchannel] = ChannelName;
@@ -622,7 +624,6 @@ void xConverter::ReadLorFile(const char* filename)
                 intensity = xml->getAttributeValueAsInt("intensity");
                 startIntensity = xml->getAttributeValueAsInt("startIntensity");
                 endIntensity = xml->getAttributeValueAsInt("endIntensity");
-                if (intensity == 0 && startIntensity == 0 && endIntensity == 0) intensity=MaxIntensity;
                 startper = startcsec * 10 / XTIMER_INTERVAL;
                 endper = endcsec * 10 / XTIMER_INTERVAL;
                 perdiff=endper - startper;  // # of 50ms ticks
@@ -645,6 +646,7 @@ void xConverter::ReadLorFile(const char* filename)
                             }
                         }
                     } else if (EffectType == wxT("twinkle")) {
+                        if (intensity == 0 && startIntensity == 0 && endIntensity == 0) intensity=MaxIntensity;
                         twinklestate=static_cast<int>(rand01()*2.0) & 0x01;
                         nexttwinkle=static_cast<int>(rand01()*twinkleperiod+100) / XTIMER_INTERVAL;
                         if (intensity > 0) {
@@ -670,6 +672,7 @@ void xConverter::ReadLorFile(const char* filename)
                             }
                         }
                     } else if (EffectType == wxT("shimmer")) {
+                        if (intensity == 0 && startIntensity == 0 && endIntensity == 0) intensity=MaxIntensity;
                         if (intensity > 0) {
                             for (i=0; i < perdiff; i++) {
                                 twinklestate=(startper + i) & 0x01;

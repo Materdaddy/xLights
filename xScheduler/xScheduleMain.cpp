@@ -399,7 +399,7 @@ public:
     {
         //char msgbuf[100];
         if (runstate!=-1) return;
-        for (int i=0; i < SerialPorts.size(); i++) {
+        for (unsigned int i=0; i < SerialPorts.size(); i++) {
             int rxgoto = SerialPorts[i].GetCallback();
             if (rxgoto > 0 && SerialPorts[i].AvailableToRead() > 0) {
                 //sprintf(msgbuf, "SerialCallback to line %d\n", rxgoto);
@@ -981,7 +981,7 @@ void xScheduleFrame::OnButtonPlaylistDeleteClick() {
     wxGrid* ListBoxPlay=(wxGrid*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
 
     wxArrayInt selectedRows = ListBoxPlay->GetSelectedRows();
-    int cnt = selectedRows.GetCount();
+    size_t cnt = selectedRows.GetCount();
     if (cnt == 0) {
         wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
     } else {
@@ -1171,7 +1171,7 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
 
 int xScheduleFrame::FindNotebookPage(wxString& pagename)
 {
-    for (int i=FixedPages; i < Notebook1->GetPageCount(); i++) {
+    for (unsigned int i=FixedPages; i < Notebook1->GetPageCount(); i++) {
         if (Notebook1->GetPageText(i) == pagename) {
             return i;
         }
@@ -1253,6 +1253,8 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                         case LOR_SHIMMER:
                             xout->shimmer(netnum,chindex,100,LorIter->second->StartIntensity);
                             break;
+                        default:
+                            break;
                     }
                 } else {
                     duration = endmsec - startmsec;
@@ -1265,6 +1267,8 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                             break;
                         case LOR_SHIMMER:
                             xout->shimmerfade(netnum,chindex,100,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -1334,6 +1338,8 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                         case LOR_SHIMMER:
                             xout->shimmer(netnum,chindex,100,LorIter->second->StartIntensity);
                             break;
+                        default:
+                            break;
                     }
                 } else {
                     duration = endmsec - startmsec;
@@ -1346,6 +1352,8 @@ void xScheduleFrame::OnTimer(wxTimerEvent& event)
                             break;
                         case LOR_SHIMMER:
                             xout->shimmerfade(netnum,chindex,100,duration,LorIter->second->StartIntensity,LorIter->second->EndIntesity);
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -1781,7 +1789,7 @@ bool xScheduleFrame::LoadXlightsFile(wxString& FileName)
     wxFileName fn;
     fn.AssignDir(CurrentDir);
     char hdr[512],filetype[10];
-    int fileversion,numch,numper,scancnt,i;
+    int fileversion,numch,numper,scancnt;
     size_t SeqDataLen, readcnt;
     mediaFilename.clear();
     if (VixEventData) delete VixEventData;
@@ -1807,7 +1815,7 @@ bool xScheduleFrame::LoadXlightsFile(wxString& FileName)
                 PlayerError(_("Unable to read all event data from:\n")+FileName);
             } else {
                 xout->SetMaxIntensity(255);
-                for (i=0; i < VixNetwork.size(); i++) {
+                for (unsigned int i=0; i < VixNetwork.size(); i++) {
                     VixNetwork2.push_back(VixNetwork[i]);
                 }
                 ok=true;
@@ -1880,7 +1888,7 @@ bool xScheduleFrame::LoadVixenFile(wxString& FileName)
                 }
             } else if (tag == _("Profile")) {
                 tempstr=e->GetNodeContent();
-                if (!tempstr.IsEmpty() && VixNumChannels==0) {
+                if (!tempstr.IsEmpty()) {
                     if (!LoadVixenProfile(tempstr)) return false;
                 }
             } else if (tag == _("EventValues")) {
@@ -1905,6 +1913,8 @@ bool xScheduleFrame::LoadVixenProfile(const wxString& ProfileName)
 {
     wxString tag,tempstr;
     long OutputChannel;
+    VixNumChannels = 0;
+    VixNetwork2.clear();
     wxFileName fn;
     fn.AssignDir(CurrentDir);
     fn.SetFullName(ProfileName + wxT(".pro"));
@@ -2768,7 +2778,7 @@ int xScheduleFrame::DisplayScheduleOneDay(wxDateTime::WeekDay wkday) {
     WkDayStr.Printf(wxT("%d"),wkday);
     wxString WkDayHeading = wxT("--------- ") + wxDateTime::GetWeekDayName(wkday) + wxT(" ---------");
     ListBoxSched->Append(WkDayHeading);
-    for (int i=0; i < ShowEvents.Count(); i++) {
+    for (unsigned int i=0; i < ShowEvents.Count(); i++) {
         if (ShowEvents[i].StartsWith(WkDayStr)) {
             UnpackSchedCode(ShowEvents[i], &SchedDay, StartTime, EndTime, RepeatOptions, Playlist);
             if (RepeatOptions[0]=='R') {
