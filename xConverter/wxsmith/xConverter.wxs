@@ -10,7 +10,7 @@
 					<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 						<cols>1</cols>
 						<growablecols>0</growablecols>
-						<growablerows>1</growablerows>
+						<growablerows>3</growablerows>
 						<object class="sizeritem">
 							<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 								<label>xLights File Converter</label>
@@ -29,9 +29,10 @@
 						<object class="sizeritem">
 							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 								<cols>2</cols>
+								<growablecols>0</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-										<label>Sequence file to convert:</label>
+										<label>Sequence files to convert:</label>
 									</object>
 									<flag>wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -44,7 +45,9 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxTextCtrl" name="ID_TEXTCTRL_FILENAME" variable="TextCtrlFilename" member="yes">
-										<size>217,23</size>
+										<size>217,65</size>
+										<bg>#E0E0E0</bg>
+										<style>wxTE_MULTILINE|wxTE_READONLY</style>
 									</object>
 									<flag>wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -52,10 +55,10 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON_CHOOSE_FILE" variable="ButtonChooseFile" member="yes">
-										<label>Choose File</label>
+										<label>Choose Files</label>
 										<handler function="OnButtonChooseFileClick" entry="EVT_BUTTON" />
 									</object>
-									<flag>wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<flag>wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -80,8 +83,22 @@
 									<border>5</border>
 									<option>1</option>
 								</object>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+										<label>All channels off at end:</label>
+									</object>
+									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxCheckBox" name="ID_CHECKBOX_OFF_AT_END" variable="CheckBoxOffAtEnd" member="yes" />
+									<flag>wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
 							</object>
-							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
 							<option>1</option>
 						</object>
@@ -113,7 +130,7 @@
 		<object class="wxFileDialog" variable="FileDialog1" member="yes">
 			<message>Select file</message>
 			<wildcard>LOR Music Sequences (*.lms)|*.lms|LOR Animation Sequences (*.las)|*.las|Vixen Sequences (*.vix)|*.vix</wildcard>
-			<style>wxFD_OPEN|wxFD_FILE_MUST_EXIST</style>
+			<style>wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE</style>
 		</object>
 	</object>
 </wxsmith>

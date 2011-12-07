@@ -24,6 +24,8 @@ const long xConverter::ID_TEXTCTRL_FILENAME = wxNewId();
 const long xConverter::ID_BUTTON_CHOOSE_FILE = wxNewId();
 const long xConverter::ID_STATICTEXT3 = wxNewId();
 const long xConverter::ID_CHOICE_OUTPUT_FORMAT = wxNewId();
+const long xConverter::ID_STATICTEXT4 = wxNewId();
+const long xConverter::ID_CHECKBOX_OFF_AT_END = wxNewId();
 const long xConverter::ID_BUTTON_START = wxNewId();
 const long xConverter::ID_TEXTCTRL_STATUS = wxNewId();
 const long xConverter::ID_PANEL1 = wxNewId();
@@ -48,19 +50,21 @@ xConverter::xConverter(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(1);
+	FlexGridSizer1->AddGrowableRow(3);
 	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("xLights File Converter"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	wxFont StaticText1Font(12,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText1->SetFont(StaticText1Font);
 	FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Sequence file to convert:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	FlexGridSizer3->AddGrowableCol(0);
+	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Sequence files to convert:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	TextCtrlFilename = new wxTextCtrl(Panel1, ID_TEXTCTRL_FILENAME, wxEmptyString, wxDefaultPosition, wxSize(217,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL_FILENAME"));
+	TextCtrlFilename = new wxTextCtrl(Panel1, ID_TEXTCTRL_FILENAME, wxEmptyString, wxDefaultPosition, wxSize(217,65), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_FILENAME"));
+	TextCtrlFilename->SetBackgroundColour(wxColour(224,224,224));
 	FlexGridSizer3->Add(TextCtrlFilename, 1, wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonChooseFile = new wxButton(Panel1, ID_BUTTON_CHOOSE_FILE, _("Choose File"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CHOOSE_FILE"));
-	FlexGridSizer3->Add(ButtonChooseFile, 1, wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonChooseFile = new wxButton(Panel1, ID_BUTTON_CHOOSE_FILE, _("Choose Files"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CHOOSE_FILE"));
+	FlexGridSizer3->Add(ButtonChooseFile, 1, wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_TOP, 5);
 	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Output Format:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	ChoiceOutputFormat = new wxChoice(Panel1, ID_CHOICE_OUTPUT_FORMAT, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_OUTPUT_FORMAT"));
@@ -68,7 +72,12 @@ xConverter::xConverter(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	ChoiceOutputFormat->Append(_("Lynx Conductor"));
 	ChoiceOutputFormat->Append(_("Vixen 2.1"));
 	FlexGridSizer3->Add(ChoiceOutputFormat, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText4 = new wxStaticText(Panel1, ID_STATICTEXT4, _("All channels off at end:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	CheckBoxOffAtEnd = new wxCheckBox(Panel1, ID_CHECKBOX_OFF_AT_END, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_OFF_AT_END"));
+	CheckBoxOffAtEnd->SetValue(false);
+	FlexGridSizer3->Add(CheckBoxOffAtEnd, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonStart = new wxButton(Panel1, ID_BUTTON_START, _("Start Conversion"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_START"));
 	FlexGridSizer1->Add(ButtonStart, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
 	TextCtrlStatus = new wxTextCtrl(Panel1, ID_TEXTCTRL_STATUS, wxEmptyString, wxDefaultPosition, wxSize(341,72), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_STATUS"));
@@ -79,7 +88,7 @@ xConverter::xConverter(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	FlexGridSizer1->SetSizeHints(Panel1);
 	BoxSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(BoxSizer1);
-	FileDialog1 = new wxFileDialog(this, _("Select file"), wxEmptyString, wxEmptyString, _("LOR Music Sequences (*.lms)|*.lms|LOR Animation Sequences (*.las)|*.las|Vixen Sequences (*.vix)|*.vix"), wxFD_OPEN|wxFD_FILE_MUST_EXIST, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
+	FileDialog1 = new wxFileDialog(this, _("Select file"), wxEmptyString, wxEmptyString, _("LOR Music Sequences (*.lms)|*.lms|LOR Animation Sequences (*.las)|*.las|Vixen Sequences (*.vix)|*.vix"), wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 	BoxSizer1->Fit(this);
 	BoxSizer1->SetSizeHints(this);
 
@@ -268,8 +277,16 @@ std::string xConverter::base64_decode(const wxString& encoded_string) {
 
 void xConverter::OnButtonChooseFileClick(wxCommandEvent& event)
 {
+    wxArrayString ShortNames;
+    wxString AllNames;
     if (FileDialog1->ShowModal() == wxID_OK) {
-        TextCtrlFilename->ChangeValue( FileDialog1->GetPath() );
+        FileDialog1->GetPaths(FileNames);
+        FileDialog1->GetFilenames(ShortNames);
+        for (int i=0; i < ShortNames.GetCount(); i++) {
+            AllNames.Append(ShortNames[i]);
+            AllNames.Append(wxT("\n"));
+        }
+        TextCtrlFilename->ChangeValue( AllNames );
     }
 }
 
@@ -334,7 +351,7 @@ void xConverter::WriteVixenFile(const wxString& filename)
     textnode = new wxXmlNode( node, wxXML_TEXT_NODE, wxEmptyString, wxString::Format(wxT("%ld"),TotalTime) );
 
     if (doc.Save( filename )) {
-        TextCtrlStatus->AppendText(_("Finished conversion\nNew file: ")+filename+_("\n"));
+        TextCtrlStatus->AppendText(_("Finished writing new file: ")+filename+_("\n"));
     } else {
         ConversionError(_("Unable to save Vixen file"));
     }
@@ -361,7 +378,7 @@ void xConverter::WriteXLightsFile(const wxString& filename)
     f.Write(hdr,512);
     f.Write(SeqData,SeqDataLen);
     f.Close();
-    TextCtrlStatus->AppendText(_("Finished conversion\nNew file: ")+filename+_("\n"));
+    TextCtrlStatus->AppendText(_("Finished writing new file: ")+filename+_("\n"));
 }
 
 void xConverter::WriteConductorFile(const wxString& filename)
@@ -392,7 +409,7 @@ void xConverter::WriteConductorFile(const wxString& filename)
         f.Write(buf,4);
     }
     f.Close();
-    TextCtrlStatus->AppendText(_("Finished conversion\nNew file: ")+filename+_("\n"));
+    TextCtrlStatus->AppendText(_("Finished writing new file: ")+filename+_("\n"));
 }
 
 // return true on success
@@ -635,6 +652,9 @@ void xConverter::ReadLorFile(const char* filename)
                     //TextCtrlStatus->AppendText(wxString::Format(_("curchannel %d\n"),curchannel));
                     if (curchannel < TotChannels) {
                         ChannelName = wxString::FromAscii( xml->getAttributeValueSafe("name") );
+                        if (!ChannelNames[curchannel].IsEmpty()) {
+                            TextCtrlStatus->AppendText(_("WARNING: ")+ChannelNames[curchannel]+_(" and ")+ChannelName+_(" map to the same channel\n"));
+                        }
                         ChannelNames[curchannel] = ChannelName;
                         ChannelColor = xml->getAttributeValueAsInt("color");
                         ChannelColors[curchannel] = ChannelColor;
@@ -735,22 +755,17 @@ void xConverter::ReadLorFile(const char* filename)
     TextCtrlStatus->AppendText(wxString::Format(_("New data len=%d\n"),SeqDataLen));
 }
 
-void xConverter::DoConversion()
+void xConverter::ClearLastPeriod()
 {
-    // check user inputs
-    wxString Filename = TextCtrlFilename->GetValue();
-    if (Filename.IsEmpty()) {
-        wxMessageBox(_("Please select a sequence file"), _("Error"));
-        return;
+    long LastPer = SeqNumPeriods-1;
+    for (int ch=0; ch < SeqNumChannels; ch++) {
+        SeqData[ch*SeqNumPeriods+LastPer] = 0;
     }
-    wxString OutputFormat = ChoiceOutputFormat->GetStringSelection();
-    if (OutputFormat.IsEmpty()) {
-        wxMessageBox(_("Please select an output format"), _("Error"));
-        return;
-    }
+}
 
+void xConverter::DoConversion(const wxString& Filename, const wxString& OutputFormat)
+{
     // read sequence file
-    TextCtrlStatus->Clear();
     wxFileName oName(Filename);
     wxString ext = oName.GetExt();
     if (ext == _("vix")) {
@@ -774,6 +789,10 @@ void xConverter::DoConversion()
     if (!SeqData || SeqDataLen == 0) {
         TextCtrlStatus->AppendText(_("ERROR: sequence length is 0\n"));
         return;
+    }
+
+    if (CheckBoxOffAtEnd->IsChecked()) {
+        ClearLastPeriod();
     }
 
     // write converted file
@@ -800,6 +819,20 @@ void xConverter::DoConversion()
 void xConverter::OnButtonStartClick(wxCommandEvent& event)
 {
     ButtonStart->Enable(false);
-    DoConversion();
+    wxString OutputFormat = ChoiceOutputFormat->GetStringSelection();
+    TextCtrlStatus->Clear();
+
+    // check user inputs
+    if (FileNames.IsEmpty()) {
+        wxMessageBox(_("Please select one or more sequence files"), _("Error"));
+    } else if (OutputFormat.IsEmpty()) {
+        wxMessageBox(_("Please select an output format"), _("Error"));
+    } else {
+        for (int i=0; i < FileNames.GetCount(); i++) {
+            DoConversion(FileNames[i], OutputFormat);
+        }
+        TextCtrlStatus->AppendText(_("Finished converting all files\n"));
+    }
+
     ButtonStart->Enable(true);
 }

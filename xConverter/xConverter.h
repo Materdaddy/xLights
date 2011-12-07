@@ -5,6 +5,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/checkbox.h>
 #include <wx/panel.h>
 #include <wx/filedlg.h>
 #include <wx/choice.h>
@@ -35,6 +36,8 @@ class xConverter: public wxFrame
 		wxStaticText* StaticText3;
 		wxButton* ButtonStart;
 		wxButton* ButtonChooseFile;
+		wxStaticText* StaticText4;
+		wxCheckBox* CheckBoxOffAtEnd;
 		//*)
 
 	protected:
@@ -46,6 +49,8 @@ class xConverter: public wxFrame
 		static const long ID_BUTTON_CHOOSE_FILE;
 		static const long ID_STATICTEXT3;
 		static const long ID_CHOICE_OUTPUT_FORMAT;
+		static const long ID_STATICTEXT4;
+		static const long ID_CHECKBOX_OFF_AT_END;
 		static const long ID_BUTTON_START;
 		static const long ID_TEXTCTRL_STATUS;
 		static const long ID_PANEL1;
@@ -67,7 +72,8 @@ class xConverter: public wxFrame
         void WriteVixenFile(const wxString& filename);
         void WriteXLightsFile(const wxString& filename);
         void WriteConductorFile(const wxString& filename);
-        void DoConversion();
+        void ClearLastPeriod();
+        void DoConversion(const wxString& FileName, const wxString& OutputFormat);
         void ConversionError(const wxString& msg);
         wxString base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
         std::string base64_decode(const wxString& encoded_string);
@@ -81,6 +87,7 @@ class xConverter: public wxFrame
         long SeqNumPeriods;
         int SeqNumChannels;
         int TotChannels;
+        wxArrayString FileNames;
         wxArrayString ChannelNames;
         wxArrayInt ChannelColors;
         std::vector<int> VixChannels;
