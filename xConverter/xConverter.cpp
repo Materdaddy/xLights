@@ -650,8 +650,10 @@ void xConverter::ReadLorFile(const char* filename)
                             break;
                     }
                     //TextCtrlStatus->AppendText(wxString::Format(_("curchannel %d\n"),curchannel));
-                    if (curchannel < TotChannels) {
-                        ChannelName = wxString::FromAscii( xml->getAttributeValueSafe("name") );
+                    ChannelName = wxString::FromAscii( xml->getAttributeValueSafe("name") );
+                    if (curchannel < 0) {
+                        TextCtrlStatus->AppendText(_("WARNING: channel '")+ChannelName+_("' is unmapped\n"));
+                    } else if (curchannel < TotChannels) {
                         if (!ChannelNames[curchannel].IsEmpty()) {
                             TextCtrlStatus->AppendText(_("WARNING: ")+ChannelNames[curchannel]+_(" and ")+ChannelName+_(" map to the same channel\n"));
                         }
