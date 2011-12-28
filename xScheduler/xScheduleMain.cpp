@@ -553,7 +553,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     AuiManager1->AddPane(AuiToolBar1, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper());
     AuiManager1->Update();
     FlexGridSizer2->Add(Panel2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Notebook1 = new wxNotebook(Panel1, ID_NOTEBOOK1, wxDefaultPosition, wxSize(799,312), 0, _T("ID_NOTEBOOK1"));
+    Notebook1 = new wxNotebook(Panel1, ID_NOTEBOOK1, wxDefaultPosition, wxSize(968,312), 0, _T("ID_NOTEBOOK1"));
     PanelCal = new wxPanel(Notebook1, ID_PANEL_CAL, wxPoint(49,10), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_CAL"));
     FlexGridSizer8 = new wxFlexGridSizer(1, 2, 0, 0);
     FlexGridSizer8->AddGrowableCol(0);
@@ -780,7 +780,8 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     StaticText2->SetFont(StaticText2Font);
     FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer4->Add(0,0,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    wxBoxSizer* BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
+    //wxBoxSizer* BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
+    wxFlexGridSizer* BoxSizer4 = new wxFlexGridSizer(0, 6, 0, 0);
     wxStaticText* StaticText3 = new wxStaticText(PanelPlayList, -1, _("Files:"));
     BoxSizer4->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 
@@ -917,8 +918,8 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     GridPlaylist->SetSelectionMode(wxGrid::wxGridSelectRows);
 	GridPlaylist->SetColLabelValue(0, _("Filename"));
 	GridPlaylist->SetColLabelValue(1, _("Delay After\nPlay (sec)"));
-	GridPlaylist->SetColSize(0,150);
-	GridPlaylist->SetColSize(1,90);
+	GridPlaylist->SetColSize(0,300);
+	GridPlaylist->SetColSize(1,85);
 	GridPlaylist->SetColFormatNumber(1);
 	wxGridCellAttr* attrCol0=new wxGridCellAttr();
 	attrCol0->SetReadOnly();
@@ -1061,16 +1062,19 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
     static wxDateTime LastTime = wxDateTime::Now();  // last time this method was called
     static long StartTimeSec,EndTimeSec;
     static bool MoreShowsToday = true;
+    static wxDateTime::WeekDay StartWkDay;
 
     if (!CheckBoxRunSchedule->IsChecked()) return;
     wxDateTime n=wxDateTime::Now();
     long SecPastMidnight=n.GetHour()*60*60 + n.GetMinute()*60 + n.GetSecond();
+    wxDateTime::WeekDay CurrentWkDay = n.GetWeekDay();
     //StatusBar1->SetStatusText(_("OnSchedTimer: ") + n.FormatISOTime());
 
     if (basic.IsRunning()) {
 
         // playlist is running - check for the schedule end
 
+        if (CurrentWkDay != StartWkDay) SecPastMidnight+=24*60*60;
         SecondsRemaining=EndTimeSec - SecPastMidnight;
         int minutes=(SecondsRemaining + 59) / 60;  // round up
         if (minutes > 60) {
@@ -1086,7 +1090,6 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
         // no playlist running - wait for next event
 
         // should we check ShowEvents[]?
-        wxDateTime::WeekDay CurrentWkDay = n.GetWeekDay();
         if (LastWkDay != CurrentWkDay) {
             // either the Run Schedule button was just pressed, or we just passed midnight
             CheckSchedule = true;
@@ -1156,6 +1159,7 @@ void xScheduleFrame::OnSchedTimer(wxTimerEvent& event)
                         // this is a playlist page, run generic script
                         userscript=CreateScript(Notebook1->GetPageText(nbidx),RepeatOptions[0]=='R',RepeatOptions[1]=='F',RepeatOptions[2]=='L',false,RepeatOptions[3]=='X');
                     }
+                    StartWkDay=CurrentWkDay;
                     RunPlaylist(nbidx,userscript);
                 } else {
                     StatusBar1->SetStatusText(_("ERROR: cannot find playlist ") + Playlist, 1);
@@ -2610,7 +2614,15 @@ wxString xScheduleFrame::CreateScript(wxString ListName, bool Repeat, bool First
 
 void xScheduleFrame::OnAuiToolBarItemStopClick(wxCommandEvent& event)
 {
-    basic.halt();
+    if (CheckBoxRunSchedule->IsChecked()) {
+        wxMessageDialog confirm(this, _("Do you want to stop the schedule?\n\nIf you click yes, then you will need to click the\n'Run Schedule' checkbox to restart the schedule."), _("Confirm"), wxYES|wxNO);
+        if (confirm.ShowModal() == wxID_YES) {
+            CheckBoxRunSchedule->SetValue(false);
+            CheckRunSchedule();
+        }
+    } else {
+        basic.halt();
+    }
 }
 
 void xScheduleFrame::OnButtonSaveLogClick(wxCommandEvent& event)
@@ -2704,12 +2716,14 @@ void xScheduleFrame::PopulateShowDialog(AddShowDialog& dialog) {
     // populate start & end times
 
     wxDateTime t;
+    dialog.ChoiceStartTime->AppendString(_("midnight"));
     t.Set(0,15,0,0); // 15 minutes after midnight
     for (int i=0; i<95; i++) {
-        if (i < 94) dialog.ChoiceStartTime->AppendString(t.Format(timefmt));
-        if (i > 0) dialog.ChoiceEndTime->AppendString(t.Format(timefmt));
+        dialog.ChoiceStartTime->AppendString(t.Format(timefmt));
+        dialog.ChoiceEndTime->AppendString(t.Format(timefmt));
         t+=wxTimeSpan::Minutes(15);
     }
+    dialog.ChoiceEndTime->AppendString(_("midnight"));
 }
 
 void xScheduleFrame::OnButtonAddShowClick(wxCommandEvent& event)
@@ -2744,7 +2758,7 @@ void xScheduleFrame::OnButtonAddShowClick(wxCommandEvent& event)
             wxMessageBox(_("Start time must be before end time."), _("Error"));
             continue;
         }
-        PartialCode.Printf(wxT("%04d-%04d %c%c%c "),TimeIdx2Time(StartTimeIdx+1),TimeIdx2Time(EndTimeIdx+2),
+        PartialCode.Printf(wxT("%04d-%04d %c%c%c "),TimeIdx2Time(StartTimeIdx),TimeIdx2Time(EndTimeIdx+1),
                          dialog.CheckBoxRepeat->IsChecked() ? 'R' : '-',
                          dialog.CheckBoxFirstItem->IsChecked() ? 'F' : '-',
                          dialog.CheckBoxLastItem->IsChecked() ? 'L' : '-');
@@ -2856,8 +2870,8 @@ void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
     // allow all fields to be updated
     UnpackSchedCode(SchedCode, &WkDay, StartTime, EndTime, RepeatOptions, Playlist);
     dialog.ChoicePlayList->SetStringSelection(Playlist);
-    dialog.ChoiceStartTime->SetSelection(Time2TimeIdx(StartTime)-1);
-    dialog.ChoiceEndTime->SetSelection(Time2TimeIdx(EndTime)-2);
+    dialog.ChoiceStartTime->SetSelection(Time2TimeIdx(StartTime));
+    dialog.ChoiceEndTime->SetSelection(Time2TimeIdx(EndTime)-1);
     dialog.CheckBoxRepeat->SetValue(RepeatOptions[0]=='R');
     dialog.CheckBoxFirstItem->SetValue(RepeatOptions[1]=='F');
     dialog.CheckBoxLastItem->SetValue(RepeatOptions[2]=='L');
@@ -2894,7 +2908,7 @@ void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
         }
 
         ShowEvents.Remove(SchedCode);
-        PartialCode.Printf(wxT("%04d-%04d %c%c%c%c"),TimeIdx2Time(StartTimeIdx+1),TimeIdx2Time(EndTimeIdx+2),
+        PartialCode.Printf(wxT("%04d-%04d %c%c%c%c"),TimeIdx2Time(StartTimeIdx),TimeIdx2Time(EndTimeIdx+1),
                          dialog.CheckBoxRepeat->IsChecked() ? 'R' : '-',
                          dialog.CheckBoxFirstItem->IsChecked() ? 'F' : '-',
                          dialog.CheckBoxLastItem->IsChecked() ? 'L' : '-',

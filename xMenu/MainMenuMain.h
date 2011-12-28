@@ -64,7 +64,6 @@ class MainMenuFrame: public wxFrame
         void OnButtonAnimationClick(wxCommandEvent& event);
         void OnButtonNetworkSetupClick(wxCommandEvent& event);
         void OnMenuItemHelpContentSelected(wxCommandEvent& event);
-        void OnButtonTestRGBClick(wxCommandEvent& event);
         void OnButtonLorMapClick(wxCommandEvent& event);
         void OnButtonFileConversionClick(wxCommandEvent& event);
         //*)
@@ -79,7 +78,6 @@ class MainMenuFrame: public wxFrame
         static const long ID_BUTTON_NETWORK_SETUP;
         static const long ID_BUTTON_SCHEDULE;
         static const long ID_BUTTON_TEST;
-        static const long ID_BUTTON_TESTRGB;
         static const long ID_BUTTON_FILE_CONVERSION;
         static const long ID_BUTTON_SEQUENCE;
         static const long ID_PANEL1;
@@ -104,7 +102,6 @@ class MainMenuFrame: public wxFrame
         wxDirDialog* DirDialog1;
         wxButton* ButtonSchedule;
         wxButton* ButtonTest;
-        wxButton* ButtonTestRGB;
         //*)
 
         wxString CurrentDir;

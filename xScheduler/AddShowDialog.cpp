@@ -43,7 +43,7 @@ AddShowDialog::AddShowDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	wxBoxSizer* BoxSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
-	
+
 	Create(parent, wxID_ANY, _("Schedule Playlist"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
