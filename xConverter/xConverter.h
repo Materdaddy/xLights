@@ -85,13 +85,13 @@ class xConverter: public wxFrame
         wxUint8 * SeqData;
         long SeqDataLen;
         long SeqNumPeriods;
-        int SeqNumChannels;
-        int TotChannels;
+        size_t SeqNumChannels;
+        size_t TotChannels;
         wxArrayString FileNames;
         wxArrayString ChannelNames;
         wxArrayInt ChannelColors;
         std::vector<int> VixChannels;
-        std::vector<int> NetMaxChannel;
+        std::vector<size_t> NetMaxChannel;
 
 		DECLARE_EVENT_TABLE()
 };

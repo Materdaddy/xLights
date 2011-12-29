@@ -282,7 +282,7 @@ void xConverter::OnButtonChooseFileClick(wxCommandEvent& event)
     if (FileDialog1->ShowModal() == wxID_OK) {
         FileDialog1->GetPaths(FileNames);
         FileDialog1->GetFilenames(ShortNames);
-        for (int i=0; i < ShortNames.GetCount(); i++) {
+        for (size_t i=0; i < ShortNames.GetCount(); i++) {
             AllNames.Append(ShortNames[i]);
             AllNames.Append(wxT("\n"));
         }
@@ -312,7 +312,7 @@ void xConverter::WriteVixenFile(const wxString& filename)
     textnode = new wxXmlNode( node, wxXML_TEXT_NODE, wxEmptyString, wxT("Music") );
 
     chparent = new wxXmlNode( root, wxXML_ELEMENT_NODE, wxT("Channels") );
-    for (int ch=0; ch < SeqNumChannels; ch++ ) {
+    for (size_t ch=0; ch < SeqNumChannels; ch++ ) {
         node = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Channel") );
         node->AddProperty( wxT("output"), wxString::Format(wxT("%d"),ch));
         node->AddProperty( wxT("id"), wxT("0"));
@@ -372,7 +372,7 @@ void xConverter::WriteXLightsFile(const wxString& filename)
         return;
     }
     sprintf(hdr,"xLights %2d %8d %8ld",1,SeqNumChannels,SeqNumPeriods);
-    for (int i=0; i < mediaFilename.size(); i++) {
+    for (size_t i=0; i < mediaFilename.size(); i++) {
         hdr[i+32]=mediaFilename[i] & 0x7f;
     }
     f.Write(hdr,512);
@@ -386,12 +386,12 @@ void xConverter::WriteConductorFile(const wxString& filename)
     TextCtrlStatus->AppendText(_("Writing Lynx Conductor sequence\n"));
     wxFile f;
     wxUint8 buf[4];
-    int ch,i,j,period;
+    size_t ch,i,j;
     if (!f.Create(filename,true)) {
         ConversionError(_("Unable to create file: ")+filename);
         return;
     }
-    for (period=0; period < SeqNumPeriods; period++) {
+    for (long period=0; period < SeqNumPeriods; period++) {
         if (period % 500 == 499) TextCtrlStatus->AppendText(wxString::Format(wxT("Writing time period %d\n"),period+1));
         wxYield();
         for (i=0; i < 4096; i++) {
@@ -505,6 +505,7 @@ void xConverter::ReadVixFile(const char* filename)
             if (cnt > 0) context.RemoveAt(cnt-1);
             cnt = context.GetCount();
 			break;
+		default: break;
 		}
 	}
 	delete xml;
@@ -526,10 +527,11 @@ void xConverter::ReadVixFile(const char* filename)
     SeqData = new wxUint8[SeqDataLen];
 
     // convert to 50ms timing, reorder channels according to output number, scale so that max intensity is 255
-    int ch,newper,vixper,idx,intensity;
+    int newper,vixper,intensity;
+    size_t ch;
     for (ch=0; ch < SeqNumChannels; ch++) {
         OutputChannel = VixChannels[ch];
-        for (int newper=0; newper < SeqNumPeriods; newper++) {
+        for (newper=0; newper < SeqNumPeriods; newper++) {
             vixper=newper * VixNumPeriods / SeqNumPeriods;
             intensity=VixSeqData[ch*VixNumPeriods+vixper];
             if (MaxIntensity != 255) intensity=intensity * 255 / MaxIntensity;
@@ -564,6 +566,7 @@ int xConverter::GetLorTrack1Length(const char* filename)
                 centisec = xml->getAttributeValueAsInt("totalCentiseconds");
             }
 			break;
+        default: break;
 		}
 	}
 	delete xml;
@@ -575,13 +578,14 @@ void xConverter::ReadLorFile(const char* filename)
 {
 	wxString NodeName,msg,EffectType,ChannelName;
 	wxArrayString context;
-	int unit,circuit,network,chindex,i,startcsec,endcsec,intensity,startIntensity,endIntensity,rampdiff,ChannelColor;
-	int startper,endper,perdiff,twinklestate,nexttwinkle;
+	int unit,circuit,startcsec,endcsec,intensity,startIntensity,endIntensity,rampdiff,ChannelColor;
+	int i,startper,endper,perdiff,twinklestate,nexttwinkle;
 	int twinkleperiod = 400;
 	int curchannel = -1;
 	int MappedChannelCnt = 0;
 	int MaxIntensity = 100;
 	int EffectCnt = 0;
+	size_t network,chindex;
 	size_t cnt = 0;
 
     TextCtrlStatus->AppendText(_("Reading LOR sequence\n"));
@@ -747,6 +751,7 @@ void xConverter::ReadLorFile(const char* filename)
             if (cnt > 0) context.RemoveAt(cnt-1);
             cnt = context.GetCount();
 			break;
+        default: break;
 		}
 	}
 	delete xml;
@@ -760,7 +765,7 @@ void xConverter::ReadLorFile(const char* filename)
 void xConverter::ClearLastPeriod()
 {
     long LastPer = SeqNumPeriods-1;
-    for (int ch=0; ch < SeqNumChannels; ch++) {
+    for (size_t ch=0; ch < SeqNumChannels; ch++) {
         SeqData[ch*SeqNumPeriods+LastPer] = 0;
     }
 }
@@ -830,7 +835,7 @@ void xConverter::OnButtonStartClick(wxCommandEvent& event)
     } else if (OutputFormat.IsEmpty()) {
         wxMessageBox(_("Please select an output format"), _("Error"));
     } else {
-        for (int i=0; i < FileNames.GetCount(); i++) {
+        for (size_t i=0; i < FileNames.GetCount(); i++) {
             DoConversion(FileNames[i], OutputFormat);
         }
         TextCtrlStatus->AppendText(_("Finished converting all files\n"));

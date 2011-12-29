@@ -2,7 +2,6 @@
 #define XLIGHTS_GLOBALS_H_INCLUDED_
 
 #define XLIGHTS_VERSION "2011f"
-#define XLIGHTS_MAX_NETWORKS 16
 #define XLIGHTS_CONFIG_ID "xLights"
 #define XLIGHTS_HELP_URL        "http://sourceforge.net/apps/mediawiki/xlights/index.php?title=Main_Page"
 #define XLIGHTS_SCRIPT_HELP_URL "http://sourceforge.net/apps/mediawiki/xlights/index.php?title=XScheduler_Script_Reference"

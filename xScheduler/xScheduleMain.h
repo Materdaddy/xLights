@@ -270,7 +270,7 @@ class xScheduleFrame: public wxFrame
         bool UnsavedChanges;
         bool PortsOK;
         LorEventMap LorEvents;
-        long LorLastUnit[XLIGHTS_MAX_NETWORKS];
+        std::vector<int> LorLastUnit;
         long LorMapping;
         wxTimer timer;
         wxTimer schedtimer;

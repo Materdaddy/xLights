@@ -29,7 +29,6 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
-#include <wx/checkbox.h>
 #include <wx/listbox.h>
 #include <wx/radiobut.h>
 #include <wx/slider.h>
@@ -108,6 +107,7 @@ class xTesterFrame: public wxFrame
         void OnRadioButtonDimSelect(wxCommandEvent& event);
         void OnRadioButtonTwinkleSelect(wxCommandEvent& event);
         void OnRadioButtonShimmerSelect(wxCommandEvent& event);
+        void OnRadioButtonChase5Select(wxCommandEvent& event);
         //*)
 
         void LoadFile();
@@ -125,6 +125,7 @@ class xTesterFrame: public wxFrame
         static const long ID_RADIOBUTTON15;
         static const long ID_RADIOBUTTON16;
         static const long ID_RADIOBUTTON17;
+        static const long ID_RADIOBUTTON19;
         static const long ID_RADIOBUTTON18;
         static const long ID_STATICTEXT9;
         static const long ID_SLIDER4;
@@ -146,6 +147,7 @@ class xTesterFrame: public wxFrame
         static const long ID_RADIOBUTTON2;
         static const long ID_RADIOBUTTON3;
         static const long ID_RADIOBUTTON4;
+        static const long ID_RADIOBUTTON25;
         static const long ID_RADIOBUTTON5;
         static const long ID_SLIDER12;
         static const long ID_SLIDER11;
@@ -165,17 +167,18 @@ class xTesterFrame: public wxFrame
         static const long ID_SLIDER8;
         static const long ID_SLIDER10;
         static const long ID_PANEL2;
-        static const long ID_CHECKBOX_RUN_RGB_SEQ;
-        static const long ID_STATICTEXT14;
-        static const long ID_CHECKBOX_A;
-        static const long ID_CHECKBOX_B;
-        static const long ID_CHECKBOX_C;
-        static const long ID_CHECKBOX_ALL;
-        static const long ID_CHECKBOX_NONE;
+        static const long ID_STATICTEXT2;
+        static const long ID_RADIOBUTTON20;
+        static const long ID_RADIOBUTTON22;
+        static const long ID_RADIOBUTTON23;
+        static const long ID_RADIOBUTTON24;
+        static const long ID_RADIOBUTTON21;
         static const long ID_STATICTEXT13;
         static const long ID_SLIDER7;
         static const long ID_PANEL5;
-        static const long ID_CHECKBOX_AUTO;
+        static const long ID_STATICTEXT6;
+        static const long ID_RADIOBUTTON26;
+        static const long ID_RADIOBUTTON27;
         static const long ID_LISTBOX_AUTOTEST;
         static const long ID_PANEL_AUTOTEST;
         static const long ID_NOTEBOOK1;
@@ -188,26 +191,32 @@ class xTesterFrame: public wxFrame
         static const long ID_TIMER;
 
         //(*Declarations(xTesterFrame)
+        wxRadioButton* RadioButtonAutoOff;
         wxStaticText* StaticText10;
+        wxRadioButton* RadioButtonChase5;
         wxPanel* Panel_Dim;
         wxStaticText* StaticText9;
+        wxRadioButton* RadioButtonRgbCycle4;
         wxRadioButton* RadioButtonRgbChaseOff;
+        wxRadioButton* RadioButtonRgbCycleOff;
+        wxRadioButton* RadioButtonAutoOn;
         wxButton* ButtonExport;
         wxSlider* SliderDimColorB;
         wxRadioButton* RadioButtonRgbChase;
-        wxCheckBox* CheckBoxRunRgbSeq;
+        wxRadioButton* RadioButtonRgbChase5;
         wxRadioButton* RadioButtonRgbChase3;
         wxStaticText* StaticText29;
         wxRadioButton* RadioButtonShimmer;
-        wxCheckBox* CheckBoxC;
         wxNotebook* Notebook1;
         wxPanel* PanelAutoTest;
         wxStaticText* StaticText13;
+        wxStaticText* StaticText2;
         wxSlider* SliderFgColorC;
         wxSlider* SliderRgbChaseSpeed;
-        wxStaticText* StaticText14;
+        wxRadioButton* RadioButtonRgbCycle3;
         wxButton* Button1;
         wxPanel* PanelTwinkle;
+        wxStaticText* StaticText6;
         wxRadioButton* RadioButtonDim;
         wxRadioButton* RadioButtonChase4;
         wxRadioButton* RadioButtonRgbTwinkle;
@@ -218,9 +227,7 @@ class xTesterFrame: public wxFrame
         wxPanel* Panel_RGB_Seq;
         wxSlider* SliderFgColorA;
         wxPanel* Panel1;
-        wxCheckBox* CheckBoxRunAuto;
         wxStaticText* StaticText1;
-        wxCheckBox* CheckBoxB;
         wxButton* ButtonClear;
         wxStaticText* StaticText3;
         wxRadioButton* RadioButtonChaseOff;
@@ -228,9 +235,8 @@ class xTesterFrame: public wxFrame
         wxPanel* Panel3;
         wxSlider* SliderRgbCycleSpeed;
         wxMenuItem* MenuItemHelpContent;
-        wxCheckBox* CheckBoxNone;
         wxRadioButton* RadioButtonRgbDimOff;
-        wxCheckBox* CheckBoxA;
+        wxRadioButton* RadioButtonRgbCycleMixed;
         wxRadioButton* RadioButtonTwinkle;
         wxSlider* SliderBgColorA;
         wxSlider* SliderBgColorC;
@@ -247,10 +253,10 @@ class xTesterFrame: public wxFrame
         wxListBox* ListBoxAutoTest;
         wxPanel* Panel2;
         wxRadioButton* RadioButtonChase;
-        wxCheckBox* CheckBoxAll;
         wxSlider* SliderBgIntensity;
         wxNotebook* Notebook2;
         wxStaticText* StaticText4;
+        wxRadioButton* RadioButtonRgbCycle5;
         wxRadioButton* RadioButtonRgbChase4;
         wxSlider* SliderFgIntensity;
         wxSlider* SliderFgColorB;
@@ -261,7 +267,7 @@ class xTesterFrame: public wxFrame
 
         wxFileName networkFile;
         long LorMapping;
-        WX_DEFINE_ARRAY(NetworkInfo*, NetworkArray);
+        WX_DEFINE_ARRAY_PTR(NetworkInfo*, NetworkArray);
         NetworkArray Networks;
         NetworkInfo* AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         void alloff();

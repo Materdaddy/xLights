@@ -722,7 +722,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     build_decoding_table();
     DisplaySchedule();
     Notebook1->ChangeSelection(0);
-    if (RunFlag && !ShowEvents.IsEmpty()) {
+    if (RunFlag && PortsOK && !ShowEvents.IsEmpty()) {
         CheckBoxRunSchedule->SetValue(true);
         CheckRunSchedule();
     }
@@ -1664,9 +1664,6 @@ void xScheduleFrame::SetMediaFilename(const wxString& filename)
 bool xScheduleFrame::LoadLorFile(wxString& FileName)
 {
     LorEvents.clear();
-    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++) {
-        LorLastUnit[i]=-1;
-    }
     mediaFilename.clear();
     wxXmlDocument doc;
     if (doc.Load( FileName )) {
@@ -1699,25 +1696,26 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
             tempstr.ToLong(&circuit);
             tempstr=e->GetPropVal(wxT("network"), wxT("0"));
             tempstr.ToLong(&netnum);
-            if (netnum < XLIGHTS_MAX_NETWORKS) {
-                chindex=(unit-1)*16+circuit-1;
-                switch (LorMapping) {
-                    case XLIGHTS_LORMAP_SINGLE:
-                        if (netnum==0 && chindex < VixNetwork.size()) {
-                            LoadLorChannel(e, VixNetwork[chindex].first, VixNetwork[chindex].second);
-                        }
-                        break;
-                    case XLIGHTS_LORMAP_MULTI:
-                        if (chindex < xout->GetChannelCount(netnum)) {
-                            LoadLorChannel(e,netnum,chindex);
-                        }
-                        break;
-                    case XLIGHTS_LORMAP_STRICT:
-                        LoadLorChannel(e,netnum,chindex);
-                        break;
-                }
-                if (unit > LorLastUnit[netnum]) LorLastUnit[netnum]=unit;
+            while (netnum >= LorLastUnit.size()) {
+                LorLastUnit.push_back(-1);
             }
+            chindex=(unit-1)*16+circuit-1;
+            switch (LorMapping) {
+                case XLIGHTS_LORMAP_SINGLE:
+                    if (netnum==0 && chindex < VixNetwork.size()) {
+                        LoadLorChannel(e, VixNetwork[chindex].first, VixNetwork[chindex].second);
+                    }
+                    break;
+                case XLIGHTS_LORMAP_MULTI:
+                    if (chindex < xout->GetChannelCount(netnum)) {
+                        LoadLorChannel(e,netnum,chindex);
+                    }
+                    break;
+                case XLIGHTS_LORMAP_STRICT:
+                    LoadLorChannel(e,netnum,chindex);
+                    break;
+            }
+            if (unit > LorLastUnit[netnum]) LorLastUnit[netnum]=unit;
         }
     }
 }
@@ -2034,7 +2032,7 @@ wxString xScheduleFrame::VixenInfo()
         mapcnt = 0;
         LeftToMap = VixNumChannels;
         netidx = 0;
-        while (mapcnt < VixNumChannels && netidx < XLIGHTS_MAX_NETWORKS) {
+        while (mapcnt < VixNumChannels && netidx < xout->NetworkCount()) {
             chcnt = xout->GetChannelCount(netidx);
             if (chcnt > 0) {
                 mapcnt1 = chcnt < LeftToMap ? chcnt : LeftToMap;
@@ -2082,7 +2080,7 @@ void xScheduleFrame::OnButtonInfoClick()
                     case XLIGHTS_LORMAP_SINGLE:
                         msg += _("single network\n\nChannel Map:");
                         startch = 0;
-                        for (netidx=0; netidx<XLIGHTS_MAX_NETWORKS; netidx++) {
+                        for (netidx=0; netidx<xout->NetworkCount(); netidx++) {
                             chcnt = xout->GetChannelCount(netidx);
                             if (chcnt > 0) {
                                 endch = startch + chcnt - 1;
@@ -2090,7 +2088,7 @@ void xScheduleFrame::OnButtonInfoClick()
                                 startch = endch + 1;
                             }
                         }
-                        for (netidx=1; netidx<XLIGHTS_MAX_NETWORKS; netidx++) {
+                        for (netidx=1; netidx<xout->NetworkCount(); netidx++) {
                             if (LorLastUnit[netidx] > 0) {
                                 msg += wxString::Format(_("\nLOR sequence ")+LorNetDesc(netidx)+_(", units 1-%d are unmapped"),LorLastUnit[netidx]);
                             }
@@ -2098,7 +2096,7 @@ void xScheduleFrame::OnButtonInfoClick()
                         break;
                     case XLIGHTS_LORMAP_MULTI:
                         msg += _("multi network\n\nChannel Map:");
-                        for (netidx=0; netidx<XLIGHTS_MAX_NETWORKS; netidx++) {
+                        for (netidx=0; netidx<xout->NetworkCount(); netidx++) {
                             if (LorLastUnit[netidx] > 0) {
                                 lastch = LorLastUnit[netidx]*16;
                                 chcnt = xout->GetChannelCount(netidx);

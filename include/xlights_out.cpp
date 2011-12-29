@@ -60,7 +60,7 @@ public:
   virtual ~xNetwork() {
     if (serptr) delete serptr;
   };
-  
+
   void CloseSerialPort() {
     if (serptr) serptr->Close();
   };
@@ -442,7 +442,7 @@ public:
 
 // ******************************************************
 // * This class represents a single DMX universe
-// * Compatible with Entec Open DMX, LOR dongle, D-Light dongle, 
+// * Compatible with Entec Open DMX, LOR dongle, D-Light dongle,
 // * and any other FTDI-based USB to RS-485 converter
 // * Methods should be called with: 0 <= chindex <= 511
 // ******************************************************
@@ -971,27 +971,26 @@ class xNetwork_DLight: public xNetwork_LOR {
 // It contains references to all of the networks
 class xOutput {
 protected:
-  xNetwork* networks[XLIGHTS_MAX_NETWORKS];
-  int lastnetnum;
+  WX_DEFINE_ARRAY_PTR(xNetwork*, xNetworkArray);
+  xNetworkArray networks;
 
 public:
   xOutput() {
     srand((unsigned)time(NULL));
-    lastnetnum = -1;
-    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++)
-      networks[i]=0;
   };
 
   ~xOutput() {
-    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++) {
-      if (networks[i]) delete networks[i];
-    }
+    WX_CLEAR_ARRAY(networks);
+  };
+  
+  size_t NetworkCount() {
+    return networks.GetCount();
   };
 
-  void setnetwork (const wxString& NetworkType, int netnum, int chcount, const wxString& portname, int baudrate) {
+  // returns the network index
+  size_t addnetwork (const wxString& NetworkType, int chcount, const wxString& portname, int baudrate) {
     xNetwork* netobj;
     wxString nettype3 = NetworkType.Upper().Left(3);
-    if (networks[netnum]) throw "duplicate network defined";
     if (nettype3 == wxT("LOR")) {
         netobj = new xNetwork_LOR();
     } else if (nettype3 == wxT("D-L")) {
@@ -1009,121 +1008,111 @@ public:
     } else {
         throw "unknown network type";
     }
-    networks[netnum] = netobj;
+    size_t netnum = networks.GetCount();
+    networks.Add(netobj);
     netobj->SetChannelCount(chcount);
     wxString description = NetworkType + _(" on ") + portname;
     netobj->SetNetworkDesc(description);
-    if (netnum > lastnetnum) lastnetnum = netnum;
     if (nettype3 == wxT("E13")) {
       netobj->InitNetwork(portname, baudrate, (wxUint16) netnum);  // portname is ip address and baudrate is universe number
     } else {
       netobj->InitSerialPort(portname, baudrate);
     }
+    return netnum;
   };
 
-  // returns the network index, or -1 on failure
-  int addnetwork (const wxString& NetworkType, int chcount, const wxString& portname, int baudrate) {
-    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++) {
-      if (networks[i] == 0) {
-        setnetwork(NetworkType, i, chcount, portname, baudrate);
-        return i;
-      }
-    }
-    return -1;
-  };
-
-  int GetChannelCount(int netnum) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return 0;
+  int GetChannelCount(size_t netnum) {
+    if (netnum >= networks.GetCount()) return 0;
     return networks[netnum]->GetChannelCount();
   };
 
-  wxString GetNetworkDesc(int netnum) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return wxT("");
+  wxString GetNetworkDesc(size_t netnum) {
+    if (netnum >= networks.GetCount()) return wxT("");
     return networks[netnum]->GetNetworkDesc();
   };
 
   void SetMaxIntensity(int maxintensity) {
-    for (int i=0; i<XLIGHTS_MAX_NETWORKS; i++) {
-      if (networks[i]) networks[i]->SetMaxIntensity(maxintensity);
+    for (size_t i=0; i<networks.GetCount(); i++) {
+      networks[i]->SetMaxIntensity(maxintensity);
     }
   };
 
   // chindex starts at 0
   // duration is in milliseconds
   // intensity values are relative to the last SetMaxIntensity call
-  void ramp (int netnum, int chindex, int duration, int startintensity, int endintensity) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
+  void ramp (size_t netnum, int chindex, int duration, int startintensity, int endintensity) {
+    if (netnum >= networks.GetCount()) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->ramp(chindex, duration, startintensity, endintensity);
   };
 
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
-  void SetIntensity (int netnum, int chindex, int intensity) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
+  void SetIntensity (size_t netnum, int chindex, int intensity) {
+    if (netnum >= networks.GetCount()) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->SetIntensity(chindex, intensity);
   };
 
   // chindex starts at 0
   // intensity is relative to the last SetMaxIntensity call
-  void twinkle (int netnum, int chindex, int period, int intensity) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
+  void twinkle (size_t netnum, int chindex, int period, int intensity) {
+    if (netnum >= networks.GetCount()) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->twinkle(chindex, period, intensity);
   };
 
-  void twinklefade (int netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
+  void twinklefade (size_t netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
+    if (netnum >= networks.GetCount()) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->twinklefade(chindex, period, duration, startintensity, endintensity);
   };
 
-  void shimmer (int netnum, int chindex, int period, int intensity) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
+  void shimmer (size_t netnum, int chindex, int period, int intensity) {
+    if (netnum >= networks.GetCount()) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->shimmer(chindex, period, intensity);
   };
 
-  void shimmerfade (int netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
+  void shimmerfade (size_t netnum, int chindex, int period, int duration, int startintensity, int endintensity) {
+    if (netnum >= networks.GetCount()) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->shimmerfade(chindex, period, duration, startintensity, endintensity);
   };
 
-  void off (int netnum, int chindex) {
-    if (netnum < 0 || netnum >= XLIGHTS_MAX_NETWORKS || !networks[netnum]) return;
+  void off (size_t netnum, int chindex) {
+    if (netnum >= networks.GetCount()) return;
     if (chindex <= networks[netnum]->GetChannelCount())
       networks[netnum]->off(chindex);
   };
 
   void alloff () {
-    for(int i=0; i <= lastnetnum; ++i) {
-      if (networks[i]) networks[i]->alloff();
+    for(size_t i=0; i < networks.GetCount(); ++i) {
+      networks[i]->alloff();
     }
   };
 
   void ResetTimer() {
-    for(int i=0; i <= lastnetnum; ++i) {
-      if (networks[i]) networks[i]->ResetTimer();
+    for(size_t i=0; i < networks.GetCount(); ++i) {
+      networks[i]->ResetTimer();
     }
   };
 
   void TimerStart(long msec) {
-    for(int i=0; i <= lastnetnum; ++i) {
-      if (networks[i]) networks[i]->TimerStart(msec);
+    for(size_t i=0; i < networks.GetCount(); ++i) {
+      networks[i]->TimerStart(msec);
     }
   };
 
   void TimerEnd() {
-    for(int i=0; i <= lastnetnum; ++i) {
-      if (networks[i]) networks[i]->TimerEnd();
+    for(size_t i=0; i < networks.GetCount(); ++i) {
+      networks[i]->TimerEnd();
     }
   };
-  
+
   void ClosePorts() {
-    for(int i=0; i <= lastnetnum; ++i) {
-      if (networks[i]) networks[i]->CloseSerialPort();
+    for(size_t i=0; i < networks.GetCount(); ++i) {
+      networks[i]->CloseSerialPort();
     }
   };
 };

@@ -88,6 +88,7 @@ const long xTesterFrame::ID_RADIOBUTTON14 = wxNewId();
 const long xTesterFrame::ID_RADIOBUTTON15 = wxNewId();
 const long xTesterFrame::ID_RADIOBUTTON16 = wxNewId();
 const long xTesterFrame::ID_RADIOBUTTON17 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON19 = wxNewId();
 const long xTesterFrame::ID_RADIOBUTTON18 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT9 = wxNewId();
 const long xTesterFrame::ID_SLIDER4 = wxNewId();
@@ -109,6 +110,7 @@ const long xTesterFrame::ID_RADIOBUTTON1 = wxNewId();
 const long xTesterFrame::ID_RADIOBUTTON2 = wxNewId();
 const long xTesterFrame::ID_RADIOBUTTON3 = wxNewId();
 const long xTesterFrame::ID_RADIOBUTTON4 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON25 = wxNewId();
 const long xTesterFrame::ID_RADIOBUTTON5 = wxNewId();
 const long xTesterFrame::ID_SLIDER12 = wxNewId();
 const long xTesterFrame::ID_SLIDER11 = wxNewId();
@@ -128,17 +130,18 @@ const long xTesterFrame::ID_SLIDER3 = wxNewId();
 const long xTesterFrame::ID_SLIDER8 = wxNewId();
 const long xTesterFrame::ID_SLIDER10 = wxNewId();
 const long xTesterFrame::ID_PANEL2 = wxNewId();
-const long xTesterFrame::ID_CHECKBOX_RUN_RGB_SEQ = wxNewId();
-const long xTesterFrame::ID_STATICTEXT14 = wxNewId();
-const long xTesterFrame::ID_CHECKBOX_A = wxNewId();
-const long xTesterFrame::ID_CHECKBOX_B = wxNewId();
-const long xTesterFrame::ID_CHECKBOX_C = wxNewId();
-const long xTesterFrame::ID_CHECKBOX_ALL = wxNewId();
-const long xTesterFrame::ID_CHECKBOX_NONE = wxNewId();
+const long xTesterFrame::ID_STATICTEXT2 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON20 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON22 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON23 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON24 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON21 = wxNewId();
 const long xTesterFrame::ID_STATICTEXT13 = wxNewId();
 const long xTesterFrame::ID_SLIDER7 = wxNewId();
 const long xTesterFrame::ID_PANEL5 = wxNewId();
-const long xTesterFrame::ID_CHECKBOX_AUTO = wxNewId();
+const long xTesterFrame::ID_STATICTEXT6 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON26 = wxNewId();
+const long xTesterFrame::ID_RADIOBUTTON27 = wxNewId();
 const long xTesterFrame::ID_LISTBOX_AUTOTEST = wxNewId();
 const long xTesterFrame::ID_PANEL_AUTOTEST = wxNewId();
 const long xTesterFrame::ID_NOTEBOOK1 = wxNewId();
@@ -163,7 +166,6 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     wxFlexGridSizer* FlexGridSizer4;
     wxFlexGridSizer* FlexGridSizer24;
     wxBoxSizer* BoxSizer10;
-    wxFlexGridSizer* FlexGridSizer23;
     wxMenuItem* MenuItem2;
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
@@ -176,6 +178,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     wxMenu* Menu1;
     wxFlexGridSizer* FlexGridSizer7;
     wxStaticBoxSizer* StaticBoxSizer3;
+    wxFlexGridSizer* FlexGridSizer15;
     wxFlexGridSizer* FlexGridSizer18;
     wxFlexGridSizer* FlexGridSizer8;
     wxFlexGridSizer* FlexGridSizer21;
@@ -263,6 +266,8 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     FlexGridSizer10->Add(RadioButtonChase3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     RadioButtonChase4 = new wxRadioButton(Panel2, ID_RADIOBUTTON17, _("Chase 1/4"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON17"));
     FlexGridSizer10->Add(RadioButtonChase4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonChase5 = new wxRadioButton(Panel2, ID_RADIOBUTTON19, _("Chase 1/5"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON19"));
+    FlexGridSizer10->Add(RadioButtonChase5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     RadioButtonAlt = new wxRadioButton(Panel2, ID_RADIOBUTTON18, _("Alternate"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON18"));
     FlexGridSizer10->Add(RadioButtonAlt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer9->Add(FlexGridSizer10, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
@@ -346,6 +351,8 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     FlexGridSizer3->Add(RadioButtonRgbChase3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     RadioButtonRgbChase4 = new wxRadioButton(Panel_Dim, ID_RADIOBUTTON4, _("Chase 1/4"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON4"));
     FlexGridSizer3->Add(RadioButtonRgbChase4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonRgbChase5 = new wxRadioButton(Panel_Dim, ID_RADIOBUTTON25, _("Chase 1/5"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON25"));
+    FlexGridSizer3->Add(RadioButtonRgbChase5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     RadioButtonRgbAlt = new wxRadioButton(Panel_Dim, ID_RADIOBUTTON5, _("Alternate"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON5"));
     FlexGridSizer3->Add(RadioButtonRgbAlt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
@@ -410,36 +417,25 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     Panel1->SetSizer(FlexGridSizer13);
     FlexGridSizer13->SetSizeHints(Panel1);
     Panel_RGB_Seq = new wxPanel(Notebook1, ID_PANEL5, wxPoint(71,15), wxSize(392,209), wxTAB_TRAVERSAL, _T("ID_PANEL5"));
-    FlexGridSizer11 = new wxFlexGridSizer(0, 1, 0, 0);
-    FlexGridSizer11->AddGrowableCol(0);
-    FlexGridSizer11->AddGrowableRow(1);
-    CheckBoxRunRgbSeq = new wxCheckBox(Panel_RGB_Seq, ID_CHECKBOX_RUN_RGB_SEQ, _("Cycle selected RGB lights"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RUN_RGB_SEQ"));
-    CheckBoxRunRgbSeq->SetValue(false);
-    FlexGridSizer11->Add(CheckBoxRunRgbSeq, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_LEFT|wxALIGN_TOP, 10);
-    FlexGridSizer23 = new wxFlexGridSizer(0, 3, 0, 0);
-    FlexGridSizer23->AddGrowableRow(0);
-    FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
-    StaticText14 = new wxStaticText(Panel_RGB_Seq, ID_STATICTEXT14, _("Cycle Steps"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
-    wxFont StaticText14Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-    StaticText14->SetFont(StaticText14Font);
-    FlexGridSizer12->Add(StaticText14, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    CheckBoxA = new wxCheckBox(Panel_RGB_Seq, ID_CHECKBOX_A, _("Ch A"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_A"));
-    CheckBoxA->SetValue(true);
-    FlexGridSizer12->Add(CheckBoxA, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    CheckBoxB = new wxCheckBox(Panel_RGB_Seq, ID_CHECKBOX_B, _("Ch B"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_B"));
-    CheckBoxB->SetValue(true);
-    FlexGridSizer12->Add(CheckBoxB, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    CheckBoxC = new wxCheckBox(Panel_RGB_Seq, ID_CHECKBOX_C, _("Ch C"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_C"));
-    CheckBoxC->SetValue(true);
-    FlexGridSizer12->Add(CheckBoxC, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    CheckBoxAll = new wxCheckBox(Panel_RGB_Seq, ID_CHECKBOX_ALL, _("All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_ALL"));
-    CheckBoxAll->SetValue(false);
-    FlexGridSizer12->Add(CheckBoxAll, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    CheckBoxNone = new wxCheckBox(Panel_RGB_Seq, ID_CHECKBOX_NONE, _("None"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_NONE"));
-    CheckBoxNone->SetValue(false);
-    FlexGridSizer12->Add(CheckBoxNone, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer23->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
-    FlexGridSizer23->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer11->AddGrowableRow(0);
+    FlexGridSizer15 = new wxFlexGridSizer(0, 1, 0, 0);
+    StaticText2 = new wxStaticText(Panel_RGB_Seq, ID_STATICTEXT2, _("Select function:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    wxFont StaticText2Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    StaticText2->SetFont(StaticText2Font);
+    FlexGridSizer15->Add(StaticText2, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonRgbCycleOff = new wxRadioButton(Panel_RGB_Seq, ID_RADIOBUTTON20, _("Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON20"));
+    FlexGridSizer15->Add(RadioButtonRgbCycleOff, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonRgbCycle3 = new wxRadioButton(Panel_RGB_Seq, ID_RADIOBUTTON22, _("A-B-C"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON22"));
+    FlexGridSizer15->Add(RadioButtonRgbCycle3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonRgbCycle4 = new wxRadioButton(Panel_RGB_Seq, ID_RADIOBUTTON23, _("A-B-C-All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON23"));
+    FlexGridSizer15->Add(RadioButtonRgbCycle4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonRgbCycle5 = new wxRadioButton(Panel_RGB_Seq, ID_RADIOBUTTON24, _("A-B-C-All-None"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON24"));
+    FlexGridSizer15->Add(RadioButtonRgbCycle5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonRgbCycleMixed = new wxRadioButton(Panel_RGB_Seq, ID_RADIOBUTTON21, _("Mixed Colors"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON21"));
+    FlexGridSizer15->Add(RadioButtonRgbCycleMixed, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer11->Add(FlexGridSizer15, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    FlexGridSizer11->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer24 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer24->AddGrowableRow(1);
     StaticText13 = new wxStaticText(Panel_RGB_Seq, ID_STATICTEXT13, _("Cycle Speed"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
@@ -448,17 +444,23 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     FlexGridSizer24->Add(StaticText13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     SliderRgbCycleSpeed = new wxSlider(Panel_RGB_Seq, ID_SLIDER7, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_VERTICAL|wxSL_LABELS|wxSL_INVERSE|wxSIMPLE_BORDER, wxDefaultValidator, _T("ID_SLIDER7"));
     FlexGridSizer24->Add(SliderRgbCycleSpeed, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 10);
-    FlexGridSizer23->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer11->Add(FlexGridSizer23, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer11->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel_RGB_Seq->SetSizer(FlexGridSizer11);
     FlexGridSizer11->SetSizeHints(Panel_RGB_Seq);
     PanelAutoTest = new wxPanel(Notebook1, ID_PANEL_AUTOTEST, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_AUTOTEST"));
-    FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
-    FlexGridSizer8->AddGrowableCol(0);
+    FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer8->AddGrowableRow(1);
-    CheckBoxRunAuto = new wxCheckBox(PanelAutoTest, ID_CHECKBOX_AUTO, _("Run Automated Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_AUTO"));
-    CheckBoxRunAuto->SetValue(false);
-    FlexGridSizer8->Add(CheckBoxRunAuto, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 10);
+    FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
+    StaticText6 = new wxStaticText(PanelAutoTest, ID_STATICTEXT6, _("Select function:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    wxFont StaticText6Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    StaticText6->SetFont(StaticText6Font);
+    FlexGridSizer12->Add(StaticText6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonAutoOff = new wxRadioButton(PanelAutoTest, ID_RADIOBUTTON26, _("Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON26"));
+    FlexGridSizer12->Add(RadioButtonAutoOff, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    RadioButtonAutoOn = new wxRadioButton(PanelAutoTest, ID_RADIOBUTTON27, _("Run Automated Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON27"));
+    FlexGridSizer12->Add(RadioButtonAutoOn, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer8->Add(FlexGridSizer12, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    FlexGridSizer8->Add(0,0,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ListBoxAutoTest = new wxListBox(PanelAutoTest, ID_LISTBOX_AUTOTEST, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_LISTBOX_AUTOTEST"));
     ListBoxAutoTest->Append(_("Intensity 100%"));
     ListBoxAutoTest->Append(_("Intensity 50%"));
@@ -473,7 +475,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     ListBoxAutoTest->Append(_("Shimmer Ramp 0% to 100%"));
     ListBoxAutoTest->Append(_("Shimmer Ramp 100% to 0%"));
     ListBoxAutoTest->Disable();
-    FlexGridSizer8->Add(ListBoxAutoTest, 1, wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 10);
+    FlexGridSizer8->Add(ListBoxAutoTest, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 10);
     PanelAutoTest->SetSizer(FlexGridSizer8);
     FlexGridSizer8->Fit(PanelAutoTest);
     FlexGridSizer8->SetSizeHints(PanelAutoTest);
@@ -516,6 +518,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     Connect(ID_RADIOBUTTON15,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChaseSelect);
     Connect(ID_RADIOBUTTON16,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase3Select);
     Connect(ID_RADIOBUTTON17,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase4Select);
+    Connect(ID_RADIOBUTTON19,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase5Select);
     Connect(ID_RADIOBUTTON18,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonAltSelect);
     Connect(ID_RADIOBUTTON9,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonOffSelect);
     Connect(ID_RADIOBUTTON6,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonDimSelect);
@@ -525,11 +528,19 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChaseSelect);
     Connect(ID_RADIOBUTTON3,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase3Select);
     Connect(ID_RADIOBUTTON4,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase4Select);
+    Connect(ID_RADIOBUTTON25,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase5Select);
     Connect(ID_RADIOBUTTON5,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonAltSelect);
     Connect(ID_RADIOBUTTON10,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonOffSelect);
     Connect(ID_RADIOBUTTON11,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonDimSelect);
     Connect(ID_RADIOBUTTON12,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonTwinkleSelect);
     Connect(ID_RADIOBUTTON13,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonShimmerSelect);
+    Connect(ID_RADIOBUTTON20,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonOffSelect);
+    Connect(ID_RADIOBUTTON22,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase3Select);
+    Connect(ID_RADIOBUTTON23,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase4Select);
+    Connect(ID_RADIOBUTTON24,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonChase5Select);
+    Connect(ID_RADIOBUTTON21,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonDimSelect);
+    Connect(ID_RADIOBUTTON26,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonOffSelect);
+    Connect(ID_RADIOBUTTON27,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnRadioButtonDimSelect);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnQuit);
     Connect(idMenuHelpContent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnMenuItemHelpContentSelected);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&xTesterFrame::OnAbout);
@@ -565,6 +576,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
 xTesterFrame::~xTesterFrame()
 {
     if (timer.IsRunning()) timer.Stop();
+    WX_CLEAR_ARRAY(Networks);
     //(*Destroy(xTesterFrame)
     //*)
 }
@@ -589,10 +601,9 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
     static int LastAutomatedTest;
     static long NextSequenceStart = -1;
     static TestFunctions LastFunc = OFF;
-    static int interval, rgbCycle=0;
-    static unsigned int seqidx=0;
+    static unsigned int interval, rgbCycle, seqidx;
     static wxArrayInt chArray;
-    //static float frequency;
+    static float frequency;
     int v,n,ch,rgbChannel,color[3],BgIntensity,FgIntensity;
     unsigned int i;
     /*
@@ -613,10 +624,12 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
     if (NotebookSelection != LastNotebookSelection) {
         LastNotebookSelection = NotebookSelection;
         CheckChannelList = true;
+        seqidx=0;
         alloff();
     }
     if (TestFunc != LastFunc) {
         LastFunc = TestFunc;
+        rgbCycle=0;
         CheckChannelList = true;
     }
 
@@ -636,10 +649,9 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
         CheckChannelList = false;
     }
 
-    switch (NotebookSelection) {
+    if (TestFunc != OFF && chArray.Count() > 0) switch (NotebookSelection) {
         case 0:
             // chase
-            if (TestFunc == OFF) break;
             v=SliderChaseSpeed->GetValue();  // 0-100
             BgIntensity = SliderBgIntensity->GetValue();
             FgIntensity = SliderFgIntensity->GetValue();
@@ -688,6 +700,7 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
                         }
                         StatusBar1->SetStatusText(wxString::Format(_("Shimmering %d channels, speed=%d"),chArray.Count(),interval));
                         break;
+                    default: break;
                 }
                 LastBgIntensity = v;
             }
@@ -748,8 +761,23 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
 
         case 4:
             // RGB Cycle
-            if (CheckBoxRunRgbSeq->IsChecked()) {
-                v=SliderRgbCycleSpeed->GetValue();  // 0-100
+            v=SliderRgbCycleSpeed->GetValue();  // 0-100
+            if (TestFunc == DIM) {
+                // color mixing
+                if (v != LastSequenceSpeed) {
+                    frequency=v/1000.0 + 0.05;
+                    StatusBar1->SetStatusText(wxString::Format(_("Color Cycle, speed=%d"),v));
+                    LastSequenceSpeed = v;
+                }
+                color[0] = sin(frequency*seqidx + 0.0) * 127 + 128;
+                color[1] = sin(frequency*seqidx + 2.0) * 127 + 128;
+                color[2] = sin(frequency*seqidx + 4.0) * 127 + 128;
+                seqidx++;
+                for (i=0; i < chArray.Count(); i++) {
+                    xout.SetIntensity(netidx, chArray[i], color[i % 3]);
+                }
+            } else {
+                // RGB cycle
                 if (v != LastSequenceSpeed) {
                     interval = 1600 - v*15;
                     NextSequenceStart = curtime + interval;
@@ -757,152 +785,107 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
                     StatusBar1->SetStatusText(wxString::Format(_("Turning on channels in RGB sequence, speed=%d"),interval));
                 }
                 if (curtime >= NextSequenceStart) {
-                    for (ch=0,rgbChannel=0; ch < maxch; ch++) {
-                        if (lb->IsChecked(ch)) {
-                            switch (rgbCycle) {
-                                case 3: v=MAXINTENSITY; break;
-                                case 4: v=0; break;
-                                default: v = rgbChannel == rgbCycle ? MAXINTENSITY : 0;
-                            }
-                            xout.SetIntensity(netidx, ch, v);
-                            rgbChannel=(rgbChannel + 1) % 3;
+                    for (i=0; i < chArray.Count(); i++) {
+                        switch (rgbCycle) {
+                            case 3: v=MAXINTENSITY; break;
+                            default: v = (i % 3) == rgbCycle ? MAXINTENSITY : 0; break;
                         }
+                        xout.SetIntensity(netidx, chArray[i], v);
                     }
-                    rgbCycle=(rgbCycle + 1) % 5;
+                    rgbCycle=(rgbCycle + 1) % ChaseGrouping;
                     NextSequenceStart += interval;
                 }
-            } else if (LastSequenceSpeed != -1) {
-                for (i=0; i < chArray.Count(); i++) xout.off(netidx, chArray[i]);
-                LastSequenceSpeed=-1;
-                rgbCycle=0;
             }
             break;
 
         case 5:
             // automated test
-            if (CheckBoxRunAuto->IsChecked()) {
-                interval = 3000;  // 3 seconds per test
-                if (LastAutomatedTest == -1) {
-                    seqidx=99;  // test #
-                    NextSequenceStart = curtime;
-                    ListBoxAutoTest->Enable(true);
-                }
-                if (curtime >= NextSequenceStart && chArray.Count() > 0) {
-                    NextSequenceStart = curtime + interval + 1500; // allow time between tests
-                    seqidx++;
-                    if (seqidx >= ListBoxAutoTest->GetCount()) seqidx=0;
-                    LastAutomatedTest=seqidx;
-                    ListBoxAutoTest->Select(seqidx);
-                    switch (seqidx) {
-                        case 0:
-                            // intensity 100%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.SetIntensity(netidx, chArray[i], MAXINTENSITY);
-                            }
-                            break;
-                        case 1:
-                            // intensity 50%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.SetIntensity(netidx, chArray[i], MAXINTENSITY/2);
-                            }
-                            break;
-                        case 2:
-                            // twinkle 100%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.twinkle(netidx, chArray[i], TWINKLE_PERIOD, MAXINTENSITY);
-                            }
-                            break;
-                        case 3:
-                            // twinkle 50%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.twinkle(netidx, chArray[i], TWINKLE_PERIOD, MAXINTENSITY/2);
-                            }
-                            break;
-                        case 4:
-                            // shimmer 100%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.shimmer(netidx, chArray[i], SHIMMER_PERIOD, MAXINTENSITY);
-                            }
-                            break;
-                        case 5:
-                            // shimmer 50%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.shimmer(netidx, chArray[i], SHIMMER_PERIOD, MAXINTENSITY/2);
-                            }
-                            break;
-                        case 6:
-                            // ramp 0% to 100%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.ramp(netidx, chArray[i], interval, 0, MAXINTENSITY);
-                            }
-                            break;
-                        case 7:
-                            // ramp 100% to 0%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.ramp(netidx, chArray[i], interval, MAXINTENSITY, 0);
-                            }
-                            break;
-                        case 8:
-                            // twinkle ramp 0% to 100%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.twinklefade(netidx, chArray[i], TWINKLE_PERIOD, interval, 0, MAXINTENSITY);
-                            }
-                            break;
-                        case 9:
-                            // twinkle ramp 100% to 0%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.twinklefade(netidx, chArray[i], TWINKLE_PERIOD, interval, MAXINTENSITY, 0);
-                            }
-                            break;
-                        case 10:
-                            // shimmer ramp 0% to 100%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.shimmerfade(netidx, chArray[i], SHIMMER_PERIOD, interval, 0, MAXINTENSITY);
-                            }
-                            break;
-                        case 11:
-                            // shimmer ramp 100% to 0%
-                            for (i=0; i < chArray.Count(); i++) {
-                                xout.shimmerfade(netidx, chArray[i], SHIMMER_PERIOD, interval, MAXINTENSITY, 0);
-                            }
-                            break;
-                    }
-                }
-            } else if (LastAutomatedTest != -1) {
-                for (i=0; i < chArray.Count(); i++) {
-                    xout.off(netidx, chArray[i]);
-                }
-                chArray.Clear();
-                ListBoxAutoTest->Enable(false);
-                LastAutomatedTest=-1;
+            interval = 3000;  // 3 seconds per test
+            if (LastAutomatedTest == -1) {
+                seqidx=99;  // test #
+                NextSequenceStart = curtime;
+                ListBoxAutoTest->Enable(true);
             }
-            break;
-
-
-        case 8:
-            // Color Cycle
-            /*
-            if (CheckBoxRunFade->IsChecked()) {
-                v=Slider3->GetValue();  // 0-100
-                if (v != LastSequenceSpeed) {
-                    frequency=v/1000.0 + 0.05;
-                    StatusBar1->SetStatusText(wxString::Format(_("Color Cycle, speed=%d"),v));
-                }
-                color[0] = sin(frequency*SeqNum + 0.0) * 127 + 128;
-                color[1] = sin(frequency*SeqNum + 2.0) * 127 + 128;
-                color[2] = sin(frequency*SeqNum + 4.0) * 127 + 128;
-                SeqNum++;
-                for (ch=0,rgbChannel=0; ch < maxch; ch++) {
-                    if (lb->IsChecked(ch)) {
-                        xout.SetIntensity(netidx, ch, color[rgbChannel]);
-                        rgbChannel=(rgbChannel + 1) % 3;
+            if (curtime < NextSequenceStart) break;
+            NextSequenceStart = curtime + interval + 1500; // allow time between tests
+            seqidx++;
+            if (seqidx >= ListBoxAutoTest->GetCount()) seqidx=0;
+            LastAutomatedTest=seqidx;
+            ListBoxAutoTest->Select(seqidx);
+            switch (seqidx) {
+                case 0:
+                    // intensity 100%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.SetIntensity(netidx, chArray[i], MAXINTENSITY);
                     }
-                }
-            } else {
-                LastSequenceSpeed=-1;
-                SeqNum=0;
+                    break;
+                case 1:
+                    // intensity 50%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.SetIntensity(netidx, chArray[i], MAXINTENSITY/2);
+                    }
+                    break;
+                case 2:
+                    // twinkle 100%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.twinkle(netidx, chArray[i], TWINKLE_PERIOD, MAXINTENSITY);
+                    }
+                    break;
+                case 3:
+                    // twinkle 50%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.twinkle(netidx, chArray[i], TWINKLE_PERIOD, MAXINTENSITY/2);
+                    }
+                    break;
+                case 4:
+                    // shimmer 100%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.shimmer(netidx, chArray[i], SHIMMER_PERIOD, MAXINTENSITY);
+                    }
+                    break;
+                case 5:
+                    // shimmer 50%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.shimmer(netidx, chArray[i], SHIMMER_PERIOD, MAXINTENSITY/2);
+                    }
+                    break;
+                case 6:
+                    // ramp 0% to 100%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.ramp(netidx, chArray[i], interval, 0, MAXINTENSITY);
+                    }
+                    break;
+                case 7:
+                    // ramp 100% to 0%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.ramp(netidx, chArray[i], interval, MAXINTENSITY, 0);
+                    }
+                    break;
+                case 8:
+                    // twinkle ramp 0% to 100%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.twinklefade(netidx, chArray[i], TWINKLE_PERIOD, interval, 0, MAXINTENSITY);
+                    }
+                    break;
+                case 9:
+                    // twinkle ramp 100% to 0%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.twinklefade(netidx, chArray[i], TWINKLE_PERIOD, interval, MAXINTENSITY, 0);
+                    }
+                    break;
+                case 10:
+                    // shimmer ramp 0% to 100%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.shimmerfade(netidx, chArray[i], SHIMMER_PERIOD, interval, 0, MAXINTENSITY);
+                    }
+                    break;
+                case 11:
+                    // shimmer ramp 100% to 0%
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.shimmerfade(netidx, chArray[i], SHIMMER_PERIOD, interval, MAXINTENSITY, 0);
+                    }
+                    break;
             }
-            */
             break;
     }
     xout.TimerEnd();
@@ -966,7 +949,7 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
     wxString net3 = NetInfo->net3();
     int baud = (BaudRate == _("n/a")) ? 230400 : atoi(BaudRate.mb_str(wxConvUTF8));
     try {
-        xout.setnetwork(net3,cnt,MaxChannels,ComPort,baud);
+        xout.addnetwork(net3,MaxChannels,ComPort,baud);
     }
     catch (const char *str) {
         wxString errmsg(str,wxConvUTF8);
@@ -1035,6 +1018,7 @@ void xTesterFrame::alloff()
     RadioButtonChase->SetValue(false);
     RadioButtonChase3->SetValue(false);
     RadioButtonChase4->SetValue(false);
+    RadioButtonChase5->SetValue(false);
     RadioButtonAlt->SetValue(false);
 
     RadioButtonDimOff->SetValue(true);
@@ -1046,6 +1030,7 @@ void xTesterFrame::alloff()
     RadioButtonRgbChase->SetValue(false);
     RadioButtonRgbChase3->SetValue(false);
     RadioButtonRgbChase4->SetValue(false);
+    RadioButtonRgbChase5->SetValue(false);
     RadioButtonRgbAlt->SetValue(false);
 
     RadioButtonRgbDimOff->SetValue(true);
@@ -1053,8 +1038,15 @@ void xTesterFrame::alloff()
     RadioButtonRgbTwinkle->SetValue(false);
     RadioButtonRgbShimmer->SetValue(false);
 
-    CheckBoxRunRgbSeq->SetValue(false);
-    CheckBoxRunAuto->SetValue(false);
+    RadioButtonRgbCycleOff->SetValue(true);
+    RadioButtonRgbCycle3->SetValue(false);
+    RadioButtonRgbCycle4->SetValue(false);
+    RadioButtonRgbCycle5->SetValue(false);
+    RadioButtonRgbCycleMixed->SetValue(false);
+
+    RadioButtonAutoOff->SetValue(true);
+    RadioButtonAutoOn->SetValue(false);
+
     xout.alloff();
     TestFunc=OFF;
     StatusBar1->SetStatusText(_("All lights off"));
@@ -1102,6 +1094,12 @@ void xTesterFrame::OnRadioButtonChaseSelect(wxCommandEvent& event)
     ChaseGrouping=std::numeric_limits<int>::max();
 }
 
+void xTesterFrame::OnRadioButtonAltSelect(wxCommandEvent& event)
+{
+    TestFunc=CHASE;
+    ChaseGrouping=2;
+}
+
 void xTesterFrame::OnRadioButtonChase3Select(wxCommandEvent& event)
 {
     TestFunc=CHASE;
@@ -1114,10 +1112,10 @@ void xTesterFrame::OnRadioButtonChase4Select(wxCommandEvent& event)
     ChaseGrouping=4;
 }
 
-void xTesterFrame::OnRadioButtonAltSelect(wxCommandEvent& event)
+void xTesterFrame::OnRadioButtonChase5Select(wxCommandEvent& event)
 {
     TestFunc=CHASE;
-    ChaseGrouping=2;
+    ChaseGrouping=5;
 }
 
 void xTesterFrame::OnRadioButtonDimSelect(wxCommandEvent& event)
