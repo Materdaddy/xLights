@@ -1,6 +1,7 @@
 #include "AddShowDialog.h"
 
 //(*InternalHeaders(AddShowDialog)
+#include <wx/font.h>
 #include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
@@ -10,9 +11,13 @@
 const long AddShowDialog::ID_STATICTEXT1 = wxNewId();
 const long AddShowDialog::ID_CHOICE_PLAYLIST = wxNewId();
 const long AddShowDialog::ID_STATICTEXT5 = wxNewId();
-const long AddShowDialog::ID_CHOICE_STARTTIME = wxNewId();
+const long AddShowDialog::ID_SPINCTRL1 = wxNewId();
+const long AddShowDialog::ID_STATICTEXT8 = wxNewId();
+const long AddShowDialog::ID_SPINCTRL2 = wxNewId();
 const long AddShowDialog::ID_STATICTEXT6 = wxNewId();
-const long AddShowDialog::ID_CHOICE_ENDTIME = wxNewId();
+const long AddShowDialog::ID_SPINCTRL3 = wxNewId();
+const long AddShowDialog::ID_STATICTEXT9 = wxNewId();
+const long AddShowDialog::ID_SPINCTRL4 = wxNewId();
 const long AddShowDialog::ID_STATICTEXT2 = wxNewId();
 const long AddShowDialog::ID_CHECKBOX_REPEAT = wxNewId();
 const long AddShowDialog::ID_STATICTEXT3 = wxNewId();
@@ -39,7 +44,9 @@ AddShowDialog::AddShowDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 {
 	//(*Initialize(AddShowDialog)
 	wxFlexGridSizer* FlexGridSizer4;
+	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
+	wxFlexGridSizer* FlexGridSizer2;
 	wxBoxSizer* BoxSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
@@ -51,16 +58,41 @@ AddShowDialog::AddShowDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Playlist"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer4->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	ChoicePlayList = new wxChoice(this, ID_CHOICE_PLAYLIST, wxDefaultPosition, wxSize(113,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_PLAYLIST"));
-	FlexGridSizer4->Add(ChoicePlayList, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(ChoicePlayList, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Start Time"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer4->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	ChoiceStartTime = new wxChoice(this, ID_CHOICE_STARTTIME, wxDefaultPosition, wxSize(80,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_STARTTIME"));
-	FlexGridSizer4->Add(ChoiceStartTime, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
+	SpinCtrlStartHour = new wxSpinCtrl(this, ID_SPINCTRL1, _T("18"), wxDefaultPosition, wxSize(52,21), wxSP_ARROW_KEYS, 0, 23, 18, _T("ID_SPINCTRL1"));
+	SpinCtrlStartHour->SetValue(_T("18"));
+	SpinCtrlStartHour->SetToolTip(_("Start hour (0-23)"));
+	FlexGridSizer2->Add(SpinCtrlStartHour, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _(":"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	wxFont StaticText8Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	StaticText8->SetFont(StaticText8Font);
+	FlexGridSizer2->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	SpinCtrlStartMinute = new wxSpinCtrl(this, ID_SPINCTRL2, _T("0"), wxDefaultPosition, wxSize(52,21), wxSP_ARROW_KEYS|wxSP_WRAP, 0, 59, 0, _T("ID_SPINCTRL2"));
+	SpinCtrlStartMinute->SetValue(_T("0"));
+	SpinCtrlStartMinute->SetToolTip(_("Start minute (0-59)"));
+	FlexGridSizer2->Add(SpinCtrlStartMinute, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("End Time"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer4->Add(StaticText6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	ChoiceEndTime = new wxChoice(this, ID_CHOICE_ENDTIME, wxDefaultPosition, wxSize(80,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_ENDTIME"));
-	FlexGridSizer4->Add(ChoiceEndTime, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	SpinCtrlEndHour = new wxSpinCtrl(this, ID_SPINCTRL3, _T("21"), wxDefaultPosition, wxSize(52,21), wxSP_ARROW_KEYS, 0, 23, 21, _T("ID_SPINCTRL3"));
+	SpinCtrlEndHour->SetValue(_T("21"));
+	SpinCtrlEndHour->SetToolTip(_("End hour (0-23)"));
+	FlexGridSizer3->Add(SpinCtrlEndHour, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _(":"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+	wxFont StaticText9Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	StaticText9->SetFont(StaticText9Font);
+	FlexGridSizer3->Add(StaticText9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	SpinCtrlEndMinute = new wxSpinCtrl(this, ID_SPINCTRL4, _T("0"), wxDefaultPosition, wxSize(52,21), wxSP_ARROW_KEYS|wxSP_WRAP, 0, 59, 0, _T("ID_SPINCTRL4"));
+	SpinCtrlEndMinute->SetValue(_T("0"));
+	SpinCtrlEndMinute->SetToolTip(_("End minute (0-59)"));
+	FlexGridSizer3->Add(SpinCtrlEndMinute, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(FlexGridSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Repeat"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2->SetToolTip(_("Repeat playlist until scheduled end time"));
 	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	CheckBoxRepeat = new wxCheckBox(this, ID_CHECKBOX_REPEAT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_REPEAT"));
 	CheckBoxRepeat->SetValue(false);

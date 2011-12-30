@@ -89,6 +89,7 @@
 										<object class="sizeritem">
 											<object class="wxButton" name="ID_BUTTON_EXPORT" variable="ButtonExport" member="yes">
 												<label>Export</label>
+												<hidden>1</hidden>
 												<handler function="OnButtonExportClick" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxLEFT|wxRIGHT|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>

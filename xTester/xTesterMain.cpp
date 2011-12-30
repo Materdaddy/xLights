@@ -242,6 +242,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer17->AddGrowableCol(0);
     ButtonExport = new wxButton(Panel3, ID_BUTTON_EXPORT, _("Export"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_EXPORT"));
+    ButtonExport->Hide();
     FlexGridSizer17->Add(ButtonExport, 1, wxLEFT|wxRIGHT|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     Button1 = new wxButton(Panel3, ID_BUTTON1, _("All Lights Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     FlexGridSizer17->Add(Button1, 0, wxALIGN_RIGHT|wxALIGN_TOP, 0);
@@ -460,7 +461,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     RadioButtonAutoOn = new wxRadioButton(PanelAutoTest, ID_RADIOBUTTON27, _("Run Automated Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON27"));
     FlexGridSizer12->Add(RadioButtonAutoOn, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(FlexGridSizer12, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
-    FlexGridSizer8->Add(0,0,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer8->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ListBoxAutoTest = new wxListBox(PanelAutoTest, ID_LISTBOX_AUTOTEST, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_LISTBOX_AUTOTEST"));
     ListBoxAutoTest->Append(_("Intensity 100%"));
     ListBoxAutoTest->Append(_("Intensity 50%"));
@@ -595,17 +596,18 @@ void xTesterFrame::OnAbout(wxCommandEvent& event)
 
 void xTesterFrame::OnTimer(wxTimerEvent& event) {
     static int LastNotebookSelection = -1;
-    static int LastBgIntensity,LastFgIntensity;
-    static int LastRgbValue[3];
+    static int LastBgIntensity,LastFgIntensity,LastBgColor[3],LastFgColor[3];
     static int LastSequenceSpeed;
     static int LastAutomatedTest;
     static long NextSequenceStart = -1;
     static TestFunctions LastFunc = OFF;
     static unsigned int interval, rgbCycle, seqidx;
-    static wxArrayInt chArray;
+    static wxArrayInt chArray,TwinkleState;
     static float frequency;
-    int v,n,ch,rgbChannel,color[3],BgIntensity,FgIntensity;
+	static int twinkleperiod = 400;
+    int v,ch,BgIntensity,FgIntensity,BgColor[3],FgColor[3];
     unsigned int i;
+    bool ColorChange;
     /*
     static bool loggingEnabled=false;
     if (CheckBoxRunSh->IsChecked() && !loggingEnabled) {
@@ -646,6 +648,10 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
         LastBgIntensity=-1;
         LastFgIntensity=-1;
         LastAutomatedTest=-1;
+        for (i=0; i < 3; i++) {
+            LastBgColor[i] = -1;
+            LastFgColor[i] = -1;
+        }
         CheckChannelList = false;
     }
 
@@ -692,13 +698,13 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
                         for (i=0; i < chArray.Count(); i++) {
                             xout.twinkle(netidx, chArray[i], TWINKLE_PERIOD, v);
                         }
-                        StatusBar1->SetStatusText(wxString::Format(_("Twinkling %d channels, intentiy=%d"),chArray.Count(),v));
+                        StatusBar1->SetStatusText(wxString::Format(_("Twinkling %d channels, intensity=%d"),chArray.Count(),v));
                         break;
                     case SHIMMER:
                         for (i=0; i < chArray.Count(); i++) {
                             xout.shimmer(netidx, chArray[i], SHIMMER_PERIOD, v);
                         }
-                        StatusBar1->SetStatusText(wxString::Format(_("Shimmering %d channels, speed=%d"),chArray.Count(),interval));
+                        StatusBar1->SetStatusText(wxString::Format(_("Shimmering %d channels, intensity=%d"),chArray.Count(),v));
                         break;
                     default: break;
                 }
@@ -708,54 +714,106 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
 
         case 2:
             // RGB chase
-            if (RadioButtonRgbChase->GetValue()) {
-                v=SliderRgbChaseSpeed->GetValue();  // 0-100
-                if (v != LastSequenceSpeed) {
-                    interval = 1600 - v*15;
-                    if (seqidx < chArray.Count()) {
-                        NextSequenceStart = curtime + interval;
-                    }
-                    LastSequenceSpeed = v;
-                    StatusBar1->SetStatusText(wxString::Format(_("Turning on %d channels in sequence, speed=%d"),chArray.Count(),interval));
+            v=SliderRgbChaseSpeed->GetValue();  // 0-100
+            BgColor[0] = SliderBgColorA->GetValue();
+            BgColor[1] = SliderBgColorB->GetValue();
+            BgColor[2] = SliderBgColorC->GetValue();
+            FgColor[0] = SliderFgColorA->GetValue();
+            FgColor[1] = SliderFgColorB->GetValue();
+            FgColor[2] = SliderFgColorC->GetValue();
+
+            if (v != LastSequenceSpeed) {
+                interval = 1600 - v*15;
+                NextSequenceStart = curtime + interval;
+                LastSequenceSpeed = v;
+                StatusBar1->SetStatusText(wxString::Format(_("RGB Chasing %d channels, speed=%d"),chArray.Count(),interval));
+            }
+            for (ColorChange=false,i=0; i < 3; i++) {
+                ColorChange |= (BgColor[i] != LastBgColor[i]);
+                ColorChange |= (FgColor[i] != LastFgColor[i]);
+            }
+            if (curtime >= NextSequenceStart || ColorChange) {
+                for (i=0; i < chArray.Count(); i++) {
+                    v = (i / 3 % ChaseGrouping) == seqidx ? FgColor[i % 3] : BgColor[i % 3];
+                    xout.SetIntensity(netidx, chArray[i], v);
                 }
-                if (curtime >= NextSequenceStart && chArray.Count() > 0) {
-                    if (seqidx < chArray.Count()) xout.off(netidx, chArray[seqidx]);
+                for (i=0; i < 3; i++) {
+                    LastBgColor[i] = BgColor[i];
+                    LastFgColor[i] = FgColor[i];
+                }
+                if (curtime >= NextSequenceStart) {
                     NextSequenceStart = curtime + interval;
-                    seqidx++;
-                    if (seqidx >= chArray.Count()) seqidx=0;
-                    xout.SetIntensity(netidx, chArray[seqidx], MAXINTENSITY);
+                    seqidx = (seqidx + 1) % ChaseGrouping;
+                    if (seqidx >= (chArray.Count()+2) / 3) seqidx=0;
                 }
-            } else if (RadioButtonRgbChase->GetValue()) {
-            } else if (RadioButtonRgbChase3->GetValue()) {
-            } else if (RadioButtonRgbChase4->GetValue()) {
-            } else if (RadioButtonRgbAlt->GetValue()) {
-            } else {
-                LastSequenceSpeed=-1;
             }
             break;
 
         case 3:
             // RGB dim, twinkle, shimmer
-            if (RadioButtonRgbDim->GetValue()) {
-                // RGB Color
-                color[0]=SliderDimColorA->GetValue();
-                color[1]=SliderDimColorB->GetValue();
-                color[2]=SliderDimColorC->GetValue();
-                if (color[0] != LastRgbValue[0] || color[1] != LastRgbValue[1] || color[2] != LastRgbValue[2]) {
-                    for (ch=0,n=0,rgbChannel=0; ch < maxch; ch++) {
-                        if (lb->IsChecked(ch)) {
-                            xout.SetIntensity(netidx, ch, color[rgbChannel]);
-                            n++;
-                            rgbChannel=(rgbChannel + 1) % 3;
+            BgColor[0]=SliderDimColorA->GetValue();
+            BgColor[1]=SliderDimColorB->GetValue();
+            BgColor[2]=SliderDimColorC->GetValue();
+            switch (TestFunc) {
+                case DIM:
+                    for (ColorChange=false,i=0; i < 3; i++) {
+                        ColorChange |= (BgColor[i] != LastBgColor[i]);
+                    }
+                    if (ColorChange) {
+                        for (i=0; i < chArray.Count(); i++) {
+                            xout.SetIntensity(netidx, chArray[i], BgColor[i % 3]);
+                        }
+                        StatusBar1->SetStatusText(wxString::Format(_("RGB Dimming %d channels"),chArray.Count()));
+                        for (i=0; i < 3; i++) {
+                            LastBgColor[i] = BgColor[i];
                         }
                     }
-                    LastRgbValue[0] = color[0];
-                    LastRgbValue[1] = color[1];
-                    LastRgbValue[2] = color[2];
-                    StatusBar1->SetStatusText(wxString::Format(_("Dimming %d channels to %d %d %d"),n,color[0],color[1],color[2]));
-                }
-            } else if (RadioButtonRgbTwinkle->GetValue()) {
-            } else if (RadioButtonRgbShimmer->GetValue()) {
+                    break;
+
+                case TWINKLE:
+                    if (LastSequenceSpeed < 0) {
+                        StatusBar1->SetStatusText(wxString::Format(_("RGB Twinkling %d channels"),chArray.Count()));
+                        LastSequenceSpeed=0;
+                        TwinkleState.Clear();
+                        for (i=0; i < chArray.Count(); i+=3) {
+                            TwinkleState.Add(static_cast<int>(rand01()*2.0) * 2 - 1);  // +1 or -1
+                        }
+                    }
+                    for (i=0; i < TwinkleState.Count(); i++) {
+                        if (TwinkleState[i] < -1) {
+                            // off
+                            TwinkleState[i]++;
+                        } else if (TwinkleState[i] > 1) {
+                            // on
+                            TwinkleState[i]--;
+                        } else if (TwinkleState[i] == -1) {
+                            // was off, now turn on for random period
+                            TwinkleState[i]=static_cast<int>(rand01()*twinkleperiod+100) / XTIMER_INTERVAL;
+                            seqidx = i * 3;
+                            xout.SetIntensity(netidx, seqidx, BgColor[0]);
+                            xout.SetIntensity(netidx, seqidx+1, BgColor[1]);
+                            xout.SetIntensity(netidx, seqidx+2, BgColor[2]);
+                        } else {
+                            // was on, now turn off for random period
+                            TwinkleState[i]=-static_cast<int>(rand01()*twinkleperiod+100) / XTIMER_INTERVAL;
+                            seqidx = i * 3;
+                            xout.SetIntensity(netidx, seqidx, 0);
+                            xout.SetIntensity(netidx, seqidx+1, 0);
+                            xout.SetIntensity(netidx, seqidx+2, 0);
+                        }
+                    }
+                    break;
+                case SHIMMER:
+                    if (LastSequenceSpeed < 0) {
+                        StatusBar1->SetStatusText(wxString::Format(_("RGB Shimmering %d channels"),chArray.Count()));
+                        LastSequenceSpeed=0;
+                    }
+                    seqidx = seqidx == 0 ? 1 : 0;
+                    for (i=0; i < chArray.Count(); i++) {
+                        xout.SetIntensity(netidx, chArray[i], BgColor[i % 3] * seqidx);
+                    }
+                    break;
+                default: break;
             }
             break;
 
@@ -769,12 +827,12 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
                     StatusBar1->SetStatusText(wxString::Format(_("Color Cycle, speed=%d"),v));
                     LastSequenceSpeed = v;
                 }
-                color[0] = sin(frequency*seqidx + 0.0) * 127 + 128;
-                color[1] = sin(frequency*seqidx + 2.0) * 127 + 128;
-                color[2] = sin(frequency*seqidx + 4.0) * 127 + 128;
+                BgColor[0] = sin(frequency*seqidx + 0.0) * 127 + 128;
+                BgColor[1] = sin(frequency*seqidx + 2.0) * 127 + 128;
+                BgColor[2] = sin(frequency*seqidx + 4.0) * 127 + 128;
                 seqidx++;
                 for (i=0; i < chArray.Count(); i++) {
-                    xout.SetIntensity(netidx, chArray[i], color[i % 3]);
+                    xout.SetIntensity(netidx, chArray[i], BgColor[i % 3]);
                 }
             } else {
                 // RGB cycle
@@ -891,6 +949,12 @@ void xTesterFrame::OnTimer(wxTimerEvent& event) {
     xout.TimerEnd();
     wxLogTrace(wxT("xout"),wxT("Ending OnTimer"));
     //StatusBar1->SetStatusText(ts.Format(_("%S.%l")));
+}
+
+// return a random number between 0 and 1 inclusive
+double xTesterFrame::rand01()
+{
+    return (double)rand()/(double)RAND_MAX;
 }
 
 void xTesterFrame::LoadFile()
@@ -1132,3 +1196,4 @@ void xTesterFrame::OnRadioButtonShimmerSelect(wxCommandEvent& event)
 {
     TestFunc=SHIMMER;
 }
+

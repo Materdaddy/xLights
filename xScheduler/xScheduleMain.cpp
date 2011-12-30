@@ -675,16 +675,6 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     xout = new xOutput();
     ResetTimer(NO_SEQ);
 
-    // set time format
-
-    if (wxDateTime::GetCountry() == wxDateTime::USA) {
-        datefmt=_("%b %d");
-        timefmt=_("%I:%M %p");
-    } else {
-        datefmt=_("%d %b");
-        timefmt=_("%X");
-    }
-
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
     if ( !config->Read(_("LastDir"), &CurrentDir) ) {
@@ -2671,31 +2661,16 @@ void xScheduleFrame::OnAuiToolBarItemPlayClick(wxCommandEvent& event)
     RunPlaylist(selidx,userscript);
 }
 
-// convert ChoiceBox index to hhmm
-int xScheduleFrame::TimeIdx2Time(int TimeIdx) {
-    return (TimeIdx / 4) * 100 + (TimeIdx % 4) * 15;
-}
-
 // convert hhmm string to seconds past midnight
+// 23:59 is treated as 23:59:59
 int xScheduleFrame::Time2Seconds(const wxString& hhmm) {
     long t;
-    if (hhmm.ToLong(&t)) {
+    if (hhmm == wxT("2359")) {
+        return 24*60*60 - 1;
+    } else if (hhmm.ToLong(&t)) {
         int hh=t / 100;
         int mm=t % 100;
         return hh*60*60+mm*60;
-    } else {
-        return 0;
-    }
-}
-
-
-// convert hhmm string to ChoiceBox index
-int xScheduleFrame::Time2TimeIdx(const wxString& hhmm) {
-    long t;
-    if (hhmm.ToLong(&t)) {
-        int hh=t / 100;
-        int mm=t % 100;
-        return (hh * 4) + (mm / 15);
     } else {
         return 0;
     }
@@ -2710,23 +2685,11 @@ void xScheduleFrame::PopulateShowDialog(AddShowDialog& dialog) {
     for (int i=FixedPages; i < cnt; i++) {
         dialog.ChoicePlayList->AppendString(Notebook1->GetPageText(i));
     }
-
-    // populate start & end times
-
-    wxDateTime t;
-    dialog.ChoiceStartTime->AppendString(_("midnight"));
-    t.Set(0,15,0,0); // 15 minutes after midnight
-    for (int i=0; i<95; i++) {
-        dialog.ChoiceStartTime->AppendString(t.Format(timefmt));
-        dialog.ChoiceEndTime->AppendString(t.Format(timefmt));
-        t+=wxTimeSpan::Minutes(15);
-    }
-    dialog.ChoiceEndTime->AppendString(_("midnight"));
 }
 
 void xScheduleFrame::OnButtonAddShowClick(wxCommandEvent& event)
 {
-    int StartTimeIdx, EndTimeIdx;
+    int StartTime, EndTime;
     wxString Playlist, PartialCode;
     int cnt = Notebook1->GetPageCount();
     if (cnt < FixedPages) {
@@ -2742,21 +2705,13 @@ void xScheduleFrame::OnButtonAddShowClick(wxCommandEvent& event)
             wxMessageBox(_("Select a playlist."), _("Error"));
             continue;
         }
-        StartTimeIdx=dialog.ChoiceStartTime->GetSelection();
-        if (StartTimeIdx == wxNOT_FOUND) {
-            wxMessageBox(_("Select a start time."), _("Error"));
-            continue;
-        }
-        EndTimeIdx=dialog.ChoiceEndTime->GetSelection();
-        if (EndTimeIdx == wxNOT_FOUND) {
-            wxMessageBox(_("Select an end time."), _("Error"));
-            continue;
-        }
-        if (StartTimeIdx > EndTimeIdx) {
+        StartTime = dialog.SpinCtrlStartHour->GetValue()*100 + dialog.SpinCtrlStartMinute->GetValue();
+        EndTime = dialog.SpinCtrlEndHour->GetValue()*100 + dialog.SpinCtrlEndMinute->GetValue();
+        if (StartTime >= EndTime) {
             wxMessageBox(_("Start time must be before end time."), _("Error"));
             continue;
         }
-        PartialCode.Printf(wxT("%04d-%04d %c%c%c "),TimeIdx2Time(StartTimeIdx),TimeIdx2Time(EndTimeIdx+1),
+        PartialCode.Printf(wxT("%04d-%04d %c%c%c "),StartTime,EndTime,
                          dialog.CheckBoxRepeat->IsChecked() ? 'R' : '-',
                          dialog.CheckBoxFirstItem->IsChecked() ? 'F' : '-',
                          dialog.CheckBoxLastItem->IsChecked() ? 'L' : '-');
@@ -2843,7 +2798,7 @@ void xScheduleFrame::AddShow(wxDateTime::WeekDay wkday, const wxString& StartSto
 
 void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
 {
-    int StartTimeIdx, EndTimeIdx;
+    int StartTimeInt, EndTimeInt;
     wxString SchedCode, StartTime, EndTime, RepeatOptions, Playlist, PartialCode;
     int WkDay;
     wxArrayInt selections;
@@ -2868,12 +2823,17 @@ void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
     // allow all fields to be updated
     UnpackSchedCode(SchedCode, &WkDay, StartTime, EndTime, RepeatOptions, Playlist);
     dialog.ChoicePlayList->SetStringSelection(Playlist);
-    dialog.ChoiceStartTime->SetSelection(Time2TimeIdx(StartTime));
-    dialog.ChoiceEndTime->SetSelection(Time2TimeIdx(EndTime)-1);
+
+    dialog.SpinCtrlStartHour->SetValue(StartTime.Left(2));
+    dialog.SpinCtrlStartMinute->SetValue(StartTime.Mid(2));
+    dialog.SpinCtrlEndHour->SetValue(EndTime.Left(2));
+    dialog.SpinCtrlEndMinute->SetValue(EndTime.Mid(2));
+
     dialog.CheckBoxRepeat->SetValue(RepeatOptions[0]=='R');
     dialog.CheckBoxFirstItem->SetValue(RepeatOptions[1]=='F');
     dialog.CheckBoxLastItem->SetValue(RepeatOptions[2]=='L');
     dialog.CheckBoxRandom->SetValue(RepeatOptions[3]=='X');
+
     dialog.CheckBoxSu->SetValue(wxDateTime::Sun==WkDay);
     dialog.CheckBoxMo->SetValue(wxDateTime::Mon==WkDay);
     dialog.CheckBoxTu->SetValue(wxDateTime::Tue==WkDay);
@@ -2889,24 +2849,16 @@ void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
                 wxMessageBox(_("Select a playlist."), _("Error"));
                 continue;
             }
-            StartTimeIdx=dialog.ChoiceStartTime->GetSelection();
-            if (StartTimeIdx == wxNOT_FOUND) {
-                wxMessageBox(_("Select a start time."), _("Error"));
-                continue;
-            }
-            EndTimeIdx=dialog.ChoiceEndTime->GetSelection();
-            if (EndTimeIdx == wxNOT_FOUND) {
-                wxMessageBox(_("Select an end time."), _("Error"));
-                continue;
-            }
+            StartTimeInt = dialog.SpinCtrlStartHour->GetValue()*100 + dialog.SpinCtrlStartMinute->GetValue();
+            EndTimeInt = dialog.SpinCtrlEndHour->GetValue()*100 + dialog.SpinCtrlEndMinute->GetValue();
         }
-        if (StartTimeIdx != wxNOT_FOUND && EndTimeIdx != wxNOT_FOUND && StartTimeIdx > EndTimeIdx) {
+        if (StartTimeInt >= EndTimeInt) {
             wxMessageBox(_("Start time must be before end time."), _("Error"));
             continue;
         }
 
         ShowEvents.Remove(SchedCode);
-        PartialCode.Printf(wxT("%04d-%04d %c%c%c%c"),TimeIdx2Time(StartTimeIdx),TimeIdx2Time(EndTimeIdx+1),
+        PartialCode.Printf(wxT("%04d-%04d %c%c%c%c"),StartTimeInt,EndTimeInt,
                          dialog.CheckBoxRepeat->IsChecked() ? 'R' : '-',
                          dialog.CheckBoxFirstItem->IsChecked() ? 'F' : '-',
                          dialog.CheckBoxLastItem->IsChecked() ? 'L' : '-',

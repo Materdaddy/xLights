@@ -23,7 +23,7 @@
 								<object class="wxChoice" name="ID_CHOICE_PLAYLIST" variable="ChoicePlayList" member="yes">
 									<size>113,21</size>
 								</object>
-								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+								<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
 								<option>1</option>
 							</object>
@@ -36,10 +36,50 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxChoice" name="ID_CHOICE_STARTTIME" variable="ChoiceStartTime" member="yes">
-									<size>80,21</size>
+								<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+									<cols>3</cols>
+									<object class="sizeritem">
+										<object class="wxSpinCtrl" name="ID_SPINCTRL1" variable="SpinCtrlStartHour" member="yes">
+											<value>18</value>
+											<max>23</max>
+											<size>52,21</size>
+											<tooltip>Start hour (0-23)</tooltip>
+											<style>wxSP_ARROW_KEYS</style>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
+											<label>:</label>
+											<font>
+												<size>10</size>
+												<style>normal</style>
+												<weight>bold</weight>
+												<underlined>0</underlined>
+												<family>swiss</family>
+												<face></face>
+											</font>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxSpinCtrl" name="ID_SPINCTRL2" variable="SpinCtrlStartMinute" member="yes">
+											<value>0</value>
+											<max>59</max>
+											<size>52,21</size>
+											<tooltip>Start minute (0-59)</tooltip>
+											<style>wxSP_ARROW_KEYS|wxSP_WRAP</style>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
 								</object>
-								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
 								<option>1</option>
 							</object>
@@ -52,16 +92,56 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxChoice" name="ID_CHOICE_ENDTIME" variable="ChoiceEndTime" member="yes">
-									<size>80,21</size>
+								<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+									<cols>3</cols>
+									<object class="sizeritem">
+										<object class="wxSpinCtrl" name="ID_SPINCTRL3" variable="SpinCtrlEndHour" member="yes">
+											<value>21</value>
+											<max>23</max>
+											<size>52,21</size>
+											<tooltip>End hour (0-23)</tooltip>
+											<style>wxSP_ARROW_KEYS</style>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText9" member="yes">
+											<label>:</label>
+											<font>
+												<size>10</size>
+												<style>normal</style>
+												<weight>bold</weight>
+												<underlined>0</underlined>
+												<family>swiss</family>
+											</font>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxSpinCtrl" name="ID_SPINCTRL4" variable="SpinCtrlEndMinute" member="yes">
+											<value>0</value>
+											<max>59</max>
+											<size>52,21</size>
+											<tooltip>End minute (0-59)</tooltip>
+											<style>wxSP_ARROW_KEYS|wxSP_WRAP</style>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
 								</object>
-								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
 									<label>Repeat</label>
+									<tooltip>Repeat playlist until scheduled end time</tooltip>
 								</object>
 								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>

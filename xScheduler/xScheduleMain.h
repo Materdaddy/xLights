@@ -265,7 +265,6 @@ class xScheduleFrame: public wxFrame
         wxString CurrentDir;
         wxFileName networkFile;
         wxFileName scheduleFile;
-        wxString datefmt, timefmt;
         PlayerFrame* PlayerDlg;
         bool UnsavedChanges;
         bool PortsOK;
@@ -324,8 +323,6 @@ class xScheduleFrame: public wxFrame
         //std::string base64_decode(const wxString& encoded_string);
         void build_decoding_table();
         wxUint8 *base64_decode(const wxString& data, long *output_length);
-        int TimeIdx2Time(int TimeIdx);
-        int Time2TimeIdx(const wxString& hhmm);
         int Time2Seconds(const wxString& hhmm);
         void AddShow(wxDateTime::WeekDay wkday, const wxString& StartStop, const wxString& Playlist);
         void DisplaySchedule();

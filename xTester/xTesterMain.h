@@ -110,8 +110,6 @@ class xTesterFrame: public wxFrame
         void OnRadioButtonChase5Select(wxCommandEvent& event);
         //*)
 
-        void LoadFile();
-
         //(*Identifiers(xTesterFrame)
         static const long ID_STATICTEXT1;
         static const long ID_CHOICE_NUMSELECT;
@@ -264,6 +262,9 @@ class xTesterFrame: public wxFrame
         wxSlider* SliderDimColorC;
         wxSlider* SliderDimIntensity;
         //*)
+
+        void LoadFile();
+        double rand01();
 
         wxFileName networkFile;
         long LorMapping;
