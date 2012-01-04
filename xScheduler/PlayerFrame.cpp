@@ -49,10 +49,17 @@ PlayerFrame::PlayerFrame(wxWindow* parent,wxWindowID id,const wxPoint& pos,const
     //  Create and attach the media control
     //
     MediaCtrl = new wxMediaCtrl();
+    wxString MediaBackend;
+
+#ifdef __WXMSW__
+    // this causes Windows to use latest installed Windows Media Player version
+    // On XP, users were getting WMP 6.4 without this
+    MediaBackend = wxMEDIABACKEND_WMP10;
+#endif
 
     //  Make sure creation was successful
     bool bOK = MediaCtrl->Create(this, wxID_MEDIACTRL, wxEmptyString,
-                                    wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+                                    wxDefaultPosition, wxDefaultSize, wxBORDER_NONE, MediaBackend);
 
     wxASSERT_MSG(bOK, wxT("Could not create media control!"));
     wxUnusedVar(bOK);
