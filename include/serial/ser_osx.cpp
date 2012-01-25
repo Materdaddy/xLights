@@ -1,9 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ser_posix.cpp
-// Purpose:
-// Author:      Joachim Buermann (adapted for xLights by Matt Brown)
-// Id:          $Id: serport.cpp,v 1.1.1.1 2004/11/24 10:30:11 jb Exp $
-// Copyright:   (c) 2001 Joachim Buermann
+// Name:        ser_osx.cpp
+// Author:      Matt Brown
+// Copyright:   (c) 2012 Matt Brown
 // Licence:     wxWindows licence
 /////////////////////////////////////////////////////////////////////////////
 
@@ -14,14 +12,14 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-#include <linux/serial.h>
+#include <IOKit/serial/ioss.h>
 
 namespace ctb {
 
 /*!
   \class SerialPort
 
-  \brief linux version
+  \brief OS/X version
 */
 class SerialPort : public SerialPort_x
 {
@@ -68,7 +66,7 @@ class SerialPort : public SerialPort_x
        // With some systems, it is recommended to flush the serial port's
        // Output before closing it, in order to avoid a possible hang of
        // the process...
-       tcflush(fd, TCOFLUSH);
+       //tcflush(fd, TCOFLUSH);
 
        // Don't recover the orgin settings while the device is open. This
        // implicate a mismatched data output!
@@ -94,10 +92,6 @@ class SerialPort : public SerialPort_x
 
         // save the device name
         m_devname = devname;
-
-        // Fill the internal termios struct.
-        speed_t adBaudrate=AdaptBaudrate( baudrate );
-        cfsetspeed(&t, adBaudrate);
 
         // parity settings
         switch( protocol[1] ) {
@@ -128,40 +122,36 @@ class SerialPort : public SerialPort_x
           default:  t.c_cflag |= CS8; break;
         }
 
-        // this may overwrite the number of bits to 8
+        // set baud rate
+        speed_t adBaudrate=AdaptBaudrate( baudrate );
+        cfsetspeed(&t, adBaudrate);
+
+        // Set raw input (non-canonical) mode
         cfmakeraw(&t);
 
         // look out!
         // MIN = 1 means, in TIME (1/10 secs) defined timeout
         // will be started AFTER receiving the first byte
         // so we must set MIN = 0. (timeout starts immediately, abort
-        // also without readed byte)
+        // also when no input to read)
         t.c_cc[VMIN] = 0;
         // timeout in 1/10 secs
         // no timeout for non blocked transfer
         t.c_cc[VTIME] = 0;
+
+        /* Custom baud rates - NOT WORKING!!
+        
+        // custom baud rate ( OS/X version )
+        speed_t speed = baudrate;
+        if ( ioctl( fd, IOSSIOSPEED, &speed ) == -1 ) {
+            //printf( "Error %d calling ioctl( ..., IOSSIOSPEED, ... )\n", errno );
+            return -1;
+        }
+        
+        */
+
         // write the settings
         if (tcsetattr(fd,TCSANOW,&t) == -1) return -1;
-
-        if (adBaudrate==B38400 && baudrate!=38400) {
-
-          // custom baud rate - Linux version
-
-          struct serial_struct sstruct;
-          if(ioctl(fd, TIOCGSERIAL, &sstruct) < 0){
-              //printf("Error: could not get comm ioctl\n");
-              return -1;
-          }
-          sstruct.custom_divisor = sstruct.baud_base / baudrate;
-          sstruct.flags &= ~ASYNC_SPD_MASK;
-          sstruct.flags |= ASYNC_SPD_CUST;
-          if(ioctl(fd, TIOCSSERIAL, &sstruct) < 0){
-              //printf("Error: could not set custom comm baud divisor\n");
-              return -1;
-          }
-
-        }
-
 
        return fd;
     };

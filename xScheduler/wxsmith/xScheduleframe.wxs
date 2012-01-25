@@ -70,10 +70,18 @@
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_PLAY" variable="AuiToolBarItemPlay" member="yes">
 													<bitmap stock_id="xlights_play" stock_client="wxART_TOOLBAR" />
 													<shorthelp>Start Playlist</shorthelp>
-													<dropdown>1</dropdown>
 													<handler function="OnAuiToolBarItemPlayClick" entry="EVT_TOOL" />
 												</object>
 												<label>Start Playlist</label>
+												<enabled>0</enabled>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM_TEST" variable="AuiToolBarItemTest" member="yes">
+													<bitmap stock_id="xlights_test" stock_client="wxART_TOOLBAR" />
+													<shorthelp>Test Lights</shorthelp>
+													<handler function="OnAuiToolBarItemTestClick" entry="EVT_TOOL" />
+												</object>
+												<label>Test Lights</label>
 												<enabled>0</enabled>
 											</object>
 										</object>

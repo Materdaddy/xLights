@@ -77,9 +77,7 @@ class MainMenuFrame: public wxFrame
         static const long ID_BUTTON5;
         static const long ID_BUTTON_NETWORK_SETUP;
         static const long ID_BUTTON_SCHEDULE;
-        static const long ID_BUTTON_TEST;
         static const long ID_BUTTON_FILE_CONVERSION;
-        static const long ID_BUTTON_SEQUENCE;
         static const long ID_PANEL1;
         static const long idMenuOpen;
         static const long idMenuQuit;
@@ -89,7 +87,6 @@ class MainMenuFrame: public wxFrame
         //*)
 
         //(*Declarations(MainMenuFrame)
-        wxButton* ButtonSequence;
         wxButton* ButtonFileConversion;
         wxStaticText* StaticText2;
         wxPanel* Panel1;
@@ -101,7 +98,6 @@ class MainMenuFrame: public wxFrame
         wxStatusBar* StatusBar1;
         wxDirDialog* DirDialog1;
         wxButton* ButtonSchedule;
-        wxButton* ButtonTest;
         //*)
 
         wxString CurrentDir;

@@ -136,6 +136,10 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	GridNetwork->SetColLabelValue(2, _("Baud Rate or\nE1.31 Univ"));
     LorMapping = XLIGHTS_LORMAP_MULTI;
 
+#ifdef __WXOSX__
+    ButtonAddOpenDMX->Enable(false);
+#endif
+
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
     wxString CurrentDir;
@@ -330,9 +334,9 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
 	if (NetName == _("LOR")) {
 	    SerialDlg.SetLabel(_("LOR controllers attached\nto any LOR dongle"));
 	} else if (NetName == _("OpenDMX")) {
-	    SerialDlg.SetLabel(_("LOR or DMX controllers attached\nto an LOR dongle, D-Light dongle,\nHolidayCoro programming cable,\nor Entec Open DMX dongle"));
+	    SerialDlg.SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode) attached\nto an LOR dongle, D-Light dongle,\nHolidayCoro programming cable,\nor Entec Open DMX dongle"));
 	} else if (NetName == _("DMX")) {
-	    SerialDlg.SetLabel(_("LOR or DMX controllers attached to an\nEntec DMX USB Pro, Lynx DMX dongle,\nor DIYC RPM dongle"));
+	    SerialDlg.SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode) attached to an\nEntec DMX USB Pro, Lynx DMX dongle,\nDIYC RPM, or DMXking.com dongle"));
 	} else if (NetName == _("Pixelnet")) {
 	    SerialDlg.SetLabel(_("Pixelnet hub attached to a\nLynx Pixelnet dongle"));
 	}

@@ -62,6 +62,7 @@
 #include "DelListDialog.h"
 #include "WizardDialog.h"
 #include "AddShowDialog.h"
+#include "TestDialog.h"
 #include "../include/globals.h"
 #include "../include/xlights_out.cpp"
 
@@ -131,6 +132,7 @@ class xScheduleFrame: public wxFrame
 
         xOutput* xout;
         long SecondsRemaining;
+        int TxOverflowCnt;
         void BasicPrompt(char* prompt, char* buff, int size);
         void BasicOutput(char *msg);
         void BasicError(const char *msg);
@@ -174,6 +176,7 @@ class xScheduleFrame: public wxFrame
         void OnMenuItemConvert2VixenSelected(wxCommandEvent& event);
         void OnMenuItemSave2ConductorSelected(wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
+        void OnAuiToolBarItemTestClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -183,6 +186,7 @@ class xScheduleFrame: public wxFrame
         static const long ID_AUITOOLBARITEM_SAVE;
         static const long ID_AUITOOLBARITEM_STOP;
         static const long ID_AUITOOLBARITEM_PLAY;
+        static const long ID_AUITOOLBARITEM_TEST;
         static const long ID_AUITOOLBAR1;
         static const long ID_PANEL2;
         static const long ID_LISTBOX_SCHED;
@@ -287,6 +291,7 @@ class xScheduleFrame: public wxFrame
         wxArrayString ShowEvents;
         wxUint8* VixEventData;
         wxUint8 decoding_table[256];
+        TestDialog* pTestDialog;
 
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         wxString LorNetDesc(int netnum);
@@ -331,6 +336,8 @@ class xScheduleFrame: public wxFrame
         void UnpackSchedCode(const wxString& SchedCode, int* WkDay, wxString& StartTime, wxString& EndTime, wxString& RepeatOptions, wxString& Playlist);
         void ForceScheduleCheck();
         void CheckRunSchedule();
+        void PerformTesting();
+        double rand01();
 
         void OnTimer(wxTimerEvent& event);
         void OnSchedTimer(wxTimerEvent& event);

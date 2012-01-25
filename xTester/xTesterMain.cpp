@@ -370,7 +370,7 @@ xTesterFrame::xTesterFrame(wxWindow* parent,wxWindowID id) : timer(this, ID_TIME
     SliderRgbChaseSpeed = new wxSlider(Panel_RGB, ID_SLIDER2, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_VERTICAL|wxSL_LABELS|wxSL_INVERSE|wxSIMPLE_BORDER, wxDefaultValidator, _T("ID_SLIDER2"));
     FlexGridSizer14->Add(SliderRgbChaseSpeed, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer1->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
-    FlexGridSizer1->Add(0,0,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer1->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel_RGB->SetSizer(FlexGridSizer1);
     FlexGridSizer1->SetSizeHints(Panel_RGB);
     Panel_RGB_Cycle = new wxPanel(Notebook1, ID_PANEL_RGB_CYCLE, wxPoint(71,15), wxSize(392,209), wxTAB_TRAVERSAL, _T("ID_PANEL_RGB_CYCLE"));
@@ -996,7 +996,7 @@ NetworkInfo* xTesterFrame::AddNetwork(const wxString& NetworkType, const wxStrin
     wxArrayString chNames;
     if (net3 == wxT("LOR") || net3 == wxT("D-L")) {
         for (int i=0; i < MaxChannels; i++) {
-            chNames.Add( wxString::Format(_T("Unit %d.%02d"), (i >> 4)+1, (i & 0x0F)+1 ));
+            chNames.Add( wxString::Format(_T("Unit %02X.%d"), (i >> 4)+1, (i & 0x0F)+1 ));
         }
     } else {
         for (int i=1; i <= MaxChannels; i++) {

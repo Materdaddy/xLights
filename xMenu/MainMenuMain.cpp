@@ -69,9 +69,7 @@ const long MainMenuFrame::ID_STATICTEXT2 = wxNewId();
 const long MainMenuFrame::ID_BUTTON5 = wxNewId();
 const long MainMenuFrame::ID_BUTTON_NETWORK_SETUP = wxNewId();
 const long MainMenuFrame::ID_BUTTON_SCHEDULE = wxNewId();
-const long MainMenuFrame::ID_BUTTON_TEST = wxNewId();
 const long MainMenuFrame::ID_BUTTON_FILE_CONVERSION = wxNewId();
-const long MainMenuFrame::ID_BUTTON_SEQUENCE = wxNewId();
 const long MainMenuFrame::ID_PANEL1 = wxNewId();
 const long MainMenuFrame::idMenuOpen = wxNewId();
 const long MainMenuFrame::idMenuQuit = wxNewId();
@@ -127,19 +125,12 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     ButtonNetworkSetup = new wxButton(Panel1, ID_BUTTON_NETWORK_SETUP, _("Network Setup"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_NETWORK_SETUP"));
     ButtonNetworkSetup->Disable();
     BoxSizer3->Add(ButtonNetworkSetup, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonSchedule = new wxButton(Panel1, ID_BUTTON_SCHEDULE, _("Scheduler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SCHEDULE"));
+    ButtonSchedule = new wxButton(Panel1, ID_BUTTON_SCHEDULE, _("Schedule && Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SCHEDULE"));
     ButtonSchedule->Disable();
     BoxSizer3->Add(ButtonSchedule, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonTest = new wxButton(Panel1, ID_BUTTON_TEST, _("Lighting Test"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEST"));
-    ButtonTest->Disable();
-    BoxSizer3->Add(ButtonTest, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ButtonFileConversion = new wxButton(Panel1, ID_BUTTON_FILE_CONVERSION, _("File Conversion"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_FILE_CONVERSION"));
     ButtonFileConversion->Disable();
     BoxSizer3->Add(ButtonFileConversion, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ButtonSequence = new wxButton(Panel1, ID_BUTTON_SEQUENCE, _("Sequencer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SEQUENCE"));
-    ButtonSequence->Disable();
-    ButtonSequence->Hide();
-    BoxSizer3->Add(ButtonSequence, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(BoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel1->SetSizer(FlexGridSizer1);
     FlexGridSizer1->Fit(Panel1);
@@ -172,9 +163,7 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(ID_BUTTON_NETWORK_SETUP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonNetworkSetupClick);
     Connect(ID_BUTTON_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonScheduleClick);
-    Connect(ID_BUTTON_TEST,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonTestClick);
     Connect(ID_BUTTON_FILE_CONVERSION,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonFileConversionClick);
-    Connect(ID_BUTTON_SEQUENCE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MainMenuFrame::OnButtonSequenceClick);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuOpenFolderSelected);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnQuit);
     Connect(idMenuHelpContent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuItemHelpContentSelected);
@@ -310,9 +299,7 @@ void MainMenuFrame::SetButtonEnable() {
     netFile.AssignDir( CurrentDir );
     netFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     FileExists = netFile.FileExists();
-    //ButtonSequence->Enable(FileExists);
     ButtonSchedule->Enable(FileExists);
-    ButtonTest->Enable(FileExists);
     ButtonFileConversion->Enable(FileExists);
 }
 
@@ -351,21 +338,10 @@ void MainMenuFrame::OnButtonNetworkSetupClick(wxCommandEvent& event)
     SetButtonEnable();
 }
 
-void MainMenuFrame::OnButtonSequenceClick(wxCommandEvent& event)
-{
-    Exec(_("xSequencer"));
-}
-
 void MainMenuFrame::OnButtonScheduleClick(wxCommandEvent& event)
 {
     Exec(_("xScheduler"));
 }
-
-void MainMenuFrame::OnButtonTestClick(wxCommandEvent& event)
-{
-    Exec(_("xTester"));
-}
-
 
 void MainMenuFrame::OnMenuItemHelpContentSelected(wxCommandEvent& event)
 {

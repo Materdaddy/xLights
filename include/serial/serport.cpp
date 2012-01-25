@@ -98,6 +98,8 @@ class SerialPort_x
 
 #ifdef __WXMSW__
 # include "ser_win32.cpp"
+#elif defined __WXOSX__
+# include "ser_osx.cpp"
 #else
 # include "ser_posix.cpp"
 #endif

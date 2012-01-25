@@ -65,6 +65,11 @@ public:
     if (serptr) serptr->Close();
   };
 
+  bool TxEmpty() {
+    if (serptr) return (serptr->WaitingToWrite() == 0);
+    return true;
+  };
+  
   wxByte MapIntensity(wxByte intensity) {
     return IntensityMap[intensity];
   };
@@ -630,7 +635,7 @@ public:
 
     data[115]=0x72;  // DMP Protocol flags and length (high)
     data[116]=0x0b;  // 0x20b = 638 - 115
-    data[117]=0x00;  // DMP Vector (Identifies DMP Set Property Message PDU)
+    data[117]=0x02;  // DMP Vector (Identifies DMP Set Property Message PDU)
     data[118]=0xa1;  // DMP Address Type & Data Type
     data[119]=0x00;  // First Property Address (high)
     data[120]=0x00;  // First Property Address (low)
@@ -1114,5 +1119,12 @@ public:
     for(size_t i=0; i < networks.GetCount(); ++i) {
       networks[i]->CloseSerialPort();
     }
+  };
+  
+  bool TxEmpty() {
+    for(size_t i=0; i < networks.GetCount(); ++i) {
+      if (!networks[i]->TxEmpty()) return false;
+    }
+    return true;
   };
 };
