@@ -25,13 +25,13 @@
 #define XSCHEDULEMAIN_H
 
 //(*Headers(xScheduleFrame)
+#include <wx/treectrl.h>
 #include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
-#include <wx/listbox.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/bmpbuttn.h>
@@ -52,6 +52,7 @@
 #include <wx/file.h>
 #include <wx/timer.h>
 #include <wx/xml/xml.h>
+#include <wx/listctrl.h>
 
 #include <set>
 #include <map>
@@ -63,6 +64,8 @@
 #include "WizardDialog.h"
 #include "AddShowDialog.h"
 #include "TestDialog.h"
+#include "StopDialog.h"
+#include "ShowDatesDialog.h"
 #include "../include/globals.h"
 #include "../include/xlights_out.cpp"
 
@@ -94,6 +97,16 @@ class LorEventClass
     LOR_ACTIONS action;
 };
 
+class SchedTreeData : public wxTreeItemData
+{
+protected:
+    wxString eventString;
+
+public:
+    SchedTreeData(const wxString& EventData = wxT("")) { eventString = EventData; };
+    wxString GetString() { return eventString; };
+};
+
 typedef std::set<std::pair<int, int> > GridSelection;
 typedef std::multimap<int, LorEventClass* > LorEventMap;
 typedef std::pair<int, LorEventClass* > LorEventPair;
@@ -115,6 +128,7 @@ class xScheduleFrame: public wxFrame
             DOWN_BUTTON,
             INFO_BUTTON,
             PLAY_BUTTON,
+            DELAY_BUTTON,
             CREATE_SCRIPT,
             PLAYLIST_LISTBOX,
             PLAYLIST_FILES,
@@ -131,7 +145,7 @@ class xScheduleFrame: public wxFrame
         virtual ~xScheduleFrame();
 
         xOutput* xout;
-        long SecondsRemaining;
+        long SecondsRemaining, EndTimeSec;
         int TxOverflowCnt;
         void BasicPrompt(char* prompt, char* buff, int size);
         void BasicOutput(char *msg);
@@ -177,6 +191,7 @@ class xScheduleFrame: public wxFrame
         void OnMenuItemSave2ConductorSelected(wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnAuiToolBarItemTestClick(wxCommandEvent& event);
+        void OnButtonShowDatesChangeClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xScheduleFrame)
@@ -189,13 +204,19 @@ class xScheduleFrame: public wxFrame
         static const long ID_AUITOOLBARITEM_TEST;
         static const long ID_AUITOOLBAR1;
         static const long ID_PANEL2;
-        static const long ID_LISTBOX_SCHED;
-        static const long ID_BITMAPBUTTON_SCHED_INFO;
+        static const long ID_TREECTRL1;
         static const long ID_CHECKBOX_RUN_SCHEDULE;
         static const long ID_BUTTON_ADD_SHOW;
+        static const long ID_BITMAPBUTTON_SCHED_INFO;
         static const long ID_BUTTON2;
         static const long ID_BUTTON_DELETE_SHOW;
         static const long ID_BUTTON_DESELECT;
+        static const long ID_STATICTEXT2;
+        static const long ID_BUTTON_SHOW_DATES_CHANGE;
+        static const long ID_STATICTEXT3;
+        static const long ID_STATICTEXT4;
+        static const long ID_STATICTEXT5;
+        static const long ID_STATICTEXT6;
         static const long ID_PANEL_CAL;
         static const long ID_BUTTON_CLEARLOG;
         static const long ID_BUTTON_SAVELOG;
@@ -226,18 +247,24 @@ class xScheduleFrame: public wxFrame
         wxNotebook* Notebook1;
         wxButton* ButtonClearLog;
         wxPanel* PanelLog;
+        wxStaticText* StaticText2;
+        wxStaticText* StaticTextShowEnd;
         wxTextCtrl* TextCtrlLog;
         wxMenuItem* MenuItemRefresh;
+        wxStaticText* StaticTextShowStart;
         wxPanel* Panel1;
         wxStaticText* StaticText1;
+        wxStaticText* StaticText3;
         wxButton* ButtonSaveLog;
         wxButton* ButtonDeselect;
-        wxListBox* ListBoxSched;
+        wxTreeCtrl* ListBoxSched;
         wxPanel* PanelCal;
         wxStatusBar* StatusBar1;
         wxButton* ButtonDeleteShow;
+        wxButton* ButtonShowDatesChange;
         wxPanel* Panel2;
         wxButton* ButtonUpdateShow;
+        wxStaticText* StaticText4;
         wxBitmapButton* BitmapButtonSchedInfo;
         wxButton* ButtonAddShow;
         //*)
@@ -278,7 +305,7 @@ class xScheduleFrame: public wxFrame
         wxTimer timer;
         wxTimer schedtimer;
         wxDateTime starttime;
-        wxDateTime::WeekDay LastWkDay;
+        wxString LastMoDay;
         PlayModes PlayMode;
         SeqPlayerStates SeqPlayerState;
         long VixEventPeriod;
@@ -292,6 +319,9 @@ class xScheduleFrame: public wxFrame
         wxUint8* VixEventData;
         wxUint8 decoding_table[256];
         TestDialog* pTestDialog;
+        wxDateTime ShowStartDate,ShowEndDate;
+        long DragRowIdx;
+        wxListCtrl* DragListBox;
 
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         wxString LorNetDesc(int netnum);
@@ -329,32 +359,39 @@ class xScheduleFrame: public wxFrame
         void build_decoding_table();
         wxUint8 *base64_decode(const wxString& data, long *output_length);
         int Time2Seconds(const wxString& hhmm);
-        void AddShow(wxDateTime::WeekDay wkday, const wxString& StartStop, const wxString& Playlist);
+        void AddShow(const wxDateTime& d, const wxString& StartStop, const wxString& Playlist);
         void DisplaySchedule();
-        int DisplayScheduleOneDay(wxDateTime::WeekDay wkday);
-        void PopulateShowDialog(AddShowDialog& dialog);
-        void UnpackSchedCode(const wxString& SchedCode, int* WkDay, wxString& StartTime, wxString& EndTime, wxString& RepeatOptions, wxString& Playlist);
+        int DisplayScheduleOneDay(const wxDateTime& d, const wxTreeItemId& root);
+        void PopulateShowDialog(AddShowDialog& dialog, wxSortedArrayString& SelectedDates);
+        void UnpackSchedCode(const wxString& SchedCode, wxString& StartTime, wxString& EndTime, wxString& RepeatOptions, wxString& Playlist);
         void ForceScheduleCheck();
         void CheckRunSchedule();
         void PerformTesting();
         double rand01();
+        long GetSelectedItem(wxListCtrl* ListBoxPlay);
+        void UpdateShowDates(const wxDateTime& NewStart, const wxDateTime NewEnd);
+        bool DisplayAddShowDialog(AddShowDialog& dialog);
+        int DeleteSelectedShows();
 
         void OnTimer(wxTimerEvent& event);
         void OnSchedTimer(wxTimerEvent& event);
         void OnFileTypeButtonClicked();
-        void OnPlaylistToggle();
         void OnButtonRunPlaylistClick();
         void OnButtonPlayItemClick();
         void OnScriptHelpClick(wxCommandEvent& event);
         void OnButtonUpClick();
         void OnButtonDownClick();
         void OnButtonInfoClick();
+        void OnButtonSetDelayClick();
         void OnButtonPlaylistAddClick();
         void OnButtonPlaylistAddAllClick();
         void OnButtonPlaylistDeleteClick();
         void OnButtonPlaylistDeleteAllClick();
         void OnButtonRemoveScriptClick(wxCommandEvent& event);
         void OnMediaEnd( wxCommandEvent &event );
+        void OnPlayListBeginDrag(wxListEvent& event);
+        void OnDragEnd(wxMouseEvent& event);
+        void OnDragQuit(wxMouseEvent& event);
 
         DECLARE_EVENT_TABLE()
 };

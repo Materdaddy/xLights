@@ -26,13 +26,8 @@ const long AddShowDialog::ID_STATICTEXT4 = wxNewId();
 const long AddShowDialog::ID_CHECKBOX_LAST_ITEM = wxNewId();
 const long AddShowDialog::ID_STATICTEXT7 = wxNewId();
 const long AddShowDialog::ID_CHECKBOX_RANDOM = wxNewId();
-const long AddShowDialog::ID_CHECKBOX4 = wxNewId();
-const long AddShowDialog::ID_CHECKBOX5 = wxNewId();
-const long AddShowDialog::ID_CHECKBOX6 = wxNewId();
-const long AddShowDialog::ID_CHECKBOX7 = wxNewId();
-const long AddShowDialog::ID_CHECKBOX_TH = wxNewId();
-const long AddShowDialog::ID_CHECKBOX_FR = wxNewId();
-const long AddShowDialog::ID_CHECKBOX_SA = wxNewId();
+const long AddShowDialog::ID_STATICTEXT10 = wxNewId();
+const long AddShowDialog::ID_LISTBOX1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(AddShowDialog,wxDialog)
@@ -47,7 +42,6 @@ AddShowDialog::AddShowDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
-	wxBoxSizer* BoxSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
 
@@ -112,30 +106,11 @@ AddShowDialog::AddShowDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	CheckBoxRandom = new wxCheckBox(this, ID_CHECKBOX_RANDOM, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RANDOM"));
 	CheckBoxRandom->SetValue(false);
 	FlexGridSizer4->Add(CheckBoxRandom, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer5->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
-	CheckBoxSu = new wxCheckBox(this, ID_CHECKBOX4, _("Su"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
-	CheckBoxSu->SetValue(false);
-	BoxSizer2->Add(CheckBoxSu, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-	CheckBoxMo = new wxCheckBox(this, ID_CHECKBOX5, _("Mo"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
-	CheckBoxMo->SetValue(false);
-	BoxSizer2->Add(CheckBoxMo, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-	CheckBoxTu = new wxCheckBox(this, ID_CHECKBOX6, _("Tu"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
-	CheckBoxTu->SetValue(false);
-	BoxSizer2->Add(CheckBoxTu, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-	CheckBoxWe = new wxCheckBox(this, ID_CHECKBOX7, _("We"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
-	CheckBoxWe->SetValue(false);
-	BoxSizer2->Add(CheckBoxWe, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-	CheckBoxTh = new wxCheckBox(this, ID_CHECKBOX_TH, _("Th"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_TH"));
-	CheckBoxTh->SetValue(false);
-	BoxSizer2->Add(CheckBoxTh, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-	CheckBoxFr = new wxCheckBox(this, ID_CHECKBOX_FR, _("Fr"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_FR"));
-	CheckBoxFr->SetValue(false);
-	BoxSizer2->Add(CheckBoxFr, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-	CheckBoxSa = new wxCheckBox(this, ID_CHECKBOX_SA, _("Sa"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_SA"));
-	CheckBoxSa->SetValue(false);
-	BoxSizer2->Add(CheckBoxSa, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-	FlexGridSizer5->Add(BoxSizer2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer5->Add(FlexGridSizer4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText10 = new wxStaticText(this, ID_STATICTEXT10, _("Apply to these dates\nUse shift-click or ctrl-click to select multiple dates"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+	FlexGridSizer5->Add(StaticText10, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	ListBoxDates = new wxListBox(this, ID_LISTBOX1, wxDefaultPosition, wxSize(231,87), 0, 0, wxLB_EXTENDED|wxLB_ALWAYS_SB, wxDefaultValidator, _T("ID_LISTBOX1"));
+	FlexGridSizer5->Add(ListBoxDates, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxSHAPED|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StdDialogButtonSizer1 = new wxStdDialogButtonSizer();
 	StdDialogButtonSizer1->AddButton(new wxButton(this, wxID_OK, wxEmptyString));
 	StdDialogButtonSizer1->AddButton(new wxButton(this, wxID_CANCEL, wxEmptyString));
@@ -154,3 +129,28 @@ AddShowDialog::~AddShowDialog()
 	//*)
 }
 
+// return true if start time is before end time
+bool AddShowDialog::StartBeforeEnd()
+{
+    return (SpinCtrlStartHour->GetValue() < SpinCtrlEndHour->GetValue()) ||
+        (SpinCtrlStartHour->GetValue() == SpinCtrlEndHour->GetValue() && SpinCtrlStartMinute->GetValue() < SpinCtrlEndMinute->GetValue());
+}
+
+// returns true if the user has selected a playlist
+bool AddShowDialog::IsPlaylistSelected()
+{
+    return (ChoicePlayList->GetSelection() != wxNOT_FOUND);
+}
+
+wxString AddShowDialog::PartialEventCode()
+{
+    wxString PartialCode;
+    int StartTime = SpinCtrlStartHour->GetValue()*100 + SpinCtrlStartMinute->GetValue();
+    int EndTime = SpinCtrlEndHour->GetValue()*100 + SpinCtrlEndMinute->GetValue();
+    PartialCode.Printf(wxT("%04d-%04d %c%c%c%c"),StartTime,EndTime,
+                     CheckBoxRepeat->IsChecked() ? 'R' : '-',
+                     CheckBoxFirstItem->IsChecked() ? 'F' : '-',
+                     CheckBoxLastItem->IsChecked() ? 'L' : '-',
+                     CheckBoxRandom->IsChecked() ? 'X' : '-');
+    return PartialCode;
+}

@@ -100,6 +100,10 @@
 		<Unit filename="DelListDialog.h" />
 		<Unit filename="PlayerFrame.cpp" />
 		<Unit filename="PlayerFrame.h" />
+		<Unit filename="ShowDatesDialog.cpp" />
+		<Unit filename="ShowDatesDialog.h" />
+		<Unit filename="StopDialog.cpp" />
+		<Unit filename="StopDialog.h" />
 		<Unit filename="TestDialog.cpp" />
 		<Unit filename="TestDialog.h" />
 		<Unit filename="WizardDialog.cpp" />
@@ -125,6 +129,8 @@
 					<wxDialog wxs="wxsmith/AddShowDialog.wxs" src="AddShowDialog.cpp" hdr="AddShowDialog.h" name="AddShowDialog" language="CPP" />
 					<wxFrame wxs="wxsmith/PlayerFrame.wxs" src="PlayerFrame.cpp" hdr="PlayerFrame.h" name="PlayerFrame" language="CPP" />
 					<wxDialog wxs="wxsmith/TestDialog.wxs" src="TestDialog.cpp" hdr="TestDialog.h" name="TestDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/StopDialog.wxs" src="StopDialog.cpp" hdr="StopDialog.h" name="StopDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ShowDatesDialog.wxs" src="ShowDatesDialog.cpp" hdr="ShowDatesDialog.h" name="ShowDatesDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

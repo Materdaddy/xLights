@@ -23,7 +23,7 @@ WizardDialog::WizardDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	//(*Initialize(WizardDialog)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
-
+	
 	Create(parent, id, _("Playback Options"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
 	SetClientSize(wxDefaultSize);
 	Move(wxDefaultPosition);
