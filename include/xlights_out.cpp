@@ -69,7 +69,7 @@ public:
     if (serptr) return (serptr->WaitingToWrite() == 0);
     return true;
   };
-  
+
   wxByte MapIntensity(wxByte intensity) {
     return IntensityMap[intensity];
   };
@@ -301,7 +301,8 @@ class xNetwork_Dimmer: public xNetwork {
 protected:
   std::list<int> timerCallbackList;
   std::vector<xChannel_Dimmer*> channels;
-  int datalen,changed;
+  int datalen;
+  bool changed;
 
   void AddChannelCallback (int channel) {
     timerCallbackList.remove(channel);  // ensure there are no lingering callbacks for this channel
@@ -406,25 +407,26 @@ public:
 
 // ******************************************************
 // * This class represents a single DMX universe
-// * Compatible with Entec Pro, Lynx DMX, and DIYC RPM dongles
-// * Methods should be called with: 0 <= chindex <= 511
+// * Compatible with Entec Pro, Lynx DMX, DIYC RPM, DMXking.com, and DIYblinky.com dongles
+// * Universes are exactly 512 bytes, except for DIYblinky, where they can be up to 3036 bytes
+// * Methods should be called with: 0 <= chindex < 3036
 // ******************************************************
 class xNetwork_DMXpro: public xNetwork_Dimmer {
 protected:
-  wxByte data[518];
+  wxByte data[3036+6];
 
   void SetMappedIntensity(int chindex, wxByte mappedintensity) {
     data[chindex+5]=mappedintensity;
     //printf("DMXentec::SetMappedIntensity channel=%d mapped-value=%d\n",chindex,(int)mappedintensity);
-    changed=1;
+    changed=true;
   };
 
 public:
   void SetChannelCount(int numchannels) {
-    if (numchannels > 512) {
-      throw "max channels on DMX is 512";
+    if (numchannels > 3036) {
+      throw "max channels on DMX is 3036";
     }
-    int len=513;   // entec supports this, but lynx does not: len=numchannels < 24 ? 25 : numchannels+1;
+    int len=numchannels < 512 ? 513 : numchannels+1;
     datalen=len+5;
     data[0]=0x7E;               // start of message
     data[1]=6;                  // dmx send
@@ -432,14 +434,14 @@ public:
     data[3]=(len >> 8) & 0xFF;  // length MSB
     data[4]=0;                  // DMX start
     data[datalen-1]=0xE7;       // end of message
-    changed=0;
+    changed=false;
     CreateChannels(numchannels);
   };
 
   void TimerEnd() {
     if (changed && serptr) {
       serptr->Write((char *)data,datalen);
-      changed=0;
+      changed=false;
     }
   };
 };
@@ -458,7 +460,7 @@ protected:
   void SetMappedIntensity(int chindex, wxByte mappedintensity) {
     data[chindex+1]=mappedintensity;
     //printf("DMXentec::SetMappedIntensity channel=%d mapped-value=%d\n",chindex,(int)mappedintensity);
-    changed=1;
+    changed=true;
   };
 
 public:
@@ -467,7 +469,7 @@ public:
       throw "max channels on DMX is 512";
     }
     data[0]=0;   // dmx start code
-    changed=0;
+    changed=false;
     CreateChannels(numchannels);
     SerialConfig[2]='2'; // use 2 stop bits so padding chars are not required
   };
@@ -477,7 +479,7 @@ public:
       serptr->SendBreak();  // sends a 1 millisecond break
       wxMilliSleep(1);      // mark after break (MAB) - 1 millisecond is overkill (8 microseconds is the minimum dmx requirement)
       serptr->Write((char *)data,513);
-      changed=0;
+      changed=false;
     }
   };
 };
@@ -501,7 +503,7 @@ protected:
 
   void SetMappedIntensity(int chindex, wxByte mappedintensity) {
     data[chindex+126]=mappedintensity;
-    changed=1;
+    changed=true;
   };
 
 public:
@@ -511,6 +513,8 @@ public:
     }
     SequenceNum=0;
     SkipCount=0;
+    wxByte UnivHi = UniverseNumber >> 8;   // Universe Number (high)
+    wxByte UnivLo = UniverseNumber & 0xff; // Universe Number (low)
 
     data[0]=0x00;   // RLP preamble size (high)
     data[1]=0x10;   // RLP preamble size (low)
@@ -630,8 +634,8 @@ public:
     data[110]=0x00; // Reserved
     data[111]=0x00; // Sequence Number
     data[112]=0x00; // Framing Options Flags
-    data[113]=UniverseNumber >> 8;   // Universe Number (high)
-    data[114]=UniverseNumber & 0xff; // Universe Number (low)
+    data[113]=UnivHi;  // Universe Number (high)
+    data[114]=UnivLo;  // Universe Number (low)
 
     data[115]=0x72;  // DMP Protocol flags and length (high)
     data[116]=0x0b;  // 0x20b = 638 - 115
@@ -647,10 +651,17 @@ public:
 
     wxIPV4address localaddr;
     localaddr.AnyAddress();
+    //localaddr.Hostname(wxT("192.168.2.100"));
     localaddr.Service(0x8000 | NetNum);
     datagram = new wxDatagramSocket(localaddr, wxSOCKET_NOWAIT);
 
-    remoteAddr.Hostname (ipaddr);
+    if (ipaddr.StartsWith(wxT("239.255."))) {
+      // multicast - universe number must be in lower 2 bytes
+      wxString ipaddrWithUniv = wxString::Format(wxT("%d.%d.%d.%d"),239,255,(int)UnivHi,(int)UnivLo);
+      remoteAddr.Hostname (ipaddrWithUniv);
+    } else {
+      remoteAddr.Hostname (ipaddr);
+    }
     remoteAddr.Service (E131_PORT);
   };
 
@@ -658,16 +669,17 @@ public:
     if (numchannels > 512) {
       throw "max channels on DMX is 512";
     }
-    changed=0;
+    changed=false;
     CreateChannels(numchannels);
   };
 
   void TimerEnd() {
+    // skipping would cause ECG-DR4 (firmware version 1.30) to timeout
     if (changed || SkipCount > 10) {
       data[111]=SequenceNum;
       datagram->SendTo(remoteAddr, data, E131_PACKET_LEN);
       SequenceNum= SequenceNum==255 ? 0 : SequenceNum+1;
-      changed=0;
+      changed=false;
       SkipCount=0;
     } else {
       SkipCount++;
@@ -691,7 +703,7 @@ protected:
       default: RenIntensity=mappedintensity;
     }
     data[chindex+2]=RenIntensity;
-    changed=1;
+    changed=true;
   };
 
 public:
@@ -705,7 +717,7 @@ public:
     datalen=numchannels+2;
     data[0]=0x7E;               // start of message
     data[1]=0x80;               // start address
-    changed=0;
+    changed=false;
     CreateChannels(numchannels);
     SerialConfig[2]='2'; // use 2 stop bits so padding chars are not required
   };
@@ -713,7 +725,7 @@ public:
   void TimerEnd() {
     if (changed && serptr) {
       serptr->Write((char *)data,datalen);
-      changed=0;
+      changed=false;
     }
   };
 };
@@ -987,7 +999,7 @@ public:
   ~xOutput() {
     WX_CLEAR_ARRAY(networks);
   };
-  
+
   size_t NetworkCount() {
     return networks.GetCount();
   };
@@ -1120,7 +1132,7 @@ public:
       networks[i]->CloseSerialPort();
     }
   };
-  
+
   bool TxEmpty() {
     for(size_t i=0; i < networks.GetCount(); ++i) {
       if (!networks[i]->TxEmpty()) return false;

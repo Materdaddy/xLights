@@ -29,7 +29,7 @@ SerialPortWithRate::SerialPortWithRate(wxWindow* parent,const wxString& title)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
-
+	
 	Create(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticTextExplanation = new wxStaticText(this, ID_STATICTEXT_EXPLANATION, _("Serial port or USB dongle\nwith virtual comm port"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT_EXPLANATION"));

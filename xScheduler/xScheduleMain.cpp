@@ -1691,7 +1691,7 @@ void xScheduleFrame::PerformTesting()
             } else {
                 // RGB cycle
                 if (v != LastSequenceSpeed) {
-                    interval = 1600 - v*15;
+                    interval = (101-v)*50;
                     NextSequenceStart = curtime + interval;
                     LastSequenceSpeed = v;
                 }
@@ -3281,7 +3281,6 @@ void xScheduleFrame::AddShow(const wxDateTime& d, const wxString& StartStop, con
 
 void xScheduleFrame::OnButtonUpdateShowClick(wxCommandEvent& event)
 {
-    int StartTimeInt, EndTimeInt;
     wxString FirstSchedCode, SchedCode, StartTime, EndTime, RepeatOptions, Playlist, PartialCode;
     wxArrayTreeItemIds selections;
     SchedTreeData *SchedPtr;

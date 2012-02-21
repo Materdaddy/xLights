@@ -2,10 +2,10 @@
 #define NETWORKDIALOG_H
 
 //(*Headers(NetworkDialog)
+#include <wx/listctrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/panel.h>
-#include <wx/grid.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -35,9 +35,9 @@ class NetworkDialog: public wxDialog
 		wxButton* ButtonAddDMX;
 		wxButton* ButtonMoveDown;
 		wxPanel* Panel1;
-		wxGrid* GridNetwork;
 		wxStaticText* StaticText1;
 		wxButton* ButtonAddLOR;
+		wxListCtrl* GridNetwork;
 		wxButton* ButtonAddPixelnet;
 		wxButton* ButtonDelRow;
 		wxButton* ButtonEditRow;
@@ -61,7 +61,7 @@ class NetworkDialog: public wxDialog
 		static const long ID_BUTTON_DELROW;
 		static const long ID_BUTTON_MOVE_UP;
 		static const long ID_BUTTON_MOVE_DOWN;
-		static const long ID_GRID_NETWORK;
+		static const long ID_LISTCTRL_NETWORKS;
 		static const long ID_PANEL1;
 		//*)
 
@@ -71,8 +71,6 @@ class NetworkDialog: public wxDialog
 		void OnButtonSaveClick(wxCommandEvent& event);
 		void OnButtonAddRowClick(wxCommandEvent& event);
 		void OnButtonDelRowClick(wxCommandEvent& event);
-		void OnGridNetworkEditorShown(wxGridEvent& event);
-		void OnGridNetworkCellLeftClick(wxGridEvent& event);
 		void OnButtonNetCloseClick(wxCommandEvent& event);
 		void OnButtonMoveUpClick(wxCommandEvent& event);
 		void OnButtonMoveDownClick(wxCommandEvent& event);
@@ -85,16 +83,21 @@ class NetworkDialog: public wxDialog
 		void OnButtonAddE131Click(wxCommandEvent& event);
 		void OnButtonAddOpenDMXClick(wxCommandEvent& event);
 		void OnButtonLorMapClick(wxCommandEvent& event);
+		void OnGridNetworkBeginDrag(wxListEvent& event);
 		//*)
 
         wxFileName networkFile;
         long LorMapping;
+        long DragRowIdx;
 
         void LoadFile();
         void MoveRowData(int fromRow, int toRow);
         void AddSerial(wxString NetName, int r=-1);
         bool EnableRate(const wxString& NetName);
         void AddE131(int r=-1);
+        long GetSelectedItem();
+        void OnDragQuit(wxMouseEvent& event);
+        void OnDragEnd(wxMouseEvent& event);
 
 		DECLARE_EVENT_TABLE()
 };

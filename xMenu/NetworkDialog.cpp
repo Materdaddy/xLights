@@ -24,7 +24,7 @@ const long NetworkDialog::ID_BUTTON_EDIT_ROW = wxNewId();
 const long NetworkDialog::ID_BUTTON_DELROW = wxNewId();
 const long NetworkDialog::ID_BUTTON_MOVE_UP = wxNewId();
 const long NetworkDialog::ID_BUTTON_MOVE_DOWN = wxNewId();
-const long NetworkDialog::ID_GRID_NETWORK = wxNewId();
+const long NetworkDialog::ID_LISTCTRL_NETWORKS = wxNewId();
 const long NetworkDialog::ID_PANEL1 = wxNewId();
 //*)
 
@@ -95,20 +95,10 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	FlexGridSizer4->Add(ButtonMoveDown, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	GridNetwork = new wxGrid(Panel1, ID_GRID_NETWORK, wxDefaultPosition, wxSize(592,203), 0, _T("ID_GRID_NETWORK"));
-	GridNetwork->CreateGrid(0,4);
-	GridNetwork->EnableEditing(false);
-	GridNetwork->EnableGridLines(true);
-	GridNetwork->SetRowLabelSize(50);
-	GridNetwork->SetDefaultColSize(135, true);
-	GridNetwork->SetColLabelValue(0, _("Network Type"));
-	GridNetwork->SetColLabelValue(1, _("Port"));
-	GridNetwork->SetColLabelValue(2, _("Baud Rate"));
-	GridNetwork->SetColLabelValue(3, _("Last Channel"));
-	GridNetwork->SetDefaultCellFont( GridNetwork->GetFont() );
-	GridNetwork->SetDefaultCellTextColour( GridNetwork->GetForegroundColour() );
+	GridNetwork = new wxListCtrl(Panel1, ID_LISTCTRL_NETWORKS, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL, wxDefaultValidator, _T("ID_LISTCTRL_NETWORKS"));
+	GridNetwork->SetToolTip(_("Drag an item to reorder the list"));
 	FlexGridSizer3->Add(GridNetwork, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(Panel1);
 	FlexGridSizer2->SetSizeHints(Panel1);
@@ -129,12 +119,29 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	Connect(ID_BUTTON_DELROW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonDelRowClick);
 	Connect(ID_BUTTON_MOVE_UP,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonMoveUpClick);
 	Connect(ID_BUTTON_MOVE_DOWN,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NetworkDialog::OnButtonMoveDownClick);
+	Connect(ID_LISTCTRL_NETWORKS,wxEVT_COMMAND_LIST_BEGIN_DRAG,(wxObjectEventFunction)&NetworkDialog::OnGridNetworkBeginDrag);
 	//*)
 
     SetAffirmativeId(wxID_SAVE);
-    GridNetwork->SetSelectionMode(wxGrid::wxGridSelectRows);
-	GridNetwork->SetColLabelValue(2, _("Baud Rate or\nE1.31 Univ"));
     LorMapping = XLIGHTS_LORMAP_MULTI;
+
+    wxListItem itemCol;
+    itemCol.SetText(_T("Network Type"));
+    itemCol.SetImage(-1);
+    GridNetwork->InsertColumn(0, itemCol);
+
+    itemCol.SetText(_T("Port"));
+    itemCol.SetAlign(wxLIST_FORMAT_CENTRE);
+    GridNetwork->InsertColumn(1, itemCol);
+
+    itemCol.SetText(_T("Baud Rate or E1.31 Univ"));
+    itemCol.SetAlign(wxLIST_FORMAT_CENTRE);
+    GridNetwork->InsertColumn(2, itemCol);
+
+    itemCol.SetText(_T("Last Channel"));
+    itemCol.SetAlign(wxLIST_FORMAT_CENTRE);
+    GridNetwork->InsertColumn(3, itemCol);
+
 
 #ifdef __WXOSX__
     ButtonAddOpenDMX->Enable(false);
@@ -152,6 +159,10 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
     UnsavedChanges=false;
     if (networkFile.FileExists()) {
         LoadFile();
+        for (int i=0; i<3; i++) {
+            GridNetwork->SetColumnWidth(i,wxLIST_AUTOSIZE_USEHEADER);
+        }
+        GridNetwork->SetColumnWidth(3,100);
     }
 }
 
@@ -169,6 +180,7 @@ NetworkDialog::~NetworkDialog()
 
 void NetworkDialog::LoadFile()
 {
+    long newidx;
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
         int r=0;
@@ -177,11 +189,12 @@ void NetworkDialog::LoadFile()
         LorMappingStr.ToLong(&LorMapping);
         for( e=e->GetChildren(); e!=NULL; e=e->GetNext() ) {
             if (e->GetName() == wxT("network")) {
-                GridNetwork->AppendRows(1);
-                GridNetwork->SetCellValue(r,0,e->GetPropVal(wxT("NetworkType"), wxT("")));
-                GridNetwork->SetCellValue(r,1,e->GetPropVal(wxT("ComPort"), wxT("")));
-                GridNetwork->SetCellValue(r,2,e->GetPropVal(wxT("BaudRate"), wxT("")));
-                GridNetwork->SetCellValue(r,3,e->GetPropVal(wxT("MaxChannels"), wxT("0")));
+                newidx = GridNetwork->InsertItem(GridNetwork->GetItemCount(), e->GetPropVal(wxT("NetworkType"), wxT("")));
+                GridNetwork->SetItem(newidx,1,e->GetPropVal(wxT("ComPort"), wxT("")));
+                GridNetwork->SetItem(newidx,2,e->GetPropVal(wxT("BaudRate"), wxT("")));
+                GridNetwork->SetItem(newidx,3,e->GetPropVal(wxT("MaxChannels"), wxT("0")));
+                GridNetwork->SetColumnWidth(0,wxLIST_AUTOSIZE);
+                GridNetwork->SetColumnWidth(1,wxLIST_AUTOSIZE);
                 r++;
             }
         }
@@ -194,6 +207,7 @@ void NetworkDialog::LoadFile()
 void NetworkDialog::SaveFile()
 {
     int RowCount;
+    wxString PropNames[4];
     wxXmlNode* net;
     wxXmlDocument doc;
     wxString LorMappingStr;
@@ -202,14 +216,23 @@ void NetworkDialog::SaveFile()
     root->AddProperty( wxT("computer"), wxGetHostName());
     root->AddProperty( wxT("LorMapping"), LorMappingStr);
     doc.SetRoot( root );
+    PropNames[0]=wxT("NetworkType");
+    PropNames[1]=wxT("ComPort");
+    PropNames[2]=wxT("BaudRate");
+    PropNames[3]=wxT("MaxChannels");
 
-    RowCount=GridNetwork->GetNumberRows();
+    RowCount=GridNetwork->GetItemCount();
+    wxListItem listcol;
     for (int r=0; r < RowCount; r++ ) {
         net = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("network") );
-        net->AddProperty( wxT("NetworkType"), GridNetwork->GetCellValue(r,0));
-        net->AddProperty( wxT("ComPort"), GridNetwork->GetCellValue(r,1));
-        net->AddProperty( wxT("BaudRate"), GridNetwork->GetCellValue(r,2));
-        net->AddProperty( wxT("MaxChannels"), GridNetwork->GetCellValue(r,3));
+        net->AddProperty( PropNames[0], GridNetwork->GetItemText(r));
+        for (int c=1; c<4; c++) {
+            listcol.SetId(r);
+            listcol.SetColumn(c);
+            listcol.SetMask(wxLIST_MASK_TEXT);
+            GridNetwork->GetItem(listcol);
+            net->AddProperty( PropNames[c], listcol.GetText());
+        }
         root->AddChild( net );
     }
     wxString FileName=networkFile.GetFullPath();
@@ -220,83 +243,78 @@ void NetworkDialog::SaveFile()
     }
 }
 
-void NetworkDialog::OnButtonAddRowClick(wxCommandEvent& event)
+// returns -1 if not found
+long NetworkDialog::GetSelectedItem()
 {
-    GridNetwork->AppendRows(1);
+    return GridNetwork->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 }
 
 void NetworkDialog::OnButtonDelRowClick(wxCommandEvent& event)
 {
-    wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
-    int cnt = selectedRows.GetCount();
-    if (cnt == 0) {
+    long SelectedItem = GetSelectedItem();
+    if ( SelectedItem == -1 ) {
         wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
     } else {
-        for(int i = 0; i < cnt; i++)
-        {
-            GridNetwork->DeleteRows(selectedRows[i]);
+        GridNetwork->DeleteItem(SelectedItem);
+        UnsavedChanges=true;
+        int cnt=GridNetwork->GetItemCount();
+        if (cnt > 0) {
+            GridNetwork->SetItemState(cnt <= SelectedItem ? cnt-1 : SelectedItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
         }
     }
 }
 
 void NetworkDialog::MoveRowData(int fromRow, int toRow)
 {
-    int colcnt=GridNetwork->GetCols();
+    GridNetwork->InsertItem(toRow,wxT(""));
+    wxListItem listcol;
+    listcol.SetId(fromRow);
+    int colcnt=4;
     for (int c=0; c < colcnt; c++)
     {
-        GridNetwork->SetCellValue(toRow,c,GridNetwork->GetCellValue(fromRow,c));
+        listcol.SetColumn(c);
+        listcol.SetMask(wxLIST_MASK_TEXT);
+        GridNetwork->GetItem(listcol);
+        GridNetwork->SetItem(toRow,c,listcol.GetText());
     }
-    GridNetwork->DeleteRows(fromRow);
+    GridNetwork->DeleteItem(fromRow);
 }
 
 void NetworkDialog::OnButtonMoveUpClick(wxCommandEvent& event)
 {
-    wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
-    int cnt = selectedRows.GetCount();
-    if (cnt == 1) {
-        int r=selectedRows[0];
-        if (r > 0)
-        {
-            GridNetwork->InsertRows(r-1);
-            MoveRowData(r+1,r-1);
-            GridNetwork->SelectRow(r-1);
-        }
-    } else {
-        wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
+    long SelectedItem = GetSelectedItem();
+    if (SelectedItem == -1) {
+        wxMessageBox(_("Please select a single row first"), _("Error"));
+        return;
     }
+    if (SelectedItem == 0) return;
+    MoveRowData(SelectedItem+1, SelectedItem-1);
+    GridNetwork->SetItemState(SelectedItem-1,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
 }
 
 void NetworkDialog::OnButtonMoveDownClick(wxCommandEvent& event)
 {
-    wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
-    int cnt = selectedRows.GetCount();
-    if (cnt == 1) {
-        int r=selectedRows[0];
-        int lastrow = GridNetwork->GetRows()-1;
-        if (r < lastrow)
-        {
-            GridNetwork->InsertRows(r+2);
-            MoveRowData(r,r+2);
-            GridNetwork->SelectRow(r+1);
-        }
-    } else {
-        wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
+    long SelectedItem = GetSelectedItem();
+    if (SelectedItem == -1) {
+        wxMessageBox(_("Please select a single row first"), _("Error"));
+        return;
     }
+    if (SelectedItem == GridNetwork->GetItemCount()-1) return;
+    MoveRowData(SelectedItem, SelectedItem+2);
+    GridNetwork->SetItemState(SelectedItem+1,wxLIST_STATE_SELECTED,wxLIST_STATE_SELECTED);
 }
 
 void NetworkDialog::OnButtonEditRowClick(wxCommandEvent& event)
 {
-    wxArrayInt selectedRows = GridNetwork->GetSelectedRows();
-    int cnt = selectedRows.GetCount();
-    if (cnt == 1) {
-        int r=selectedRows[0];
-        if (GridNetwork->GetCellValue(r,0) == wxT("E131")) {
-            AddE131(r);
-        } else {
-            AddSerial(wxT(""), r);
-        }
+    long SelectedItem = GetSelectedItem();
+    if (SelectedItem == -1) {
+        wxMessageBox(_("Please select a single row first"), _("Error"));
+        return;
+    }
+    if (GridNetwork->GetItemText(SelectedItem) == wxT("E131")) {
+        AddE131(SelectedItem);
     } else {
-        wxMessageBox(_("You must select a row by clicking on the row number first!"), _("WARNING"));
+        AddSerial(wxT(""), SelectedItem);
     }
 }
 
@@ -307,6 +325,7 @@ bool NetworkDialog::EnableRate(const wxString& NetName)
 
 void NetworkDialog::AddSerial(wxString NetName, int r)
 {
+    wxListItem listcol;
 	int DlgResult;
 	bool ok=true;
 	wxString Port,BaudRate,LastChannel;
@@ -315,10 +334,18 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
 	if (r >= 0)
 	{
 	    action=_("Change ");
-        NetName=GridNetwork->GetCellValue(r,0);
-        Port=GridNetwork->GetCellValue(r,1);
-        BaudRate=GridNetwork->GetCellValue(r,2);
-        LastChannel=GridNetwork->GetCellValue(r,3);
+        listcol.SetId(r);
+        listcol.SetMask(wxLIST_MASK_TEXT);
+        NetName=GridNetwork->GetItemText(r);
+        listcol.SetColumn(1);
+        GridNetwork->GetItem(listcol);
+        Port=listcol.GetText();
+        listcol.SetColumn(2);
+        GridNetwork->GetItem(listcol);
+        BaudRate=listcol.GetText();
+        listcol.SetColumn(3);
+        GridNetwork->GetItem(listcol);
+        LastChannel=listcol.GetText();
 	}
 
 	bool RateEnabled = EnableRate(NetName);
@@ -333,10 +360,12 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
 	}
 	if (NetName == _("LOR")) {
 	    SerialDlg.SetLabel(_("LOR controllers attached\nto any LOR dongle"));
+	} else if (NetName == _("Renard")) {
+	    SerialDlg.SetLabel(_("Renard controllers connected\nto a serial port or a USB dongle\nwith virtual comm port.\n2 stop bits are set automatically."));
 	} else if (NetName == _("OpenDMX")) {
 	    SerialDlg.SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode) attached\nto an LOR dongle, D-Light dongle,\nHolidayCoro programming cable,\nor Entec Open DMX dongle"));
 	} else if (NetName == _("DMX")) {
-	    SerialDlg.SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode) attached to an\nEntec DMX USB Pro, Lynx DMX dongle,\nDIYC RPM, or DMXking.com dongle"));
+	    SerialDlg.SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode)\nattached to an Entec DMX USB Pro, Lynx DMX dongle,\nDIYC RPM, DMXking.com, or DIY Blinky dongle.\n\nLast Channel should be 512 or less, unless you are using\na DIY Blinky dongle (in which case it can be up to 3036)."));
 	} else if (NetName == _("Pixelnet")) {
 	    SerialDlg.SetLabel(_("Pixelnet hub attached to a\nLynx Pixelnet dongle"));
 	}
@@ -350,18 +379,18 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
             if (ok) {
                 if (r < 0)
                 {
-                    GridNetwork->AppendRows(1);
-                    r=GridNetwork->GetRows()-1;
+                    r=GridNetwork->GetItemCount();
+                    GridNetwork->InsertItem(r,wxT(""));
                 }
-                GridNetwork->SetCellValue(r,0,NetName);
-                GridNetwork->SetCellValue(r,1,Port);
+                GridNetwork->SetItem(r,0,NetName);
+                GridNetwork->SetItem(r,1,Port);
                 if (NetName==wxT("OpenDMX"))
-                    GridNetwork->SetCellValue(r,2,wxT("250000"));
+                    GridNetwork->SetItem(r,2,wxT("250000"));
                 else if (RateEnabled)
-                    GridNetwork->SetCellValue(r,2,BaudRate);
+                    GridNetwork->SetItem(r,2,BaudRate);
                 else
-                    GridNetwork->SetCellValue(r,2,_("n/a"));
-                GridNetwork->SetCellValue(r,3,LastChannel);
+                    GridNetwork->SetItem(r,2,_("n/a"));
+                GridNetwork->SetItem(r,3,LastChannel);
                 UnsavedChanges=true;
             } else {
                 wxMessageBox(_("All fields must be filled in!"), _("ERROR"));
@@ -397,46 +426,69 @@ void NetworkDialog::OnButtonAddPixelnetClick(wxCommandEvent& event)
 
 void NetworkDialog::AddE131(int r)
 {
-	int DlgResult;
+    wxListItem listcol;
+	int DlgResult,UnivNum;
 	bool ok=true;
-	wxString IpAddr,Universe,LastChannel;
+	int NumUniv;
+	wxString IpAddr,StartUniverse,LastChannel;
 	wxString action=_("Add ");
 	wxString NetName=wxT("E131");
 
 	if (r >= 0)
 	{
 	    action=_("Change ");
-        //NetName=GridNetwork->GetCellValue(r,0);
-        IpAddr=GridNetwork->GetCellValue(r,1);
-        Universe=GridNetwork->GetCellValue(r,2);
-        LastChannel=GridNetwork->GetCellValue(r,3);
+        listcol.SetId(r);
+        listcol.SetMask(wxLIST_MASK_TEXT);
+        listcol.SetColumn(1);
+        GridNetwork->GetItem(listcol);
+        IpAddr=listcol.GetText();
+        listcol.SetColumn(2);
+        GridNetwork->GetItem(listcol);
+        StartUniverse=listcol.GetText();
+        listcol.SetColumn(3);
+        GridNetwork->GetItem(listcol);
+        LastChannel=listcol.GetText();
+        //LastChannel.ToLong(&NumUniv);
+        //NumUniv=(NumUniv + 511) / 512; // round up
 	}
 
 	wxString title = action + NetName + _(" Network");
 	E131Dialog E131Dlg(this,title);
 	if (r >= 0)
 	{
-        E131Dlg.TextCtrlIpAddr->SetValue(IpAddr);
-        E131Dlg.TextCtrlUniverse->SetValue(Universe);
-        E131Dlg.TextCtrlLastChannel->SetValue(LastChannel);
+        E131Dlg.SpinCtrl_StartUniv->SetValue(StartUniverse);
+        E131Dlg.SpinCtrl_NumUniv->SetValue(1);
+        E131Dlg.SpinCtrl_NumUniv->Enable(false);
+        //E131Dlg.SpinCtrl_NumUniv->SetValue(NumUniv);
+
+        if (IpAddr != _("239.255.0.1")) {
+            E131Dlg.TextCtrlIpAddr->SetValue(IpAddr);
+            E131Dlg.TextCtrlIpAddr->Enable(true);
+            E131Dlg.RadioButtonUnicast->SetValue(true);
+        }
 	}
 	do {
 	    DlgResult=E131Dlg.ShowModal();
 	    if (DlgResult == wxID_OK) {
             IpAddr=E131Dlg.TextCtrlIpAddr->GetValue();
-            Universe=E131Dlg.TextCtrlUniverse->GetValue();
-            LastChannel=E131Dlg.TextCtrlLastChannel->GetValue();
-            ok=!IpAddr.IsEmpty() && !Universe.IsEmpty() && !LastChannel.IsEmpty();
+            UnivNum = E131Dlg.SpinCtrl_StartUniv->GetValue();
+            LastChannel = wxT("512");
+            //LastChannel = wxString::Format(wxT("%d"), E131Dlg.SpinCtrl_NumUniv->GetValue() * 512);
+            ok=!IpAddr.IsEmpty() && !LastChannel.IsEmpty();
             if (ok) {
-                if (r < 0)
-                {
-                    GridNetwork->AppendRows(1);
-                    r=GridNetwork->GetRows()-1;
+                NumUniv = E131Dlg.SpinCtrl_NumUniv->GetValue();
+                for (int u=0; u < NumUniv; u++) {
+                    if (action == _("Add "))
+                    {
+                        r=GridNetwork->GetItemCount();
+                        GridNetwork->InsertItem(r,wxT(""));
+                    }
+                    GridNetwork->SetItem(r,0,NetName);
+                    GridNetwork->SetItem(r,1,IpAddr);
+                    GridNetwork->SetItem(r,2,wxString::Format(wxT("%d"),UnivNum));
+                    GridNetwork->SetItem(r,3,LastChannel);
+                    UnivNum++;
                 }
-                GridNetwork->SetCellValue(r,0,NetName);
-                GridNetwork->SetCellValue(r,1,IpAddr);
-                GridNetwork->SetCellValue(r,2,Universe);
-                GridNetwork->SetCellValue(r,3,LastChannel);
                 UnsavedChanges=true;
             } else {
                 wxMessageBox(_("All fields must be filled in!"), _("ERROR"));
@@ -469,4 +521,57 @@ void NetworkDialog::OnButtonLorMapClick(wxCommandEvent& event)
         if (MapDlg.RadioButtonStrictMap->GetValue()) LorMapping=XLIGHTS_LORMAP_STRICT;
         if (LorMapping != PreviousMapValue) UnsavedChanges=true;
     }
+}
+
+
+// drop a list item (start row is in DragRowIdx)
+void NetworkDialog::OnDragEnd(wxMouseEvent& event)
+{
+  wxPoint pos = event.GetPosition();  // must reference the event
+  int flags = wxLIST_HITTEST_ONITEM;
+  long index = GridNetwork->HitTest(pos,flags,NULL); // got to use it at last
+  if(index >= 0){
+    if (index > DragRowIdx) {
+        // moving down
+        MoveRowData(DragRowIdx, index+1);
+        UnsavedChanges=true;
+    } else if (index < DragRowIdx) {
+        // moving up
+        MoveRowData(DragRowIdx+1, index);
+        UnsavedChanges=true;
+    }
+  }
+  // restore cursor
+  GridNetwork->SetCursor(wxCursor(*wxSTANDARD_CURSOR));
+  // disconnect both functions
+  GridNetwork->Disconnect(wxEVT_LEFT_UP,
+    wxMouseEventHandler(NetworkDialog::OnDragEnd));
+  GridNetwork->Disconnect(wxEVT_LEAVE_WINDOW,
+    wxMouseEventHandler(NetworkDialog::OnDragQuit));
+}
+
+// abort dragging a list item because user has left window
+void NetworkDialog::OnDragQuit(wxMouseEvent& event)
+{
+  // restore cursor and disconnect unconditionally
+  GridNetwork->SetCursor(wxCursor(*wxSTANDARD_CURSOR));
+  GridNetwork->Disconnect(wxEVT_LEFT_UP,
+    wxMouseEventHandler(NetworkDialog::OnDragEnd));
+  GridNetwork->Disconnect(wxEVT_LEAVE_WINDOW,
+    wxMouseEventHandler(NetworkDialog::OnDragQuit));
+}
+
+void NetworkDialog::OnGridNetworkBeginDrag(wxListEvent& event)
+{
+  DragRowIdx = event.GetIndex();	// save the start index
+  // do some checks here to make sure valid start
+  // ...
+  // trigger when user releases left button (drop)
+  GridNetwork->Connect(wxEVT_LEFT_UP,
+    wxMouseEventHandler(NetworkDialog::OnDragEnd), NULL,this);
+  // trigger when user leaves window to abort drag
+  GridNetwork->Connect(wxEVT_LEAVE_WINDOW,
+    wxMouseEventHandler(NetworkDialog::OnDragQuit), NULL,this);
+  // give visual feedback that we are doing something
+  GridNetwork->SetCursor(wxCursor(wxCURSOR_HAND));
 }

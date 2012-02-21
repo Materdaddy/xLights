@@ -185,25 +185,17 @@
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
-									<object class="wxGrid" name="ID_GRID_NETWORK" variable="GridNetwork" member="yes">
-										<cols>4</cols>
-										<readonly>1</readonly>
-										<labelcolwidth>50</labelcolwidth>
-										<defaultcolsize>135</defaultcolsize>
-										<collabels>
-											<item>Network Type</item>
-											<item>Port</item>
-											<item>Baud Rate</item>
-											<item>Last Channel</item>
-										</collabels>
-										<size>592,203</size>
+									<object class="wxListCtrl" name="ID_LISTCTRL_NETWORKS" variable="GridNetwork" member="yes">
+										<tooltip>Drag an item to reorder the list</tooltip>
+										<style>wxLC_REPORT|wxLC_SINGLE_SEL</style>
+										<handler function="OnGridNetworkBeginDrag" entry="EVT_LIST_BEGIN_DRAG" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
 							</object>
-							<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+							<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
 							<option>1</option>
 						</object>

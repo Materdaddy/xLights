@@ -110,7 +110,11 @@ xConverter::xConverter(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
         wxMessageBox(_("No directory specified"), _("ERROR"));
         Close();
     }
-    FileDialog1->SetDirectory(CurrentDir);
+    wxString ConvertDir;
+    if (!config->Read(_("ConvertDir"), &ConvertDir)) {
+        ConvertDir=CurrentDir;
+    }
+    FileDialog1->SetDirectory(ConvertDir);
     networkFile.AssignDir( CurrentDir );
     networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     LoadNetworkFile();
@@ -287,6 +291,9 @@ void xConverter::OnButtonChooseFileClick(wxCommandEvent& event)
             AllNames.Append(wxT("\n"));
         }
         TextCtrlFilename->ChangeValue( AllNames );
+        wxString ConvertDir = FileDialog1->GetDirectory();
+        wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
+        config->Write(_("ConvertDir"), ConvertDir);
     }
 }
 
