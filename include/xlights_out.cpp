@@ -655,7 +655,7 @@ public:
     localaddr.Service(0x8000 | NetNum);
     datagram = new wxDatagramSocket(localaddr, wxSOCKET_NOWAIT);
 
-    if (ipaddr.StartsWith(wxT("239.255."))) {
+    if (ipaddr.StartsWith(wxT("239.255.")) || ipaddr == wxT("MULTICAST")) {
       // multicast - universe number must be in lower 2 bytes
       wxString ipaddrWithUniv = wxString::Format(wxT("%d.%d.%d.%d"),239,255,(int)UnivHi,(int)UnivLo);
       remoteAddr.Hostname (ipaddrWithUniv);

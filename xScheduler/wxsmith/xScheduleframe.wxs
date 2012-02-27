@@ -107,7 +107,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
-								<size>968,312</size>
+								<size>1057,350</size>
 								<handler function="OnNotebook1PageChanged" entry="EVT_NOTEBOOK_PAGE_CHANGED" />
 								<object class="notebookpage">
 									<object class="wxPanel" name="ID_PANEL_CAL" variable="PanelCal" member="yes">
@@ -206,7 +206,6 @@
 																	<label>Show Dates</label>
 																	<font>
 																		<weight>bold</weight>
-																		<face></face>
 																	</font>
 																</object>
 																<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

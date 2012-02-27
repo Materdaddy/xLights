@@ -159,9 +159,9 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
     UnsavedChanges=false;
     if (networkFile.FileExists()) {
         LoadFile();
-        for (int i=0; i<3; i++) {
-            GridNetwork->SetColumnWidth(i,wxLIST_AUTOSIZE_USEHEADER);
-        }
+        GridNetwork->SetColumnWidth(0,wxLIST_AUTOSIZE_USEHEADER);
+        GridNetwork->SetColumnWidth(1,100);
+        GridNetwork->SetColumnWidth(2,wxLIST_AUTOSIZE_USEHEADER);
         GridNetwork->SetColumnWidth(3,100);
     }
 }
@@ -360,10 +360,12 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
 	}
 	if (NetName == _("LOR")) {
 	    SerialDlg.SetLabel(_("LOR controllers attached\nto any LOR dongle"));
+	} else if (NetName == _("D-Light")) {
+	    SerialDlg.SetLabel(_("D-Light controllers attached\nto a D-Light dongle"));
 	} else if (NetName == _("Renard")) {
 	    SerialDlg.SetLabel(_("Renard controllers connected\nto a serial port or a USB dongle\nwith virtual comm port.\n2 stop bits are set automatically."));
 	} else if (NetName == _("OpenDMX")) {
-	    SerialDlg.SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode) attached\nto an LOR dongle, D-Light dongle,\nHolidayCoro programming cable,\nor Entec Open DMX dongle"));
+	    SerialDlg.SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode)\nattached to an LOR dongle, D-Light dongle, HolidayCoro\nprogramming cable, or Entec Open DMX dongle"));
 	} else if (NetName == _("DMX")) {
 	    SerialDlg.SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode)\nattached to an Entec DMX USB Pro, Lynx DMX dongle,\nDIYC RPM, DMXking.com, or DIY Blinky dongle.\n\nLast Channel should be 512 or less, unless you are using\na DIY Blinky dongle (in which case it can be up to 3036)."));
 	} else if (NetName == _("Pixelnet")) {
@@ -459,9 +461,12 @@ void NetworkDialog::AddE131(int r)
         E131Dlg.SpinCtrl_StartUniv->SetValue(StartUniverse);
         E131Dlg.SpinCtrl_NumUniv->SetValue(1);
         E131Dlg.SpinCtrl_NumUniv->Enable(false);
-        //E131Dlg.SpinCtrl_NumUniv->SetValue(NumUniv);
 
-        if (IpAddr != _("239.255.0.1")) {
+        if (IpAddr.StartsWith( wxT("239.255.") ) || IpAddr == wxT("MULTICAST")) {
+            E131Dlg.TextCtrlIpAddr->SetValue(wxT("MULTICAST"));
+            E131Dlg.TextCtrlIpAddr->Enable(false);
+            E131Dlg.RadioButtonMulticast->SetValue(true);
+        } else {
             E131Dlg.TextCtrlIpAddr->SetValue(IpAddr);
             E131Dlg.TextCtrlIpAddr->Enable(true);
             E131Dlg.RadioButtonUnicast->SetValue(true);

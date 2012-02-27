@@ -46,9 +46,9 @@ bool xScheduleApp::OnInit()
     wxInitAllImageHandlers();
     if ( wxsOK )
     {
-      xScheduleFrame* Frame = new xScheduleFrame(0);
-      Frame->Show();
-      SetTopWindow(Frame);
+    	xScheduleFrame* Frame = new xScheduleFrame(0);
+    	Frame->Show();
+    	SetTopWindow(Frame);
     }
     //*)
     return wxsOK;

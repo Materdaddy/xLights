@@ -25,19 +25,19 @@
 #define XSCHEDULEMAIN_H
 
 //(*Headers(xScheduleFrame)
-#include <wx/treectrl.h>
-#include <wx/notebook.h>
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/menu.h>
-#include <wx/textctrl.h>
-#include <wx/checkbox.h>
-#include <wx/aui/aui.h>
-#include <wx/panel.h>
 #include <wx/bmpbuttn.h>
+#include <wx/checkbox.h>
+#include <wx/sizer.h>
+#include <wx/notebook.h>
 #include <wx/button.h>
-#include <wx/frame.h>
+#include <wx/menu.h>
+#include <wx/panel.h>
 #include <wx/statusbr.h>
+#include <wx/frame.h>
+#include <wx/stattext.h>
+#include <wx/aui/aui.h>
+#include <wx/textctrl.h>
+#include <wx/treectrl.h>
 //*)
 
 #include <wx/msgdlg.h>
@@ -241,32 +241,32 @@ class xScheduleFrame: public wxFrame
         static const long ID_PLAYER_DIALOG;
 
         //(*Declarations(xScheduleFrame)
-        wxAuiManager* AuiManager1;
         wxAuiToolBar* AuiToolBar1;
-        wxCheckBox* CheckBoxRunSchedule;
-        wxNotebook* Notebook1;
+        wxStaticText* StaticTextShowEnd;
+        wxButton* ButtonDeleteShow;
+        wxPanel* Panel1;
         wxButton* ButtonClearLog;
         wxPanel* PanelLog;
-        wxStaticText* StaticText2;
-        wxStaticText* StaticTextShowEnd;
-        wxTextCtrl* TextCtrlLog;
-        wxMenuItem* MenuItemRefresh;
-        wxStaticText* StaticTextShowStart;
-        wxPanel* Panel1;
-        wxStaticText* StaticText1;
-        wxStaticText* StaticText3;
-        wxButton* ButtonSaveLog;
-        wxButton* ButtonDeselect;
-        wxTreeCtrl* ListBoxSched;
-        wxPanel* PanelCal;
         wxStatusBar* StatusBar1;
-        wxButton* ButtonDeleteShow;
-        wxButton* ButtonShowDatesChange;
-        wxPanel* Panel2;
         wxButton* ButtonUpdateShow;
-        wxStaticText* StaticText4;
+        wxTreeCtrl* ListBoxSched;
+        wxCheckBox* CheckBoxRunSchedule;
         wxBitmapButton* BitmapButtonSchedInfo;
+        wxButton* ButtonSaveLog;
+        wxStaticText* StaticText1;
+        wxStaticText* StaticTextShowStart;
+        wxPanel* Panel2;
+        wxPanel* PanelCal;
+        wxStaticText* StaticText3;
+        wxTextCtrl* TextCtrlLog;
         wxButton* ButtonAddShow;
+        wxButton* ButtonDeselect;
+        wxButton* ButtonShowDatesChange;
+        wxStaticText* StaticText4;
+        wxStaticText* StaticText2;
+        wxMenuItem* MenuItemRefresh;
+        wxNotebook* Notebook1;
+        wxAuiManager* AuiManager1;
         //*)
 
         enum SeqPlayerStates {

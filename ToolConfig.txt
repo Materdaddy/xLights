@@ -8,32 +8,47 @@ Linux users will need to follow the instructions below to compile there own copy
 
 LINUX
 
-You will need (use either package manager or "sudo apt-get install xxx")
-  a) From the Ubuntu repository: build-essential & gdb packages
+These instructions are based on Linux Mint 12. Instructions for other Linux
+distributions will vary. 
 
-  b) Unforunately, the wxWidgets and code::blocks packages in the
-     Ubuntu respositories are too far out of date for use.
-     Therefore, you will need to follow the instructions at:
+Using Software Manager, install these packages:
 
-        http://apt.jenslody.de/
+  a) g++
 
-     in order to get the latest wxWidgets and code::blocks packages.
+  b) libwxgtk2.8-dev 
 
-     Make sure you get these packages:
-        libwxgtk2.xx
-        libwxgtk2.xx-dev
-        wx2.xx-headers
-        wx-common
-        wx2.xx-doc
-        codeblocks
-        codeblocks-contrib
+  c) subversion
 
-  c) In Code::Blocks:
+  d) Get the xLights source code by opening a terminal window and typing the following:
+
+     svn co https://xlights.svn.sourceforge.net/svnroot/xlights/trunk xlights
+
+xLights can be built 2 ways on Linux. First, you can use the supplied makefiles
+to build it. This is sufficient to get xLights running, but not to modify it.
+The second way is to install the Code::Blocks IDE and compile xLights within
+the IDE. If you plan on modifying xLights yourself, this is the way to go.
+
+To build xLights using the supplied makefiles:
+
+  e) While still in the terminal window, cd to the new xlights directory
+ 
+  f) Make the shell script executable by typing: chmod 766 makeall.sh
+
+  g) Execute the shell script: ./makeall.sh
+     You will get some compiler warnings, however, the 3 executables should
+     get built in the ./bin directory.
+
+Building xLights using Code::Blocks (if you want to edit the code)
+
+  h) Code::Blocks
      1) Make sure "wx" is defined under Settings > Global Variables
         as described in the Code::Blocks documentation. It should be
         set to your wxWidgets base directory (/usr/lib/wx on my system).
-  d) Now you are ready to use Code::Blocks to build
-     each of the binaries (xMenu, xTester, xTesterRGB, xSchedule)
+
+  i) Install libwxsmithlib0 to enable visual layout
+
+  i) Now you are ready to use Code::Blocks to build
+     each of the binaries (xMenu, xSchedule, xConverter)
      by double-clicking on the cbp file in each directory.
      In order for the double-click to work, you may need 
      to first right-click on the cbp file, select properties,

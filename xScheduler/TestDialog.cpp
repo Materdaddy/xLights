@@ -3,9 +3,9 @@
 #include <limits>
 
 //(*InternalHeaders(TestDialog)
-#include <wx/font.h>
-#include <wx/intl.h>
 #include <wx/string.h>
+#include <wx/intl.h>
+#include <wx/font.h>
 //*)
 
 //(*IdInit(TestDialog)
@@ -15,6 +15,7 @@ const long TestDialog::ID_BUTTON_CLEAR = wxNewId();
 const long TestDialog::ID_STATICTEXT3 = wxNewId();
 const long TestDialog::ID_BUTTON_EXPORT = wxNewId();
 const long TestDialog::ID_BUTTON_LIGHTS_OFF = wxNewId();
+const long TestDialog::ID_BUTTON_CLOSE = wxNewId();
 const long TestDialog::ID_NOTEBOOK2 = wxNewId();
 const long TestDialog::ID_STATICTEXT8 = wxNewId();
 const long TestDialog::ID_RADIOBUTTON14 = wxNewId();
@@ -79,26 +80,26 @@ END_EVENT_TABLE()
 TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(TestDialog)
-	wxFlexGridSizer* FlexGridSizer24;
-	wxStaticBoxSizer* StaticBoxSizerHighlightColor;
-	wxBoxSizer* BoxSizer10;
-	wxFlexGridSizer* FlexGridSizer10;
-	wxFlexGridSizer* FlexGridSizer3;
-	wxFlexGridSizer* FlexGridSizer22;
-	wxFlexGridSizer* FlexGridSizer9;
-	wxFlexGridSizer* FlexGridSizer2;
-	wxBoxSizer* BoxSizer2;
-	wxFlexGridSizer* FlexGridSizer7;
-	wxFlexGridSizer* FlexGridSizer15;
 	wxFlexGridSizer* FlexGridSizer21;
-	wxFlexGridSizer* FlexGridSizer14;
-	wxFlexGridSizer* FlexGridSizer20;
-	wxBoxSizer* BoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer11;
+	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* FlexGridSizer15;
 	wxBoxSizer* BoxSizer3;
 	wxFlexGridSizer* FlexGridSizer17;
+	wxBoxSizer* BoxSizer10;
+	wxFlexGridSizer* FlexGridSizer11;
+	wxFlexGridSizer* FlexGridSizer7;
+	wxBoxSizer* BoxSizer2;
+	wxFlexGridSizer* FlexGridSizer9;
+	wxFlexGridSizer* FlexGridSizer14;
+	wxFlexGridSizer* FlexGridSizer3;
+	wxFlexGridSizer* FlexGridSizer22;
+	wxStaticBoxSizer* StaticBoxSizerHighlightColor;
 	wxStaticBoxSizer* StaticBoxSizerBackgroundColor;
+	wxFlexGridSizer* FlexGridSizer10;
+	wxBoxSizer* BoxSizer1;
+	wxFlexGridSizer* FlexGridSizer24;
+	wxFlexGridSizer* FlexGridSizer20;
 
 	Create(parent, id, _("xTester"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
 	SetClientSize(wxDefaultSize);
@@ -151,6 +152,8 @@ TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	FlexGridSizer17->Add(ButtonExport, 1, wxLEFT|wxRIGHT|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonLightsOff = new wxButton(Panel3, ID_BUTTON_LIGHTS_OFF, _("All Lights Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_LIGHTS_OFF"));
 	FlexGridSizer17->Add(ButtonLightsOff, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
+	ButtonClose = new wxButton(Panel3, ID_BUTTON_CLOSE, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CLOSE"));
+	FlexGridSizer17->Add(ButtonClose, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer2->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(BoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Notebook2 = new wxNotebook(Panel3, ID_NOTEBOOK2, wxDefaultPosition, wxSize(225,220), 0, _T("ID_NOTEBOOK2"));
@@ -337,6 +340,7 @@ TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	Connect(ID_BUTTON_CLEAR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonClearClick);
 	Connect(ID_BUTTON_EXPORT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonExportClick);
 	Connect(ID_BUTTON_LIGHTS_OFF,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonLightsOffClick);
+	Connect(ID_BUTTON_CLOSE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonCloseClick);
 	Connect(ID_RADIOBUTTON14,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&TestDialog::OnRadioButtonOffSelect);
 	Connect(ID_RADIOBUTTON15,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&TestDialog::OnRadioButtonChaseSelect);
 	Connect(ID_RADIOBUTTON16,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&TestDialog::OnRadioButtonChase3Select);
@@ -657,3 +661,10 @@ int TestDialog::RgbCycleSpeed()
     return SliderRgbCycleSpeed->GetValue();  // 0-100
 }
 
+
+void TestDialog::OnButtonCloseClick(wxCommandEvent& event)
+{
+    RadioButtonsOff();
+    wxMilliSleep(100);  // give some time for everything to shut off
+    this->Close();
+}

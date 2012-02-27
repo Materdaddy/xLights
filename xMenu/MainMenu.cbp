@@ -7,7 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="DebugWindows">
-				<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
+				<Option platforms="Windows;" />
+				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -20,11 +21,11 @@
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
-					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
+					<Add directory="$(#wx)/lib/gcc_dll/mswud" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="$(#wx)\include" />
-					<Add directory="$(#wx)\lib\gcc_dll\mswud" />
+					<Add directory="$(#wx)/include" />
+					<Add directory="$(#wx)/lib/gcc_dll/mswud" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-mthreads" />
@@ -32,7 +33,8 @@
 				</Linker>
 			</Target>
 			<Target title="ReleaseWindows">
-				<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
+				<Option platforms="Windows;" />
+				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -44,11 +46,11 @@
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-O2" />
 					<Add option='[[if ((GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
-					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
+					<Add directory="$(#wx)/lib/gcc_dll/mswu" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="$(#wx)\include" />
-					<Add directory="$(#wx)\lib\gcc_dll\mswu" />
+					<Add directory="$(#wx)/include" />
+					<Add directory="$(#wx)/lib/gcc_dll/mswu" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-mthreads" />
@@ -57,38 +59,40 @@
 				</Linker>
 			</Target>
 			<Target title="DebugLinux">
-				<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
+				<Option platforms="Unix;" />
+				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="`wx-config --cflags`" />
+					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add option="`wx-config --cflags`" />
 					<Add option="-Winvalid-pch" />
 					<Add option="-include wx_pch.h" />
 					<Add option="-DWX_PRECOMP" />
-					<Add option="-Wall" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs`" />
 				</Linker>
 			</Target>
 			<Target title="ReleaseLinux">
-				<Option output="..\bin\xMenu" prefix_auto="1" extension_auto="1" />
+				<Option platforms="Unix;" />
+				<Option output="../bin/xMenu" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="`wx-config --cflags`" />
 					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="`wx-config --cflags`" />
 					<Add option="-Winvalid-pch" />
 					<Add option="-include wx_pch.h" />
 					<Add option="-DWX_PRECOMP" />
-					<Add option="-Wall" />
 				</Compiler>
 				<Linker>
-					<Add option="`wx-config --libs`" />
 					<Add option="-s" />
+					<Add option="`wx-config --libs`" />
 				</Linker>
 			</Target>
 		</Build>
@@ -109,9 +113,11 @@
 		<Unit filename="SerialPortWithRate.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
+			<Option target="DebugWindows" />
+			<Option target="ReleaseWindows" />
 		</Unit>
 		<Unit filename="wx_pch.h" />
-		<Unit filename="wxsmith\MainMenuframe.wxs" />
+		<Unit filename="wxsmith/MainMenuframe.wxs" />
 		<Extensions>
 			<code_completion />
 			<envvars />

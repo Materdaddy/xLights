@@ -33,12 +33,12 @@
 #include <wx/numdlg.h>
 
 //(*InternalHeaders(xScheduleFrame)
-#include <wx/artprov.h>
-#include <wx/bitmap.h>
-#include <wx/font.h>
-#include <wx/intl.h>
-#include <wx/image.h>
 #include <wx/string.h>
+#include <wx/intl.h>
+#include <wx/font.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/artprov.h>
 //*)
 
 #include "../include/minibasic.cpp"
@@ -525,26 +525,26 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     wxArtProvider::Push(new MyArtProvider);
 
     //(*Initialize(xScheduleFrame)
-    wxMenu* MenuHelp;
-    wxFlexGridSizer* FlexGridSizer4;
-    wxMenuItem* MenuItemCustomScript;
     wxMenuItem* MenuItem2;
-    wxMenuItem* MenuItemAddList;
-    wxFlexGridSizer* FlexGridSizer3;
     wxMenuItem* MenuItem1;
-    wxMenuItem* MenuItem4;
-    wxFlexGridSizer* FlexGridSizer5;
-    wxFlexGridSizer* FlexGridSizer2;
-    wxFlexGridSizer* FlexGridSizer7;
-    wxMenuItem* MenuItemDelList;
-    wxMenuItem* MenuItem3;
     wxFlexGridSizer* FlexGridSizer8;
-    wxMenu* MenuFile;
-    wxMenuItem* MenuItemRenameList;
-    wxMenuBar* MenuBar1;
-    wxFlexGridSizer* FlexGridSizer6;
     wxFlexGridSizer* FlexGridSizer1;
+    wxFlexGridSizer* FlexGridSizer2;
+    wxMenuItem* MenuItemDelList;
+    wxMenu* MenuFile;
+    wxMenuItem* MenuItemAddList;
+    wxFlexGridSizer* FlexGridSizer7;
+    wxFlexGridSizer* FlexGridSizer4;
+    wxFlexGridSizer* FlexGridSizer6;
+    wxMenuItem* MenuItem3;
+    wxFlexGridSizer* FlexGridSizer3;
+    wxMenuBar* MenuBar1;
+    wxMenuItem* MenuItem4;
+    wxMenuItem* MenuItemCustomScript;
     wxMenu* MenuPlaylist;
+    wxFlexGridSizer* FlexGridSizer5;
+    wxMenu* MenuHelp;
+    wxMenuItem* MenuItemRenameList;
 
     Create(parent, wxID_ANY, _("xScheduler"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(635,311));
@@ -572,7 +572,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     AuiManager1->AddPane(AuiToolBar1, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper());
     AuiManager1->Update();
     FlexGridSizer2->Add(Panel2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Notebook1 = new wxNotebook(Panel1, ID_NOTEBOOK1, wxDefaultPosition, wxSize(968,312), 0, _T("ID_NOTEBOOK1"));
+    Notebook1 = new wxNotebook(Panel1, ID_NOTEBOOK1, wxDefaultPosition, wxSize(1057,350), 0, _T("ID_NOTEBOOK1"));
     PanelCal = new wxPanel(Notebook1, ID_PANEL_CAL, wxPoint(49,10), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_CAL"));
     FlexGridSizer8 = new wxFlexGridSizer(1, 2, 0, 0);
     FlexGridSizer8->AddGrowableCol(0);
@@ -934,16 +934,9 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
 
     id=baseid+PLAYLIST_LISTBOX;
     wxListCtrl* ListBox1 = new wxListCtrl(PanelPlayList, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL);
-    wxListItem itemCol;
-    itemCol.SetText(_T("Filename"));
-    itemCol.SetImage(-1);
-    ListBox1->InsertColumn(0, itemCol);
+
     ListBox1->SetToolTip(_("Drag an item to reorder the list"));
     Connect(id, wxEVT_COMMAND_LIST_BEGIN_DRAG, (wxObjectEventFunction)&xScheduleFrame::OnPlayListBeginDrag);
-
-    itemCol.SetText(_T("Delay (s)"));
-    itemCol.SetAlign(wxLIST_FORMAT_CENTRE);
-    ListBox1->InsertColumn(1, itemCol);
     FlexGridSizer4->Add(ListBox1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 
     id=baseid+PLAYLIST_LOGIC;
@@ -955,6 +948,17 @@ void xScheduleFrame::AddPlaylist(const wxString& name) {
     FlexGridSizer4->Fit(PanelPlayList);
     FlexGridSizer4->SetSizeHints(PanelPlayList);
     Notebook1->AddPage(PanelPlayList, name, true);
+
+    // set playlist columns
+    wxListItem itemCol;
+    itemCol.SetText(_T("Filename"));
+    itemCol.SetImage(-1);
+    ListBox1->InsertColumn(0, itemCol);
+    itemCol.SetText(_T("Delay (s)"));
+    itemCol.SetAlign(wxLIST_FORMAT_CENTRE);
+    ListBox1->InsertColumn(1, itemCol);
+    ListBox1->SetColumnWidth(0,100);
+    ListBox1->SetColumnWidth(1,100);
 }
 
 void xScheduleFrame::OnButtonPlaylistAddClick() {
