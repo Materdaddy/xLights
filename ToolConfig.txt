@@ -62,7 +62,7 @@ OS/X (Mac)
 On OS/X, compilation is done using Xcode. Code::Blocks is not used.
 Xcode can be downloaded from the Apple developer web site. Make
 sure you install the version of Xcode that matches your version of
-OS/X. For example, I use OS/X 10.4, so I installed Xcode 2.5.
+OS/X. For example, I use OS/X 10.6, so I installed Xcode 3.1.
 Instructions are here:
 
   http://wiki.wxwidgets.org/Installing_Xcode
@@ -85,7 +85,7 @@ However, I followed the method used for Linux from inside a Terminal window:
   make
 
 Next, you will use Xcode to compile each of the xLights modules
-(xMenu, xTester, xTesterRGB, xSchedule). You will need to treat each one
+(xMenu, xScheduler, xConverter). You will need to treat each one
 as a separate project. Most of the steps are listed here:
 
   http://wiki.wxwidgets.org/Creating_Xcode_projects_for_wxWidgets_applications
@@ -103,7 +103,7 @@ WINDOWS
 You will need:
   a) MinGW compiler (a nice distro is here: http://nuwen.net/mingw.html)
   b) Code::Blocks for Windows (currently using 10.05)
-  c) wxWidgets for Windows (currently using 2.8.11)
+  c) wxWidgets for Windows (currently using 2.9.3)
   d) If using wxPack, wxWidgets is precompiled. Otherwise, you will need
      to compile it yourself. To compile it yourself:
      1) Open a command prompt
@@ -123,7 +123,7 @@ You will need:
         as described in the Code::Blocks documentation. It should be
         set to your wxWidgets base directory.
   f) Now you are ready to use Code::Blocks to build
-     each of the binaries (xMenu, xTester, xTesterRGB, xSchedule)
+     each of the binaries (xMenu, xScheduler, xConverter)
      by double-clicking on the cbp file in each directory.
 
 

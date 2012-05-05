@@ -2,15 +2,15 @@
 #define TESTDIALOG_H
 
 //(*Headers(TestDialog)
-#include <wx/dialog.h>
-#include <wx/sizer.h>
 #include <wx/notebook.h>
-#include <wx/button.h>
-#include <wx/radiobut.h>
-#include <wx/panel.h>
-#include <wx/slider.h>
+#include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/radiobut.h>
+#include <wx/slider.h>
+#include <wx/panel.h>
 #include <wx/choice.h>
+#include <wx/button.h>
+#include <wx/dialog.h>
 //*)
 
 #include <wx/checklst.h>
@@ -86,67 +86,67 @@ class TestDialog: public wxDialog
         } TestFunc;
 
 		//(*Declarations(TestDialog)
-		wxRadioButton* RadioButtonTwinkle50;
-		wxRadioButton* RadioButtonAlt;
-		wxRadioButton* RadioButtonRgbChase;
-		wxSlider* SliderBgColorC;
+		wxStaticText* StaticText10;
+		wxRadioButton* RadioButtonChase5;
+		wxStaticText* StaticText9;
+		wxRadioButton* RadioButtonRgbCycle4;
 		wxRadioButton* RadioButtonRgbChaseOff;
+		wxRadioButton* RadioButtonRgbCycleOff;
+		wxButton* ButtonExport;
+		wxRadioButton* RadioButtonRgbChase;
+		wxRadioButton* RadioButtonRgbChase5;
+		wxRadioButton* RadioButtonRgbChase3;
+		wxStaticText* StaticText29;
+		wxRadioButton* RadioButtonShimmer;
+		wxNotebook* Notebook1;
 		wxStaticText* StaticText13;
-		wxRadioButton* RadioButtonRgbCycle3;
+		wxStaticText* StaticText2;
 		wxButton* ButtonClose;
 		wxSlider* SliderFgColorC;
-		wxButton* ButtonClear;
-		wxRadioButton* RadioButtonRgbTwinkle05;
-		wxRadioButton* RadioButtonRgbCycleOff;
-		wxRadioButton* RadioButtonRgbCycleMixed;
-		wxRadioButton* RadioButtonRgbShimmer;
-		wxRadioButton* RadioButtonRgbTwinkle10;
-		wxRadioButton* RadioButtonRgbAlt;
-		wxRadioButton* RadioButtonTwinkle10;
-		wxSlider* SliderBgColorA;
-		wxSlider* SliderFgIntensity;
-		wxSlider* SliderFgColorA;
-		wxRadioButton* RadioButtonRgbCycle4;
-		wxRadioButton* RadioButtonRgbTwinkle50;
-		wxRadioButton* RadioButtonOff;
-		wxRadioButton* RadioButtonChase3;
-		wxRadioButton* RadioButtonChase;
-		wxPanel* Panel_RGB;
-		wxStaticText* StaticText1;
-		wxStaticText* StaticText10;
-		wxRadioButton* RadioButtonRgbDim;
-		wxStaticText* StaticText3;
-		wxRadioButton* RadioButtonTwinkle05;
-		wxSlider* SliderChaseSpeed;
-		wxRadioButton* RadioButtonShimmer;
-		wxRadioButton* RadioButtonTwinkle25;
-		wxRadioButton* RadioButtonRgbChase3;
-		wxRadioButton* RadioButtonChase5;
-		wxStaticText* StaticText8;
-		wxButton* ButtonExport;
-		wxPanel* Panel3;
-		wxRadioButton* RadioButtonChase4;
-		wxButton* ButtonLightsOff;
-		wxRadioButton* RadioButtonRgbChase5;
-		wxNotebook* Notebook2;
-		wxChoice* ChoiceNumSelect;
-		wxStaticText* StaticText4;
-		wxRadioButton* RadioButtonRgbTwinkle25;
-		wxStaticText* StaticText2;
-		wxSlider* SliderRgbCycleSpeed;
-		wxNotebook* Notebook1;
-		wxPanel* Panel_RGB_Cycle;
-		wxPanel* PanelStandard;
-		wxSlider* SliderBgColorB;
-		wxSlider* SliderFgColorB;
-		wxRadioButton* RadioButtonRgbCycle5;
-		wxSlider* SliderBgIntensity;
-		wxStaticText* StaticText29;
-		wxStaticText* StaticText9;
-		wxRadioButton* RadioButtonDim;
-		wxRadioButton* RadioButtonRgbChase4;
 		wxSlider* SliderRgbChaseSpeed;
+		wxButton* ButtonLightsOff;
+		wxRadioButton* RadioButtonRgbCycle3;
+		wxRadioButton* RadioButtonDim;
+		wxRadioButton* RadioButtonChase4;
+		wxPanel* Panel_RGB;
+		wxRadioButton* RadioButtonRgbTwinkle10;
+		wxRadioButton* RadioButtonChase3;
+		wxSlider* SliderChaseSpeed;
+		wxStaticText* StaticText8;
 		wxStaticText* StaticText11;
+		wxPanel* PanelStandard;
+		wxSlider* SliderFgColorA;
+		wxStaticText* StaticText1;
+		wxButton* ButtonClear;
+		wxStaticText* StaticText3;
+		wxRadioButton* RadioButtonRgbAlt;
+		wxPanel* Panel3;
+		wxSlider* SliderRgbCycleSpeed;
+		wxRadioButton* RadioButtonTwinkle50;
+		wxRadioButton* RadioButtonRgbCycleMixed;
+		wxSlider* SliderBgColorA;
+		wxRadioButton* RadioButtonRgbTwinkle50;
+		wxSlider* SliderBgColorC;
+		wxRadioButton* RadioButtonRgbTwinkle05;
+		wxChoice* ChoiceNumSelect;
+		wxRadioButton* RadioButtonRgbTwinkle25;
+		wxRadioButton* RadioButtonRgbShimmer;
+		wxRadioButton* RadioButtonTwinkle10;
+		wxSlider* SliderBgColorB;
+		wxRadioButton* RadioButtonRgbDim;
+		wxRadioButton* RadioButtonTwinkle25;
+		wxRadioButton* RadioButtonChase;
+		wxSlider* SliderBgIntensity;
+		wxRadioButton* RadioButtonTwinkle05;
+		wxNotebook* Notebook2;
+		wxRadioButton* RadioButtonOff;
+		wxStaticText* StaticText4;
+		wxRadioButton* RadioButtonRgbCycle5;
+		wxRadioButton* RadioButtonRgbChase4;
+		wxPanel* Panel_RGB_Cycle;
+		wxSlider* SliderFgIntensity;
+		wxSlider* SliderFgColorB;
+		wxRadioButton* RadioButtonAlt;
 		//*)
 
 	protected:

@@ -182,18 +182,24 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
     int menuID, idx;
     for (int i=0; i<MRU_LENGTH; i++) {
         mru_name=wxString::Format(wxT("mru%d"),i);
+        dir.clear();
         if ( config->Read(mru_name, &dir) ) {
-            idx=mru.Index(dir);
-            if (idx == wxNOT_FOUND && !dir.IsEmpty()) mru.Add(dir);
+            if (!dir.IsEmpty()) {
+                idx=mru.Index(dir);
+                if (idx == wxNOT_FOUND) mru.Add(dir);
+            }
         }
         menuID = wxNewId();
-        mru_MenuItem[i] = new wxMenuItem(mru_Menu, menuID);
+        mru_MenuItem[i] = new wxMenuItem(mru_Menu, menuID, mru_name);
         Connect(menuID,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuMRU);
     }
+    dir.clear();
     if ( config->Read(_("LastDir"), &dir) ) {
-        idx=mru.Index(dir);
-        if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
-        SetDir(dir);
+        if (!dir.IsEmpty()) {
+            idx=mru.Index(dir);
+            if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
+            SetDir(dir);
+        }
     }
     delete config;
 }
@@ -268,21 +274,11 @@ void MainMenuFrame::SetDir(const wxString& dirname)
     ButtonNetworkSetup->Enable();
     SetButtonEnable();
 
-    /*
-    wxString msg=wxString::Format(wxT("SetDir %d:\n"),mru.GetCount());;
-    for (int i=0; i<mru.GetCount(); i++) msg+=wxT("\n") + mru[i];
-    wxMessageBox(msg);
-    */
-
-    // clear mru items from menu
-    /*
-    for (int i=0; i<MRU_LENGTH; i++) {
-        mru_Menu->Remove(mru_MenuItem[i]);
-    }
-    */
-
     // append mru items to menu
     int cnt=mru.GetCount();
+    if (mru_MenuLength == 0 && cnt > 0) {
+        mru_Menu->AppendSeparator();
+    }
     for (int i=0; i<cnt; i++) {
         mru_MenuItem[i]->SetItemLabel(mru[i]);
         if (i >= mru_MenuLength) {

@@ -3,9 +3,9 @@
 #include <limits>
 
 //(*InternalHeaders(TestDialog)
-#include <wx/string.h>
-#include <wx/intl.h>
 #include <wx/font.h>
+#include <wx/intl.h>
+#include <wx/string.h>
 //*)
 
 //(*IdInit(TestDialog)
@@ -80,27 +80,27 @@ END_EVENT_TABLE()
 TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(TestDialog)
-	wxFlexGridSizer* FlexGridSizer21;
-	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer2;
-	wxFlexGridSizer* FlexGridSizer15;
-	wxBoxSizer* BoxSizer3;
-	wxFlexGridSizer* FlexGridSizer17;
+	wxFlexGridSizer* FlexGridSizer24;
+	wxStaticBoxSizer* StaticBoxSizerHighlightColor;
 	wxBoxSizer* BoxSizer10;
-	wxFlexGridSizer* FlexGridSizer11;
-	wxFlexGridSizer* FlexGridSizer7;
-	wxBoxSizer* BoxSizer2;
-	wxFlexGridSizer* FlexGridSizer9;
-	wxFlexGridSizer* FlexGridSizer14;
+	wxFlexGridSizer* FlexGridSizer10;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer22;
-	wxStaticBoxSizer* StaticBoxSizerHighlightColor;
-	wxStaticBoxSizer* StaticBoxSizerBackgroundColor;
-	wxFlexGridSizer* FlexGridSizer10;
-	wxBoxSizer* BoxSizer1;
-	wxFlexGridSizer* FlexGridSizer24;
+	wxFlexGridSizer* FlexGridSizer9;
+	wxFlexGridSizer* FlexGridSizer2;
+	wxBoxSizer* BoxSizer2;
+	wxFlexGridSizer* FlexGridSizer7;
+	wxFlexGridSizer* FlexGridSizer15;
+	wxFlexGridSizer* FlexGridSizer21;
+	wxFlexGridSizer* FlexGridSizer14;
 	wxFlexGridSizer* FlexGridSizer20;
-
+	wxBoxSizer* BoxSizer1;
+	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer11;
+	wxBoxSizer* BoxSizer3;
+	wxFlexGridSizer* FlexGridSizer17;
+	wxStaticBoxSizer* StaticBoxSizerBackgroundColor;
+	
 	Create(parent, id, _("xTester"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
 	SetClientSize(wxDefaultSize);
 	Move(wxDefaultPosition);
@@ -336,7 +336,7 @@ TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	BoxSizer1->Fit(this);
 	BoxSizer1->SetSizeHints(this);
 	Center();
-
+	
 	Connect(ID_BUTTON_CLEAR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonClearClick);
 	Connect(ID_BUTTON_EXPORT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonExportClick);
 	Connect(ID_BUTTON_LIGHTS_OFF,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonLightsOffClick);

@@ -140,19 +140,19 @@ void xConverter::LoadNetworkFile()
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
         wxXmlNode* e=doc.GetRoot();
-        tempstr=e->GetPropVal(wxT("LorMapping"), wxT("2"));
+        tempstr=e->GetAttribute(wxT("LorMapping"), wxT("2"));
         tempstr.ToLong(&LorMapping);
         for( e=e->GetChildren(); e!=NULL; e=e->GetNext() ) {
             tagname=e->GetName();
             if (tagname == wxT("network")) {
-                tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
+                tempstr=e->GetAttribute(wxT("MaxChannels"), wxT("0"));
                 tempstr.ToLong(&MaxChan);
                 TotChannels+=MaxChan;
                 NetMaxChannel.push_back(MaxChan);
                 /*
-                NetworkType=e->GetPropVal(wxT("NetworkType"), wxT(""));
-                ComPort=e->GetPropVal(wxT("ComPort"), wxT(""));
-                BaudRate=e->GetPropVal(wxT("BaudRate"), wxT(""));
+                NetworkType=e->GetAttribute(wxT("NetworkType"), wxT(""));
+                ComPort=e->GetAttribute(wxT("ComPort"), wxT(""));
+                BaudRate=e->GetAttribute(wxT("BaudRate"), wxT(""));
                 AddNetwork(NetworkType,ComPort,BaudRate,MaxChan);
                 */
             }
@@ -314,16 +314,16 @@ void xConverter::WriteVixenFile(const wxString& filename)
     textnode = new wxXmlNode( node, wxXML_TEXT_NODE, wxEmptyString, base64_encode(SeqData, SeqDataLen) );
 
     node = new wxXmlNode( root, wxXML_ELEMENT_NODE, wxT("Audio") );
-    node->AddProperty( wxT("filename"), mediaFilename);
-    node->AddProperty( wxT("duration"), wxString::Format(wxT("%ld"),TotalTime));
+    node->AddAttribute( wxT("filename"), mediaFilename);
+    node->AddAttribute( wxT("duration"), wxString::Format(wxT("%ld"),TotalTime));
     textnode = new wxXmlNode( node, wxXML_TEXT_NODE, wxEmptyString, wxT("Music") );
 
     chparent = new wxXmlNode( root, wxXML_ELEMENT_NODE, wxT("Channels") );
     for (size_t ch=0; ch < SeqNumChannels; ch++ ) {
         node = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Channel") );
-        node->AddProperty( wxT("output"), wxString::Format(wxT("%d"),ch));
-        node->AddProperty( wxT("id"), wxT("0"));
-        node->AddProperty( wxT("enabled"), wxT("True"));
+        node->AddAttribute( wxT("output"), wxString::Format(wxT("%d"),ch));
+        node->AddAttribute( wxT("id"), wxT("0"));
+        node->AddAttribute( wxT("enabled"), wxT("True"));
         chparent->AddChild( node );
         if (ch < ChannelNames.size() && !ChannelNames[ch].IsEmpty()) {
             ChannelName = ChannelNames[ch];
@@ -338,7 +338,7 @@ void xConverter::WriteVixenFile(const wxString& filename)
             // default to white
             ChannelColor = -1;
         }
-        node->AddProperty( wxT("color"), wxString::Format(wxT("%d"),ChannelColor));
+        node->AddAttribute( wxT("color"), wxString::Format(wxT("%d"),ChannelColor));
         textnode = new wxXmlNode( node, wxXML_TEXT_NODE, wxEmptyString, ChannelName );
     }
 
@@ -379,9 +379,7 @@ void xConverter::WriteXLightsFile(const wxString& filename)
         return;
     }
     sprintf(hdr,"xLights %2d %8d %8ld",1,SeqNumChannels,SeqNumPeriods);
-    for (size_t i=0; i < mediaFilename.size(); i++) {
-        hdr[i+32]=mediaFilename[i] & 0x7f;
-    }
+    strncpy(&hdr[32],mediaFilename.c_str(),470);
     f.Write(hdr,512);
     f.Write(SeqData,SeqDataLen);
     f.Close();
@@ -440,8 +438,8 @@ bool xConverter::LoadVixenProfile(const wxString& ProfileName)
             if (tag == _("ChannelObjects")) {
                 for( wxXmlNode* p=e->GetChildren(); p!=NULL; p=p->GetNext() ) {
                     if (p->GetName() == _("Channel")) {
-                        if (p->HasProp(wxT("output"))) {
-                            tempstr=p->GetPropVal(wxT("output"), wxT("0"));
+                        if (p->HasAttribute(wxT("output"))) {
+                            tempstr=p->GetAttribute(wxT("output"), wxT("0"));
                             tempstr.ToLong(&OutputChannel);
                             VixChannels.push_back(OutputChannel);
                         }
@@ -810,7 +808,9 @@ void xConverter::DoConversion(const wxString& Filename, const wxString& OutputFo
     }
 
     // write converted file
-    switch (OutputFormat[0])
+    char c;
+    OutputFormat[0].GetAsChar(&c);
+    switch (c)
     {
         case 'x':
             oName.SetExt(_(XLIGHTS_SEQUENCE_EXT));

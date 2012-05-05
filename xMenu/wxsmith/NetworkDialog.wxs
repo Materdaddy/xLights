@@ -4,12 +4,13 @@
 		<title>Define Lighting Networks</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
-			<cols>3</cols>
+			<cols>1</cols>
+			<rows>1</rows>
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
 					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 						<cols>1</cols>
-						<rows>2</rows>
+						<rows>3</rows>
 						<growablecols>0</growablecols>
 						<growablerows>1</growablerows>
 						<object class="sizeritem">

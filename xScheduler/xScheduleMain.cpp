@@ -1029,6 +1029,7 @@ xScheduleFrame::~xScheduleFrame()
 {
     //(*Destroy(xScheduleFrame)
     //*)
+    if (AuiManager1) AuiManager1->UnInit();
     if (pTestDialog) delete pTestDialog;
 }
 
@@ -1823,16 +1824,16 @@ void xScheduleFrame::LoadNetworkFile()
     wxXmlDocument doc;
     if (doc.Load( networkFile.GetFullPath() )) {
         wxXmlNode* e=doc.GetRoot();
-        tempstr=e->GetPropVal(wxT("LorMapping"), wxT("2"));
+        tempstr=e->GetAttribute(wxT("LorMapping"), wxT("2"));
         tempstr.ToLong(&LorMapping);
         for( e=doc.GetRoot()->GetChildren(); e!=NULL; e=e->GetNext() ) {
             wxString tagname=e->GetName();
             if (tagname == wxT("network")) {
-                wxString tempstr=e->GetPropVal(wxT("MaxChannels"), wxT("0"));
+                wxString tempstr=e->GetAttribute(wxT("MaxChannels"), wxT("0"));
                 tempstr.ToLong(&MaxChan);
-                wxString NetworkType=e->GetPropVal(wxT("NetworkType"), wxT(""));
-                wxString ComPort=e->GetPropVal(wxT("ComPort"), wxT(""));
-                wxString BaudRate=e->GetPropVal(wxT("BaudRate"), wxT(""));
+                wxString NetworkType=e->GetAttribute(wxT("NetworkType"), wxT(""));
+                wxString ComPort=e->GetAttribute(wxT("ComPort"), wxT(""));
+                wxString BaudRate=e->GetAttribute(wxT("BaudRate"), wxT(""));
                 AddNetwork(NetworkType,ComPort,BaudRate,MaxChan);
             }
         }
@@ -2103,7 +2104,7 @@ bool xScheduleFrame::LoadLorFile(wxString& FileName)
     wxXmlDocument doc;
     if (doc.Load( FileName )) {
         wxXmlNode* root=doc.GetRoot();
-        SetMediaFilename(root->GetPropVal(wxT("musicFilename"), wxT("")));
+        SetMediaFilename(root->GetAttribute(wxT("musicFilename"), wxT("")));
         for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
             if (e->GetName() == _("channels")) {
                 LoadLorChannels(e);
@@ -2123,13 +2124,13 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
     wxString tempstr;
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() != _("channel")) continue;
-        if (e->HasProp(_("unit")) && e->HasProp(_("circuit"))) {
-            tempstr=e->GetPropVal(wxT("unit"), wxT("1"));
+        if (e->HasAttribute(_("unit")) && e->HasAttribute(_("circuit"))) {
+            tempstr=e->GetAttribute(wxT("unit"), wxT("1"));
             tempstr.ToLong(&unit);
             if (unit < 0) unit+=256;
-            tempstr=e->GetPropVal(wxT("circuit"), wxT("0"));
+            tempstr=e->GetAttribute(wxT("circuit"), wxT("0"));
             tempstr.ToLong(&circuit);
-            tempstr=e->GetPropVal(wxT("network"), wxT("0"));
+            tempstr=e->GetAttribute(wxT("network"), wxT("0"));
             tempstr.ToLong(&netnum);
             while (netnum >= LorLastUnit.size()) {
                 LorLastUnit.push_back(-1);
@@ -2163,11 +2164,11 @@ void xScheduleFrame::LoadLorChannel(wxXmlNode* n, int netnum, int chindex)
     wxString tempstr;
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() != _("effect")) continue;
-        if (!e->HasProp(_("startCentisecond"))) continue;
-        if (!e->HasProp(_("endCentisecond"))) continue;
-        if (!e->HasProp(_("type"))) continue;
+        if (!e->HasAttribute(_("startCentisecond"))) continue;
+        if (!e->HasAttribute(_("endCentisecond"))) continue;
+        if (!e->HasAttribute(_("type"))) continue;
 
-        tempstr=e->GetPropVal(wxT("type"), wxT(""));
+        tempstr=e->GetAttribute(wxT("type"), wxT(""));
         if (tempstr == _("intensity")) {
             action=LOR_INTENSITY;
         } else if (tempstr == _("twinkle")) {
@@ -2177,18 +2178,18 @@ void xScheduleFrame::LoadLorChannel(wxXmlNode* n, int netnum, int chindex)
         } else {
             continue;
         }
-        tempstr=e->GetPropVal(wxT("startCentisecond"), wxT("0"));
+        tempstr=e->GetAttribute(wxT("startCentisecond"), wxT("0"));
         tempstr.ToLong(&start);
-        tempstr=e->GetPropVal(wxT("endCentisecond"), wxT("0"));
+        tempstr=e->GetAttribute(wxT("endCentisecond"), wxT("0"));
         tempstr.ToLong(&end);
-        if (e->HasProp(wxT("intensity"))) {
-            tempstr=e->GetPropVal(wxT("intensity"), wxT("0"));
+        if (e->HasAttribute(wxT("intensity"))) {
+            tempstr=e->GetAttribute(wxT("intensity"), wxT("0"));
             tempstr.ToLong(&startint);
             endint=-1;
-        } else if (e->HasProp(wxT("startIntensity")) && e->HasProp(wxT("endIntensity"))) {
-            tempstr=e->GetPropVal(wxT("startIntensity"), wxT("0"));
+        } else if (e->HasAttribute(wxT("startIntensity")) && e->HasAttribute(wxT("endIntensity"))) {
+            tempstr=e->GetAttribute(wxT("startIntensity"), wxT("0"));
             tempstr.ToLong(&startint);
-            tempstr=e->GetPropVal(wxT("endIntensity"), wxT("100"));
+            tempstr=e->GetAttribute(wxT("endIntensity"), wxT("100"));
             tempstr.ToLong(&endint);
         }
         if (start != lastend && lastend > 0) {
@@ -2310,14 +2311,14 @@ bool xScheduleFrame::LoadVixenFile(wxString& FileName)
                 tempstr=e->GetNodeContent();
                 tempstr.ToLong(&MaxIntensity);
             } else if (tag == _("Audio") || tag == _("Song")) {
-                wxString filename=e->GetPropVal(wxT("filename"), wxT(""));
+                wxString filename=e->GetAttribute(wxT("filename"), wxT(""));
                 SetMediaFilename(filename);
             } else if (tag == _("Channels")) {
                 for( wxXmlNode* p=e->GetChildren(); p!=NULL; p=p->GetNext() ) {
                     if (p->GetName() == _("Channel")) {
                         VixNumChannels++;
-                        if (p->HasProp(wxT("output"))) {
-                            tempstr=p->GetPropVal(wxT("output"), wxT("0"));
+                        if (p->HasAttribute(wxT("output"))) {
+                            tempstr=p->GetAttribute(wxT("output"), wxT("0"));
                             tempstr.ToLong(&OutputChannel);
                             VixNetwork2.push_back(VixNetwork[OutputChannel]);
                         }
@@ -2368,8 +2369,8 @@ bool xScheduleFrame::LoadVixenProfile(const wxString& ProfileName)
                 for( wxXmlNode* p=e->GetChildren(); p!=NULL; p=p->GetNext() ) {
                     if (p->GetName() == _("Channel")) {
                         VixNumChannels++;
-                        if (p->HasProp(wxT("output"))) {
-                            tempstr=p->GetPropVal(wxT("output"), wxT("0"));
+                        if (p->HasAttribute(wxT("output"))) {
+                            tempstr=p->GetAttribute(wxT("output"), wxT("0"));
                             tempstr.ToLong(&OutputChannel);
                             VixNetwork2.push_back(VixNetwork[OutputChannel]);
                         }
@@ -2657,18 +2658,18 @@ void xScheduleFrame::SaveFile()
     wxXmlDocument doc;
     wxXmlNode *item, *plist, *scriptnode, *scripttext;
     wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("xSchedule") );
-    root->AddProperty( wxT("computer"), wxGetHostName());
+    root->AddAttribute( wxT("computer"), wxGetHostName());
     doc.SetRoot( root );
 
     // save schedule
     wxXmlNode* sched = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("schedule") );
-    sched->AddProperty( wxT("schedstart"), ShowStartDate.FormatISODate() );
-    sched->AddProperty( wxT("schedend"), ShowEndDate.FormatISODate() );
+    sched->AddAttribute( wxT("schedstart"), ShowStartDate.FormatISODate() );
+    sched->AddAttribute( wxT("schedend"), ShowEndDate.FormatISODate() );
     root->AddChild(sched);
     int cnt=ShowEvents.GetCount();
     for (int i=0; i<cnt; i++) {
         item = new wxXmlNode( wxXML_ELEMENT_NODE, _("calevent") );
-        item->AddProperty( wxT("schedcode"), ShowEvents[i] );
+        item->AddAttribute( wxT("schedcode"), ShowEvents[i] );
         sched->AddChild( item );
     }
 
@@ -2679,7 +2680,7 @@ void xScheduleFrame::SaveFile()
     cnt=Notebook1->GetPageCount();
     for (int pagenum=FixedPages; pagenum < cnt; pagenum++) {
         plist = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("playlist") );
-        plist->AddProperty( wxT("name"), Notebook1->GetPageText(pagenum) );
+        plist->AddAttribute( wxT("name"), Notebook1->GetPageText(pagenum) );
         baseid=1000*pagenum;
         wxListCtrl* ListBoxPlay=(wxListCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
         for (int i=CHKBOX_AUDIO; i<=CHKBOX_MOVIEMODE; i++) {
@@ -2687,19 +2688,19 @@ void xScheduleFrame::SaveFile()
             v = chkbox->GetValue() ? _("1") : _("0");
             wxString label = chkbox->GetLabelText();
             label.Replace(_(" "), _(""));
-            plist->AddProperty( label, v );
+            plist->AddAttribute( label, v );
         }
         lists->AddChild( plist );
 
         RowCount=ListBoxPlay->GetItemCount();
         for (unsigned int r=0; r < RowCount; r++ ) {
             item = new wxXmlNode( wxXML_ELEMENT_NODE, _("listitem") );
-            item->AddProperty( wxT("name"), ListBoxPlay->GetItemText(r) );
+            item->AddAttribute( wxT("name"), ListBoxPlay->GetItemText(r) );
             column1.SetId(r);
             column1.SetColumn(1);
             column1.SetMask(wxLIST_MASK_TEXT);
             ListBoxPlay->GetItem(column1);
-            item->AddProperty( wxT("delay"), column1.GetText() );
+            item->AddAttribute( wxT("delay"), column1.GetText() );
             plist->AddChild( item );
         }
 
@@ -2746,16 +2747,16 @@ void xScheduleFrame::LoadSchedule(wxXmlNode* n)
 {
     wxDateTime NewStart = wxDateTime::Now();
     wxDateTime NewEnd = wxDateTime::Now();
-    if (n->HasProp(wxT("schedstart"))) {
-        NewStart.ParseFormat(n->GetPropVal( wxT("schedstart"), wxT("")), wxT("%Y-%m-%d"));
+    if (n->HasAttribute(wxT("schedstart"))) {
+        NewStart.ParseFormat(n->GetAttribute( wxT("schedstart"), wxT("")), wxT("%Y-%m-%d"));
     }
-    if (n->HasProp(wxT("schedend"))) {
-        NewEnd.ParseFormat(n->GetPropVal( wxT("schedend"), wxT("")), wxT("%Y-%m-%d"));
+    if (n->HasAttribute(wxT("schedend"))) {
+        NewEnd.ParseFormat(n->GetAttribute( wxT("schedend"), wxT("")), wxT("%Y-%m-%d"));
     }
     UpdateShowDates(NewStart,NewEnd);
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == _("calevent")) {
-            wxString schedcode = e->GetPropVal( wxT("schedcode"), wxT(""));
+            wxString schedcode = e->GetAttribute( wxT("schedcode"), wxT(""));
             if (schedcode.Len() > 10) ShowEvents.Add(schedcode);
         }
     }
@@ -2774,7 +2775,7 @@ void xScheduleFrame::LoadPlaylist(wxXmlNode* n)
 {
     wxCheckBox* chkbox;
     wxString chkval;
-    wxString name = n->GetPropVal( wxT("name"), wxT(""));
+    wxString name = n->GetAttribute( wxT("name"), wxT(""));
     int baseid=1000*Notebook1->GetPageCount();
     AddPlaylist(name);
     for (int i=CHKBOX_AUDIO; i<=CHKBOX_MOVIEMODE; i++) {
@@ -2782,7 +2783,7 @@ void xScheduleFrame::LoadPlaylist(wxXmlNode* n)
         if (!chkbox) continue;
         wxString label = chkbox->GetLabelText();
         label.Replace(_(" "), _(""));
-        chkval = n->GetPropVal(label, wxT("0"));
+        chkval = n->GetAttribute(label, wxT("0"));
         chkbox->SetValue( chkval == _("1") );
     }
     wxListCtrl* ListBoxPlay = (wxListCtrl*)wxWindow::FindWindowById(baseid+PLAYLIST_LISTBOX,Notebook1);
@@ -2791,8 +2792,8 @@ void xScheduleFrame::LoadPlaylist(wxXmlNode* n)
     int cnt=0;
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == _("listitem")) {
-            ListBoxPlay->InsertItem(cnt,e->GetPropVal(wxT("name"), wxT("")));
-            ListBoxPlay->SetItem(cnt,1,e->GetPropVal(wxT("delay"), wxT("0")));
+            ListBoxPlay->InsertItem(cnt,e->GetAttribute(wxT("name"), wxT("")));
+            ListBoxPlay->SetItem(cnt,1,e->GetAttribute(wxT("delay"), wxT("0")));
             cnt++;
         } else if (e->GetName() == _("script")) {
             ButtonRemoveScript->Show();

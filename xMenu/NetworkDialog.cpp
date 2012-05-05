@@ -46,9 +46,9 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
 
 	Create(parent, wxID_ANY, _("Define Lighting Networks"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
-	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer1 = new wxFlexGridSizer(1, 1, 0, 0);
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-	FlexGridSizer2 = new wxFlexGridSizer(2, 1, 0, 0);
+	FlexGridSizer2 = new wxFlexGridSizer(3, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer2->AddGrowableRow(1);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -185,14 +185,14 @@ void NetworkDialog::LoadFile()
     if (doc.Load( networkFile.GetFullPath() )) {
         int r=0;
         wxXmlNode* e=doc.GetRoot();
-        wxString LorMappingStr=e->GetPropVal(wxT("LorMapping"), wxT("2"));
+        wxString LorMappingStr=e->GetAttribute(wxT("LorMapping"), wxT("2"));
         LorMappingStr.ToLong(&LorMapping);
         for( e=e->GetChildren(); e!=NULL; e=e->GetNext() ) {
             if (e->GetName() == wxT("network")) {
-                newidx = GridNetwork->InsertItem(GridNetwork->GetItemCount(), e->GetPropVal(wxT("NetworkType"), wxT("")));
-                GridNetwork->SetItem(newidx,1,e->GetPropVal(wxT("ComPort"), wxT("")));
-                GridNetwork->SetItem(newidx,2,e->GetPropVal(wxT("BaudRate"), wxT("")));
-                GridNetwork->SetItem(newidx,3,e->GetPropVal(wxT("MaxChannels"), wxT("0")));
+                newidx = GridNetwork->InsertItem(GridNetwork->GetItemCount(), e->GetAttribute(wxT("NetworkType"), wxT("")));
+                GridNetwork->SetItem(newidx,1,e->GetAttribute(wxT("ComPort"), wxT("")));
+                GridNetwork->SetItem(newidx,2,e->GetAttribute(wxT("BaudRate"), wxT("")));
+                GridNetwork->SetItem(newidx,3,e->GetAttribute(wxT("MaxChannels"), wxT("0")));
                 GridNetwork->SetColumnWidth(0,wxLIST_AUTOSIZE);
                 GridNetwork->SetColumnWidth(1,wxLIST_AUTOSIZE);
                 r++;
@@ -213,8 +213,8 @@ void NetworkDialog::SaveFile()
     wxString LorMappingStr;
     LorMappingStr.Printf(wxT("%d"),(int)LorMapping);
     wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Networks") );
-    root->AddProperty( wxT("computer"), wxGetHostName());
-    root->AddProperty( wxT("LorMapping"), LorMappingStr);
+    root->AddAttribute( wxT("computer"), wxGetHostName());
+    root->AddAttribute( wxT("LorMapping"), LorMappingStr);
     doc.SetRoot( root );
     PropNames[0]=wxT("NetworkType");
     PropNames[1]=wxT("ComPort");
@@ -225,13 +225,13 @@ void NetworkDialog::SaveFile()
     wxListItem listcol;
     for (int r=0; r < RowCount; r++ ) {
         net = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("network") );
-        net->AddProperty( PropNames[0], GridNetwork->GetItemText(r));
+        net->AddAttribute( PropNames[0], GridNetwork->GetItemText(r));
         for (int c=1; c<4; c++) {
             listcol.SetId(r);
             listcol.SetColumn(c);
             listcol.SetMask(wxLIST_MASK_TEXT);
             GridNetwork->GetItem(listcol);
-            net->AddProperty( PropNames[c], listcol.GetText());
+            net->AddAttribute( PropNames[c], listcol.GetText());
         }
         root->AddChild( net );
     }
@@ -374,11 +374,15 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
 	do {
 	    DlgResult=SerialDlg.ShowModal();
 	    if (DlgResult == wxID_OK) {
+            ok=false;
             Port=SerialDlg.ChoicePort->GetStringSelection();
             BaudRate=SerialDlg.ChoiceBaudRate->GetStringSelection();
             LastChannel=SerialDlg.TextCtrlLastChannel->GetValue();
-            ok=!Port.IsEmpty() && (!RateEnabled || !BaudRate.IsEmpty()) && !LastChannel.IsEmpty();
-            if (ok) {
+            if (Port.IsEmpty() || (RateEnabled && BaudRate.IsEmpty()) || LastChannel.IsEmpty()) {
+                wxMessageBox(_("All fields must be filled in!"), _("ERROR"));
+            } else if (!LastChannel.IsNumber() || LastChannel[0]=='-') {
+                wxMessageBox(_("Last Channel must be a positive number!"), _("ERROR"));
+            } else {
                 if (r < 0)
                 {
                     r=GridNetwork->GetItemCount();
@@ -394,8 +398,7 @@ void NetworkDialog::AddSerial(wxString NetName, int r)
                     GridNetwork->SetItem(r,2,_("n/a"));
                 GridNetwork->SetItem(r,3,LastChannel);
                 UnsavedChanges=true;
-            } else {
-                wxMessageBox(_("All fields must be filled in!"), _("ERROR"));
+                ok=true;
             }
 	    }
 	} while (DlgResult == wxID_OK && !ok);
