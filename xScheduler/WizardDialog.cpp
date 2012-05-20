@@ -1,9 +1,9 @@
 #include "WizardDialog.h"
 
 //(*InternalHeaders(WizardDialog)
-#include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
+#include <wx/intl.h>
 //*)
 
 //(*IdInit(WizardDialog)

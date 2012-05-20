@@ -729,6 +729,7 @@ xScheduleFrame::xScheduleFrame(wxWindow* parent,wxWindowID id)
     networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     if (networkFile.FileExists()) {
         pTestDialog = new TestDialog(this);
+        pTestDialog->SetCurrentDir( CurrentDir );
         LoadNetworkFile();
     }
     ResetTimer(NO_SEQ);
@@ -1506,7 +1507,7 @@ void xScheduleFrame::PerformTesting()
         if (pTestDialog->TestFunc == TestDialog::OFF) {
             StatusBar1->SetStatusText(_("All lights off"));
         } else {
-            StatusBar1->SetStatusText(wxString::Format(_("Testing %d channels"),chArray.Count()));
+            StatusBar1->SetStatusText(wxString::Format(_("Testing %ld channels"),static_cast<long>(chArray.Count())));
         }
         pTestDialog->CheckChannelList = false;
     }
@@ -1539,7 +1540,6 @@ void xScheduleFrame::PerformTesting()
                             seqidx = static_cast<int>(rand01()*pTestDialog->TwinkleRatio);
                             TwinkleState.Add(seqidx == 0 ? -1 : 1);
                         }
-                        //StatusBar1->SetStatusText(wxString::Format(_("Twinkling %d rgb nodes"),TwinkleState.Count()));
                     }
                     for (i=0; i < TwinkleState.Count(); i++) {
                         if (TwinkleState[i] < -1) {
@@ -1623,7 +1623,6 @@ void xScheduleFrame::PerformTesting()
                             seqidx = static_cast<int>(rand01()*pTestDialog->TwinkleRatio);
                             TwinkleState.Add(seqidx == 0 ? -1 : 1);
                         }
-                        StatusBar1->SetStatusText(wxString::Format(_("Twinkling %d rgb nodes"),TwinkleState.Count()));
                     }
                     for (i=0; i < TwinkleState.Count(); i++) {
                         if (TwinkleState[i] < -1) {
@@ -1894,8 +1893,8 @@ void xScheduleFrame::ScanForFiles()
     wxCheckBox* CheckBoxVixen=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_VIXEN,Notebook1);
     wxCheckBox* CheckBoxXlights=(wxCheckBox*)wxWindow::FindWindowById(baseid+CHKBOX_XLIGHTS,Notebook1);
 
-    wxFileName* oName=new wxFileName();
-    oName->AssignDir( CurrentDir );
+    wxFileName oName;
+    oName.AssignDir( CurrentDir );
 
     // if file was deleted, remove matching entry
     int cnt=ListBoxPlay->GetItemCount();
@@ -1903,8 +1902,8 @@ void xScheduleFrame::ScanForFiles()
         filenames.Add(ListBoxPlay->GetItemText(i));
     }
     for (i=filenames.GetCount()-1; i >= 0; i--) {
-        oName->SetFullName(filenames[i]);
-        if (!oName->FileExists()) {
+        oName.SetFullName(filenames[i]);
+        if (!oName.FileExists()) {
             ListBoxPlay->DeleteItem(i);
             UnsavedChanges=true;
             wxMessageBox(_("File ") + filenames[i] + _(" was deleted from the show directory\n\nRemoving it from playlist ") + PageName, _("Playlist Updated"));
@@ -1914,26 +1913,23 @@ void xScheduleFrame::ScanForFiles()
     // scan directory for matches
     TreeCtrlFiles->DeleteAllItems();
     wxTreeItemId root=TreeCtrlFiles->AddRoot(_("Show Directory"));
-    wxDir* d=new wxDir(CurrentDir);
-    if (d->GetFirst(&filename)) {
-        do {
-            if (filenames.Index(filename) != wxNOT_FOUND) continue;
-            oName->SetFullName(filename);
+    wxDir dir(CurrentDir);
+    bool cont = dir.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
+    while ( cont ) {
+        if (filenames.Index(filename) == wxNOT_FOUND) {
+            oName.SetFullName(filename);
             ok=false;
-            switch (ExtType(oName->GetExt())) {
+            switch (ExtType(oName.GetExt())) {
                 case 'a': ok=CheckBoxAudio->IsChecked(); break;
                 case 'v': ok=CheckBoxVideo->IsChecked(); break;
                 case 'L': ok=CheckBoxLOR->IsChecked(); break;
                 case 'V': ok=CheckBoxVixen->IsChecked(); break;
                 case 'X': ok=CheckBoxXlights->IsChecked(); break;
             }
-            if (ok) {
-                TreeCtrlFiles->AppendItem(root,filename);
-            }
-        } while (d->GetNext(&filename));
+            if (ok) TreeCtrlFiles->AppendItem(root,filename);
+        }
+        cont = dir.GetNext(&filename);
     }
-    delete d;
-    delete oName;
     TreeCtrlFiles->ExpandAll();
 }
 
@@ -2467,7 +2463,7 @@ wxString xScheduleFrame::VixenInfo()
         msg+=_("Media file: ") + mediaFilename;
     }
     float seqlen = (float)VixNumPeriods*VixEventPeriod/1000.0;
-    msg += wxString::Format(_("\nSequence Length: %3.1f sec\nEvent Period: %d msec\nChannel Count: %d"),seqlen,VixEventPeriod,VixNumChannels);
+    msg += wxString::Format(_("\nSequence Length: %3.1f sec\nEvent Period: %ld msec\nChannel Count: %ld"),seqlen,VixEventPeriod,VixNumChannels);
     if (VixNumChannels > 0) {
         msg += _("\n\nChannel Map:");
         mapcnt = 0;
@@ -2484,7 +2480,7 @@ wxString xScheduleFrame::VixenInfo()
             netidx++;
         }
         if (LeftToMap > 0) {
-            msg += wxString::Format(_("\nSequence channels %d-%d are unmapped"),mapcnt+1,VixNumChannels);
+            msg += wxString::Format(_("\nSequence channels %d-%ld are unmapped"),mapcnt+1,VixNumChannels);
         }
     }
     return msg;
@@ -2854,58 +2850,6 @@ void xScheduleFrame::build_decoding_table()
         decoding_table[encoding_table[i]] = i;
 }
 
-/*
-// from: http://www.adp-gmbh.ch/cpp/common/base64.html
-// Copyright (C) 2004-2008 René Nyffenegger
-static inline bool is_base64(unsigned char c) {
-  return (isalnum(c) || (c == '+') || (c == '/'));
-}
-
-static const std::string base64_chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-std::string xScheduleFrame::base64_decode(const wxString& encoded_string) {
-  int in_len = encoded_string.size();
-  int i = 0;
-  int j = 0;
-  int in_ = 0;
-  unsigned char char_array_4[4], char_array_3[3];
-  std::string ret;
-
-  while (in_len-- && ( encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
-    char_array_4[i++] = encoded_string[in_]; in_++;
-    if (i ==4) {
-      for (i = 0; i <4; i++)
-        char_array_4[i] = base64_chars.find(char_array_4[i]);
-
-      char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-      char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-      char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-      for (i = 0; (i < 3); i++)
-        ret += char_array_3[i];
-      i = 0;
-    }
-  }
-
-  if (i) {
-    for (j = i; j <4; j++)
-      char_array_4[j] = 0;
-
-    for (j = 0; j <4; j++)
-      char_array_4[j] = base64_chars.find(char_array_4[j]);
-
-    char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-    char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-    char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-    for (j = 0; (j < i - 1); j++) ret += char_array_3[j];
-  }
-
-  return ret;
-}
-*/
-
 void xScheduleFrame::OnMenuItemRefreshSelected(wxCommandEvent& event)
 {
     ScanForFiles();
@@ -3077,6 +3021,7 @@ void xScheduleFrame::OnAuiToolBarItemStopClick(wxCommandEvent& event)
                 EndTimeSec = 0;
             } else {
                 SecondsRemaining = 0;
+                StatusBar1->SetStatusText(_("Finishing playlist"));
             }
         }
     }

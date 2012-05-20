@@ -42,7 +42,7 @@ E131Dialog::E131Dialog(wxWindow* parent,const wxString& title)
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Method"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer2->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer1 = new wxBoxSizer(wxVERTICAL);
-	RadioButtonMulticast = new wxRadioButton(this, ID_RADIOBUTTON1, _("Multicast"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+	RadioButtonMulticast = new wxRadioButton(this, ID_RADIOBUTTON1, _("Multicast"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
 	RadioButtonMulticast->SetValue(true);
 	BoxSizer1->Add(RadioButtonMulticast, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	RadioButtonUnicast = new wxRadioButton(this, ID_RADIOBUTTON2, _("Unicast"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));

@@ -2,10 +2,10 @@
 #define LORMAPDIALOG_H
 
 //(*Headers(LorMapDialog)
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/radiobut.h>
 #include <wx/dialog.h>
+#include <wx/sizer.h>
+#include <wx/radiobut.h>
+#include <wx/stattext.h>
 //*)
 
 class LorMapDialog: public wxDialog
@@ -16,12 +16,12 @@ class LorMapDialog: public wxDialog
 		virtual ~LorMapDialog();
 
 		//(*Declarations(LorMapDialog)
-		wxRadioButton* RadioButtonMultiNetwork;
 		wxRadioButton* RadioButtonStrictMap;
-		wxStaticText* StaticText2;
-		wxRadioButton* RadioButtonSingleNetwork;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxStaticText* StaticText2;
+		wxRadioButton* RadioButtonSingleNetwork;
+		wxRadioButton* RadioButtonMultiNetwork;
 		//*)
 
 	protected:

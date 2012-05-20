@@ -1,10 +1,10 @@
 #include "DelListDialog.h"
 
 //(*InternalHeaders(DelListDialog)
-#include <wx/font.h>
-#include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
+#include <wx/intl.h>
+#include <wx/font.h>
 //*)
 
 //(*IdInit(DelListDialog)

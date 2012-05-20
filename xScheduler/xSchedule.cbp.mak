@@ -23,8 +23,8 @@ CFLAGS_RELEASELINUX =  $(CFLAGS) -O2 -Wall `wx-config --cflags` -Winvalid-pch -i
 RESINC_RELEASELINUX =  $(RESINC)
 RCFLAGS_RELEASELINUX =  $(RCFLAGS)
 LIBDIR_RELEASELINUX =  $(LIBDIR)
-LIB_RELEASELINUX = $(LIB) `wx-config --libs std,media`
-LDFLAGS_RELEASELINUX =  -s $(LDFLAGS)
+LIB_RELEASELINUX = $(LIB)
+LDFLAGS_RELEASELINUX =  -s `wx-config --libs std,media,aui` $(LDFLAGS)
 OBJDIR_RELEASELINUX = .objs
 DEP_RELEASELINUX = 
 OUT_RELEASELINUX = ../bin/xScheduler
@@ -44,7 +44,7 @@ after_releaselinux:
 releaselinux: before_releaselinux out_releaselinux after_releaselinux
 
 out_releaselinux: $(OBJ_RELEASELINUX) $(DEP_RELEASELINUX)
-	$(LD) $(LDFLAGS_RELEASELINUX) $(LIBDIR_RELEASELINUX) $(OBJ_RELEASELINUX) $(LIB_RELEASELINUX) -o $(OUT_RELEASELINUX)
+	$(LD) $(LIBDIR_RELEASELINUX) $(OBJ_RELEASELINUX) $(LIB_RELEASELINUX) $(LDFLAGS_RELEASELINUX) -o $(OUT_RELEASELINUX)
 
 $(OBJDIR_RELEASELINUX)/xScheduleMain.o: xScheduleMain.cpp
 	$(CXX) $(CFLAGS_RELEASELINUX) $(INC_RELEASELINUX) -c xScheduleMain.cpp -o $(OBJDIR_RELEASELINUX)/xScheduleMain.o

@@ -1,10 +1,10 @@
 #include "AddShowDialog.h"
 
 //(*InternalHeaders(AddShowDialog)
-#include <wx/font.h>
-#include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
+#include <wx/intl.h>
+#include <wx/font.h>
 //*)
 
 //(*IdInit(AddShowDialog)
@@ -38,13 +38,13 @@ END_EVENT_TABLE()
 AddShowDialog::AddShowDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(AddShowDialog)
+	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
-	wxFlexGridSizer* FlexGridSizer2;
-	wxFlexGridSizer* FlexGridSizer1;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
-
+	
 	Create(parent, wxID_ANY, _("Schedule Playlist"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);

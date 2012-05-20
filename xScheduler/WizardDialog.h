@@ -2,9 +2,9 @@
 #define WIZARDDIALOG_H
 
 //(*Headers(WizardDialog)
-#include <wx/sizer.h>
 #include <wx/checkbox.h>
 #include <wx/dialog.h>
+#include <wx/sizer.h>
 //*)
 
 class WizardDialog: public wxDialog
@@ -15,10 +15,10 @@ class WizardDialog: public wxDialog
 		virtual ~WizardDialog();
 
 		//(*Declarations(WizardDialog)
-		wxCheckBox* CheckBoxFirstItem;
-		wxCheckBox* CheckBoxRepeat;
 		wxCheckBox* CheckBoxLastItem;
+		wxCheckBox* CheckBoxFirstItem;
 		wxCheckBox* CheckBoxRandom;
+		wxCheckBox* CheckBoxRepeat;
 		//*)
 
 	protected:

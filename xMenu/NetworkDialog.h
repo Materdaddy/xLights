@@ -2,12 +2,12 @@
 #define NETWORKDIALOG_H
 
 //(*Headers(NetworkDialog)
-#include <wx/listctrl.h>
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/panel.h>
-#include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/sizer.h>
+#include <wx/listctrl.h>
+#include <wx/button.h>
+#include <wx/panel.h>
+#include <wx/stattext.h>
 //*)
 
 #include <wx/config.h>
@@ -28,21 +28,21 @@ class NetworkDialog: public wxDialog
         void SaveFile();
 
 		//(*Declarations(NetworkDialog)
-		wxButton* ButtonMoveUp;
-		wxButton* ButtonAddE131;
-		wxButton* ButtonAddDLight;
-		wxButton* ButtonAddRenard;
-		wxButton* ButtonAddDMX;
-		wxButton* ButtonMoveDown;
-		wxPanel* Panel1;
-		wxStaticText* StaticText1;
-		wxButton* ButtonAddLOR;
-		wxListCtrl* GridNetwork;
 		wxButton* ButtonAddPixelnet;
-		wxButton* ButtonDelRow;
-		wxButton* ButtonEditRow;
-		wxButton* ButtonAddOpenDMX;
+		wxPanel* Panel1;
+		wxButton* ButtonAddE131;
+		wxButton* ButtonAddRenard;
+		wxButton* ButtonMoveDown;
+		wxButton* ButtonAddLOR;
 		wxButton* ButtonLorMap;
+		wxStaticText* StaticText1;
+		wxButton* ButtonAddDLight;
+		wxButton* ButtonEditRow;
+		wxButton* ButtonDelRow;
+		wxListCtrl* GridNetwork;
+		wxButton* ButtonAddOpenDMX;
+		wxButton* ButtonMoveUp;
+		wxButton* ButtonAddDMX;
 		//*)
 
 	protected:

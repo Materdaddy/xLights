@@ -2,19 +2,22 @@
 #define TESTDIALOG_H
 
 //(*Headers(TestDialog)
-#include <wx/notebook.h>
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/radiobut.h>
-#include <wx/slider.h>
-#include <wx/panel.h>
-#include <wx/choice.h>
-#include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/sizer.h>
+#include <wx/notebook.h>
+#include <wx/button.h>
+#include <wx/radiobut.h>
+#include <wx/panel.h>
+#include <wx/slider.h>
+#include <wx/stattext.h>
 //*)
 
 #include <wx/checklst.h>
-
+#include <wx/textdlg.h>
+#include <wx/choicdlg.h>
+#include <wx/filename.h>
+#include <wx/dir.h>
+#include <wx/xml/xml.h>
 
 class NetworkInfo
 {
@@ -54,6 +57,7 @@ class TestDialog: public wxDialog
 		TestDialog(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
 		virtual ~TestDialog();
 
+        void SetCurrentDir(const wxString& dir);
         void AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
         int GetNetIdx();
         int GetTestIdx();
@@ -86,77 +90,78 @@ class TestDialog: public wxDialog
         } TestFunc;
 
 		//(*Declarations(TestDialog)
-		wxStaticText* StaticText10;
-		wxRadioButton* RadioButtonChase5;
-		wxStaticText* StaticText9;
-		wxRadioButton* RadioButtonRgbCycle4;
-		wxRadioButton* RadioButtonRgbChaseOff;
-		wxRadioButton* RadioButtonRgbCycleOff;
-		wxButton* ButtonExport;
+		wxRadioButton* RadioButtonTwinkle50;
+		wxRadioButton* RadioButtonAlt;
 		wxRadioButton* RadioButtonRgbChase;
-		wxRadioButton* RadioButtonRgbChase5;
-		wxRadioButton* RadioButtonRgbChase3;
-		wxStaticText* StaticText29;
-		wxRadioButton* RadioButtonShimmer;
-		wxNotebook* Notebook1;
+		wxSlider* SliderBgColorC;
+		wxRadioButton* RadioButtonRgbChaseOff;
 		wxStaticText* StaticText13;
-		wxStaticText* StaticText2;
+		wxRadioButton* RadioButtonRgbCycle3;
 		wxButton* ButtonClose;
 		wxSlider* SliderFgColorC;
-		wxSlider* SliderRgbChaseSpeed;
-		wxButton* ButtonLightsOff;
-		wxRadioButton* RadioButtonRgbCycle3;
-		wxRadioButton* RadioButtonDim;
-		wxRadioButton* RadioButtonChase4;
-		wxPanel* Panel_RGB;
-		wxRadioButton* RadioButtonRgbTwinkle10;
-		wxRadioButton* RadioButtonChase3;
-		wxSlider* SliderChaseSpeed;
-		wxStaticText* StaticText8;
-		wxStaticText* StaticText11;
-		wxPanel* PanelStandard;
-		wxSlider* SliderFgColorA;
-		wxStaticText* StaticText1;
 		wxButton* ButtonClear;
-		wxStaticText* StaticText3;
-		wxRadioButton* RadioButtonRgbAlt;
-		wxPanel* Panel3;
-		wxSlider* SliderRgbCycleSpeed;
-		wxRadioButton* RadioButtonTwinkle50;
-		wxRadioButton* RadioButtonRgbCycleMixed;
-		wxSlider* SliderBgColorA;
-		wxRadioButton* RadioButtonRgbTwinkle50;
-		wxSlider* SliderBgColorC;
 		wxRadioButton* RadioButtonRgbTwinkle05;
-		wxChoice* ChoiceNumSelect;
-		wxRadioButton* RadioButtonRgbTwinkle25;
+		wxRadioButton* RadioButtonRgbCycleOff;
+		wxRadioButton* RadioButtonRgbCycleMixed;
 		wxRadioButton* RadioButtonRgbShimmer;
+		wxRadioButton* RadioButtonRgbTwinkle10;
+		wxRadioButton* RadioButtonRgbAlt;
 		wxRadioButton* RadioButtonTwinkle10;
-		wxSlider* SliderBgColorB;
-		wxRadioButton* RadioButtonRgbDim;
-		wxRadioButton* RadioButtonTwinkle25;
-		wxRadioButton* RadioButtonChase;
-		wxSlider* SliderBgIntensity;
-		wxRadioButton* RadioButtonTwinkle05;
-		wxNotebook* Notebook2;
-		wxRadioButton* RadioButtonOff;
-		wxStaticText* StaticText4;
-		wxRadioButton* RadioButtonRgbCycle5;
-		wxRadioButton* RadioButtonRgbChase4;
-		wxPanel* Panel_RGB_Cycle;
+		wxButton* ButtonLoad;
+		wxSlider* SliderBgColorA;
 		wxSlider* SliderFgIntensity;
+		wxSlider* SliderFgColorA;
+		wxRadioButton* RadioButtonRgbCycle4;
+		wxRadioButton* RadioButtonRgbTwinkle50;
+		wxRadioButton* RadioButtonOff;
+		wxButton* ButtonSelectAll;
+		wxRadioButton* RadioButtonChase3;
+		wxRadioButton* RadioButtonChase;
+		wxPanel* Panel_RGB;
+		wxStaticText* StaticText1;
+		wxStaticText* StaticText10;
+		wxRadioButton* RadioButtonRgbDim;
+		wxRadioButton* RadioButtonTwinkle05;
+		wxSlider* SliderChaseSpeed;
+		wxRadioButton* RadioButtonShimmer;
+		wxRadioButton* RadioButtonTwinkle25;
+		wxRadioButton* RadioButtonRgbChase3;
+		wxRadioButton* RadioButtonChase5;
+		wxStaticText* StaticText8;
+		wxPanel* Panel3;
+		wxRadioButton* RadioButtonChase4;
+		wxButton* ButtonLightsOff;
+		wxRadioButton* RadioButtonRgbChase5;
+		wxNotebook* Notebook2;
+		wxStaticText* StaticText4;
+		wxRadioButton* RadioButtonRgbTwinkle25;
+		wxStaticText* StaticText2;
+		wxSlider* SliderRgbCycleSpeed;
+		wxNotebook* Notebook1;
+		wxPanel* Panel_RGB_Cycle;
+		wxPanel* PanelStandard;
+		wxSlider* SliderBgColorB;
 		wxSlider* SliderFgColorB;
-		wxRadioButton* RadioButtonAlt;
+		wxRadioButton* RadioButtonRgbCycle5;
+		wxSlider* SliderBgIntensity;
+		wxStaticText* StaticText29;
+		wxStaticText* StaticText9;
+		wxRadioButton* RadioButtonDim;
+		wxButton* ButtonSave;
+		wxRadioButton* RadioButtonRgbChase4;
+		wxSlider* SliderRgbChaseSpeed;
+		wxStaticText* StaticText11;
 		//*)
+
 
 	protected:
 
 		//(*Identifiers(TestDialog)
+		static const long ID_BUTTON_SELECT_ALL;
+		static const long ID_BUTTON_CLEAR_ALL;
+		static const long ID_BUTTON_LOAD;
+		static const long ID_BUTTON_SAVE;
 		static const long ID_STATICTEXT1;
-		static const long ID_CHOICE_NUMSELECT;
-		static const long ID_BUTTON_CLEAR;
-		static const long ID_STATICTEXT3;
-		static const long ID_BUTTON_EXPORT;
 		static const long ID_BUTTON_LIGHTS_OFF;
 		static const long ID_BUTTON_CLOSE;
 		static const long ID_NOTEBOOK2;
@@ -219,7 +224,6 @@ class TestDialog: public wxDialog
 
 		//(*Handlers(TestDialog)
 		void OnButtonClearClick(wxCommandEvent& event);
-		void OnButtonExportClick(wxCommandEvent& event);
 		void OnButtonLightsOffClick(wxCommandEvent& event);
 		void OnRadioButtonOffSelect(wxCommandEvent& event);
 		void OnRadioButtonChaseSelect(wxCommandEvent& event);
@@ -234,11 +238,18 @@ class TestDialog: public wxDialog
 		void OnRadioButtonShimmerSelect(wxCommandEvent& event);
 		void OnRadioButtonDimSelect(wxCommandEvent& event);
 		void OnButtonCloseClick(wxCommandEvent& event);
+		void OnButtonSelectAllClick(wxCommandEvent& event);
+		void OnButtonLoadClick(wxCommandEvent& event);
+		void OnButtonSaveClick(wxCommandEvent& event);
+		void OnNotebook2PageChanged(wxNotebookEvent& event);
 		//*)
 
         void OnCheckboxToggle(wxCommandEvent& event);
+        void SetAllCheckboxes(bool NewValue);
         WX_DEFINE_ARRAY_PTR(NetworkInfo*, NetworkArray);
         NetworkArray Networks;
+		wxFileName* TestConfigFilename;
+		wxString CurrentDir;
 
 		DECLARE_EVENT_TABLE()
 };

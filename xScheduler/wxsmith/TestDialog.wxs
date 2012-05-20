@@ -3,8 +3,7 @@
 	<object class="wxDialog" name="TestDialog">
 		<title>xTester</title>
 		<centered>1</centered>
-		<pos_arg>1</pos_arg>
-		<size_arg>1</size_arg>
+		<id_arg>0</id_arg>
 		<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL4" variable="Panel3" member="yes">
@@ -16,53 +15,60 @@
 						<growablerows>1</growablerows>
 						<object class="sizeritem">
 							<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
-								<cols>4</cols>
+								<cols>1</cols>
+								<rows>2</rows>
 								<growablecols>0</growablecols>
 								<growablerows>0</growablerows>
 								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+										<cols>4</cols>
+										<rows>1</rows>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON_SELECT_ALL" variable="ButtonSelectAll" member="yes">
+												<label>Select All</label>
+												<handler function="OnButtonSelectAllClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON_CLEAR_ALL" variable="ButtonClear" member="yes">
+												<label>Clear All</label>
+												<handler function="OnButtonClearClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON_LOAD" variable="ButtonLoad" member="yes">
+												<label>Load</label>
+												<enabled>0</enabled>
+												<handler function="OnButtonLoadClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON_SAVE" variable="ButtonSave" member="yes">
+												<label>Save</label>
+												<enabled>0</enabled>
+												<handler function="OnButtonSaveClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Selection mode:</label>
-									</object>
-									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxChoice" name="ID_CHOICE_NUMSELECT" variable="ChoiceNumSelect" member="yes">
-										<content>
-											<item>1</item>
-											<item>16</item>
-											<item>32</item>
-											<item>64</item>
-											<item>128</item>
-											<item>3</item>
-											<item>15</item>
-											<item>30</item>
-											<item>45</item>
-											<item>60</item>
-											<item>75</item>
-											<item>90</item>
-											<item>120</item>
-											<item>150</item>
-											<item>225</item>
-											<item>300</item>
-											<item>600</item>
-											<item>1200</item>
-											<item>1800</item>
-											<item>2400</item>
-											<item>3000</item>
-											<item>All</item>
-										</content>
-										<selection>0</selection>
-									</object>
-									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON_CLEAR" variable="ButtonClear" member="yes">
-										<label>Clear</label>
-										<handler function="OnButtonClearClick" entry="EVT_BUTTON" />
+										<label>Use Shift-click, Ctrl-click, or click &amp;&amp; drag to select multiple channels</label>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -74,58 +80,35 @@
 							<option>1</option>
 						</object>
 						<object class="sizeritem">
-							<object class="wxBoxSizer" variable="BoxSizer2" member="no">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+								<cols>3</cols>
+								<rows>1</rows>
+								<growablecols>0</growablecols>
 								<object class="sizeritem">
-									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>Available Tests</label>
+									<object class="wxButton" name="ID_BUTTON_LIGHTS_OFF" variable="ButtonLightsOff" member="yes">
+										<label>All Lights Off</label>
+										<handler function="OnButtonLightsOffClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_CLOSE" variable="ButtonClose" member="yes">
+										<label>Close</label>
+										<handler function="OnButtonCloseClick" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
-								<object class="sizeritem">
-									<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
-										<cols>3</cols>
-										<growablecols>0</growablecols>
-										<object class="sizeritem">
-											<object class="wxButton" name="ID_BUTTON_EXPORT" variable="ButtonExport" member="yes">
-												<label>Export</label>
-												<hidden>1</hidden>
-												<handler function="OnButtonExportClick" entry="EVT_BUTTON" />
-											</object>
-											<flag>wxLEFT|wxRIGHT|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
-											<option>1</option>
-										</object>
-										<object class="sizeritem">
-											<object class="wxButton" name="ID_BUTTON_LIGHTS_OFF" variable="ButtonLightsOff" member="yes">
-												<label>All Lights Off</label>
-												<handler function="OnButtonLightsOffClick" entry="EVT_BUTTON" />
-											</object>
-											<flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-										</object>
-										<object class="sizeritem">
-											<object class="wxButton" name="ID_BUTTON_CLOSE" variable="ButtonClose" member="yes">
-												<label>Close</label>
-												<handler function="OnButtonCloseClick" entry="EVT_BUTTON" />
-											</object>
-											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
-											<option>1</option>
-										</object>
-									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
 							</object>
-							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_TOP</flag>
 							<border>5</border>
 							<option>1</option>
 						</object>
 						<object class="sizeritem">
 							<object class="wxNotebook" name="ID_NOTEBOOK2" variable="Notebook2" member="yes">
 								<size>225,220</size>
+								<handler function="OnNotebook2PageChanged" entry="EVT_NOTEBOOK_PAGE_CHANGED" />
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
@@ -161,6 +144,7 @@
 													<object class="sizeritem">
 														<object class="wxRadioButton" name="ID_RADIOBUTTON14" variable="RadioButtonOff" member="yes">
 															<label>Off</label>
+															<style>wxRB_GROUP</style>
 															<handler function="OnRadioButtonOffSelect" entry="EVT_RADIOBUTTON" />
 														</object>
 														<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -417,6 +401,7 @@
 													<object class="sizeritem">
 														<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="RadioButtonRgbChaseOff" member="yes">
 															<label>Off</label>
+															<style>wxRB_GROUP</style>
 															<handler function="OnRadioButtonOffSelect" entry="EVT_RADIOBUTTON" />
 														</object>
 														<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -687,6 +672,7 @@
 													<object class="sizeritem">
 														<object class="wxRadioButton" name="ID_RADIOBUTTON20" variable="RadioButtonRgbCycleOff" member="yes">
 															<label>Off</label>
+															<style>wxRB_GROUP</style>
 															<handler function="OnRadioButtonOffSelect" entry="EVT_RADIOBUTTON" />
 														</object>
 														<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>

@@ -1,9 +1,9 @@
 #include "StopDialog.h"
 
 //(*InternalHeaders(StopDialog)
-#include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
+#include <wx/intl.h>
 //*)
 
 //(*IdInit(StopDialog)
@@ -23,14 +23,14 @@ StopDialog::StopDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	//(*Initialize(StopDialog)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
-
+	
 	Create(parent, id, _("Stop Playlist"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
 	SetClientSize(wxDefaultSize);
 	Move(wxDefaultPosition);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("How should the playlist be stopped\?"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	RadioButtonImmediate = new wxRadioButton(this, ID_RADIOBUTTON_IMMEDIATE, _("Immediately"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_IMMEDIATE"));
+	RadioButtonImmediate = new wxRadioButton(this, ID_RADIOBUTTON_IMMEDIATE, _("Immediately"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON_IMMEDIATE"));
 	RadioButtonImmediate->SetValue(true);
 	FlexGridSizer1->Add(RadioButtonImmediate, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	RadioButtonWait = new wxRadioButton(this, ID_RADIOBUTTON_WAIT, _("After the current item finishes playing"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_WAIT"));

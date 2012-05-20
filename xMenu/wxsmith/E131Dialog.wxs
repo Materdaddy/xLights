@@ -32,6 +32,7 @@
 								<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="RadioButtonMulticast" member="yes">
 									<label>Multicast</label>
 									<selected>1</selected>
+									<style>wxRB_GROUP</style>
 									<handler function="OnRadioButtonMulticastSelect" entry="EVT_RADIOBUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>

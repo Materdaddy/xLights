@@ -2,10 +2,10 @@
 #define DELLISTDIALOG_H
 
 //(*Headers(DelListDialog)
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/statline.h>
 #include <wx/dialog.h>
+#include <wx/sizer.h>
+#include <wx/statline.h>
+#include <wx/stattext.h>
 //*)
 
 class DelListDialog: public wxDialog
@@ -16,9 +16,9 @@ class DelListDialog: public wxDialog
 		virtual ~DelListDialog();
 
 		//(*Declarations(DelListDialog)
-		wxStaticText* StaticTextDelName;
 		wxStaticText* StaticText1;
 		wxStaticLine* StaticLine1;
+		wxStaticText* StaticTextDelName;
 		//*)
 
 	protected:

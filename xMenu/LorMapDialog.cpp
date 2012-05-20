@@ -1,9 +1,9 @@
 #include "LorMapDialog.h"
 
 //(*InternalHeaders(LorMapDialog)
-#include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
+#include <wx/intl.h>
 //*)
 
 //(*IdInit(LorMapDialog)
@@ -23,8 +23,8 @@ END_EVENT_TABLE()
 LorMapDialog::LorMapDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(LorMapDialog)
-	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer2;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
 	
 	Create(parent, id, _("LOR Sequence Channel Mapping"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
@@ -32,7 +32,7 @@ LorMapDialog::LorMapDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	Move(wxDefaultPosition);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
-	RadioButtonSingleNetwork = new wxRadioButton(this, ID_RADIOBUTTON_SINGLENET, _("Single Network"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON_SINGLENET"));
+	RadioButtonSingleNetwork = new wxRadioButton(this, ID_RADIOBUTTON_SINGLENET, _("Single Network"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON_SINGLENET"));
 	FlexGridSizer2->Add(RadioButtonSingleNetwork, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("All LOR channels are assumed to be on the \"regular\" (default) network.\nIf the first network defined in xLights has 32 channels and the second\nnetwork has 64 channels, then the first 32 channels in the sequence \nwould be mapped to the first xLights network and the next 64 channels \nwould be mapped to the second network. \n\nxLights channel # = ((LOR-Unit-Number - 1) * 16) + LOR-Circuit-Number\n\nBasically, xLights assumes each controller in the LOR sequence has 16 channels. \nHowever, you can use circuits 1-32 on unit x if you don\'t define unit x+1 in your \nsequence. If you have a CCR, which uses circuits 1-150, on unit 10 (0A hex), the \nnext unit number you could use is 20 (14 hex) - 10 units/160 channels are then \nreserved for the CCR.\n"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

@@ -3,17 +3,17 @@
 #include <limits>
 
 //(*InternalHeaders(TestDialog)
-#include <wx/font.h>
-#include <wx/intl.h>
 #include <wx/string.h>
+#include <wx/intl.h>
+#include <wx/font.h>
 //*)
 
 //(*IdInit(TestDialog)
+const long TestDialog::ID_BUTTON_SELECT_ALL = wxNewId();
+const long TestDialog::ID_BUTTON_CLEAR_ALL = wxNewId();
+const long TestDialog::ID_BUTTON_LOAD = wxNewId();
+const long TestDialog::ID_BUTTON_SAVE = wxNewId();
 const long TestDialog::ID_STATICTEXT1 = wxNewId();
-const long TestDialog::ID_CHOICE_NUMSELECT = wxNewId();
-const long TestDialog::ID_BUTTON_CLEAR = wxNewId();
-const long TestDialog::ID_STATICTEXT3 = wxNewId();
-const long TestDialog::ID_BUTTON_EXPORT = wxNewId();
 const long TestDialog::ID_BUTTON_LIGHTS_OFF = wxNewId();
 const long TestDialog::ID_BUTTON_CLOSE = wxNewId();
 const long TestDialog::ID_NOTEBOOK2 = wxNewId();
@@ -80,82 +80,59 @@ END_EVENT_TABLE()
 TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(TestDialog)
-	wxFlexGridSizer* FlexGridSizer24;
-	wxStaticBoxSizer* StaticBoxSizerHighlightColor;
-	wxBoxSizer* BoxSizer10;
-	wxFlexGridSizer* FlexGridSizer10;
-	wxFlexGridSizer* FlexGridSizer3;
-	wxFlexGridSizer* FlexGridSizer22;
-	wxFlexGridSizer* FlexGridSizer9;
-	wxFlexGridSizer* FlexGridSizer2;
-	wxBoxSizer* BoxSizer2;
-	wxFlexGridSizer* FlexGridSizer7;
-	wxFlexGridSizer* FlexGridSizer15;
 	wxFlexGridSizer* FlexGridSizer21;
-	wxFlexGridSizer* FlexGridSizer14;
-	wxFlexGridSizer* FlexGridSizer20;
-	wxBoxSizer* BoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer11;
+	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* FlexGridSizer15;
 	wxBoxSizer* BoxSizer3;
 	wxFlexGridSizer* FlexGridSizer17;
+	wxBoxSizer* BoxSizer10;
+	wxFlexGridSizer* FlexGridSizer11;
+	wxFlexGridSizer* FlexGridSizer7;
+	wxFlexGridSizer* FlexGridSizer4;
+	wxFlexGridSizer* FlexGridSizer9;
+	wxFlexGridSizer* FlexGridSizer14;
+	wxFlexGridSizer* FlexGridSizer3;
+	wxFlexGridSizer* FlexGridSizer22;
+	wxStaticBoxSizer* StaticBoxSizerHighlightColor;
 	wxStaticBoxSizer* StaticBoxSizerBackgroundColor;
-	
-	Create(parent, id, _("xTester"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
-	SetClientSize(wxDefaultSize);
-	Move(wxDefaultPosition);
+	wxFlexGridSizer* FlexGridSizer10;
+	wxBoxSizer* BoxSizer1;
+	wxFlexGridSizer* FlexGridSizer24;
+	wxFlexGridSizer* FlexGridSizer20;
+
+	Create(parent, wxID_ANY, _("xTester"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	Panel3 = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, _T("ID_PANEL4"));
 	FlexGridSizer2 = new wxFlexGridSizer(2, 2, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer2->AddGrowableCol(1);
 	FlexGridSizer2->AddGrowableRow(1);
-	FlexGridSizer7 = new wxFlexGridSizer(0, 4, 0, 0);
+	FlexGridSizer7 = new wxFlexGridSizer(2, 1, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
 	FlexGridSizer7->AddGrowableRow(0);
-	StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("Selection mode:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	FlexGridSizer7->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	ChoiceNumSelect = new wxChoice(Panel3, ID_CHOICE_NUMSELECT, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_NUMSELECT"));
-	ChoiceNumSelect->SetSelection( ChoiceNumSelect->Append(_("1")) );
-	ChoiceNumSelect->Append(_("16"));
-	ChoiceNumSelect->Append(_("32"));
-	ChoiceNumSelect->Append(_("64"));
-	ChoiceNumSelect->Append(_("128"));
-	ChoiceNumSelect->Append(_("3"));
-	ChoiceNumSelect->Append(_("15"));
-	ChoiceNumSelect->Append(_("30"));
-	ChoiceNumSelect->Append(_("45"));
-	ChoiceNumSelect->Append(_("60"));
-	ChoiceNumSelect->Append(_("75"));
-	ChoiceNumSelect->Append(_("90"));
-	ChoiceNumSelect->Append(_("120"));
-	ChoiceNumSelect->Append(_("150"));
-	ChoiceNumSelect->Append(_("225"));
-	ChoiceNumSelect->Append(_("300"));
-	ChoiceNumSelect->Append(_("600"));
-	ChoiceNumSelect->Append(_("1200"));
-	ChoiceNumSelect->Append(_("1800"));
-	ChoiceNumSelect->Append(_("2400"));
-	ChoiceNumSelect->Append(_("3000"));
-	ChoiceNumSelect->Append(_("All"));
-	FlexGridSizer7->Add(ChoiceNumSelect, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ButtonClear = new wxButton(Panel3, ID_BUTTON_CLEAR, _("Clear"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CLEAR"));
-	FlexGridSizer7->Add(ButtonClear, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4 = new wxFlexGridSizer(1, 4, 0, 0);
+	ButtonSelectAll = new wxButton(Panel3, ID_BUTTON_SELECT_ALL, _("Select All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SELECT_ALL"));
+	FlexGridSizer4->Add(ButtonSelectAll, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonClear = new wxButton(Panel3, ID_BUTTON_CLEAR_ALL, _("Clear All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CLEAR_ALL"));
+	FlexGridSizer4->Add(ButtonClear, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonLoad = new wxButton(Panel3, ID_BUTTON_LOAD, _("Load"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_LOAD"));
+	ButtonLoad->Disable();
+	FlexGridSizer4->Add(ButtonLoad, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	ButtonSave = new wxButton(Panel3, ID_BUTTON_SAVE, _("Save"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SAVE"));
+	ButtonSave->Disable();
+	FlexGridSizer4->Add(ButtonSave, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer7->Add(FlexGridSizer4, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("Use Shift-click, Ctrl-click, or click && drag to select multiple channels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer7->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
-	StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Available Tests"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	BoxSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer17 = new wxFlexGridSizer(1, 3, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
-	ButtonExport = new wxButton(Panel3, ID_BUTTON_EXPORT, _("Export"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_EXPORT"));
-	ButtonExport->Hide();
-	FlexGridSizer17->Add(ButtonExport, 1, wxLEFT|wxRIGHT|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	ButtonLightsOff = new wxButton(Panel3, ID_BUTTON_LIGHTS_OFF, _("All Lights Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_LIGHTS_OFF"));
 	FlexGridSizer17->Add(ButtonLightsOff, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	ButtonClose = new wxButton(Panel3, ID_BUTTON_CLOSE, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CLOSE"));
 	FlexGridSizer17->Add(ButtonClose, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BoxSizer2->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(BoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_TOP, 5);
 	Notebook2 = new wxNotebook(Panel3, ID_NOTEBOOK2, wxDefaultPosition, wxSize(225,220), 0, _T("ID_NOTEBOOK2"));
 	FlexGridSizer2->Add(Notebook2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Notebook1 = new wxNotebook(Panel3, ID_NOTEBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK1"));
@@ -167,7 +144,7 @@ TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	wxFont StaticText8Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText8->SetFont(StaticText8Font);
 	FlexGridSizer10->Add(StaticText8, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	RadioButtonOff = new wxRadioButton(PanelStandard, ID_RADIOBUTTON14, _("Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON14"));
+	RadioButtonOff = new wxRadioButton(PanelStandard, ID_RADIOBUTTON14, _("Off"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON14"));
 	FlexGridSizer10->Add(RadioButtonOff, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	RadioButtonChase = new wxRadioButton(PanelStandard, ID_RADIOBUTTON15, _("Chase"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON15"));
 	FlexGridSizer10->Add(RadioButtonChase, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -235,7 +212,7 @@ TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	wxFont StaticText29Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText29->SetFont(StaticText29Font);
 	FlexGridSizer3->Add(StaticText29, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	RadioButtonRgbChaseOff = new wxRadioButton(Panel_RGB, ID_RADIOBUTTON1, _("Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+	RadioButtonRgbChaseOff = new wxRadioButton(Panel_RGB, ID_RADIOBUTTON1, _("Off"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
 	FlexGridSizer3->Add(RadioButtonRgbChaseOff, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	RadioButtonRgbChase = new wxRadioButton(Panel_RGB, ID_RADIOBUTTON2, _("Chase"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
 	FlexGridSizer3->Add(RadioButtonRgbChase, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -301,7 +278,7 @@ TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	wxFont StaticText2Font(10,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer15->Add(StaticText2, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	RadioButtonRgbCycleOff = new wxRadioButton(Panel_RGB_Cycle, ID_RADIOBUTTON20, _("Off"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON20"));
+	RadioButtonRgbCycleOff = new wxRadioButton(Panel_RGB_Cycle, ID_RADIOBUTTON20, _("Off"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON20"));
 	FlexGridSizer15->Add(RadioButtonRgbCycleOff, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	RadioButtonRgbCycle3 = new wxRadioButton(Panel_RGB_Cycle, ID_RADIOBUTTON22, _("A-B-C"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON22"));
 	FlexGridSizer15->Add(RadioButtonRgbCycle3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -336,11 +313,14 @@ TestDialog::TestDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const w
 	BoxSizer1->Fit(this);
 	BoxSizer1->SetSizeHints(this);
 	Center();
-	
-	Connect(ID_BUTTON_CLEAR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonClearClick);
-	Connect(ID_BUTTON_EXPORT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonExportClick);
+
+	Connect(ID_BUTTON_SELECT_ALL,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonSelectAllClick);
+	Connect(ID_BUTTON_CLEAR_ALL,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonClearClick);
+	Connect(ID_BUTTON_LOAD,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonLoadClick);
+	Connect(ID_BUTTON_SAVE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonSaveClick);
 	Connect(ID_BUTTON_LIGHTS_OFF,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonLightsOffClick);
 	Connect(ID_BUTTON_CLOSE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TestDialog::OnButtonCloseClick);
+	Connect(ID_NOTEBOOK2,wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&TestDialog::OnNotebook2PageChanged);
 	Connect(ID_RADIOBUTTON14,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&TestDialog::OnRadioButtonOffSelect);
 	Connect(ID_RADIOBUTTON15,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&TestDialog::OnRadioButtonChaseSelect);
 	Connect(ID_RADIOBUTTON16,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&TestDialog::OnRadioButtonChase3Select);
@@ -381,21 +361,25 @@ TestDialog::~TestDialog()
 	//*)
 }
 
-
-void TestDialog::OnButtonClearClick(wxCommandEvent& event)
+void TestDialog::SetAllCheckboxes(bool NewValue)
 {
     int netidx = Notebook2->GetSelection(); // which network
     wxCheckListBox* lb = Networks[netidx]->ListBox;
     int ChCount = lb->GetCount();
     for (int i=0; i < ChCount; i++) {
-        lb->Check(i,false);
+        lb->Check(i,NewValue);
     }
     CheckChannelList = true;
 }
 
-void TestDialog::OnButtonExportClick(wxCommandEvent& event)
+void TestDialog::OnButtonClearClick(wxCommandEvent& event)
 {
-    wxMessageBox(_("Export not implemented yet"), _("Export"));
+    SetAllCheckboxes(false);
+}
+
+void TestDialog::OnButtonSelectAllClick(wxCommandEvent& event)
+{
+    SetAllCheckboxes(true);
 }
 
 void TestDialog::OnButtonLightsOffClick(wxCommandEvent& event)
@@ -488,7 +472,7 @@ void TestDialog::AddNetwork(const wxString& NetworkType, const wxString& ComPort
     FlexSizer->AddGrowableCol(0);
     wxStaticText* stNetDesc = new wxStaticText(Panel, -1, NetInfo->Description());
     FlexSizer->Add(stNetDesc, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    wxCheckListBox* ListBox = new wxCheckListBox(Panel, -1);
+    wxCheckListBox* ListBox = new wxCheckListBox(Panel, -1, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_EXTENDED);
     FlexSizer->Add(ListBox, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel->SetSizer(FlexSizer);
     FlexSizer->Fit(Panel);
@@ -523,27 +507,15 @@ void TestDialog::OnCheckboxToggle(wxCommandEvent& event)
     int ChCount = lb->GetCount();
     int row=event.GetInt();
     bool newval=lb->IsChecked(row);
-    long SelectCount;
-    wxString SelectString = ChoiceNumSelect->GetStringSelection();
-    if (SelectString == wxT("All")) {
+
+    if (lb->IsSelected(row)) {
         for (int i=0; i < ChCount; i++) {
-            lb->Check(i,newval);
-        }
-    } else {
-        SelectString.ToLong(&SelectCount);
-        int lastrow = row+SelectCount;
-        for (int i=row+1; i < lastrow; i++) {
-            if (i >= ChCount) break;
-            lb->Check(i,newval);
+            if (lb->IsSelected(i)) lb->Check(i,newval);
         }
     }
+
     CheckChannelList = true;
     //StatusBar1->SetStatusText(newval ? _("true") : _("false"));
-    //static int lastrow=0;
-
-    // In wxWidgets 2.9/3.0:
-    // test state of shift key using wxKeyboardState class
-    // so that shift-click will select a range of checkboxes
 }
 
 
@@ -667,4 +639,119 @@ void TestDialog::OnButtonCloseClick(wxCommandEvent& event)
     RadioButtonsOff();
     wxMilliSleep(100);  // give some time for everything to shut off
     this->Close();
+}
+
+void TestDialog::SetCurrentDir(const wxString& dir)
+{
+    TestConfigFilename = new wxFileName();
+    TestConfigFilename->AssignDir( dir );
+    TestConfigFilename->SetExt( wxT("xtest") );
+    ButtonLoad->Enable(true);
+    ButtonSave->Enable(true);
+    CurrentDir = dir;
+}
+
+void TestDialog::OnButtonLoadClick(wxCommandEvent& event)
+{
+    // get list of files in show directory
+    wxArrayString filenames;
+    wxDir::GetAllFiles(CurrentDir, &filenames, wxT("*.xtest"), wxDIR_FILES);
+
+    if (filenames.Count() == 0) {
+        wxMessageBox(_("No test files found in:\n\n") + CurrentDir, _("Error"));
+        return;
+    }
+
+    // get user selection
+    wxSingleChoiceDialog dialog(this, _("Load Test Settings"), _("Select file"), filenames);
+    if (dialog.ShowModal() != wxID_OK) return;
+
+    // load file
+    TestConfigFilename->SetFullName(dialog.GetStringSelection());
+    wxString FullPath = TestConfigFilename->GetFullPath();
+    wxXmlDocument doc;
+    if (!doc.Load( FullPath )) {
+        wxMessageBox(_("Unable to load:\n")+FullPath);
+        return;
+    }
+
+    // process file
+    wxString netidstr,chidstr;
+    long netid,chid;
+    SetAllCheckboxes(false);
+    wxXmlNode* root=doc.GetRoot();
+    for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() == _("network") && e->GetAttribute(wxT("id"), &netidstr) && netidstr.ToLong(&netid) && netid >= 0 && netid < Networks.Count()) {
+            wxCheckListBox* lb = Networks[netid]->ListBox;
+            long ChCount = lb->GetCount();
+            for( wxXmlNode* c=e->GetChildren(); c!=NULL; c=c->GetNext() ) {
+                if (c->GetName() == _("channel") && c->GetAttribute(wxT("id"), &chidstr) && chidstr.ToLong(&chid) && chid >= 0 && chid < ChCount) {
+                    lb->Check(chid);
+                }
+            }
+        }
+    }
+}
+
+void TestDialog::OnButtonSaveClick(wxCommandEvent& event)
+{
+    wxString filename;
+    wxXmlDocument doc;
+    wxXmlNode *net,*channel;
+    wxTextEntryDialog FileNameDialog(this, _("Enter a file name"), _("Save Test Settings"));
+    while (FileNameDialog.ShowModal() == wxID_OK) {
+        filename = FileNameDialog.GetValue();
+        filename.Trim(true);
+        filename.Trim(false);
+        if (filename.IsEmpty()) {
+            wxMessageBox(_("File name cannot be empty"), _("Error"));
+        } else if (filename.Len() > 240) {
+            wxMessageBox(_("File name is too long"), _("Error"));
+        } else if (filename.StartsWith(wxT("."))) {
+            wxMessageBox(_("File name cannot begin with a period"), _("Error"));
+        } else if (filename.Find('/') != wxNOT_FOUND ||
+                   filename.Find('\\') != wxNOT_FOUND ||
+                   filename.Find('*') != wxNOT_FOUND ||
+                   filename.Find('?') != wxNOT_FOUND ||
+                   filename.Find('<') != wxNOT_FOUND ||
+                   filename.Find('>') != wxNOT_FOUND ||
+                   filename.Find('|') != wxNOT_FOUND ||
+                   filename.Find(':') != wxNOT_FOUND ||
+                   filename.Find('^') != wxNOT_FOUND ||
+                   filename.Find('~') != wxNOT_FOUND) {
+            wxMessageBox(_("File name cannot contain these characters: /\\*?<>|:^~"), _("Error"));
+        } else {
+            TestConfigFilename->SetName(filename);
+            wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Networks") );
+            doc.SetRoot( root );
+            wxString FullPath=TestConfigFilename->GetFullPath();
+
+            // create nodes for each network
+            for (int n=0; n < Networks.Count(); n++) {
+                net = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("network") );
+                net->AddAttribute( wxT("id"), wxString::Format(wxT("%d"),n));
+                root->AddChild( net );
+
+                // create nodes for each channel in the network
+                wxCheckListBox* lb = Networks[n]->ListBox;
+                int ChCount = lb->GetCount();
+                for (int c=0; c < ChCount; c++) {
+                    if (lb->IsChecked(c)) {
+                        channel = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("channel") );
+                        channel->AddAttribute( wxT("id"), wxString::Format(wxT("%d"),c));
+                        net->AddChild( channel );
+                    }
+                }
+            }
+            if (doc.Save( FullPath )) {
+                break;
+            } else {
+                wxMessageBox(_("Unable to save test configuration file"), _("Error"));
+            }
+        }
+    }
+}
+
+void TestDialog::OnNotebook2PageChanged(wxNotebookEvent& event)
+{
 }

@@ -2,10 +2,10 @@
 #define STOPDIALOG_H
 
 //(*Headers(StopDialog)
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/radiobut.h>
 #include <wx/dialog.h>
+#include <wx/sizer.h>
+#include <wx/radiobut.h>
+#include <wx/stattext.h>
 //*)
 
 class StopDialog: public wxDialog
@@ -18,9 +18,9 @@ class StopDialog: public wxDialog
 
 		//(*Declarations(StopDialog)
 		wxRadioButton* RadioButtonImmediate;
-		wxStaticText* StaticText2;
 		wxStaticText* StaticText1;
 		wxRadioButton* RadioButtonWait;
+		wxStaticText* StaticText2;
 		//*)
 
 	protected:

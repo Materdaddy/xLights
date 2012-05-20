@@ -85,7 +85,7 @@ class xConverter: public wxFrame
         wxUint8 * SeqData;
         long SeqDataLen;
         long SeqNumPeriods;
-        size_t SeqNumChannels;
+        long SeqNumChannels;
         size_t TotChannels;
         wxArrayString FileNames;
         wxArrayString ChannelNames;

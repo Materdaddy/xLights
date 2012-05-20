@@ -1,9 +1,9 @@
 #include "ShowDatesDialog.h"
 
 //(*InternalHeaders(ShowDatesDialog)
-#include <wx/intl.h>
 #include <wx/button.h>
 #include <wx/string.h>
+#include <wx/intl.h>
 //*)
 
 //(*IdInit(ShowDatesDialog)
@@ -22,9 +22,9 @@ END_EVENT_TABLE()
 ShowDatesDialog::ShowDatesDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(ShowDatesDialog)
-	wxFlexGridSizer* FlexGridSizer3;
-	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* FlexGridSizer3;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
 	
 	Create(parent, id, _("Set Show Dates"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));

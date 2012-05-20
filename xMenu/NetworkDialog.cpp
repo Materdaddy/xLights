@@ -1,8 +1,8 @@
 #include "NetworkDialog.h"
 
 //(*InternalHeaders(NetworkDialog)
-#include <wx/intl.h>
 #include <wx/string.h>
+#include <wx/intl.h>
 //*)
 
 #include <wx/msgdlg.h>
@@ -37,13 +37,13 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 {
 	//(*Initialize(NetworkDialog)
 	wxStaticBoxSizer* StaticBoxSizer2;
-	wxFlexGridSizer* FlexGridSizer4;
-	wxFlexGridSizer* FlexGridSizer3;
-	wxFlexGridSizer* FlexGridSizer2;
-	wxFlexGridSizer* FlexGridSizer6;
-	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* FlexGridSizer4;
+	wxFlexGridSizer* FlexGridSizer6;
+	wxFlexGridSizer* FlexGridSizer3;
 	wxStdDialogButtonSizer* StdDialogButtonSizer1;
+	wxStaticBoxSizer* StaticBoxSizer1;
 
 	Create(parent, wxID_ANY, _("Define Lighting Networks"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(1, 1, 0, 0);

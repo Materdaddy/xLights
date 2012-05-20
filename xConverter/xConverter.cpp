@@ -294,6 +294,7 @@ void xConverter::OnButtonChooseFileClick(wxCommandEvent& event)
         wxString ConvertDir = FileDialog1->GetDirectory();
         wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
         config->Write(_("ConvertDir"), ConvertDir);
+        delete config;
     }
 }
 
@@ -319,7 +320,7 @@ void xConverter::WriteVixenFile(const wxString& filename)
     textnode = new wxXmlNode( node, wxXML_TEXT_NODE, wxEmptyString, wxT("Music") );
 
     chparent = new wxXmlNode( root, wxXML_ELEMENT_NODE, wxT("Channels") );
-    for (size_t ch=0; ch < SeqNumChannels; ch++ ) {
+    for (int ch=0; ch < SeqNumChannels; ch++ ) {
         node = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Channel") );
         node->AddAttribute( wxT("output"), wxString::Format(wxT("%d"),ch));
         node->AddAttribute( wxT("id"), wxT("0"));
@@ -378,7 +379,8 @@ void xConverter::WriteXLightsFile(const wxString& filename)
         ConversionError(_("Media file name is too long"));
         return;
     }
-    sprintf(hdr,"xLights %2d %8d %8ld",1,SeqNumChannels,SeqNumPeriods);
+    int xseq_format_version = 1;
+    sprintf(hdr,"xLights %2d %8ld %8ld",xseq_format_version,SeqNumChannels,SeqNumPeriods);
     strncpy(&hdr[32],mediaFilename.c_str(),470);
     f.Write(hdr,512);
     f.Write(SeqData,SeqDataLen);
@@ -397,7 +399,7 @@ void xConverter::WriteConductorFile(const wxString& filename)
         return;
     }
     for (long period=0; period < SeqNumPeriods; period++) {
-        if (period % 500 == 499) TextCtrlStatus->AppendText(wxString::Format(wxT("Writing time period %d\n"),period+1));
+        if (period % 500 == 499) TextCtrlStatus->AppendText(wxString::Format(wxT("Writing time period %ld\n"),period+1));
         wxYield();
         for (i=0; i < 4096; i++) {
             for (j=0; j < 4; j++) {
@@ -458,7 +460,7 @@ void xConverter::ReadVixFile(const char* filename)
 {
 	wxString NodeName,NodeValue,msg;
 	std::string VixSeqData;
-	size_t cnt = 0;
+	long cnt = 0;
 	wxArrayString context;
     long VixEventPeriod=-1;
 	long MaxIntensity = 255;
@@ -491,7 +493,7 @@ void xConverter::ReadVixFile(const char* filename)
             NodeName = wxString::FromAscii( xml->getNodeName() );
             context.Add(NodeName);
             cnt++;
-            //msg=_("Element: ") + NodeName + wxString::Format(_(" (%d)\n"),cnt);
+            //msg=_("Element: ") + NodeName + wxString::Format(_(" (%ld)\n"),cnt);
             //TextCtrlStatus->AppendText(msg);
             if (cnt == 2 && (NodeName == _("Audio") || NodeName == _("Song"))) {
                 mediaFilename = wxString::FromAscii( xml->getAttributeValueSafe("filename") );
@@ -517,9 +519,9 @@ void xConverter::ReadVixFile(const char* filename)
 	long VixDataLen = VixSeqData.size();
 	SeqNumChannels = VixChannels.size();
     TextCtrlStatus->AppendText(wxString::Format(_("Max Intensity=%ld\n"),MaxIntensity));
-    TextCtrlStatus->AppendText(wxString::Format(_("# of Channels=%d\n"),SeqNumChannels));
+    TextCtrlStatus->AppendText(wxString::Format(_("# of Channels=%ld\n"),SeqNumChannels));
     TextCtrlStatus->AppendText(wxString::Format(_("Vix Event Period=%ld\n"),VixEventPeriod));
-    TextCtrlStatus->AppendText(wxString::Format(_("Vix data len=%d\n"),VixDataLen));
+    TextCtrlStatus->AppendText(wxString::Format(_("Vix data len=%ld\n"),VixDataLen));
     if (SeqNumChannels == 0) return;
     long VixNumPeriods = VixDataLen / SeqNumChannels;
     TextCtrlStatus->AppendText(wxString::Format(_("Vix # of time periods=%ld\n"),VixNumPeriods));
@@ -527,7 +529,7 @@ void xConverter::ReadVixFile(const char* filename)
     SeqNumPeriods = VixNumPeriods * VixEventPeriod / XTIMER_INTERVAL;
     SeqDataLen = SeqNumPeriods * SeqNumChannels;
     TextCtrlStatus->AppendText(wxString::Format(_("New # of time periods=%ld\n"),SeqNumPeriods));
-    TextCtrlStatus->AppendText(wxString::Format(_("New data len=%d\n"),SeqDataLen));
+    TextCtrlStatus->AppendText(wxString::Format(_("New data len=%ld\n"),SeqDataLen));
     if (SeqDataLen == 0) return;
     SeqData = new wxUint8[SeqDataLen];
 
@@ -591,7 +593,7 @@ void xConverter::ReadLorFile(const char* filename)
 	int MaxIntensity = 100;
 	int EffectCnt = 0;
 	size_t network,chindex;
-	size_t cnt = 0;
+	long cnt = 0;
 
     TextCtrlStatus->AppendText(_("Reading LOR sequence\n"));
     mediaFilename.clear();
@@ -625,7 +627,7 @@ void xConverter::ReadLorFile(const char* filename)
             NodeName = wxString::FromAscii( xml->getNodeName() );
             context.Add(NodeName);
             cnt++;
-            //msg=_("Element: ") + NodeName + wxString::Format(_(" (%d)\n"),cnt);
+            //msg=_("Element: ") + NodeName + wxString::Format(_(" (%ld)\n"),cnt);
             //TextCtrlStatus->AppendText(msg);
             if (NodeName == _("sequence")) {
                 mediaFilename = wxString::FromAscii( xml->getAttributeValueSafe("musicFilename") );
@@ -764,7 +766,7 @@ void xConverter::ReadLorFile(const char* filename)
     TextCtrlStatus->AppendText(wxString::Format(_("# of effects=%d\n"),EffectCnt));
     TextCtrlStatus->AppendText(_("Media file=")+mediaFilename+_("\n"));
     TextCtrlStatus->AppendText(wxString::Format(_("New # of time periods=%ld\n"),SeqNumPeriods));
-    TextCtrlStatus->AppendText(wxString::Format(_("New data len=%d\n"),SeqDataLen));
+    TextCtrlStatus->AppendText(wxString::Format(_("New data len=%ld\n"),SeqDataLen));
 }
 
 void xConverter::ClearLastPeriod()
@@ -778,6 +780,7 @@ void xConverter::ClearLastPeriod()
 void xConverter::DoConversion(const wxString& Filename, const wxString& OutputFormat)
 {
     // read sequence file
+    TextCtrlStatus->AppendText(_("\nReading: ") + Filename + wxT("\n"));
     wxFileName oName(Filename);
     wxString ext = oName.GetExt();
     if (ext == _("vix")) {
@@ -807,7 +810,8 @@ void xConverter::DoConversion(const wxString& Filename, const wxString& OutputFo
         ClearLastPeriod();
     }
 
-    // write converted file
+    // write converted file to xLights directory
+    oName.SetPath( CurrentDir );
     char c;
     OutputFormat[0].GetAsChar(&c);
     switch (c)
