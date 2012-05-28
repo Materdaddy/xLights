@@ -194,59 +194,18 @@ MainMenuFrame::MainMenuFrame(wxWindow* parent,wxWindowID id)
         Connect(menuID,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainMenuFrame::OnMenuMRU);
     }
     dir.clear();
-    if ( config->Read(_("LastDir"), &dir) ) {
-        if (!dir.IsEmpty()) {
-            idx=mru.Index(dir);
-            if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
-            SetDir(dir);
-        }
+    bool ok = config->Read(_("LastDir"), &dir);
+    delete config;  // close config before calling SetDir, which will open config
+    if (ok && !dir.IsEmpty()) {
+        SetDir(dir);
     }
-    delete config;
 }
 
 void MainMenuFrame::OnMenuMRU(wxCommandEvent& event)
 {
     int id = event.GetId();
     wxString newdir = mru_Menu->GetLabel(id);
-    UpdateMRU(newdir);
     SetDir(newdir);
-}
-
-void MainMenuFrame::UpdateMRU(const wxString& newdir)
-{
-    // update most recently used array
-    int idx;
-    idx=mru.Index(newdir);
-    if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
-    idx=mru.Index(CurrentDir);
-    if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
-    mru.Insert(CurrentDir,0);
-    int cnt=mru.GetCount();
-    if (cnt > MRU_LENGTH) {
-        mru.RemoveAt(MRU_LENGTH, cnt - MRU_LENGTH);
-        cnt = MRU_LENGTH;
-    }
-
-    /*
-    wxString msg=wxT("UpdateMRU:\n");
-    for (int i=0; i<mru.GetCount(); i++) msg+=wxT("\n") + mru[i];
-    wxMessageBox(msg);
-    */
-
-    // save config
-    wxString mru_name, value;
-    wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
-    config->Write(_("LastDir"), newdir);
-    for (int i=0; i<MRU_LENGTH; i++) {
-        mru_name=wxString::Format(wxT("mru%d"),i);
-        if (i < cnt) {
-            value = mru[i];
-        } else {
-            value = wxEmptyString;
-        }
-        config->Write(mru_name, value);
-    }
-    delete config;
 }
 
 MainMenuFrame::~MainMenuFrame()
@@ -267,19 +226,56 @@ void MainMenuFrame::OnAbout(wxCommandEvent& event)
     wxMessageBox(msg, hdg);
 }
 
-void MainMenuFrame::SetDir(const wxString& dirname)
+void MainMenuFrame::SetDir(const wxString& newdir)
 {
-    CurrentDir=dirname;
+    // update most recently used array
+    int idx, cnt, i;
+    idx=mru.Index(newdir);
+    if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
+    if (!CurrentDir.IsEmpty()) {
+        idx=mru.Index(CurrentDir);
+        if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
+        mru.Insert(CurrentDir,0);
+    }
+    cnt=mru.GetCount();
+    if (cnt > MRU_LENGTH) {
+        mru.RemoveAt(MRU_LENGTH, cnt - MRU_LENGTH);
+        cnt = MRU_LENGTH;
+    }
+
+    /*
+    wxString msg=wxT("UpdateMRU:\n");
+    for (int i=0; i<mru.GetCount(); i++) msg+=wxT("\n") + mru[i];
+    wxMessageBox(msg);
+    */
+
+    // save config
+    wxString mru_name, value;
+    wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
+    config->Write(_("LastDir"), newdir);
+    for (i=0; i<MRU_LENGTH; i++) {
+        mru_name=wxString::Format(wxT("mru%d"),i);
+        if (i < cnt) {
+            value = mru[i];
+        } else {
+            value = wxEmptyString;
+        }
+        config->Write(mru_name, value);
+    }
+    delete config;
+
+    // update UI
+    CurrentDir=newdir;
     StaticTextDirName->SetLabel(CurrentDir);
     ButtonNetworkSetup->Enable();
     SetButtonEnable();
 
     // append mru items to menu
-    int cnt=mru.GetCount();
+    cnt=mru.GetCount();
     if (mru_MenuLength == 0 && cnt > 0) {
         mru_Menu->AppendSeparator();
     }
-    for (int i=0; i<cnt; i++) {
+    for (i=0; i<cnt; i++) {
         mru_MenuItem[i]->SetItemLabel(mru[i]);
         if (i >= mru_MenuLength) {
             mru_Menu->Append(mru_MenuItem[i]);
@@ -305,7 +301,6 @@ void MainMenuFrame::OnMenuOpenFolderSelected(wxCommandEvent& event)
     if (DirDialog1->ShowModal() == wxID_OK) {
         newdir=DirDialog1->GetPath();
         if (newdir == CurrentDir) return;
-        UpdateMRU(newdir);
         SetDir(newdir);
     }
 }

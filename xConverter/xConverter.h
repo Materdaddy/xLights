@@ -15,6 +15,7 @@
 
 #include <wx/xml/xml.h>
 #include <wx/filename.h>
+#include <string>
 #include <vector>
 #include "../include/globals.h"
 

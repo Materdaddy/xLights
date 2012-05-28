@@ -68,8 +68,6 @@ class MainMenuFrame: public wxFrame
         void OnButtonFileConversionClick(wxCommandEvent& event);
         //*)
 
-        void SetDir(const wxString& dirname);
-
         //(*Identifiers(MainMenuFrame)
         static const long ID_STATICTEXT1;
         static const long ID_STATICTEXT3;
@@ -108,8 +106,9 @@ class MainMenuFrame: public wxFrame
         int mru_MenuLength;
         void Exec(const wxString& program);
         void SetButtonEnable();
-        void UpdateMRU(const wxString& newdir);
         void OnMenuMRU(wxCommandEvent& event);
+        void SetDir(const wxString& dirname);
+
 
         DECLARE_EVENT_TABLE()
 };

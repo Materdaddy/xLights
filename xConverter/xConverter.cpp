@@ -813,7 +813,12 @@ void xConverter::DoConversion(const wxString& Filename, const wxString& OutputFo
     // write converted file to xLights directory
     oName.SetPath( CurrentDir );
     char c;
+#if wxCHECK_VERSION(2,9,1)
     OutputFormat[0].GetAsChar(&c);
+#else
+    c=OutputFormat[0];
+#endif
+
     switch (c)
     {
         case 'x':

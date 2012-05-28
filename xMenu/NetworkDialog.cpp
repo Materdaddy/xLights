@@ -145,6 +145,7 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 
 #ifdef __WXOSX__
     ButtonAddOpenDMX->Enable(false);
+	GridNetwork->SetToolTip(_(""));
 #endif
 
     // Get CurrentDir
@@ -266,11 +267,48 @@ void NetworkDialog::OnButtonDelRowClick(wxCommandEvent& event)
 
 void NetworkDialog::MoveRowData(int fromRow, int toRow)
 {
-    GridNetwork->InsertItem(toRow,wxT(""));
+#define NETWORKDIALOG_COLS 4
+#ifdef __WXOSX__
+    // cannot use regular code because of wxWidgets ticket #4492
+	wxArrayString ColText[NETWORKDIALOG_COLS];
+    int rowcnt=GridNetwork->GetItemCount();
+    wxListItem listcol;
+	int r,c;
+	// get text for all rows
+	for (r=0; r < rowcnt; r++) {
+		listcol.SetId(r);
+		for (c=0; c < NETWORKDIALOG_COLS; c++)
+		{
+			listcol.SetColumn(c);
+			listcol.SetMask(wxLIST_MASK_TEXT);
+			GridNetwork->GetItem(listcol);
+			ColText[c].Add(listcol.GetText());
+		}
+	}
+	
+	GridNetwork->DeleteAllItems();
+	
+	// update order
+	for (c=0; c < NETWORKDIALOG_COLS; c++) {
+	    ColText[c].Insert(ColText[c][fromRow],toRow);
+	}
+	for (c=0; c < NETWORKDIALOG_COLS; c++) {
+	    ColText[c].RemoveAt(fromRow);
+	}
+	
+	// add everything back in the new order
+	for (r=0; r < rowcnt; r++) {
+        GridNetwork->InsertItem(r,ColText[0][r]);
+		for (c=1; c < NETWORKDIALOG_COLS; c++)
+		{
+			GridNetwork->SetItem(r,c,ColText[c][r]);
+		}
+	}
+#else
+    GridNetwork->InsertItem(toRow,wxT("new item"));
     wxListItem listcol;
     listcol.SetId(fromRow);
-    int colcnt=4;
-    for (int c=0; c < colcnt; c++)
+    for (int c=0; c < NETWORKDIALOG_COLS; c++)
     {
         listcol.SetColumn(c);
         listcol.SetMask(wxLIST_MASK_TEXT);
@@ -278,6 +316,7 @@ void NetworkDialog::MoveRowData(int fromRow, int toRow)
         GridNetwork->SetItem(toRow,c,listcol.GetText());
     }
     GridNetwork->DeleteItem(fromRow);
+#endif
 }
 
 void NetworkDialog::OnButtonMoveUpClick(wxCommandEvent& event)

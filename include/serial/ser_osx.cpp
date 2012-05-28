@@ -12,7 +12,6 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
-#include <IOKit/serial/ioss.h>
 
 namespace ctb {
 
@@ -66,7 +65,7 @@ class SerialPort : public SerialPort_x
        // With some systems, it is recommended to flush the serial port's
        // Output before closing it, in order to avoid a possible hang of
        // the process...
-       //tcflush(fd, TCOFLUSH);
+       tcflush(fd, TCOFLUSH);
 
        // Don't recover the orgin settings while the device is open. This
        // implicate a mismatched data output!
@@ -92,6 +91,9 @@ class SerialPort : public SerialPort_x
 
         // save the device name
         m_devname = devname;
+
+        // set baud rate
+        cfsetspeed(&t, AdaptBaudrate( baudrate ) );
 
         // parity settings
         switch( protocol[1] ) {
@@ -121,13 +123,10 @@ class SerialPort : public SerialPort_x
           case '7': t.c_cflag |= CS7; break;
           default:  t.c_cflag |= CS8; break;
         }
-
-        // set baud rate
-        speed_t adBaudrate=AdaptBaudrate( baudrate );
-        cfsetspeed(&t, adBaudrate);
+        t.c_oflag &= ~OPOST;
 
         // Set raw input (non-canonical) mode
-        cfmakeraw(&t);
+        //cfmakeraw(&t);
 
         // look out!
         // MIN = 1 means, in TIME (1/10 secs) defined timeout
@@ -138,17 +137,6 @@ class SerialPort : public SerialPort_x
         // timeout in 1/10 secs
         // no timeout for non blocked transfer
         t.c_cc[VTIME] = 0;
-
-        /* Custom baud rates - NOT WORKING!!
-        
-        // custom baud rate ( OS/X version )
-        speed_t speed = baudrate;
-        if ( ioctl( fd, IOSSIOSPEED, &speed ) == -1 ) {
-            //printf( "Error %d calling ioctl( ..., IOSSIOSPEED, ... )\n", errno );
-            return -1;
-        }
-        
-        */
 
         // write the settings
         if (tcsetattr(fd,TCSANOW,&t) == -1) return -1;

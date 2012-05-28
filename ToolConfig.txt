@@ -5,21 +5,23 @@ web site for Windows and Mac OS/X -- you can ignore the rest of this document.
 Linux users will need to follow the instructions below to compile there own copy.
 
 
+xLights is written in C++ and uses the wxWidgets library as a compatibility layer across operating systems.
+xLights versions 2012a and EARLIER are compatible with wxWidgets 2.8.10, 2.8.11, and 2.8.12
+xLights versions 2012b and LATER are compatible with wxWidgets 2.8.11, 2.8.12, and 2.9.3
+wxWidgets versions 2.8.x are available as precompiled downloads from various locations on the internet.
+wxWidgets versions 2.9.x are not considered stable and must be compiled yourself.
+
 
 LINUX
 
 These instructions are based on Linux Mint 12. Instructions for other Linux
 distributions will vary. 
 
-Using Software Manager, install these packages:
+  a) Using Software Manager, install these packages: g++, subversion
 
-  a) g++
+  b) Using Software Manager, install libwxgtk2.8-dev (easier) OR download and compile wxWidgets 2.9.3 (more challenging)
 
-  b) libwxgtk2.8-dev 
-
-  c) subversion
-
-  d) Get the xLights source code by opening a terminal window and typing the following:
+  c) Get the xLights source code by opening a terminal window and typing the following:
 
      svn co https://xlights.svn.sourceforge.net/svnroot/xlights/trunk xlights
 
@@ -30,22 +32,22 @@ the IDE. If you plan on modifying xLights yourself, this is the way to go.
 
 To build xLights using the supplied makefiles:
 
-  e) While still in the terminal window, cd to the new xlights directory
+  d) While still in the terminal window, cd to the new xlights directory
  
-  f) Make the shell script executable by typing: chmod 766 makeall.sh
+  e) Make the shell script executable by typing: chmod 766 makeall.sh
 
-  g) Execute the shell script: ./makeall.sh
+  f) Execute the shell script: ./makeall.sh
      You will get some compiler warnings, however, the 3 executables should
      get built in the ./bin directory.
 
 Building xLights using Code::Blocks (if you want to edit the code)
 
-  h) Code::Blocks
+  g) In Code::Blocks
      1) Make sure "wx" is defined under Settings > Global Variables
         as described in the Code::Blocks documentation. It should be
         set to your wxWidgets base directory (/usr/lib/wx on my system).
 
-  i) Install libwxsmithlib0 to enable visual layout
+  h) Install libwxsmithlib0 to enable visual layout
 
   i) Now you are ready to use Code::Blocks to build
      each of the binaries (xMenu, xSchedule, xConverter)
@@ -58,6 +60,10 @@ Building xLights using Code::Blocks (if you want to edit the code)
 
 
 OS/X (Mac)
+
+Unfortunately, xLights cannot be compiled using the OS/X cocoa libraries
+due to bugs in wxWidgets. Ticket #13065 (wxMediaCtrl not ported to wxCocoa)
+is the problem. Until the ticket is resolved, xLights must be compiled as a carbon app.
 
 On OS/X, compilation is done using Xcode. Code::Blocks is not used.
 Xcode can be downloaded from the Apple developer web site. Make
@@ -95,7 +101,7 @@ In addition to the instructions on the wiki page above, you will also need to:
      be done by double-clicking on the xxxTarget.xcconfig file and then changing
      the GCC_PREFIX_HEADER to wx_pch.h.
   2) When configuring the project for xScheduler, set "Other Linker Flags" to
-     the output of: "./wx-config --libs std,media".
+     the output of: "./wx-config --libs std,media,aui".
 
 
 WINDOWS
@@ -104,7 +110,7 @@ You will need:
   a) MinGW compiler (a nice distro is here: http://nuwen.net/mingw.html)
   b) Code::Blocks for Windows (currently using 10.05)
   c) wxWidgets for Windows (currently using 2.9.3)
-  d) If using wxPack, wxWidgets is precompiled. Otherwise, you will need
+  d) Since we are now using the development version of wxWidgets, you will need
      to compile it yourself. To compile it yourself:
      1) Open a command prompt
      2) cd to the build\msw directory under your wxWidgets base directory
