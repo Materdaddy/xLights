@@ -145,7 +145,7 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 
 #ifdef __WXOSX__
     ButtonAddOpenDMX->Enable(false);
-	GridNetwork->SetToolTip(_(""));
+    GridNetwork->SetToolTip(_(""));
 #endif
 
     // Get CurrentDir
@@ -160,11 +160,11 @@ NetworkDialog::NetworkDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
     UnsavedChanges=false;
     if (networkFile.FileExists()) {
         LoadFile();
-        GridNetwork->SetColumnWidth(0,wxLIST_AUTOSIZE_USEHEADER);
-        GridNetwork->SetColumnWidth(1,100);
-        GridNetwork->SetColumnWidth(2,wxLIST_AUTOSIZE_USEHEADER);
-        GridNetwork->SetColumnWidth(3,100);
     }
+    GridNetwork->SetColumnWidth(0,wxLIST_AUTOSIZE_USEHEADER);
+    GridNetwork->SetColumnWidth(1,100);
+    GridNetwork->SetColumnWidth(2,wxLIST_AUTOSIZE_USEHEADER);
+    GridNetwork->SetColumnWidth(3,100);
 }
 
 NetworkDialog::~NetworkDialog()
