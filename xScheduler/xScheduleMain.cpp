@@ -1621,7 +1621,7 @@ void xScheduleFrame::PerformTesting()
                     if (LastSequenceSpeed < 0) {
                         LastSequenceSpeed=0;
                         TwinkleState.Clear();
-                        for (i=0; i < chArray.Count(); i+=3) {
+                        for (i=0; i < chArray.Count()-2; i+=3) {
                             seqidx = static_cast<int>(rand01()*pTestDialog->TwinkleRatio);
                             TwinkleState.Add(seqidx == 0 ? -1 : 1);
                         }
@@ -1847,9 +1847,13 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
 {
     int netnum=-1;
     int baud = (BaudRate == _("n/a")) ? 115200 : atoi(BaudRate.mb_str(wxConvUTF8));
-    wxString msg = _("Error occurred while connecting to ") + NetworkType+ _(" network on ") + ComPort + _("\n\n");
+    wxString msg = _("Error occurred while connecting to ") + NetworkType+ _(" network on ") + ComPort +
+        _("\n\nThings to check:\n1. Are all required cables plugged in?") +
+        _("\n2. Is there another program running that is accessing the port (like the LOR Control Panel)? If so, then you must close the other program and then restart xLights.") +
+        _("\n3. If this is a USB dongle, are the FTDI Virtual COM Port drivers loaded?\n\n");
     try {
         netnum=xout->addnetwork(NetworkType,MaxChannels,ComPort,baud);
+        TextCtrlLog->AppendText(_("Successfully initialized ") + NetworkType + _(" network on ") + ComPort + _("\n"));
     }
     catch (const char *str) {
         wxString errmsg(str,wxConvUTF8);
@@ -2119,10 +2123,11 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
 {
     long netnum, unit, circuit;
     int chindex;
-    wxString tempstr;
+    wxString tempstr,deviceType;
+    //TextCtrlLog->AppendText(wxT("LoadLorChannels\n"));
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() != _("channel")) continue;
-        if (e->HasAttribute(_("unit")) && e->HasAttribute(_("circuit"))) {
+        if (e->HasAttribute(_("circuit"))) {
             tempstr=e->GetAttribute(wxT("unit"), wxT("1"));
             tempstr.ToLong(&unit);
             if (unit < 0) unit+=256;
@@ -2130,10 +2135,17 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
             tempstr.ToLong(&circuit);
             tempstr=e->GetAttribute(wxT("network"), wxT("0"));
             tempstr.ToLong(&netnum);
+            deviceType=e->GetAttribute(wxT("deviceType"), wxT("LOR"));
+            if (deviceType.Left(3) == wxT("DMX")) {
+                chindex=circuit-1;
+                netnum--;
+            } else {
+                chindex=(unit-1)*16+circuit-1;
+            }
             while (netnum >= LorLastUnit.size()) {
                 LorLastUnit.push_back(-1);
             }
-            chindex=(unit-1)*16+circuit-1;
+            //TextCtrlLog->AppendText(wxString::Format(deviceType + wxT(" unit=%ld, circuit=%ld, chindex=%d, maxch=%d\n"),unit,circuit,chindex,xout->GetChannelCount(netnum)));
             switch (LorMapping) {
                 case XLIGHTS_LORMAP_SINGLE:
                     if (netnum==0 && chindex < VixNetwork.size()) {
@@ -2160,6 +2172,7 @@ void xScheduleFrame::LoadLorChannel(wxXmlNode* n, int netnum, int chindex)
     long startint,endint;
     LOR_ACTIONS action;
     wxString tempstr;
+    //TextCtrlLog->AppendText(wxString::Format(wxT("  LoadLorChannel net=%d, chindex=%d\n"),netnum,chindex));
     for( wxXmlNode* e=n->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() != _("effect")) continue;
         if (!e->HasAttribute(_("startCentisecond"))) continue;
@@ -2411,9 +2424,9 @@ void xScheduleFrame::OnButtonUpClick()
 		}
 	}
 	//wxMessageBox(wxString::Format(wxT("SelectedItem=%ld"),SelectedItem), wxT("DEBUG"));
-	
+
 	ListBoxPlay->DeleteAllItems();
-	
+
 	// update order
 	wxString s;
 	for (c=0; c < 2; c++) {
@@ -2423,7 +2436,7 @@ void xScheduleFrame::OnButtonUpClick()
 	for (c=0; c < 2; c++) {
 	    ColText[c].RemoveAt(SelectedItem+1);
 	}
-	
+
 	// add everything back in the new order
 	for (r=0; r < rowcnt; r++) {
         ListBoxPlay->InsertItem(r,ColText[0][r]);
@@ -2479,9 +2492,9 @@ void xScheduleFrame::OnButtonDownClick()
 		}
 	}
 	//wxMessageBox(wxString::Format(wxT("SelectedItem=%ld"),SelectedItem), wxT("DEBUG"));
-	
+
 	ListBoxPlay->DeleteAllItems();
-	
+
 	// update order
 	wxString s;
 	for (c=0; c < 2; c++) {
@@ -2491,7 +2504,7 @@ void xScheduleFrame::OnButtonDownClick()
 	for (c=0; c < 2; c++) {
 	    ColText[c].RemoveAt(SelectedItem);
 	}
-	
+
 	// add everything back in the new order
 	for (r=0; r < rowcnt; r++) {
         ListBoxPlay->InsertItem(r,ColText[0][r]);

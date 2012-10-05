@@ -583,7 +583,7 @@ int xConverter::GetLorTrack1Length(const char* filename)
 
 void xConverter::ReadLorFile(const char* filename)
 {
-	wxString NodeName,msg,EffectType,ChannelName;
+	wxString NodeName,msg,EffectType,ChannelName,deviceType;
 	wxArrayString context;
 	int unit,circuit,startcsec,endcsec,intensity,startIntensity,endIntensity,rampdiff,ChannelColor;
 	int i,startper,endper,perdiff,twinklestate,nexttwinkle;
@@ -633,12 +633,18 @@ void xConverter::ReadLorFile(const char* filename)
                 mediaFilename = wxString::FromAscii( xml->getAttributeValueSafe("musicFilename") );
             }
             if (cnt > 1 && context[1] == _("channels") && NodeName == _("channel") && !xml->isEmptyElement()) {
+                deviceType = wxString::FromAscii( xml->getAttributeValueSafe("deviceType") );
                 network = xml->getAttributeValueAsInt("network");
                 unit = xml->getAttributeValueAsInt("unit");
                 if (unit < 0) unit+=256;
                 circuit = xml->getAttributeValueAsInt("circuit");
-                if (unit > 0 && circuit > 0 && network < NetMaxChannel.size()) {
+                if (deviceType.Left(3) == wxT("DMX")) {
+                    chindex=circuit-1;
+                    network--;
+                } else {
                     chindex=(unit-1)*16+circuit-1;
+                }
+                if (chindex >= 0 && network < NetMaxChannel.size()) {
                     switch (LorMapping) {
                         case XLIGHTS_LORMAP_SINGLE:
                             if (network==0 && chindex < TotChannels) {
