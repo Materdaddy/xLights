@@ -99,6 +99,16 @@
 									<border>5</border>
 									<option>1</option>
 								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON_SEQUENCER" variable="ButtonSequencer" member="yes">
+										<label>RGB Sequencer</label>
+										<enabled>0</enabled>
+										<handler function="OnButtonSequencerClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>

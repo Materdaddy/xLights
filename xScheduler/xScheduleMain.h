@@ -110,7 +110,6 @@ public:
 typedef std::set<std::pair<int, int> > GridSelection;
 typedef std::multimap<int, LorEventClass* > LorEventMap;
 typedef std::pair<int, LorEventClass* > LorEventPair;
-typedef std::vector<std::pair<int, int> > VixChannelVector; // first is network #, second is channel #
 
 class xScheduleFrame: public wxFrame
 {
@@ -312,8 +311,7 @@ class xScheduleFrame: public wxFrame
         int VixNumPeriods;
         long VixNumChannels;
         long DelayAfterPlayMSEC;
-        VixChannelVector VixNetwork;  // maps channel# to net#/netch#
-        VixChannelVector VixNetwork2; // accounts for channel re-ordering in Vixen
+        ChannelVector VixNetwork2; // accounts for channel re-ordering in Vixen
         wxString mediaFilename;
         wxArrayString ShowEvents;
         wxUint8* VixEventData;

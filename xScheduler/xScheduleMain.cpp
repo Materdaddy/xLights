@@ -1865,8 +1865,6 @@ void xScheduleFrame::AddNetwork(const wxString& NetworkType, const wxString& Com
         wxMessageBox(msg + errmsg, _("Communication Error"));
         PortsOK=false;
     }
-    for (int ch=0; ch<MaxChannels; ch++)
-        VixNetwork.push_back(std::make_pair(netnum, ch));
 
     if (pTestDialog) pTestDialog->AddNetwork(NetworkType,ComPort,BaudRate,PortsOK ? MaxChannels : 0);
 }
@@ -2148,8 +2146,8 @@ void xScheduleFrame::LoadLorChannels(wxXmlNode* n)
             //TextCtrlLog->AppendText(wxString::Format(deviceType + wxT(" unit=%ld, circuit=%ld, chindex=%d, maxch=%d\n"),unit,circuit,chindex,xout->GetChannelCount(netnum)));
             switch (LorMapping) {
                 case XLIGHTS_LORMAP_SINGLE:
-                    if (netnum==0 && chindex < VixNetwork.size()) {
-                        LoadLorChannel(e, VixNetwork[chindex].first, VixNetwork[chindex].second);
+                    if (netnum==0 && chindex < xout->TotalChannelCount()) {
+                        LoadLorChannel(e, xout->AbsChannel2NetNum(chindex), xout->AbsChannel2NetCh(chindex));
                     }
                     break;
                 case XLIGHTS_LORMAP_MULTI:
@@ -2264,8 +2262,8 @@ bool xScheduleFrame::LoadXlightsFile(wxString& FileName)
                 PlayerError(_("Unable to read all event data from:\n")+FileName);
             } else {
                 xout->SetMaxIntensity(255);
-                for (unsigned int i=0; i < VixNetwork.size(); i++) {
-                    VixNetwork2.push_back(VixNetwork[i]);
+                for (size_t i=0; i < xout->TotalChannelCount(); i++) {
+                    VixNetwork2.push_back(xout->AbsChannelPair(i));
                 }
                 ok=true;
             }
@@ -2331,7 +2329,7 @@ bool xScheduleFrame::LoadVixenFile(wxString& FileName)
                         if (p->HasAttribute(wxT("output"))) {
                             tempstr=p->GetAttribute(wxT("output"), wxT("0"));
                             tempstr.ToLong(&OutputChannel);
-                            VixNetwork2.push_back(VixNetwork[OutputChannel]);
+                            VixNetwork2.push_back(xout->AbsChannelPair(OutputChannel));
                         }
                     }
                 }
@@ -2383,7 +2381,7 @@ bool xScheduleFrame::LoadVixenProfile(const wxString& ProfileName)
                         if (p->HasAttribute(wxT("output"))) {
                             tempstr=p->GetAttribute(wxT("output"), wxT("0"));
                             tempstr.ToLong(&OutputChannel);
-                            VixNetwork2.push_back(VixNetwork[OutputChannel]);
+                            VixNetwork2.push_back(xout->AbsChannelPair(OutputChannel));
                         }
                     }
                 }

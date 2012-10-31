@@ -16,6 +16,7 @@
 #define XLIGHTS_NETWORK_FILE   "xlights_networks.xml"
 #define XLIGHTS_CHANNEL_FILE   "xlights_channels.csv"
 #define XLIGHTS_SCHEDULE_FILE  "xlights_schedule.xml"
+#define XLIGHTS_RGBEFFECTS_FILE  "xlights_rgbeffects.xml"
 #define XLIGHTS_SEQUENCE_EXT   "xseq"
 
 #define XLIGHTS_DESCRIPTION "Use xLights to control you holiday light display"

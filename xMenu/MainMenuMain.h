@@ -66,6 +66,7 @@ class MainMenuFrame: public wxFrame
         void OnMenuItemHelpContentSelected(wxCommandEvent& event);
         void OnButtonLorMapClick(wxCommandEvent& event);
         void OnButtonFileConversionClick(wxCommandEvent& event);
+        void OnButtonSequencerClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(MainMenuFrame)
@@ -76,6 +77,7 @@ class MainMenuFrame: public wxFrame
         static const long ID_BUTTON_NETWORK_SETUP;
         static const long ID_BUTTON_SCHEDULE;
         static const long ID_BUTTON_FILE_CONVERSION;
+        static const long ID_BUTTON_SEQUENCER;
         static const long ID_PANEL1;
         static const long idMenuOpen;
         static const long idMenuQuit;
@@ -96,6 +98,7 @@ class MainMenuFrame: public wxFrame
         wxStatusBar* StatusBar1;
         wxDirDialog* DirDialog1;
         wxButton* ButtonSchedule;
+        wxButton* ButtonSequencer;
         //*)
 
         wxString CurrentDir;
