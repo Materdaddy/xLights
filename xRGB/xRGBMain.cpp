@@ -146,6 +146,8 @@ const long xRGBFrame::ID_STATICTEXT10 = wxNewId();
 const long xRGBFrame::ID_SLIDER_Spirals1_Rotation = wxNewId();
 const long xRGBFrame::ID_STATICTEXT11 = wxNewId();
 const long xRGBFrame::ID_SLIDER_Spirals1_Thickness = wxNewId();
+const long xRGBFrame::ID_STATICTEXT24 = wxNewId();
+const long xRGBFrame::ID_SLIDER_Spirals1_Direction = wxNewId();
 const long xRGBFrame::ID_CHECKBOX_Spirals1_Blend = wxNewId();
 const long xRGBFrame::ID_CHECKBOX_Spirals1_3D = wxNewId();
 const long xRGBFrame::ID_PANEL26 = wxNewId();
@@ -229,6 +231,8 @@ const long xRGBFrame::ID_STATICTEXT14 = wxNewId();
 const long xRGBFrame::ID_SLIDER_Spirals2_Rotation = wxNewId();
 const long xRGBFrame::ID_STATICTEXT15 = wxNewId();
 const long xRGBFrame::ID_SLIDER_Spirals2_Thickness = wxNewId();
+const long xRGBFrame::ID_STATICTEXT28 = wxNewId();
+const long xRGBFrame::ID_SLIDER_Spirals2_Direction = wxNewId();
 const long xRGBFrame::ID_CHECKBOX_Spirals2_Blend = wxNewId();
 const long xRGBFrame::ID_CHECKBOX_Spirals2_3D = wxNewId();
 const long xRGBFrame::ID_PANEL4 = wxNewId();
@@ -609,6 +613,10 @@ xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer4->Add(StaticText11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Slider_Spirals1_Thickness = new wxSlider(Panel1_Spirals, ID_SLIDER_Spirals1_Thickness, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Spirals1_Thickness"));
     FlexGridSizer4->Add(Slider_Spirals1_Thickness, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    StaticText19 = new wxStaticText(Panel1_Spirals, ID_STATICTEXT24, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT24"));
+    FlexGridSizer4->Add(StaticText19, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Slider_Spirals1_Direction = new wxSlider(Panel1_Spirals, ID_SLIDER_Spirals1_Direction, 1, -1, 1, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Spirals1_Direction"));
+    FlexGridSizer4->Add(Slider_Spirals1_Direction, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     CheckBox_Spirals1_Blend = new wxCheckBox(Panel1_Spirals, ID_CHECKBOX_Spirals1_Blend, _("Blend"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Spirals1_Blend"));
     CheckBox_Spirals1_Blend->SetValue(false);
     FlexGridSizer4->Add(CheckBox_Spirals1_Blend, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -704,7 +712,7 @@ xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer34 = new wxFlexGridSizer(0, 1, 0, 0);
     StaticText59 = new wxStaticText(Panel1, ID_STATICTEXT61, _("Speed"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT61"));
     FlexGridSizer34->Add(StaticText59, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Slider_Speed1 = new wxSlider(Panel1, ID_SLIDER_Speed1, 15, 0, 20, wxDefaultPosition, wxSize(30,150), wxSL_VERTICAL|wxSL_INVERSE, wxDefaultValidator, _T("ID_SLIDER_Speed1"));
+    Slider_Speed1 = new wxSlider(Panel1, ID_SLIDER_Speed1, 10, 1, 20, wxDefaultPosition, wxSize(30,150), wxSL_VERTICAL|wxSL_INVERSE, wxDefaultValidator, _T("ID_SLIDER_Speed1"));
     FlexGridSizer34->Add(Slider_Speed1, 1, wxTOP|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer7->Add(FlexGridSizer34, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
     StaticBoxSizer1->Add(FlexGridSizer7, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -877,6 +885,10 @@ xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer10->Add(StaticText15, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Slider_Spirals2_Thickness = new wxSlider(Panel2_Spirals, ID_SLIDER_Spirals2_Thickness, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Spirals2_Thickness"));
     FlexGridSizer10->Add(Slider_Spirals2_Thickness, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    StaticText20 = new wxStaticText(Panel2_Spirals, ID_STATICTEXT28, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT28"));
+    FlexGridSizer10->Add(StaticText20, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Slider_Spirals2_Direction = new wxSlider(Panel2_Spirals, ID_SLIDER_Spirals2_Direction, 1, -1, 1, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Spirals2_Direction"));
+    FlexGridSizer10->Add(Slider_Spirals2_Direction, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     CheckBox_Spirals2_Blend = new wxCheckBox(Panel2_Spirals, ID_CHECKBOX_Spirals2_Blend, _("Blend"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Spirals2_Blend"));
     CheckBox_Spirals2_Blend->SetValue(false);
     FlexGridSizer10->Add(CheckBox_Spirals2_Blend, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -972,7 +984,7 @@ xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer36 = new wxFlexGridSizer(0, 1, 0, 0);
     StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT4, _("Speed"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer36->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Slider_Speed2 = new wxSlider(Panel1, ID_SLIDER_Speed2, 15, 0, 20, wxDefaultPosition, wxSize(30,150), wxSL_VERTICAL|wxSL_INVERSE, wxDefaultValidator, _T("ID_SLIDER_Speed2"));
+    Slider_Speed2 = new wxSlider(Panel1, ID_SLIDER_Speed2, 10, 1, 20, wxDefaultPosition, wxSize(30,150), wxSL_VERTICAL|wxSL_INVERSE, wxDefaultValidator, _T("ID_SLIDER_Speed2"));
     FlexGridSizer36->Add(Slider_Speed2, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(FlexGridSizer36, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
     StaticBoxSizer2->Add(FlexGridSizer8, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -1135,7 +1147,6 @@ void xRGBFrame::TimerEffect()
 {
     wxString line1,line2,s;
     buffer.Clear();
-    buffer.IncrFrameNumber();
 
     // update SparkleFrequency or SparkleDensity if necessary
     int SparkleFrequency=Slider_SparkleFrequency->GetValue();
@@ -1206,6 +1217,7 @@ void xRGBFrame::TimerEffect()
             break;
         case 11:
             buffer.RenderSpirals(0,Slider_Spirals1_Count->GetValue(),
+                                 Slider_Spirals1_Direction->GetValue(),
                                  Slider_Spirals1_Rotation->GetValue(),
                                  Slider_Spirals1_Thickness->GetValue(),
                                  CheckBox_Spirals1_Blend->GetValue(),
@@ -1267,6 +1279,7 @@ void xRGBFrame::TimerEffect()
             break;
         case 11:
             buffer.RenderSpirals(1,Slider_Spirals2_Count->GetValue(),
+                                 Slider_Spirals2_Direction->GetValue(),
                                  Slider_Spirals2_Rotation->GetValue(),
                                  Slider_Spirals2_Thickness->GetValue(),
                                  CheckBox_Spirals2_Blend->GetValue(),

@@ -26,7 +26,6 @@
 
 PixelBufferClass::PixelBufferClass()
 {
-    FrameNumber = 0;
 }
 
 PixelBufferClass::~PixelBufferClass()
@@ -38,13 +37,9 @@ void PixelBufferClass::SetWindow(wxScrolledWindow* ScrolledWindow)
     DrawWindow = ScrolledWindow;
 }
 
-void PixelBufferClass::IncrFrameNumber()
-{
-    FrameNumber++;
-}
-
 void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
 {
+    size_t i;
     wxClientDC dc(DrawWindow);
     dc.Clear();
     SetFromXml(ModelNode);
@@ -53,8 +48,16 @@ void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
     uint8_t offset_r=RGBorder.find(wxT("R"));
     uint8_t offset_g=RGBorder.find(wxT("G"));
     uint8_t offset_b=RGBorder.find(wxT("B"));
-    for(size_t i=0; i<NodeCount; i++) {
+    for(i=0; i<NodeCount; i++) {
         Nodes[i].SetOffset(offset_r, offset_g, offset_b);
+    }
+    for(i=0; i<2; i++) {
+        BarState[i]=0;
+        ButterflyState[i]=0;
+        ColorWashState[i]=0;
+        GarlandsState[i]=0;
+        MeteorState[i]=0;
+        SpiralState[i]=0;
     }
 }
 
@@ -159,7 +162,7 @@ void PixelBufferClass::Get2ColorBlend(int layer, int coloridx1, int coloridx2, d
 }
 
 // 0 <= n < 1
-void PixelBufferClass::GetMultiColorBlend(int layer, double n, wxColour &color)
+void PixelBufferClass::GetMultiColorBlend(int layer, double n, bool circular, wxColour &color)
 {
     /*
     // debug
@@ -177,7 +180,7 @@ void PixelBufferClass::GetMultiColorBlend(int layer, double n, wxColour &color)
     }
     if (n >= 1.0) n=0.99999;
     if (n < 0.0) n=0.0;
-    double realidx=n*colorcnt;
+    double realidx=circular ? n*colorcnt : n*(colorcnt-1);
     int coloridx1=floor(realidx);
     int coloridx2=(coloridx1+1) % colorcnt;
     double ratio=realidx-double(coloridx1);
@@ -204,17 +207,18 @@ void PixelBufferClass::SetBgColor(wxString& NewBgColor)
 
 void PixelBufferClass::RenderBars(int layer, int BarCount, int Direction, bool Highlight, bool Show3D)
 {
-    int x,y,n,f_offset,pixel_ratio,ColorIdx;
+    int x,y,n,pixel_ratio,ColorIdx;
     bool IsMovingDown,IsHighlightRow;
     wxImage::HSVValue hsv;
     size_t colorcnt=GetColorCount(layer);
     int BarWidth = BufferHt/BarCount+1;
     int HalfHt = BufferHt/2;
+    BarState[layer]+=Speed;
+    int f_offset = BarState[layer]/4 % BufferHt;
     for (x=0; x<BufferWi; x++) {
         for (y=0; y<BufferHt; y++) {
             ColorIdx=(y/BarWidth) % colorcnt;
             palette[layer].GetHSV(ColorIdx, hsv);
-            f_offset = FrameNumber*Speed/4 % BufferHt;
             switch (Direction) {
                 case 1: IsMovingDown=true; break;
                 case 2: IsMovingDown=(y <= HalfHt); break;
@@ -242,19 +246,20 @@ void PixelBufferClass::RenderBars(int layer, int BarCount, int Direction, bool H
 void PixelBufferClass::RenderButterfly(int layer, int ColorScheme, int Style, int Chunks, int Skip)
 {
     int x,y,d;
-    double n,offset,x1,y1,f;
+    double n,x1,y1,f;
     double h=0.0;
     static const double pi2=6.283185307;
     wxColour color;
     wxImage::HSVValue hsv;
     int maxframe=BufferHt*2;
-    int frame=(FrameNumber * BufferHt * (Speed+1) / 200)%maxframe;
+    ButterflyState[layer]+=Speed;
+    int frame=(BufferHt * ButterflyState[layer] / 200)%maxframe;
+    double offset=double(ButterflyState[layer])/100.0;
 
     for (x=0; x<BufferWi; x++) {
         for (y=0; y<BufferHt; y++) {
             switch (Style) {
                 case 1:
-                    offset=FrameNumber*(Speed+1)/100.0;
                     n = abs((x*x - y*y) * sin (offset + ((x+y)*pi2 / (BufferHt+BufferWi))));
                     d = x*x + y*y+1;
                     h=n/d;
@@ -280,7 +285,7 @@ void PixelBufferClass::RenderButterfly(int layer, int ColorScheme, int Style, in
                     hsv.hue=h;
                     SetPixel(layer,x,y,hsv);
                 } else {
-                    GetMultiColorBlend(layer,h,color);
+                    GetMultiColorBlend(layer,h,false,color);
                     SetPixel(layer,x,y,color);
                 }
             }
@@ -294,9 +299,10 @@ void PixelBufferClass::RenderColorWash(int layer, bool HorizFade, bool VertFade)
     wxColour color;
     wxImage::HSVValue hsv,hsv2;
     size_t colorcnt=GetColorCount(layer);
-    int CycleLen=(21-Speed)*colorcnt*5;
-    double ratio= double(FrameNumber % CycleLen) / double(CycleLen);
-    GetMultiColorBlend(layer, ratio, color);
+    int CycleLen=colorcnt*100;
+    ColorWashState[layer]+=Speed;
+    double ratio= double(ColorWashState[layer]/4 % CycleLen) / double(CycleLen);
+    GetMultiColorBlend(layer, ratio, true, color);
     Color2HSV(color,hsv);
     double HalfHt=double(BufferHt-1)/2.0;
     double HalfWi=double(BufferWi-1)/2.0;
@@ -315,9 +321,57 @@ void PixelBufferClass::RenderFire(int layer)
 
 }
 
-void PixelBufferClass::RenderGarlands(int layer, int Type, int Spacing)
+void PixelBufferClass::RenderGarlands(int layer, int GarlandType, int Spacing)
 {
-
+    int x,y,yadj,ylimit,ring;
+    double ratio;
+    wxColour color;
+    int PixelSpacing=Spacing*BufferHt/100+3;
+    int limit=BufferHt*PixelSpacing;
+    GarlandsState[layer]=(GarlandsState[layer] + Speed*PixelSpacing/20 + 1) % limit;
+    // ring=0 is the top ring
+    for (ring=0; ring<BufferHt; ring++) {
+        ratio=double(ring)/double(BufferHt);
+        GetMultiColorBlend(layer, ratio, false, color);
+        y=limit - ring*PixelSpacing - GarlandsState[layer];
+        ylimit=BufferHt-ring-1;
+        for (x=0; x<BufferWi; x++) {
+            yadj=y;
+            switch (GarlandType) {
+                case 1:
+                    switch (x%5) {
+                        case 2: yadj-=2; break;
+                        case 1:
+                        case 3: yadj-=1; break;
+                    }
+                    break;
+                case 2:
+                    switch (x%5) {
+                        case 2: yadj-=4; break;
+                        case 1:
+                        case 3: yadj-=2; break;
+                    }
+                    break;
+                case 3:
+                    switch (x%6) {
+                        case 3: yadj-=6; break;
+                        case 2:
+                        case 4: yadj-=4; break;
+                        case 1:
+                        case 5: yadj-=2; break;
+                    }
+                    break;
+                case 4:
+                    switch (x%5) {
+                        case 1:
+                        case 3: yadj-=2; break;
+                    }
+                    break;
+            }
+            if (yadj < ylimit) yadj=ylimit;
+            if (yadj < BufferHt) SetPixel(layer,x,yadj,color);
+        }
+    }
 }
 
 void PixelBufferClass::RenderLife(int layer, int Count, int Seed)
@@ -327,10 +381,10 @@ void PixelBufferClass::RenderLife(int layer, int Count, int Seed)
 
 void PixelBufferClass::RenderMeteors(int layer, int MeteorType, int Count, int Length)
 {
-    int mspeed=Speed/2-5;
-    if (mspeed < 1) {
-        mspeed= (FrameNumber % (2-mspeed) == 0) ? 1 : 0;
-    }
+    MeteorState[layer]+=Speed;
+    int mspeed=MeteorState[layer]/4;
+    MeteorState[layer]-=mspeed*4;
+
     // create new meteors
     MeteorClass m;
     wxImage::HSVValue hsv,hsv0,hsv1;
@@ -394,12 +448,13 @@ void PixelBufferClass::RenderSnowstorm(int layer, int Count, int Length)
 
 }
 
-void PixelBufferClass::RenderSpirals(int layer, int Count, int Rotation, int Thickness, bool Blend, bool Show3D)
+void PixelBufferClass::RenderSpirals(int layer, int Count, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D)
 {
     int strand_base,strand,thick,x,y,ColorIdx;
     int deltaStrands=BufferWi / Count;
     int SpiralThickness=(deltaStrands * Thickness / 100) + 1;
     size_t colorcnt=GetColorCount(layer);
+    SpiralState[layer]+=Speed*Direction;
     wxImage::HSVValue hsv;
     wxColour color;
     for(int ns=0; ns < Count; ns++) {
@@ -409,10 +464,10 @@ void PixelBufferClass::RenderSpirals(int layer, int Count, int Rotation, int Thi
         for(thick=0; thick < SpiralThickness; thick++) {
             strand = (strand_base + thick) % BufferWi;
             for(y=0; y < BufferHt; y++) {
-                x=(strand + (Speed-10)*FrameNumber/4 + y*Rotation/BufferHt) % BufferWi;
+                x=(strand + SpiralState[layer]/10 + y*Rotation/BufferHt) % BufferWi;
                 if (x < 0) x += BufferWi;
                 if (Blend) {
-                    GetMultiColorBlend(layer, double(BufferHt-y-1)/double(BufferHt), color);
+                    GetMultiColorBlend(layer, double(BufferHt-y-1)/double(BufferHt), false, color);
                 }
                 if (Show3D) {
                     Color2HSV(color,hsv);

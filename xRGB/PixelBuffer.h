@@ -201,11 +201,16 @@ private:
     PixelVector pixels; // this is the calculation buffer
 
     int sparkle_count,Speed;
-    unsigned int FrameNumber;
     MixTypes MixType;
     wxScrolledWindow* DrawWindow;
     MeteorList meteors[2];
     PaletteClass palette[2];
+    long BarState[2];
+    long ButterflyState[2];
+    long ColorWashState[2];
+    long GarlandsState[2];
+    long MeteorState[2];
+    long SpiralState[2];
 
     void SetPixel(int layer, int x, int y, wxColour &color);
     void SetPixel(int layer, int x, int y, wxImage::HSVValue& hsv);
@@ -215,14 +220,13 @@ private:
     double rand01();
     wxByte ChannelBlend(wxByte c1, wxByte c2, double ratio);
     void Get2ColorBlend(int layer, int coloridx1, int coloridx2, double ratio, wxColour &color);
-    void GetMultiColorBlend(int layer, double n, wxColour &color);
+    void GetMultiColorBlend(int layer, double n, bool circular, wxColour &color);
 
 public:
     PixelBufferClass();
     ~PixelBufferClass();
     void InitBuffer(wxXmlNode* ModelNode);
     void Clear();
-    void IncrFrameNumber();
     size_t GetColorCount(int layer);
     void SetMixType(wxString& MixName);
     void SetPalette(int layer, wxColourVector& newcolors);
@@ -234,13 +238,13 @@ public:
     void RenderButterfly(int layer, int ColorScheme, int Style, int Chunks, int Skip);
     void RenderColorWash(int layer, bool HorizFade, bool VertFade);
     void RenderFire(int layer);
-    void RenderGarlands(int layer, int Type, int Spacing);
+    void RenderGarlands(int layer, int GarlandType, int Spacing);
     void RenderLife(int layer, int Count, int Seed);
     void RenderMeteors(int layer, int MeteorType, int Count, int Length);
     void RenderPictures(int layer);
     void RenderSnowflakes(int layer);
     void RenderSnowstorm(int layer, int Count, int Length);
-    void RenderSpirals(int layer, int Count, int Rotation, int Thickness, bool Blend, bool Show3D);
+    void RenderSpirals(int layer, int Count, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
     void RenderText(int layer, int Top, wxString& Line1, wxString& Line2);
     void DisplayOutput();
 };

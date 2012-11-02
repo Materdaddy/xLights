@@ -168,6 +168,8 @@ class xRGBFrame: public wxFrame
         static const long ID_SLIDER_Spirals1_Rotation;
         static const long ID_STATICTEXT11;
         static const long ID_SLIDER_Spirals1_Thickness;
+        static const long ID_STATICTEXT24;
+        static const long ID_SLIDER_Spirals1_Direction;
         static const long ID_CHECKBOX_Spirals1_Blend;
         static const long ID_CHECKBOX_Spirals1_3D;
         static const long ID_PANEL26;
@@ -251,6 +253,8 @@ class xRGBFrame: public wxFrame
         static const long ID_SLIDER_Spirals2_Rotation;
         static const long ID_STATICTEXT15;
         static const long ID_SLIDER_Spirals2_Thickness;
+        static const long ID_STATICTEXT28;
+        static const long ID_SLIDER_Spirals2_Direction;
         static const long ID_CHECKBOX_Spirals2_Blend;
         static const long ID_CHECKBOX_Spirals2_3D;
         static const long ID_PANEL4;
@@ -338,6 +342,7 @@ class xRGBFrame: public wxFrame
         wxSlider* Slider_Spirals1_Thickness;
         wxChoice* Choice_Bars1_Direction;
         wxSlider* Slider_Life1_Seed;
+        wxStaticText* StaticText19;
         wxPanel* Panel2_Butterfly;
         wxChoice* Choice_Bars2_Direction;
         wxStaticText* StaticText39;
@@ -383,6 +388,7 @@ class xRGBFrame: public wxFrame
         wxSlider* Slider_Speed1;
         wxCheckBox* CheckBox_Spirals1_Blend;
         wxStaticText* StaticText57;
+        wxSlider* Slider_Spirals2_Direction;
         wxStaticText* StaticText47;
         wxPanel* Panel2_ColorWash;
         wxCheckBox* CheckBox_Palette2_5;
@@ -390,6 +396,7 @@ class xRGBFrame: public wxFrame
         wxCheckBox* CheckBox_ColorWash1_VFade;
         wxButton* Button_Palette2_1;
         wxSlider* Slider_Spirals2_Count;
+        wxSlider* Slider_Spirals1_Direction;
         wxStaticText* StaticText14;
         wxStaticText* StaticText34;
         wxSlider* Slider_Spirals1_Count;
@@ -397,13 +404,14 @@ class xRGBFrame: public wxFrame
         wxStaticText* StaticText18;
         wxCheckBox* CheckBox_SendOutput;
         wxStaticText* StaticText37;
-        wxCheckBox* CheckBox_Bars2_Highlight;
         wxStaticText* StaticText13;
+        wxCheckBox* CheckBox_Bars2_Highlight;
         wxSlider* Slider_Bars1_BarCount;
         wxStaticText* StaticText51;
         wxChoice* Choice_Pictures1_Direction;
         wxStaticText* StaticText53;
         wxButton* Button_Pictures2_Filename;
+        wxStaticText* StaticText20;
         wxStaticText* StaticText54;
         wxPanel* Panel2_Snowstorm;
         wxPanel* Panel1_Snowflakes;

@@ -873,6 +873,24 @@
 																		<option>1</option>
 																	</object>
 																	<object class="sizeritem">
+																		<object class="wxStaticText" name="ID_STATICTEXT24" variable="StaticText19" member="yes">
+																			<label>Direction</label>
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxSlider" name="ID_SLIDER_Spirals1_Direction" variable="Slider_Spirals1_Direction" member="yes">
+																			<value>1</value>
+																			<min>-1</min>
+																			<max>1</max>
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
 																		<object class="wxCheckBox" name="ID_CHECKBOX_Spirals1_Blend" variable="CheckBox_Spirals1_Blend" member="yes">
 																			<label>Blend</label>
 																		</object>
@@ -1106,7 +1124,8 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxSlider" name="ID_SLIDER_Speed1" variable="Slider_Speed1" member="yes">
-																<value>15</value>
+																<value>10</value>
+																<min>1</min>
 																<max>20</max>
 																<size>30,150</size>
 																<style>wxSL_VERTICAL|wxSL_INVERSE</style>
@@ -1632,6 +1651,24 @@
 																		<option>1</option>
 																	</object>
 																	<object class="sizeritem">
+																		<object class="wxStaticText" name="ID_STATICTEXT28" variable="StaticText20" member="yes">
+																			<label>Direction</label>
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
+																		<object class="wxSlider" name="ID_SLIDER_Spirals2_Direction" variable="Slider_Spirals2_Direction" member="yes">
+																			<value>1</value>
+																			<min>-1</min>
+																			<max>1</max>
+																		</object>
+																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																		<border>5</border>
+																		<option>1</option>
+																	</object>
+																	<object class="sizeritem">
 																		<object class="wxCheckBox" name="ID_CHECKBOX_Spirals2_Blend" variable="CheckBox_Spirals2_Blend" member="yes">
 																			<label>Blend</label>
 																		</object>
@@ -1866,7 +1903,8 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxSlider" name="ID_SLIDER_Speed2" variable="Slider_Speed2" member="yes">
-																<value>15</value>
+																<value>10</value>
+																<min>1</min>
 																<max>20</max>
 																<size>30,150</size>
 																<style>wxSL_VERTICAL|wxSL_INVERSE</style>
