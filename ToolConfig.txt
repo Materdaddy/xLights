@@ -7,7 +7,7 @@ Linux users will need to follow the instructions below to compile there own copy
 
 xLights is written in C++ and uses the wxWidgets library as a compatibility layer across operating systems.
 xLights versions 2012a and EARLIER are compatible with wxWidgets 2.8.10, 2.8.11, and 2.8.12
-xLights versions 2012b and LATER are compatible with wxWidgets 2.8.11, 2.8.12, and 2.9.3
+xLights versions 2012b and LATER are compatible with wxWidgets 2.8.11, 2.8.12, 2.9.3, and 2.9.4
 wxWidgets versions 2.8.x are available as precompiled downloads from various locations on the internet.
 wxWidgets versions 2.9.x are not considered stable and must be compiled yourself.
 
@@ -108,8 +108,8 @@ WINDOWS
 
 You will need:
   a) MinGW compiler (a nice distro is here: http://nuwen.net/mingw.html)
-  b) Code::Blocks for Windows (currently using 10.05)
-  c) wxWidgets for Windows (currently using 2.9.3)
+  b) Code::Blocks for Windows (was using 10.05, now using SVN 8484 available here: http://forums.codeblocks.org/index.php/topic,17019.0.html)
+  c) wxWidgets for Windows (currently using 2.9.4)
   d) Since we are now using the development version of wxWidgets, you will need
      to compile it yourself. To compile it yourself:
      1) Open a command prompt

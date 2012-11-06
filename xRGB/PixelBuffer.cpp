@@ -50,6 +50,7 @@ void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
     uint8_t offset_b=RGBorder.find(wxT("B"));
     for(i=0; i<NodeCount; i++) {
         Nodes[i].SetOffset(offset_r, offset_g, offset_b);
+        Nodes[i].sparkle = rand() % 10000;
     }
     for(i=0; i<2; i++) {
         BarState[i]=0;
@@ -187,12 +188,10 @@ void PixelBufferClass::GetMultiColorBlend(int layer, double n, bool circular, wx
     Get2ColorBlend(layer,coloridx1,coloridx2,ratio,color);
 }
 
-void PixelBufferClass::SetSparkle(int freq, int density)
+// 10-200 or so, or 0 for no sparkle
+void PixelBufferClass::SetSparkle(int freq)
 {
     sparkle_count=freq;
-    for(size_t i=0; i < Nodes.size(); i++) {
-        Nodes[i].sparkle = (rand() % 100 < density) ? rand() % sparkle_count + 1 : 0;
-    }
 }
 
 void PixelBufferClass::SetSpeed(int newspeed)
@@ -537,7 +536,7 @@ void PixelBufferClass::DisplayOutput()
             // get blend of two effects
             pixels[Nodes[i].bufY*BufferWi+Nodes[i].bufX].MixColors(MixType,color);
             // add sparkles
-            if (Nodes[i].sparkle > 0 && color.GetRGB()!=0) {
+            if (sparkle_count > 0 && color.GetRGB()!=0) {
                 switch (Nodes[i].sparkle%sparkle_count) {
                     case 1:
                     case 7:

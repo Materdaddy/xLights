@@ -67,11 +67,9 @@ const long xRGBFrame::ID_STATICTEXT1 = wxNewId();
 const long xRGBFrame::ID_STATICTEXT5 = wxNewId();
 const long xRGBFrame::ID_BUTTON5 = wxNewId();
 const long xRGBFrame::ID_BUTTON1 = wxNewId();
-const long xRGBFrame::ID_BUTTON3 = wxNewId();
 const long xRGBFrame::ID_BUTTON11 = wxNewId();
 const long xRGBFrame::ID_BUTTON6 = wxNewId();
 const long xRGBFrame::ID_BUTTON2 = wxNewId();
-const long xRGBFrame::ID_BUTTON4 = wxNewId();
 const long xRGBFrame::ID_BUTTON12 = wxNewId();
 const long xRGBFrame::ID_GRID1 = wxNewId();
 const long xRGBFrame::ID_BUTTON58 = wxNewId();
@@ -85,8 +83,6 @@ const long xRGBFrame::ID_BUTTON10 = wxNewId();
 const long xRGBFrame::ID_STATICTEXT2 = wxNewId();
 const long xRGBFrame::ID_CHOICE_LayerMethod = wxNewId();
 const long xRGBFrame::ID_BUTTON56 = wxNewId();
-const long xRGBFrame::ID_STATICTEXT3 = wxNewId();
-const long xRGBFrame::ID_SLIDER_SparkleDensity = wxNewId();
 const long xRGBFrame::ID_STATICTEXT6 = wxNewId();
 const long xRGBFrame::ID_SLIDER_SparkleFrequency = wxNewId();
 const long xRGBFrame::ID_PANEL2 = wxNewId();
@@ -265,10 +261,12 @@ const long xRGBFrame::idMenuAbout = wxNewId();
 const long xRGBFrame::ID_TIMER1 = wxNewId();
 //*)
 
+
 BEGIN_EVENT_TABLE(xRGBFrame,wxFrame)
     //(*EventTable(xRGBFrame)
     //*)
 END_EVENT_TABLE()
+
 
 xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
 {
@@ -355,16 +353,13 @@ xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer9->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
-    GridSizer1 = new wxGridSizer(2, 4, 0, 0);
+    GridSizer1 = new wxGridSizer(2, 3, 0, 0);
     Button_PlaySelection = new wxButton(Panel1, ID_BUTTON5, _("Play Selection"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     Button_PlaySelection->SetBackgroundColour(wxColour(0,255,0));
     GridSizer1->Add(Button_PlaySelection, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     Button_DisplayElements = new wxButton(Panel1, ID_BUTTON1, _("Display Elements"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     Button_DisplayElements->SetBackgroundColour(wxColour(224,224,224));
     GridSizer1->Add(Button_DisplayElements, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    Button_MediaFile = new wxButton(Panel1, ID_BUTTON3, _("Media File"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-    Button_MediaFile->SetBackgroundColour(wxColour(224,224,224));
-    GridSizer1->Add(Button_MediaFile, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     Button_Open = new wxButton(Panel1, ID_BUTTON11, _("Open Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
     Button_Open->SetBackgroundColour(wxColour(224,224,224));
     GridSizer1->Add(Button_Open, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
@@ -374,21 +369,17 @@ xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
     Button_TimeSlots = new wxButton(Panel1, ID_BUTTON2, _("Time Slots"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     Button_TimeSlots->SetBackgroundColour(wxColour(224,224,224));
     GridSizer1->Add(Button_TimeSlots, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    Button_Export = new wxButton(Panel1, ID_BUTTON4, _("Import/Export"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
-    Button_Export->SetBackgroundColour(wxColour(224,224,224));
-    GridSizer1->Add(Button_Export, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     Button_Save = new wxButton(Panel1, ID_BUTTON12, _("Save Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     Button_Save->SetBackgroundColour(wxColour(224,224,224));
     GridSizer1->Add(Button_Save, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     FlexGridSizer5->Add(GridSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Grid1 = new wxGrid(Panel1, ID_GRID1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_GRID1"));
-    Grid1->CreateGrid(10,3);
+    Grid1->CreateGrid(10,2);
     Grid1->EnableEditing(true);
     Grid1->EnableGridLines(true);
     Grid1->SetRowLabelSize(35);
     Grid1->SetColLabelValue(0, _("Start Time"));
-    Grid1->SetColLabelValue(1, _("End Time"));
-    Grid1->SetColLabelValue(2, _("Label"));
+    Grid1->SetColLabelValue(1, _("Label"));
     Grid1->SetDefaultCellFont( Grid1->GetFont() );
     Grid1->SetDefaultCellTextColour( Grid1->GetForegroundColour() );
     FlexGridSizer5->Add(Grid1, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
@@ -432,12 +423,7 @@ xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
     Button_SaveEffects = new wxButton(Panel1, ID_BUTTON56, _("Save File"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON56"));
     Button_SaveEffects->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer6->Add(Button_SaveEffects, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Sparkle Density"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-    FlexGridSizer6->Add(StaticText3, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Slider_SparkleDensity = new wxSlider(Panel1, ID_SLIDER_SparkleDensity, 0, 0, 50, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_SparkleDensity"));
-    FlexGridSizer6->Add(Slider_SparkleDensity, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer6->Add(-1,-1,1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, _("Sparkle Frequency"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, _("Sparkles"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     FlexGridSizer6->Add(StaticText6, 1, wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Slider_SparkleFrequency = new wxSlider(Panel1, ID_SLIDER_SparkleFrequency, 200, 10, 200, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE, wxDefaultValidator, _T("ID_SLIDER_SparkleFrequency"));
     FlexGridSizer6->Add(Slider_SparkleFrequency, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -1056,11 +1042,15 @@ xRGBFrame::xRGBFrame(wxWindow* parent,wxWindowID id)
     UnsavedChanges=false;
     PaletteChanged=true;
     MixTypeChanged=true;
-    /*
-    ResetTimer(NO_EFFECT);
-    if (PortsOK) {
-    }
-    */
+
+    wxGridCellAttr* column0=new wxGridCellAttr();
+    //column0->SetEditor(new wxGridCellFloatEditor(5,3));
+    column0->SetRenderer(new wxGridCellFloatRenderer(5,3));
+    column0->SetReadOnly(true);
+    Grid1->SetColAttr(0,column0);
+
+    PlayerDlg = new PlayerFrame(this, wxID_ANY);
+    PlayerDlg->Show(false);
 
     // Get CurrentDir
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
@@ -1148,14 +1138,10 @@ void xRGBFrame::TimerEffect()
     wxString line1,line2,s;
     buffer.Clear();
 
-    // update SparkleFrequency or SparkleDensity if necessary
-    int SparkleFrequency=Slider_SparkleFrequency->GetValue();
-    int SparkleDensity=Slider_SparkleDensity->GetValue();
-    if (SparkleFrequency != LastSparkleFrequency || SparkleDensity != LastSparkleDensity) {
-        buffer.SetSparkle(SparkleFrequency,SparkleDensity);
-        LastSparkleFrequency=SparkleFrequency;
-        LastSparkleDensity=SparkleDensity;
-    }
+    // update SparkleFrequency
+    int freq=Slider_SparkleFrequency->GetValue();
+    if (freq == Slider_SparkleFrequency->GetMax()) freq=0;
+    buffer.SetSparkle(freq);
 
     if (PaletteChanged) {
         UpdateBufferPalette();
@@ -1166,7 +1152,6 @@ void xRGBFrame::TimerEffect()
         buffer.SetMixType(s);
         MixTypeChanged=false;
     }
-
 
     // render effect 1
     buffer.SetSpeed(Slider_Speed1->GetValue());
@@ -1550,7 +1535,6 @@ wxXmlNode* xRGBFrame::CreateEffectNode(wxString& name)
     NewXml->AddAttribute(wxT("ID_CHOICEBOOK1"), Choicebook1->GetPageText(PageIdx1));
     NewXml->AddAttribute(wxT("ID_CHOICEBOOK2"), Choicebook2->GetPageText(PageIdx2));
     NewXml->AddAttribute(wxT("ID_CHOICE_LayerMethod"), Choice_LayerMethod->GetStringSelection());
-    NewXml->AddAttribute(wxT("ID_SLIDER_SparkleDensity"), wxString::Format(wxT("%d"),Slider_SparkleDensity->GetValue()));
     NewXml->AddAttribute(wxT("ID_SLIDER_SparkleFrequency"), wxString::Format(wxT("%d"),Slider_SparkleFrequency->GetValue()));
     NewXml->AddAttribute(wxT("ID_SLIDER_Speed1"), wxString::Format(wxT("%d"),Slider_Speed1->GetValue()));
     NewXml->AddAttribute(wxT("ID_SLIDER_Speed2"), wxString::Format(wxT("%d"),Slider_Speed2->GetValue()));
@@ -1760,8 +1744,6 @@ void xRGBFrame::SetPlayMode(play_modes newmode)
             buffer.InitBuffer(ModelXml);
             s=Choice_LayerMethod->GetStringSelection();
             buffer.SetMixType(s);
-            LastSparkleFrequency=-1;
-            LastSparkleDensity=-1;
             StaticText_PlaybackMode->SetLabelText(_("Playback: effect"));
             break;
         case play_seqpartial:
@@ -1798,12 +1780,14 @@ void xRGBFrame::OnButton_PlaySelectionClick(wxCommandEvent& event)
 
 void xRGBFrame::OnButton_PlayAllClick(wxCommandEvent& event)
 {
+    PlayerDlg->MediaCtrl->Play();
     SetPlayMode(play_seqall);
 }
 
 void xRGBFrame::OnButton_StopClick(wxCommandEvent& event)
 {
     SetPlayMode(play_off);
+    PlayerDlg->MediaCtrl->Stop();
 }
 
 void xRGBFrame::OnChoice_LayerMethodSelect(wxCommandEvent& event)
@@ -1815,3 +1799,60 @@ void xRGBFrame::OnCheckBox_PaletteClick(wxCommandEvent& event)
 {
     PaletteChanged=true;
 }
+
+void xRGBFrame::DisplayError(const wxString& msg)
+{
+    wxMessageBox(msg, _("Error"), wxOK | wxICON_EXCLAMATION);
+}
+
+bool xRGBFrame::LoadXlightsFile(wxString& FileName)
+{
+    wxFile f;
+    wxFileName fn;
+    fn.AssignDir(CurrentDir);
+    char hdr[512],filetype[10];
+    int fileversion,numch,numper,scancnt;
+    size_t SeqDataLen, readcnt;
+    mediaFilename.clear();
+    if (VixEventData) delete VixEventData;
+    VixNumChannels=0;
+    VixNumPeriods=0;
+    bool ok = false;
+    if (f.Open(FileName.c_str())) {
+        f.Read(hdr,512);
+        scancnt=sscanf(hdr,"%8s %2d %8d %8d",filetype,&fileversion,&numch,&numper);
+        if (scancnt != 4 || strncmp(filetype,"xLights",7) != 0 || numch <= 0 || numper <= 0) {
+            DisplayError(_("Invalid file header:\n")+FileName);
+        } else {
+            VixNumPeriods=numper;
+            VixNumChannels=numch;
+            SeqDataLen=VixNumPeriods * VixNumChannels;
+            wxString filename=wxString::FromAscii(hdr+32);
+            SetMediaFilename(filename);
+            VixEventData = new wxUint8[SeqDataLen];
+            readcnt = f.Read(VixEventData,SeqDataLen);
+            if (readcnt < SeqDataLen) {
+                DisplayError(_("Unable to read all event data from:\n")+FileName);
+            } else {
+                ok=true;
+            }
+        }
+        f.Close();
+    } else {
+        DisplayError(_("Unable to load sequence:\n")+FileName);
+    }
+    return ok;
+}
+
+void xRGBFrame::SetMediaFilename(const wxString& filename)
+{
+    mediaFilename=filename;
+    if (mediaFilename.IsEmpty()) return;
+    wxPathFormat PathFmt = mediaFilename.Contains(_("\\")) ? wxPATH_DOS : wxPATH_NATIVE;
+    wxFileName fn1(mediaFilename, PathFmt);
+    if (!fn1.FileExists()) {
+        wxFileName fn2(CurrentDir,fn1.GetFullName());
+        mediaFilename=fn2.GetFullPath();
+    }
+}
+

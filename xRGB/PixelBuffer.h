@@ -231,7 +231,7 @@ public:
     void SetMixType(wxString& MixName);
     void SetPalette(int layer, wxColourVector& newcolors);
     void SetSpeed(int newspeed);
-    void SetSparkle(int freq, int density);
+    void SetSparkle(int freq);
     void SetBgColor(wxString& NewBgColor);
     void SetWindow(wxScrolledWindow* ScrolledWindow);
     void RenderBars(int layer, int BarCount, int Direction, bool Highlight, bool Show3D);

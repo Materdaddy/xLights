@@ -42,6 +42,7 @@
 #include "../include/globals.h"
 #include "../include/xlights_out.cpp"
 #include "PixelBuffer.h"
+#include "../xScheduler/PlayerFrame.h"
 
 
 enum play_modes {
@@ -89,11 +90,9 @@ class xRGBFrame: public wxFrame
         static const long ID_STATICTEXT5;
         static const long ID_BUTTON5;
         static const long ID_BUTTON1;
-        static const long ID_BUTTON3;
         static const long ID_BUTTON11;
         static const long ID_BUTTON6;
         static const long ID_BUTTON2;
-        static const long ID_BUTTON4;
         static const long ID_BUTTON12;
         static const long ID_GRID1;
         static const long ID_BUTTON58;
@@ -107,8 +106,6 @@ class xRGBFrame: public wxFrame
         static const long ID_STATICTEXT2;
         static const long ID_CHOICE_LayerMethod;
         static const long ID_BUTTON56;
-        static const long ID_STATICTEXT3;
-        static const long ID_SLIDER_SparkleDensity;
         static const long ID_STATICTEXT6;
         static const long ID_SLIDER_SparkleFrequency;
         static const long ID_PANEL2;
@@ -404,8 +401,8 @@ class xRGBFrame: public wxFrame
         wxStaticText* StaticText18;
         wxCheckBox* CheckBox_SendOutput;
         wxStaticText* StaticText37;
-        wxStaticText* StaticText13;
         wxCheckBox* CheckBox_Bars2_Highlight;
+        wxStaticText* StaticText13;
         wxSlider* Slider_Bars1_BarCount;
         wxStaticText* StaticText51;
         wxChoice* Choice_Pictures1_Direction;
@@ -418,7 +415,6 @@ class xRGBFrame: public wxFrame
         wxTextCtrl* TextCtrl_Pictures2_Filename;
         wxButton* Button_PresetUpdate;
         wxButton* Button_Open;
-        wxButton* Button_MediaFile;
         wxStaticText* StaticText31;
         wxSlider* Slider_Butterfly1_Skip;
         wxPanel* Panel1_Fire;
@@ -459,7 +455,6 @@ class xRGBFrame: public wxFrame
         wxSlider* Slider_Meteors1_Count;
         wxPanel* Panel1_Butterfly;
         wxPanel* Panel1_Spirals;
-        wxButton* Button_Export;
         wxPanel* Panel2_Text;
         wxCheckBox* CheckBox_Palette1_2;
         wxSlider* Slider_Spirals1_Rotation;
@@ -468,7 +463,6 @@ class xRGBFrame: public wxFrame
         wxCheckBox* CheckBox_ColorWash1_HFade;
         wxChoice* Choice_Pictures2_Direction;
         wxPanel* Panel1_Text;
-        wxSlider* Slider_SparkleDensity;
         wxCheckBox* CheckBox_Palette1_1;
         wxStaticText* StaticText38;
         wxStaticText* StaticText17;
@@ -491,7 +485,6 @@ class xRGBFrame: public wxFrame
         wxSlider* Slider_Butterfly2_Skip;
         wxStaticText* StaticText44;
         wxPanel* Panel2_None;
-        wxStaticText* StaticText3;
         //*)
 
         void ChooseColor(wxTextCtrl* TextCtrl);
@@ -513,6 +506,9 @@ class xRGBFrame: public wxFrame
         void TimerSeqPartial();
         void TimerSeqAll();
         void UpdateBufferPalette();
+        bool LoadXlightsFile(wxString& FileName);
+        void SetMediaFilename(const wxString& filename);
+        void DisplayError(const wxString& msg);
 
         wxString CurrentDir;
         wxDateTime starttime;
@@ -525,9 +521,12 @@ class xRGBFrame: public wxFrame
         bool MixTypeChanged;
         play_modes play_mode;
         PixelBufferClass buffer;
-        int LastSparkleFrequency;
-        int LastSparkleDensity;
         wxHtmlEasyPrinting* HtmlEasyPrint;
+        PlayerFrame* PlayerDlg;
+        int VixNumPeriods;
+        long VixNumChannels;
+        wxUint8* VixEventData;
+        wxString mediaFilename;
 
         DECLARE_EVENT_TABLE()
 };
