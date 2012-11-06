@@ -103,6 +103,14 @@
 		<Unit filename="E131Dialog.h" />
 		<Unit filename="SerialPortWithRate.cpp" />
 		<Unit filename="SerialPortWithRate.h" />
+		<Unit filename="TabSetup.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="TabTest.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="DebugWindows" />
