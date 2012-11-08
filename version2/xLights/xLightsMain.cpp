@@ -139,6 +139,17 @@ const long xLightsFrame::ID_SLIDER7 = wxNewId();
 const long xLightsFrame::ID_PANEL_RGB_CYCLE = wxNewId();
 const long xLightsFrame::ID_NOTEBOOK_TEST = wxNewId();
 const long xLightsFrame::ID_PANEL_TEST = wxNewId();
+const long xLightsFrame::ID_STATICTEXT14 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT15 = wxNewId();
+const long xLightsFrame::ID_TEXTCTRL_FILENAME = wxNewId();
+const long xLightsFrame::ID_BUTTON_CHOOSE_FILE = wxNewId();
+const long xLightsFrame::ID_STATICTEXT16 = wxNewId();
+const long xLightsFrame::ID_CHOICE_OUTPUT_FORMAT = wxNewId();
+const long xLightsFrame::ID_STATICTEXT17 = wxNewId();
+const long xLightsFrame::ID_CHECKBOX_OFF_AT_END = wxNewId();
+const long xLightsFrame::ID_BUTTON_START = wxNewId();
+const long xLightsFrame::ID_STATICTEXT18 = wxNewId();
+const long xLightsFrame::ID_TEXTCTRL_STATUS = wxNewId();
 const long xLightsFrame::ID_PANEL_CONVERT = wxNewId();
 const long xLightsFrame::ID_PANEL_SEQUENCE = wxNewId();
 const long xLightsFrame::ID_TREECTRL1 = wxNewId();
@@ -193,6 +204,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxStaticBoxSizer* StaticBoxSizerHighlightColor;
     wxFlexGridSizer* FlexGridSizer19;
     wxBoxSizer* BoxSizer10;
+    wxFlexGridSizer* FlexGridSizer23;
     wxMenuItem* MenuItem5;
     wxMenuItem* MenuItem2;
     wxMenuItem* MenuItemAddList;
@@ -219,6 +231,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer13;
     wxFlexGridSizer* FlexGridSizer12;
     wxMenuBar* MenuBar1;
+    wxFlexGridSizer* FlexGridSizer6;
     wxStaticBoxSizer* StaticBoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizerConvert;
@@ -508,7 +521,46 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizerTest->Fit(PanelTest);
     FlexGridSizerTest->SetSizeHints(PanelTest);
     PanelConvert = new wxPanel(Notebook1, ID_PANEL_CONVERT, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_CONVERT"));
-    FlexGridSizerConvert = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizerConvert = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText14 = new wxStaticText(PanelConvert, ID_STATICTEXT14, _("xLights File Converter"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+    wxFont StaticText14Font(12,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+    StaticText14->SetFont(StaticText14Font);
+    FlexGridSizerConvert->Add(StaticText14, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 10);
+    FlexGridSizerConvert->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
+    FlexGridSizer6->AddGrowableCol(0);
+    StaticText15 = new wxStaticText(PanelConvert, ID_STATICTEXT15, _("Sequence files to convert:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT15"));
+    FlexGridSizer6->Add(StaticText15, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer6->Add(-1,-1,1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    TextCtrlFilename = new wxTextCtrl(PanelConvert, ID_TEXTCTRL_FILENAME, wxEmptyString, wxDefaultPosition, wxSize(250,65), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_FILENAME"));
+    FlexGridSizer6->Add(TextCtrlFilename, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonChooseFile = new wxButton(PanelConvert, ID_BUTTON_CHOOSE_FILE, _("Choose Files"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_CHOOSE_FILE"));
+    FlexGridSizer6->Add(ButtonChooseFile, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    StaticText16 = new wxStaticText(PanelConvert, ID_STATICTEXT16, _("Output Format:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
+    FlexGridSizer6->Add(StaticText16, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    ChoiceOutputFormat = new wxChoice(PanelConvert, ID_CHOICE_OUTPUT_FORMAT, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_OUTPUT_FORMAT"));
+    ChoiceOutputFormat->SetSelection( ChoiceOutputFormat->Append(_("xLights Sequence")) );
+    ChoiceOutputFormat->Append(_("Lynx Conductor"));
+    ChoiceOutputFormat->Append(_("Vixen 2.1"));
+    FlexGridSizer6->Add(ChoiceOutputFormat, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText17 = new wxStaticText(PanelConvert, ID_STATICTEXT17, _("All channels off at end:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT17"));
+    FlexGridSizer6->Add(StaticText17, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    CheckBoxOffAtEnd = new wxCheckBox(PanelConvert, ID_CHECKBOX_OFF_AT_END, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_OFF_AT_END"));
+    CheckBoxOffAtEnd->SetValue(false);
+    FlexGridSizer6->Add(CheckBoxOffAtEnd, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer6->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonStart = new wxButton(PanelConvert, ID_BUTTON_START, _("Start Conversion"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_START"));
+    FlexGridSizer6->Add(ButtonStart, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizerConvert->Add(FlexGridSizer6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer23 = new wxFlexGridSizer(0, 2, 0, 0);
+    FlexGridSizer23->AddGrowableRow(1);
+    StaticText18 = new wxStaticText(PanelConvert, ID_STATICTEXT18, _("Conversion Messages:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
+    FlexGridSizer23->Add(StaticText18, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer23->Add(-1,-1,1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    TextCtrlStatus = new wxTextCtrl(PanelConvert, ID_TEXTCTRL_STATUS, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_STATUS"));
+    TextCtrlStatus->SetMinSize(wxSize(340,-1));
+    FlexGridSizer23->Add(TextCtrlStatus, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizerConvert->Add(FlexGridSizer23, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     PanelConvert->SetSizer(FlexGridSizerConvert);
     FlexGridSizerConvert->Fit(PanelConvert);
     FlexGridSizerConvert->SetSizeHints(PanelConvert);
@@ -613,10 +665,13 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     SetStatusBar(StatusBar1);
     DirDialog1 = new wxDirDialog(this, _("Select directory"), wxEmptyString, wxDD_DEFAULT_STYLE, wxDefaultPosition, wxDefaultSize, _T("wxDirDialog"));
     Timer1.SetOwner(this, ID_TIMER1);
+    FileDialogConvert = new wxFileDialog(this, _("Select file"), wxEmptyString, wxEmptyString, wxFileSelectorDefaultWildcardStr, wxFD_DEFAULT_STYLE, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
     FlexGridSizer1->Fit(this);
     FlexGridSizer1->SetSizeHints(this);
 
     Connect(ID_BITMAPBUTTON_TAB_INFO,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonTabInfoClick);
+    Connect(ID_BUTTON_LIGHTS_OFF,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonLightsOffClick);
+    Connect(ID_CHECKBOX_LIGHT_OUTPUT,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBoxLightOutputClick);
     Connect(ID_CHECKBOX_RUN_SCHEDULE,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBoxRunScheduleClick);
     Connect(ID_BUTTON_CHANGEDIR,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnMenuOpenFolderSelected);
     Connect(ID_BUTTON_ADD_DONGLE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonAddDongleClick);
@@ -722,7 +777,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
 
     // get list of most recently used directories
     wxString dir,mru_name;
-    mru_MenuLength = 0;
     int menuID, idx;
     for (int i=0; i<MRU_LENGTH; i++) {
         mru_name=wxString::Format(wxT("mru%d"),i);
@@ -743,6 +797,8 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     if (ok && !dir.IsEmpty()) {
         SetDir(dir);
     }
+    SetPlayMode(play_off);
+    Timer1.Start(XTIMER_INTERVAL, wxTIMER_CONTINUOUS);
 }
 
 xLightsFrame::~xLightsFrame()
@@ -763,8 +819,83 @@ void xLightsFrame::OnAbout(wxCommandEvent& event)
     wxMessageBox(msg, hdg);
 }
 
+// return a random number between 0 and 1 inclusive
+double xLightsFrame::rand01()
+{
+    return (double)rand()/(double)RAND_MAX;
+}
+
+void xLightsFrame::SetPlayMode(play_modes newmode)
+{
+    int sel;
+    wxString s;
+    wxXmlNode* ModelXml;
+    /*
+    switch (newmode) {
+        case play_off:
+            StaticText_PlaybackMode->SetLabelText(_("Playback: off"));
+            break;
+        case play_effect:
+            sel=Choice_Models->GetSelection();
+            if (sel == wxNOT_FOUND) {
+                wxMessageBox(_("No model is selected"), _("ERROR"));
+                return;
+            }
+            ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
+            buffer.InitBuffer(ModelXml);
+            s=Choice_LayerMethod->GetStringSelection();
+            buffer.SetMixType(s);
+            StaticText_PlaybackMode->SetLabelText(_("Playback: effect"));
+            break;
+        case play_seqpartial:
+            StaticText_PlaybackMode->SetLabelText(_("Playback: sequence selection"));
+            break;
+        case play_seqall:
+            StaticText_PlaybackMode->SetLabelText(_("Playback: complete sequence"));
+            break;
+    }
+    Button_Stop->Enable(newmode != play_off);
+    Button_PlayEffect->Enable(newmode == play_off && Choice_Models->GetCount() > 0);
+    Button_PlaySelection->Enable(newmode == play_off);
+    Button_PlayAll->Enable(newmode == play_off);
+    Button_Models->Enable(newmode == play_off);
+    Button_Presets->Enable(newmode == play_off);
+    Choice_Models->Enable(newmode == play_off);
+    Button_Pictures1_Filename->Enable(newmode == play_off);
+    TextCtrl_Pictures1_Filename->Enable(newmode == play_off);
+    Button_Pictures2_Filename->Enable(newmode == play_off);
+    TextCtrl_Pictures2_Filename->Enable(newmode == play_off);
+    */
+    play_mode=newmode;
+    starttime = wxDateTime::UNow();
+}
+
 void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
 {
+    if (xout) {
+        wxTimeSpan ts = wxDateTime::UNow() - starttime;
+        long curtime = ts.GetMilliseconds().ToLong();
+        xout->TimerStart(curtime);
+    }
+    switch (play_mode) {
+        case play_off:
+            break;
+        case play_test:
+            OnTimerTest();
+            break;
+        case play_effect:
+            //TimerEffect();
+            break;
+        case play_seqpartial:
+            //TimerSeqPartial();
+            break;
+        case play_seqall:
+            //TimerSeqAll();
+            break;
+    }
+    if (xout) {
+        xout->TimerEnd();
+    }
 }
 
 void xLightsFrame::OnCheckBoxRunScheduleClick(wxCommandEvent& event)
@@ -800,8 +931,23 @@ void xLightsFrame::OnButtonShowDatesChangeClick(wxCommandEvent& event)
 {
 }
 
+#define SETUPTAB 0
+#define TESTTAB 1
+#define CONVERTTAB 2
+#define SEQUENCETAB 3
+#define SCHEDULETAB 4
+#define LOGTAB 5
+
 void xLightsFrame::OnNotebook1PageChanged(wxNotebookEvent& event)
 {
+    switch (Notebook1->GetSelection()) {
+        case TESTTAB:
+            SetPlayMode(play_test);
+            break;
+        default:
+            SetPlayMode(play_off);
+            break;
+    }
 }
 
 void xLightsFrame::OnMenuItemRenameListSelected(wxCommandEvent& event)
@@ -877,5 +1023,62 @@ void xLightsFrame::OnMenuItemAddListSelected(wxCommandEvent& event)
 {
 }
 
+void xLightsFrame::OnButtonLightsOffClick(wxCommandEvent& event)
+{
+    TestButtonsOff();
+}
+
+void xLightsFrame::OnCheckBoxLightOutputClick(wxCommandEvent& event)
+{
+    long MaxChan;
+    bool ok=true;
+    if (CheckBoxLightOutput->IsChecked() && xout==0) {
+        xout = new xOutput();
+
+        for( wxXmlNode* e=NetworkXML.GetRoot()->GetChildren(); e!=NULL && ok; e=e->GetNext() ) {
+            wxString tagname=e->GetName();
+            if (tagname == wxT("network")) {
+                wxString tempstr=e->GetAttribute(wxT("MaxChannels"), wxT("0"));
+                tempstr.ToLong(&MaxChan);
+                wxString NetworkType=e->GetAttribute(wxT("NetworkType"), wxT(""));
+                wxString ComPort=e->GetAttribute(wxT("ComPort"), wxT(""));
+                wxString BaudRate=e->GetAttribute(wxT("BaudRate"), wxT(""));
+                ok = AddNetwork(NetworkType,ComPort,BaudRate,MaxChan);
+            }
+        }
+        if (!ok) {
+            // disable checkbox since we were not able to initialize the port(s) successfully
+            CheckBoxLightOutput->SetValue(false);
+            CheckBoxLightOutput->Enable(false);
+        }
+    }
+}
+
+bool xLightsFrame::AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels)
+{
+    int netnum=-1;
+    int baud = (BaudRate == _("n/a")) ? 115200 : atoi(BaudRate.mb_str(wxConvUTF8));
+    wxString msg = _("Error occurred while connecting to ") + NetworkType+ _(" network on ") + ComPort +
+        _("\n\nThings to check:\n1. Are all required cables plugged in?") +
+        _("\n2. Is there another program running that is accessing the port (like the LOR Control Panel)? If so, then you must close the other program and then restart xLights.") +
+        _("\n3. If this is a USB dongle, are the FTDI Virtual COM Port drivers loaded?\n\n");
+    try {
+        netnum=xout->addnetwork(NetworkType,MaxChannels,ComPort,baud);
+        //TextCtrlLog->AppendText(_("Successfully initialized ") + NetworkType + _(" network on ") + ComPort + _("\n"));
+    }
+    catch (const char *str) {
+        wxString errmsg(str,wxConvUTF8);
+        wxMessageBox(msg + errmsg, _("Communication Error"));
+        return false;
+    }
+    catch (char *str) {
+        wxString errmsg(str,wxConvUTF8);
+        wxMessageBox(msg + errmsg, _("Communication Error"));
+        return false;
+    }
+    return true;
+}
+
 #include "TabSetup.cpp"
 #include "TabTest.cpp"
+

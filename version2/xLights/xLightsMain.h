@@ -10,6 +10,26 @@
 #ifndef XLIGHTSMAIN_H
 #define XLIGHTSMAIN_H
 
+enum play_modes {
+    play_off,
+    play_effect,
+    play_seqpartial,
+    play_seqall,
+    play_test
+};
+
+enum TestFunctions {
+    OFF,
+    CHASE,
+    CHASE2,
+    CHASE3,
+    CHASE4,
+    DIM,
+    TWINKLE,
+    SHIMMER
+};
+
+
 //(*Headers(xLightsFrame)
 #include <wx/listctrl.h>
 #include <wx/treectrl.h>
@@ -23,6 +43,8 @@
 #include <wx/radiobut.h>
 #include <wx/slider.h>
 #include <wx/panel.h>
+#include <wx/filedlg.h>
+#include <wx/choice.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/dirdlg.h>
@@ -37,6 +59,7 @@
 #include <wx/xml/xml.h>
 
 #include "../include/globals.h"
+#include "../include/xlights_out.cpp"
 
 #define MRU_LENGTH 4
 
@@ -90,14 +113,13 @@ class xLightsFrame: public wxFrame
         void OnRadioButtonTwinkle50Select(wxCommandEvent& event);
         void OnRadioButtonShimmerSelect(wxCommandEvent& event);
         void OnRadioButtonDimSelect(wxCommandEvent& event);
-        void OnRadioButtonRgbChaseOffSelect(wxCommandEvent& event);
-        void OnRadioButtonRgbChaseSelect(wxCommandEvent& event);
-        void OnRadioButtonRgbChase3Select(wxCommandEvent& event);
         void OnCheckListBoxTestChannelsToggled(wxCommandEvent& event);
         void OnButtonSaveSetupClick(wxCommandEvent& event);
         void OnBitmapButtonTabInfoClick(wxCommandEvent& event);
         void OnMenuItemDelListSelected(wxCommandEvent& event);
         void OnMenuItemAddListSelected(wxCommandEvent& event);
+        void OnButtonLightsOffClick(wxCommandEvent& event);
+        void OnCheckBoxLightOutputClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xLightsFrame)
@@ -181,6 +203,17 @@ class xLightsFrame: public wxFrame
         static const long ID_PANEL_RGB_CYCLE;
         static const long ID_NOTEBOOK_TEST;
         static const long ID_PANEL_TEST;
+        static const long ID_STATICTEXT14;
+        static const long ID_STATICTEXT15;
+        static const long ID_TEXTCTRL_FILENAME;
+        static const long ID_BUTTON_CHOOSE_FILE;
+        static const long ID_STATICTEXT16;
+        static const long ID_CHOICE_OUTPUT_FORMAT;
+        static const long ID_STATICTEXT17;
+        static const long ID_CHECKBOX_OFF_AT_END;
+        static const long ID_BUTTON_START;
+        static const long ID_STATICTEXT18;
+        static const long ID_TEXTCTRL_STATUS;
         static const long ID_PANEL_CONVERT;
         static const long ID_PANEL_SEQUENCE;
         static const long ID_TREECTRL1;
@@ -220,7 +253,9 @@ class xLightsFrame: public wxFrame
         wxRadioButton* RadioButtonChase5;
         wxStaticText* StaticText9;
         wxRadioButton* RadioButtonRgbCycle4;
+        wxTextCtrl* TextCtrlFilename;
         wxRadioButton* RadioButtonRgbChaseOff;
+        wxTextCtrl* TextCtrlStatus;
         wxRadioButton* RadioButtonRgbCycleOff;
         wxRadioButton* RadioButtonLorMapSingle;
         wxRadioButton* RadioButtonLorMapMulti;
@@ -237,12 +272,15 @@ class xLightsFrame: public wxFrame
         wxStaticText* StaticText13;
         wxStaticText* StaticText2;
         wxSlider* SliderFgColorC;
+        wxFileDialog* FileDialogConvert;
         wxSlider* SliderRgbChaseSpeed;
+        wxStaticText* StaticText14;
         wxButton* ButtonLightsOff;
         wxButton* ButtonTestLoad;
         wxStaticText* StaticTextShowEnd;
         wxButton* ButtonGracefulStop;
         wxRadioButton* RadioButtonRgbCycle3;
+        wxChoice* ChoiceOutputFormat;
         wxTextCtrl* TextCtrlLog;
         wxStaticText* StaticText6;
         wxMenuItem* MenuItemRefresh;
@@ -254,6 +292,7 @@ class xLightsFrame: public wxFrame
         wxSlider* SliderChaseSpeed;
         wxStaticText* StaticText8;
         wxStaticText* StaticText11;
+        wxStaticText* StaticText18;
         wxSlider* SliderFgColorA;
         wxStaticText* StaticTextShowStart;
         wxPanel* PanelTestRgb;
@@ -295,6 +334,7 @@ class xLightsFrame: public wxFrame
         wxRadioButton* RadioButtonRgbTwinkle25;
         wxRadioButton* RadioButtonRgbShimmer;
         wxCheckBox* CheckBoxLightOutput;
+        wxStaticText* StaticText15;
         wxStaticText* StaticText12;
         wxCheckListBox* CheckListBoxTestChannels;
         wxPanel* PanelConvert;
@@ -302,6 +342,7 @@ class xLightsFrame: public wxFrame
         wxPanel* PanelSetup;
         wxSlider* SliderBgColorB;
         wxButton* ButtonSaveSetup;
+        wxButton* ButtonStart;
         wxRadioButton* RadioButtonRgbDim;
         wxRadioButton* RadioButtonTwinkle25;
         wxPanel* PanelSequence;
@@ -310,16 +351,20 @@ class xLightsFrame: public wxFrame
         wxPanel* PanelTestStandard;
         wxSlider* SliderBgIntensity;
         wxRadioButton* RadioButtonTwinkle05;
+        wxButton* ButtonChooseFile;
         wxRadioButton* RadioButtonOff;
         wxStaticText* StaticText4;
+        wxStaticText* StaticText17;
         wxRadioButton* RadioButtonRgbCycle5;
         wxRadioButton* RadioButtonRgbChase4;
         wxButton* ButtonTestSelectAll;
         wxButton* ButtonAddShow;
         wxButton* ButtonTestSave;
         wxSlider* SliderFgIntensity;
+        wxStaticText* StaticText16;
         wxSlider* SliderFgColorB;
         wxTimer Timer1;
+        wxCheckBox* CheckBoxOffAtEnd;
         wxRadioButton* RadioButtonAlt;
         wxButton* ButtonStopNow;
         //*)
@@ -328,12 +373,17 @@ class xLightsFrame: public wxFrame
         wxFileName networkFile;
         wxArrayString mru;  // most recently used directories
         wxMenuItem* mru_MenuItem[MRU_LENGTH];
-        int mru_MenuLength;
         wxXmlDocument NetworkXML;
         long DragRowIdx;
         bool UnsavedChanges;
-        bool CheckChannelList;
+        wxDateTime starttime;
+        xOutput* xout;
+        play_modes play_mode;
+        void SetPlayMode(play_modes newmode);
+        bool AddNetwork(const wxString& NetworkType, const wxString& ComPort, const wxString& BaudRate, int MaxChannels);
+        double rand01();
 
+        // setup
         void OnMenuMRU(wxCommandEvent& event);
         void SetDir(const wxString& dirname);
         void UpdateNetworkList();
@@ -344,7 +394,17 @@ class xLightsFrame: public wxFrame
         void OnGridNetworkDragEnd(wxMouseEvent& event);
         void SetupDongle(wxXmlNode* e);
         void SetupE131(wxXmlNode* e);
-        void SetAllCheckboxes(bool NewValue);
+
+        // test
+        void SetTestCheckboxes(bool NewValue);
+        void GetCheckedItems(wxArrayInt& chArray);
+        void TestButtonsOff();
+        bool CheckChannelList;
+        int ChaseGrouping;
+        int TwinkleRatio;
+        TestFunctions TestFunc;
+        void OnTimerTest();
+
 
         DECLARE_EVENT_TABLE()
 };

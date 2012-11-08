@@ -16,6 +16,7 @@ void xLightsFrame::OnMenuMRU(wxCommandEvent& event)
 void xLightsFrame::SetDir(const wxString& newdir)
 {
     // update most recently used array
+    static bool HasMenuSeparator=false;
     int idx, cnt, i;
     idx=mru.Index(newdir);
     if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
@@ -37,11 +38,15 @@ void xLightsFrame::SetDir(const wxString& newdir)
     */
 
     // save config
+    bool DirExists=wxFileName::DirExists(newdir);
     wxString mru_name, value;
     wxConfig* config = new wxConfig(_(XLIGHTS_CONFIG_ID));
-    config->Write(_("LastDir"), newdir);
+    if (DirExists) config->Write(_("LastDir"), newdir);
     for (i=0; i<MRU_LENGTH; i++) {
         mru_name=wxString::Format(wxT("mru%d"),i);
+        if (MenuFile->FindItem(mru_MenuItem[i]->GetItemLabel()) != wxNOT_FOUND) {
+            MenuFile->Remove(mru_MenuItem[i]);
+        }
         if (i < cnt) {
             value = mru[i];
         } else {
@@ -51,23 +56,26 @@ void xLightsFrame::SetDir(const wxString& newdir)
     }
     delete config;
 
-    // update UI
-    CurrentDir=newdir;
-    StaticTextDirName->SetLabel(CurrentDir);
-
     // append mru items to menu
     cnt=mru.GetCount();
-    if (mru_MenuLength == 0 && cnt > 0) {
+    if (!HasMenuSeparator && cnt > 0) {
         MenuFile->AppendSeparator();
+        HasMenuSeparator=true;
     }
     for (i=0; i<cnt; i++) {
         mru_MenuItem[i]->SetItemLabel(mru[i]);
-        if (i >= mru_MenuLength) {
-            MenuFile->Append(mru_MenuItem[i]);
-            mru_MenuLength++;
-        }
+        MenuFile->Append(mru_MenuItem[i]);
     }
 
+    if (!DirExists) {
+        wxString msg=_("The show directory '") + newdir + ("' no longer exists.\nPlease choose a new show directory.");
+        wxMessageBox(msg);
+        return;
+    }
+
+    // update UI
+    CurrentDir=newdir;
+    StaticTextDirName->SetLabel(CurrentDir);
     UnsavedChanges=false;
 
     // load network
@@ -100,7 +108,7 @@ void xLightsFrame::UpdateNetworkList()
     long newidx,LorMapping,MaxChannels;
     int TotChannels=0;
     int NetCnt=0;
-    int MaxLorChannels=240*16;
+    //int MaxLorChannels=240*16;
     int MaxDmxChannels=512;
     int StartChannel,ch;
     char c;

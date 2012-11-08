@@ -6,7 +6,7 @@
  *
  * Author:    Matt Brown (dowdybrown@yahoo.com)
  * Created:   2010-05-07
- * Copyright: 2010-2011 by Matt Brown
+ * Copyright: 2010-2012 by Matt Brown
  * License:
      This file is part of xLights.
 
@@ -27,7 +27,6 @@
 #include "globals.h"
 #include "serial/serport.cpp"
 #include <vector>
-#include <list>
 #include <time.h>
 #include <wx/socket.h>
 
@@ -42,15 +41,12 @@ typedef std::vector<ChannelPair> ChannelVector;
 class xNetwork {
 protected:
   ctb::SerialPort* serptr;
-  wxByte IntensityMap[256];
   char SerialConfig[4];
   long timer_msec;
-  wxByte max_intensity;
   size_t num_channels;
   wxString netdesc;
-  friend class xChannel_Dimmer;
-
-  virtual void SetMappedIntensity (size_t chindex, wxByte intensity) =0;
+  int datalen;
+  bool changed;
 
 public:
 
@@ -74,10 +70,6 @@ public:
     return true;
   };
 
-  wxByte MapIntensity(wxByte intensity) {
-    return IntensityMap[intensity];
-  };
-
   void SetNetworkDesc(wxString& NetworkDesc) {
     netdesc=NetworkDesc;
   };
@@ -91,8 +83,6 @@ public:
   };
 
   virtual void SetChannelCount(size_t numchannels) = 0;
-
-  virtual void SetMaxIntensity(wxByte maxintensity) = 0;
 
   void InitSerialPort(const wxString& portname, int baudrate) {
     static char errmsg[100];
@@ -108,7 +98,7 @@ public:
   virtual void InitNetwork(const wxString& ipaddr, wxUint16 UniverseNumber, wxUint16 NetNum) {
   };
 
-  virtual void TimerStart(long msec) {
+  void TimerStart(long msec) {
     timer_msec=msec;
   };
 
@@ -121,293 +111,10 @@ public:
   virtual void ResetTimer() {
   };
 
-  virtual void SetIntensity (size_t chindex, wxByte intensity) {
-    SetMappedIntensity(chindex, IntensityMap[intensity]);
-  };
+  virtual void SetIntensity (size_t chindex, wxByte intensity) = 0;
 
-  virtual void ramp (size_t chindex, int duration, wxByte startintensity, wxByte endintensity) =0;
-
-  virtual void twinkle (size_t chindex, int period, wxByte intensity) =0;
-
-  virtual void twinklefade (size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) =0;
-
-  virtual void shimmer (size_t chindex, int period, wxByte intensity) =0;
-
-  virtual void shimmerfade (size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) =0;
-
-  virtual void off (size_t chindex) =0;
-
-  virtual void alloff () =0;
 };
 
-
-
-// *************************************************
-// * This class represents a single dimmer channel
-// * It converts ramp, shimmer, and twinkle
-// * into a series of SetIntensity calls
-// *************************************************
-class xChannel_Dimmer {
-protected:
-  xNetwork* mynet;
-  int myindex, twinklestate, effectperiod;
-  char optype;
-  long optimestart, optimeend, periodend;
-  wxByte rampstart,rampend;
-  double opduration, rampdiff;
-
-  // returns a random value between 100 and 1100 (0.1 - 1.1 seconds)
-  int NextTwinkleTime() {
-    return static_cast<int>(rand01()*effectperiod)+100;
-  }
-
-  // return a random number between 0 and 1 inclusive
-  double rand01() {
-    return (double)rand()/(double)RAND_MAX;
-  };
-
-public:
-  xChannel_Dimmer(xNetwork* parentnet, int index) {
-    mynet=parentnet;
-    myindex=index;
-    optype=' ';
-  };
-
-  void ramp (int duration, wxByte startintensity, wxByte endintensity) {
-    optype='R';
-    opduration=duration;
-    rampstart=mynet->MapIntensity(startintensity);
-    rampend=mynet->MapIntensity(endintensity);
-    rampdiff=rampend - rampstart;
-    optimestart=mynet->GetTimer();
-    optimeend=optimestart + duration;
-    mynet->SetMappedIntensity(myindex,rampstart);
-  };
-
-  // period - sets the upper bound on an individual twinkle (msec)
-  void twinkle (int period, wxByte intensity) {
-    optype='T';
-    optimestart=mynet->GetTimer();
-    effectperiod=period;
-    periodend=optimestart + NextTwinkleTime();
-    rampend=mynet->MapIntensity(intensity);
-    twinklestate= rand01() < 0.5 ? 0 : 1;
-    mynet->SetMappedIntensity(myindex,twinklestate*rampend);
-  };
-
-  // duration - total duration of the effect (msec)
-  // period - sets the upper bound on an individual twinkle (msec)
-  void twinklefade (int period, int duration, wxByte startintensity, wxByte endintensity) {
-    optype='t';
-    opduration=duration;
-    rampstart=mynet->MapIntensity(startintensity);
-    rampend=mynet->MapIntensity(endintensity);
-    rampdiff=rampend - rampstart;
-    optimestart=mynet->GetTimer();
-    optimeend=optimestart + duration;
-    effectperiod=period;
-    periodend=optimestart + NextTwinkleTime();
-    twinklestate= rand01() < 0.5 ? 0 : 1;
-    mynet->SetMappedIntensity(myindex,twinklestate*rampstart);
-  };
-
-  // period - sets the length of each shimmer, typically 50-100 (msec)
-  void shimmer (int period, wxByte intensity) {
-    optype='S';
-    optimestart=mynet->GetTimer();
-    effectperiod=period;
-    periodend=optimestart + effectperiod;
-    rampend=mynet->MapIntensity(intensity);
-    twinklestate=1;
-    mynet->SetMappedIntensity(myindex,rampend);
-  };
-
-  // duration - total duration of the effect (msec)
-  // period - sets the length of each shimmer, typically 50-100 (msec)
-  void shimmerfade (int period, int duration, wxByte startintensity, wxByte endintensity) {
-    optype='s';
-    opduration=duration;
-    rampstart=mynet->MapIntensity(startintensity);
-    rampend=mynet->MapIntensity(endintensity);
-    rampdiff=rampend - rampstart;
-    optimestart=mynet->GetTimer();
-    optimeend=optimestart + duration;
-    effectperiod=period;
-    periodend=optimestart + effectperiod;
-    twinklestate=1;
-    mynet->SetMappedIntensity(myindex,rampstart);
-  };
-
-  void off () {
-    mynet->SetMappedIntensity(myindex,0);
-  };
-
-  // implements all of the channel lighting effects
-  // returns true if the callback is no longer needed, false otherwise
-  int ChannelCallback(long curtime) {
-    //printf("xChannel_Dimmer::ChannelCallback curtime=%d optype=%c\n",curtime,optype);
-    int intensity;
-    switch (optype) {
-      case 'R':
-        if (curtime >= optimeend) {
-          mynet->SetMappedIntensity(myindex, rampend);
-          return 1;
-        } else {
-          intensity=(int)((double)(curtime - optimestart) / opduration * rampdiff + rampstart);
-          mynet->SetMappedIntensity(myindex, intensity);
-        }
-        break;
-      case 'T':
-        if (curtime > periodend) {
-          periodend+=NextTwinkleTime();
-          twinklestate=1 - twinklestate;
-          mynet->SetMappedIntensity(myindex, twinklestate*rampend);
-        }
-        break;
-      case 't':
-        if (curtime >= optimeend) {
-          optype='T';
-        } else if (curtime > periodend) {
-          periodend+=NextTwinkleTime();
-          twinklestate=1 - twinklestate;
-          intensity=(int)((double)(curtime - optimestart) / opduration * rampdiff + rampstart);
-          mynet->SetMappedIntensity(myindex, twinklestate*intensity);
-        }
-        break;
-      case 'S':
-        if (curtime >= periodend) {
-          periodend+=effectperiod;
-          twinklestate=1 - twinklestate;
-          mynet->SetMappedIntensity(myindex, twinklestate*rampend);
-        }
-        break;
-      case 's':
-        if (curtime >= optimeend) {
-          optype='S';
-        } else if (curtime >= periodend) {
-          periodend+=effectperiod;
-          twinklestate=1 - twinklestate;
-          intensity=(int)((double)(curtime - optimestart) / opduration * rampdiff + rampstart);
-          mynet->SetMappedIntensity(myindex, twinklestate*intensity);
-        }
-        break;
-    }
-    return 0;
-  };
-};
-
-
-// ******************************************************
-// * This class represents a network of dimmer channels
-// * Used by DMX and Renard classes
-// ******************************************************
-class xNetwork_Dimmer: public xNetwork {
-protected:
-  std::list<int> timerCallbackList;
-  std::vector<xChannel_Dimmer*> channels;
-  int datalen;
-  bool changed;
-
-  void AddChannelCallback (int channel) {
-    timerCallbackList.remove(channel);  // ensure there are no lingering callbacks for this channel
-    timerCallbackList.push_front(channel);
-  };
-
-public:
-  xNetwork_Dimmer() {
-  };
-
-  ~xNetwork_Dimmer() {
-    for(unsigned int i=0; i < channels.size(); ++i) {
-      delete channels[i];
-    }
-  };
-
-  void SetMaxIntensity(wxByte maxintensity) {
-    max_intensity=maxintensity;
-    double factor=255.0/(double)maxintensity;
-    for (int i=0; i<=maxintensity; i++) {
-      IntensityMap[i]=(wxByte)((double)i*factor+0.5);
-    }
-  };
-
-  void ResetTimer() {
-    timerCallbackList.clear();
-  };
-
-  // callbacks return true if they are finished, false if they will continue to run
-  virtual void TimerStart(long msec) {
-    timer_msec=msec;
-    int cnt=0;
-    // process list of channels needing callbacks
-    std::list<int>::iterator temp,it = timerCallbackList.begin();
-    while (it != timerCallbackList.end()) {
-      cnt++;
-      if (channels[*it]->ChannelCallback(msec)) {
-        temp=it;
-        ++it; // move past the one we are about to erase
-        timerCallbackList.erase(temp);
-      } else {
-        ++it;
-      }
-    }
-#ifdef _WX_LOG_H_
-    wxLogTrace(wxT("xout"),wxT("xNetwork_Dimmer TimerStart %d chan"),cnt);
-#endif
-  };
-
-  void CreateChannels(size_t numchannels) {
-    for (size_t i=0; i<numchannels; i++) {
-      channels.push_back(new xChannel_Dimmer(this,i));
-    }
-    num_channels=numchannels;
-  };
-
-  virtual void ramp (size_t chindex, int duration, wxByte startintensity, wxByte endintensity) {
-    timerCallbackList.remove(chindex);  // ensure there are no lingering callbacks for this channel
-    channels.at(chindex)->ramp(duration, startintensity, endintensity);
-    AddChannelCallback(chindex);
-  };
-
-  virtual void twinkle (size_t chindex, int period, wxByte intensity) {
-    timerCallbackList.remove(chindex);  // ensure there are no lingering callbacks for this channel
-    channels.at(chindex)->twinkle(period,intensity);
-    AddChannelCallback(chindex);
-  };
-
-  virtual void twinklefade (size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) {
-    timerCallbackList.remove(chindex);  // ensure there are no lingering callbacks for this channel
-    channels.at(chindex)->twinklefade(period,duration,startintensity,endintensity);
-    AddChannelCallback(chindex);
-  };
-
-  virtual void shimmer (size_t chindex, int period, wxByte intensity) {
-    timerCallbackList.remove(chindex);  // ensure there are no lingering callbacks for this channel
-    channels.at(chindex)->shimmer(period,intensity);
-    AddChannelCallback(chindex);
-  };
-
-  virtual void shimmerfade (size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) {
-    timerCallbackList.remove(chindex);  // ensure there are no lingering callbacks for this channel
-    channels.at(chindex)->shimmerfade(period,duration,startintensity,endintensity);
-    AddChannelCallback(chindex);
-  };
-
-  virtual void SetIntensity (size_t chindex, wxByte intensity) {
-    timerCallbackList.remove(chindex);  // ensure there are no lingering callbacks for this channel
-    SetMappedIntensity(chindex, IntensityMap[intensity]);
-  };
-
-  void off (size_t chindex) {
-    SetIntensity(chindex, 0);
-  };
-
-  virtual void alloff () {
-    for(unsigned int i=0; i < channels.size(); ++i) {
-      off(i);
-    }
-  };
-};
 
 
 // ******************************************************
@@ -416,13 +123,13 @@ public:
 // * Universes are exactly 512 bytes, except for DIYblinky, where they can be up to 3036 bytes
 // * Methods should be called with: 0 <= chindex < 3036
 // ******************************************************
-class xNetwork_DMXpro: public xNetwork_Dimmer {
+class xNetwork_DMXpro: public xNetwork {
 protected:
   wxByte data[3036+6];
 
-  void SetMappedIntensity(size_t chindex, wxByte mappedintensity) {
-    data[chindex+5]=mappedintensity;
-    //printf("DMXentec::SetMappedIntensity channel=%d mapped-value=%d\n",chindex,(int)mappedintensity);
+  void SetIntensity(size_t chindex, wxByte intensity) {
+    data[chindex+5]=intensity;
+    //printf("DMXentec::SetIntensity channel=%d mapped-value=%d\n",chindex,(int)intensity);
     changed=true;
   };
 
@@ -440,7 +147,7 @@ public:
     data[4]=0;                  // DMX start
     data[datalen-1]=0xE7;       // end of message
     changed=false;
-    CreateChannels(numchannels);
+    num_channels=numchannels;
   };
 
   void TimerEnd() {
@@ -458,13 +165,13 @@ public:
 // * and any other FTDI-based USB to RS-485 converter
 // * Methods should be called with: 0 <= chindex <= 511
 // ******************************************************
-class xNetwork_DMXopen: public xNetwork_Dimmer {
+class xNetwork_DMXopen: public xNetwork {
 protected:
   wxByte data[513];
 
-  void SetMappedIntensity(size_t chindex, wxByte mappedintensity) {
-    data[chindex+1]=mappedintensity;
-    //printf("DMXentec::SetMappedIntensity channel=%d mapped-value=%d\n",chindex,(int)mappedintensity);
+  void SetIntensity(size_t chindex, wxByte intensity) {
+    data[chindex+1]=intensity;
+    //printf("DMXentec::SetIntensity channel=%d mapped-value=%d\n",chindex,(int)intensity);
     changed=true;
   };
 
@@ -475,7 +182,7 @@ public:
     }
     data[0]=0;   // dmx start code
     changed=false;
-    CreateChannels(numchannels);
+    num_channels=numchannels;
     SerialConfig[2]='2'; // use 2 stop bits so padding chars are not required
   };
 
@@ -498,7 +205,7 @@ public:
 // * This class represents a single universe for E1.31
 // * Methods should be called with: 0 <= chindex <= 511
 // ******************************************************
-class xNetwork_E131: public xNetwork_Dimmer {
+class xNetwork_E131: public xNetwork {
 protected:
   wxByte data[E131_PACKET_LEN];
   wxByte SequenceNum;
@@ -506,8 +213,8 @@ protected:
   wxIPV4address remoteAddr;
   wxDatagramSocket *datagram;
 
-  void SetMappedIntensity(size_t chindex, wxByte mappedintensity) {
-    data[chindex+126]=mappedintensity;
+  void SetIntensity(size_t chindex, wxByte intensity) {
+    data[chindex+126]=intensity;
     changed=true;
   };
 
@@ -659,6 +366,7 @@ public:
     //localaddr.Hostname(wxT("192.168.2.100"));
     localaddr.Service(0x8000 | NetNum);
     datagram = new wxDatagramSocket(localaddr, wxSOCKET_NOWAIT);
+    //datagram = new wxDatagramSocket(localaddr, wxSOCKET_WAITALL);
 
     if (ipaddr.StartsWith(wxT("239.255.")) || ipaddr == wxT("MULTICAST")) {
       // multicast - universe number must be in lower 2 bytes
@@ -672,10 +380,10 @@ public:
 
   void SetChannelCount(size_t numchannels) {
     if (numchannels > 512) {
-      throw "max channels on DMX is 512";
+      throw "max channels on E1.31 is 512";
     }
     changed=false;
-    CreateChannels(numchannels);
+    num_channels=numchannels;
   };
 
   void TimerEnd() {
@@ -695,17 +403,17 @@ public:
 
 
 // Should be called with: 0 <= chindex <= 1015 (max channels=127*8)
-class xNetwork_Renard: public xNetwork_Dimmer {
+class xNetwork_Renard: public xNetwork {
 protected:
   wxByte data[1024];
 
-  void SetMappedIntensity (size_t chindex, wxByte mappedintensity) {
+  void SetIntensity (size_t chindex, wxByte intensity) {
     wxByte RenIntensity;
-    switch (mappedintensity) {
+    switch (intensity) {
       case 0x7D:
       case 0x7E: RenIntensity=0x7C; break;
       case 0x7F: RenIntensity=0x80; break;
-      default: RenIntensity=mappedintensity;
+      default: RenIntensity=intensity;
     }
     data[chindex+2]=RenIntensity;
     changed=true;
@@ -723,7 +431,7 @@ public:
     data[0]=0x7E;               // start of message
     data[1]=0x80;               // start address
     changed=false;
-    CreateChannels(numchannels);
+    num_channels=numchannels;
     SerialConfig[2]='2'; // use 2 stop bits so padding chars are not required
   };
 
@@ -738,13 +446,13 @@ public:
 
 
 // Should be called with: 0 <= chindex <= 4095
-class xNetwork_Pixelnet: public xNetwork_Dimmer {
+class xNetwork_Pixelnet: public xNetwork {
 protected:
   wxByte data[4096];
   wxByte SerialBuffer[4097];
 
-  void SetMappedIntensity (size_t chindex, wxByte mappedintensity) {
-    data[chindex]=mappedintensity==170 ? 171 : mappedintensity;
+  void SetIntensity (size_t chindex, wxByte intensity) {
+    data[chindex]=intensity==170 ? 171 : intensity;
   };
 
 public:
@@ -753,7 +461,7 @@ public:
       throw "max channels on a Pixelnet network is 4096";
     }
     datalen=numchannels;
-    CreateChannels(numchannels);
+    num_channels=numchannels;
     memset(data,0,sizeof(data));
   };
 
@@ -772,71 +480,20 @@ public:
 class xNetwork_LOR: public xNetwork {
 protected:
   long lastheartbeat;
+  wxByte IntensityMap[256];
 
   // set intensity to a value that has already been mapped
-  void SetMappedIntensity (size_t chindex, wxByte intensity) {
+  void SetIntensity (size_t chindex, wxByte intensity) {
     wxByte d[6];
     d[0]=0;
     d[1]=chindex >> 4;
     if (d[1] < 0xF0) d[1]++;
     d[2]=3;
-    d[3]=intensity;
+    d[3]=IntensityMap[intensity];
     d[4]=0x80 | (chindex % 16);
     d[5]=0;
-    //printf("LOR SetMappedIntensity 1=%02X 2=%02X 3=%02X 4=%02X\n",d[1],d[2],d[3],d[4]);
+    //printf("LOR SetIntensity 1=%02X 2=%02X 3=%02X 4=%02X\n",d[1],d[2],d[3],d[4]);
     if (serptr) serptr->Write((char *)d,6);
-  };
-
-  // shimmer or twinkle at constant intensity
-  void shimtwink (wxByte cmd, size_t chindex, int period, wxByte intensity) {
-    wxByte d[8];
-    d[0]=0;
-    d[1]=chindex >> 4;
-    if (d[1] < 0xF0) d[1]++;
-    d[2]=cmd;
-    d[3]=0x80 | (chindex % 16);
-    if (intensity == max_intensity) {
-      d[4]=0;
-      if (serptr) serptr->Write((char *)d,5);
-    } else {
-      d[4]=0x81;
-      d[5]=3;  // intensity command
-      d[6]=IntensityMap[intensity];
-      d[7]=0;
-      if (serptr) serptr->Write((char *)d,8);
-    }
-  };
-
-  // shimmer or twinkle while ramping intensity up or down
-  virtual void shimtwinkfade (wxByte cmd, size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) {
-    wxByte d[11];
-    d[0]=0;
-    d[1]=chindex >> 4;
-    if (d[1] < 0xF0) d[1]++;
-    d[2]=cmd;
-    d[3]=0x80 | (chindex % 16);
-    d[4]=0x81;
-    d[6]=IntensityMap[startintensity];
-    d[7]=IntensityMap[endintensity];
-    if (d[6] == d[7]) {
-      d[5]=3;  // intensity command
-      d[7]=0;
-      if (serptr) serptr->Write((char *)d,8);
-    } else {
-      d[5]=4;  // ramp command
-      int deltaInt=abs((int)d[6] - (int)d[7]);
-      int ramp=(int)((double)deltaInt/239.0*510.0*1000.0/(double)duration+0.5);
-      d[8]=ramp >> 8;
-      d[9]=ramp & 0xFF;
-      if (d[9] == 0) {
-        d[9]=1;
-        d[8] |= 0x40;
-      } else if (d[8] == 0) {
-        d[8] |= 0x80;
-      }
-      d[10]=0;
-      if (serptr) serptr->Write((char *)d,11);
-    }
   };
 
 public:
@@ -860,6 +517,7 @@ public:
 
   void SetChannelCount(size_t numchannels) {
     num_channels=numchannels;
+    SetMaxIntensity(255);
   };
 
   void ResetTimer() {
@@ -869,7 +527,6 @@ public:
   // maxintensity is usually 100 (LOR) or 255 (Vixen)
   void SetMaxIntensity(wxByte maxintensity) {
     int temp;
-    max_intensity=maxintensity;
     for (int i=0; i<=maxintensity; i++) {
       temp=(int)(100.0*(double)i/(double)maxintensity+0.5);
       switch (temp) {
@@ -877,112 +534,6 @@ public:
         case 100: IntensityMap[i]=0x01; break;
         default:  IntensityMap[i]=228-temp*2; break;
       }
-    }
-  };
-
-  void ramp (size_t chindex, int duration, wxByte startintensity, wxByte endintensity) {
-    wxByte d[9];
-    d[3]=IntensityMap[startintensity];
-    d[4]=IntensityMap[endintensity];
-    if (d[3] == d[4]) {
-      SetMappedIntensity(chindex, d[3]);
-    } else {
-      d[0]=0;
-      d[1]=chindex >> 4;
-      if (d[1] < 0xF0) d[1]++;
-      d[2]=4;  // ramp command
-      int deltaInt=abs((int)d[3] - (int)d[4]);
-      int ramp=(int)((double)deltaInt/239.0*510.0*1000.0/(double)duration+0.5);
-      d[5]=ramp >> 8;
-      d[6]=ramp & 0xFF;
-      if (d[6] == 0) {
-        d[6]=1;
-        d[5] |= 0x40;
-      } else if (d[5] == 0) {
-        d[5] |= 0x80;
-      }
-      d[7]=0x80 | (chindex % 16);
-      d[8]=0;
-      //printf("LOR ramp 1=%02X 2=%02X 3=%02X 4=%02X 5=%02X 6=%02X 7=%02X\n",d[1],d[2],d[3],d[4],d[5],d[6],d[7]);
-      if (serptr) serptr->Write((char *)d,9);
-    }
-  };
-
-  void twinkle (size_t chindex, int period, wxByte intensity) {
-    shimtwink(6, chindex, period, intensity);
-  };
-
-  virtual void twinklefade (size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) {
-    shimtwinkfade(6, chindex, period, duration, startintensity, endintensity);
-  };
-
-  void shimmer (size_t chindex, int period, wxByte intensity) {
-    shimtwink(7, chindex, period, intensity);
-  };
-
-  virtual void shimmerfade (size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) {
-    shimtwinkfade(7, chindex, period, duration, startintensity, endintensity);
-  };
-
-  void off (size_t chindex) {
-    SetIntensity(chindex, 0);
-  };
-
-  void alloff () {
-    for (int i=0; i<16; i++)
-      off(0xFF * 16 + i);
-  };
-};
-
-
-// Same as LOR except shimmer and twinkle
-class xNetwork_DLight: public xNetwork_LOR {
-
-  // shimmer or twinkle at constant intensity
-  void shimtwink (wxByte cmd, size_t chindex, int period, wxByte intensity) {
-    wxByte d[8];
-    d[0]=0;
-    d[1]=chindex >> 4;
-    if (d[1] < 0xF0) d[1]++;
-    d[2]=cmd;
-    d[3]=0x80 | (chindex % 16);
-    if (intensity == max_intensity) {
-      d[4]=0;
-      if (serptr) serptr->Write((char *)d,5);
-    } else {
-      d[4]=IntensityMap[intensity];
-      d[5]=0;
-      if (serptr) serptr->Write((char *)d,6);
-    }
-  };
-
-  // shimmer or twinkle while ramping intensity up or down
-  virtual void shimtwinkfade (wxByte cmd, size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) {
-    wxByte d[10];
-    d[3]=IntensityMap[startintensity];
-    d[4]=IntensityMap[endintensity];
-    if (d[3] == d[4]) {
-      shimtwink(cmd, chindex, period, startintensity);
-    } else {
-      d[0]=0;
-      d[1]=chindex >> 4;
-      if (d[1] < 0xF0) d[1]++;
-      d[2]=4;  // ramp command
-      int deltaInt=abs((int)d[3] - (int)d[4]);
-      int ramp=(int)((double)deltaInt/239.0*510.0*1000.0/(double)duration+0.5);
-      d[5]=ramp >> 8;
-      d[6]=ramp & 0xFF;
-      if (d[6] == 0) {
-        d[6]=1;
-        d[5] |= 0x40;
-      } else if (d[5] == 0) {
-        d[5] |= 0x80;
-      }
-      d[7]=0x80 | (chindex % 16);
-      d[8]=8-cmd; // 1=shimmer, 2=twinkle
-      d[9]=0;
-      //printf("D-Light shimtwinkfade 1=%02X 2=%02X 3=%02X 4=%02X 5=%02X 6=%02X 7=%02X\n",d[1],d[2],d[3],d[4],d[5],d[6],d[7]);
-      if (serptr) serptr->Write((char *)d,10);
     }
   };
 
@@ -1017,7 +568,7 @@ public:
     if (nettype3 == wxT("LOR")) {
         netobj = new xNetwork_LOR();
     } else if (nettype3 == wxT("D-L")) {
-        netobj = new xNetwork_DLight();
+        netobj = new xNetwork_LOR();
     } else if (nettype3 == wxT("REN")) {
         netobj = new xNetwork_Renard();
     } else if (nettype3 == wxT("DMX")) {
@@ -1034,8 +585,9 @@ public:
     size_t netnum = networks.GetCount();
     networks.Add(netobj);
     netobj->SetChannelCount(chcount);
-    for (int ch=0; ch<chcount; ch++)
+    for (int ch=0; ch<chcount; ch++) {
         channels.push_back(std::make_pair(netnum, ch));
+    }
     wxString description = NetworkType + _(" on ") + portname;
     netobj->SetNetworkDesc(description);
     if (nettype3 == wxT("E13")) {
@@ -1056,36 +608,27 @@ public:
     return networks[netnum]->GetNetworkDesc();
   };
 
-  void SetMaxIntensity(wxByte maxintensity) {
-    for (size_t i=0; i<networks.GetCount(); i++) {
-      networks[i]->SetMaxIntensity(maxintensity);
-    }
-  };
-
-  // chindex starts at 0
-  // duration is in milliseconds
-  // intensity values are relative to the last SetMaxIntensity call
-  void ramp (size_t netnum, size_t chindex, int duration, wxByte startintensity, wxByte endintensity) {
-    if (netnum >= networks.GetCount()) return;
-    if (chindex <= networks[netnum]->GetChannelCount())
-      networks[netnum]->ramp(chindex, duration, startintensity, endintensity);
-  };
-
-  // chindex starts at 0
-  // intensity is relative to the last SetMaxIntensity call
-  void SetIntensity (size_t netnum, size_t chindex, wxByte intensity) {
-    if (netnum >= networks.GetCount()) return;
-    if (chindex <= networks[netnum]->GetChannelCount())
-      networks[netnum]->SetIntensity(chindex, intensity);
-  };
-
   // absChNum starts at 0
-  // intensity is relative to the last SetMaxIntensity call
+  // intensity is 0-255
   void SetIntensity (size_t absChNum, wxByte intensity) {
     if (absChNum <= channels.size())
       networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, intensity);
   };
 
+  // convenience function to turn a single channel off
+  void off (size_t absChNum) {
+    if (absChNum <= channels.size())
+      networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, 0);
+  };
+
+  // turns all channels off on all networks
+  void alloff () {
+    for(size_t absChNum=0; absChNum < channels.size(); ++absChNum) {
+      networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, 0);
+    }
+  };
+
+  // returns total number of channels across all networks
   size_t TotalChannelCount() {
     return channels.size();
   }
@@ -1101,44 +644,6 @@ public:
   ChannelPair AbsChannelPair(size_t absChNum) {
     return channels[absChNum];
   }
-
-  // chindex starts at 0
-  // intensity is relative to the last SetMaxIntensity call
-  void twinkle (size_t netnum, size_t chindex, int period, wxByte intensity) {
-    if (netnum >= networks.GetCount()) return;
-    if (chindex <= networks[netnum]->GetChannelCount())
-      networks[netnum]->twinkle(chindex, period, intensity);
-  };
-
-  void twinklefade (size_t netnum, size_t chindex, int period, int duration, int startintensity, int endintensity) {
-    if (netnum >= networks.GetCount()) return;
-    if (chindex <= networks[netnum]->GetChannelCount())
-      networks[netnum]->twinklefade(chindex, period, duration, startintensity, endintensity);
-  };
-
-  void shimmer (size_t netnum, size_t chindex, int period, wxByte intensity) {
-    if (netnum >= networks.GetCount()) return;
-    if (chindex <= networks[netnum]->GetChannelCount())
-      networks[netnum]->shimmer(chindex, period, intensity);
-  };
-
-  void shimmerfade (size_t netnum, size_t chindex, int period, int duration, wxByte startintensity, wxByte endintensity) {
-    if (netnum >= networks.GetCount()) return;
-    if (chindex <= networks[netnum]->GetChannelCount())
-      networks[netnum]->shimmerfade(chindex, period, duration, startintensity, endintensity);
-  };
-
-  void off (size_t netnum, size_t chindex) {
-    if (netnum >= networks.GetCount()) return;
-    if (chindex <= networks[netnum]->GetChannelCount())
-      networks[netnum]->off(chindex);
-  };
-
-  void alloff () {
-    for(size_t i=0; i < networks.GetCount(); ++i) {
-      networks[i]->alloff();
-    }
-  };
 
   void ResetTimer() {
     for(size_t i=0; i < networks.GetCount(); ++i) {
