@@ -181,10 +181,7 @@ void xLightsFrame::OnTimerTest()
     unsigned int i;
     bool ColorChange;
 
-    if (!xout) {
-        StatusBar1->SetStatusText(_("Testing disabled - Output to Lights is not checked"));
-        return;
-    }
+    if (!xout) return;
     wxDateTime TimerStartTime = wxDateTime::UNow();
     wxTimeSpan ts = TimerStartTime - starttime;
     long curtime = ts.GetMilliseconds().ToLong();
@@ -214,7 +211,9 @@ void xLightsFrame::OnTimerTest()
             LastBgColor[i] = -1;
             LastFgColor[i] = -1;
         }
-        if (TestFunc == OFF) {
+        if (!CheckBoxLightOutput->IsChecked()) {
+            StatusBar1->SetStatusText(_("Testing disabled - Output to Lights is not checked"));
+        } else if (TestFunc == OFF) {
             StatusBar1->SetStatusText(_("All lights off"));
         } else {
             StatusBar1->SetStatusText(wxString::Format(_("Testing %ld channels"),static_cast<long>(chArray.Count())));
@@ -426,7 +425,7 @@ void xLightsFrame::OnTimerTest()
     xout->TimerEnd();
     ts = wxDateTime::UNow() - TimerStartTime;
     curtime = ts.GetMilliseconds().ToLong();
-    StatusBar1->SetStatusText(wxString::Format(_("Timer took %ld msec"),curtime));
+    //StatusBar1->SetStatusText(wxString::Format(_("Timer took %ld msec"),curtime));
     //wxLogTrace(wxT("xout"),wxT("Ending OnTimer"));
     //StatusBar1->SetStatusText(ts.Format(_("%S.%l")));
 }

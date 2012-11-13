@@ -99,10 +99,26 @@
 		<Compiler>
 			<Add option="-DwxUSE_UNICODE" />
 		</Compiler>
+		<Unit filename="AddShowDialog.cpp" />
+		<Unit filename="AddShowDialog.h" />
 		<Unit filename="E131Dialog.cpp" />
 		<Unit filename="E131Dialog.h" />
+		<Unit filename="PlaybackOptionsDialog.cpp" />
+		<Unit filename="PlaybackOptionsDialog.h" />
+		<Unit filename="PlayerFrame.cpp" />
+		<Unit filename="PlayerFrame.h" />
 		<Unit filename="SerialPortWithRate.cpp" />
 		<Unit filename="SerialPortWithRate.h" />
+		<Unit filename="ShowDatesDialog.cpp" />
+		<Unit filename="ShowDatesDialog.h" />
+		<Unit filename="TabConvert.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="TabSchedule.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="TabSetup.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -117,9 +133,15 @@
 			<Option target="ReleaseWindows" />
 		</Unit>
 		<Unit filename="wx_pch.h" />
+		<Unit filename="wxsmith/PlaybackOptionsDialog.wxs" />
+		<Unit filename="wxsmith/PlayerFrame.wxs" />
 		<Unit filename="wxsmith/xLightsframe.wxs" />
 		<Unit filename="xLightsApp.cpp" />
 		<Unit filename="xLightsApp.h" />
+		<Unit filename="xLightsBasic.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="xLightsMain.cpp" />
 		<Unit filename="xLightsMain.h" />
 		<Extensions>
@@ -131,6 +153,10 @@
 					<wxFrame wxs="wxsmith/xLightsframe.wxs" src="xLightsMain.cpp" hdr="xLightsMain.h" fwddecl="0" i18n="1" name="xLightsFrame" language="CPP" />
 					<wxDialog wxs="wxsmith/SerialPortWithRate.wxs" src="SerialPortWithRate.cpp" hdr="SerialPortWithRate.h" fwddecl="0" i18n="1" name="SerialPortWithRate" language="CPP" />
 					<wxDialog wxs="wxsmith/E131Dialog.wxs" src="E131Dialog.cpp" hdr="E131Dialog.h" fwddecl="0" i18n="1" name="E131Dialog" language="CPP" />
+					<wxFrame wxs="wxsmith/PlayerFrame.wxs" src="PlayerFrame.cpp" hdr="PlayerFrame.h" fwddecl="0" i18n="1" name="PlayerFrame" language="CPP" />
+					<wxDialog wxs="wxsmith/AddShowDialog.wxs" src="AddShowDialog.cpp" hdr="AddShowDialog.h" fwddecl="0" i18n="1" name="AddShowDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ShowDatesDialog.wxs" src="ShowDatesDialog.cpp" hdr="ShowDatesDialog.h" fwddecl="0" i18n="1" name="ShowDatesDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/PlaybackOptionsDialog.wxs" src="PlaybackOptionsDialog.cpp" hdr="PlaybackOptionsDialog.h" fwddecl="0" i18n="1" name="PlaybackOptionsDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

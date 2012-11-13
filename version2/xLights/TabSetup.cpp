@@ -15,9 +15,16 @@ void xLightsFrame::OnMenuMRU(wxCommandEvent& event)
 
 void xLightsFrame::SetDir(const wxString& newdir)
 {
-    // update most recently used array
     static bool HasMenuSeparator=false;
     int idx, cnt, i;
+
+    // reject change if something is playing
+    if (play_mode == play_sched || play_mode == play_list || play_mode == play_single) {
+        wxMessageBox(_("Cannot change directories during playback"),_("Error"));
+        return;
+    }
+
+    // update most recently used array
     idx=mru.Index(newdir);
     if (idx != wxNOT_FOUND) mru.RemoveAt(idx);
     if (!CurrentDir.IsEmpty()) {
@@ -74,17 +81,28 @@ void xLightsFrame::SetDir(const wxString& newdir)
     }
 
     // update UI
+    CheckBoxLightOutput->SetValue(false);
+    CheckBoxRunSchedule->SetValue(false);
+    if (xout) {
+        delete xout;
+        xout=0;
+    }
     CurrentDir=newdir;
     StaticTextDirName->SetLabel(CurrentDir);
     UnsavedChanges=false;
+    TextCtrlLog->Clear();
+    while (Notebook1->GetPageCount() > FixedPages) {
+        Notebook1->DeletePage(FixedPages);
+    }
+    EnableNetworkChanges();
 
     // load network
-    networkFile.AssignDir( CurrentDir );
-    networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Networks") );
     root->AddAttribute( wxT("computer"), wxGetHostName());
     NetworkXML.SetRoot( root ); // reset xml
     UpdateLorMapping();
+    networkFile.AssignDir( CurrentDir );
+    networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     if (networkFile.FileExists()) {
         if (!NetworkXML.Load( networkFile.GetFullPath() )) {
             wxMessageBox(_("Unable to load network definition file"), _("Error"));
@@ -93,6 +111,15 @@ void xLightsFrame::SetDir(const wxString& newdir)
     UpdateNetworkList();
 
     // load schedule
+    UpdateShowDates(wxDateTime::Now(),wxDateTime::Now());
+    ShowEvents.Clear();
+    scheduleFile.AssignDir( CurrentDir );
+    scheduleFile.SetFullName(_(XLIGHTS_SCHEDULE_FILE));
+    if (scheduleFile.FileExists()) {
+        LoadScheduleFile();
+    }
+    DisplaySchedule();
+    Notebook1->ChangeSelection(SETUPTAB);
 }
 
 void xLightsFrame::UpdateLorMapping()
@@ -106,7 +133,7 @@ void xLightsFrame::UpdateLorMapping()
 void xLightsFrame::UpdateNetworkList()
 {
     long newidx,LorMapping,MaxChannels;
-    int TotChannels=0;
+    TotChannels=0;
     int NetCnt=0;
     //int MaxLorChannels=240*16;
     int MaxDmxChannels=512;
@@ -123,6 +150,7 @@ void xLightsFrame::UpdateNetworkList()
     }
     GridNetwork->DeleteAllItems();
     CheckListBoxTestChannels->Clear();
+    NetMaxChannel.clear();
     for( e=e->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == wxT("network")) {
             NetName=e->GetAttribute(wxT("NetworkType"), wxT(""));
@@ -132,8 +160,11 @@ void xLightsFrame::UpdateNetworkList()
             MaxChannelsStr=e->GetAttribute(wxT("MaxChannels"), wxT("0"));
             GridNetwork->SetItem(newidx,3,MaxChannelsStr);
             MaxChannelsStr.ToLong(&MaxChannels);
+            NetMaxChannel.push_back(MaxChannels);
             StartChannel=TotChannels+1;
             NetCnt++;
+
+            // Load channel list on Test tab
             for(ch=1; ch<=MaxChannels; ch++) {
                 TotChannels++;
                 CheckListBoxTestChannels->Append(wxString::Format(_("Ch %d: Net %d #%d"),TotChannels,NetCnt,ch));

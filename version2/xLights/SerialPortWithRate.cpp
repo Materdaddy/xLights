@@ -116,13 +116,13 @@ void SerialPortWithRate::ProtocolChange()
 	wxString NetName = ChoiceProtocol->GetStringSelection();
 	bool EnableRate;
 	if (NetName == _("LOR")) {
-	    SetLabel(_("LOR controllers attached\nto any LOR dongle"));
+	    SetLabel(_("LOR controllers attached to any LOR dongle.\nMax of 8 channels at 9600 baud.\nMax of 48 channels at 57600 baud.\nMax of 96 channels at 115200 baud.\nRun your controllers in DMX mode for higher throughput."));
 	    EnableRate=true;
 	} else if (NetName == _("D-Light")) {
-	    SetLabel(_("D-Light controllers attached\nto a D-Light dongle"));
+	    SetLabel(_("D-Light controllers attached to a D-Light dongle.\nMax of 8 channels at 9600 baud.\nMax of 48 channels at 57600 baud.\nMax of 96 channels at 115200 baud.\nRun your controllers in DMX mode for higher throughput."));
 	    EnableRate=true;
 	} else if (NetName == _("Renard")) {
-	    SetLabel(_("Renard controllers connected\nto a serial port or a USB dongle\nwith virtual comm port.\n2 stop bits are set automatically."));
+	    SetLabel(_("Renard controllers connected to a serial port or\na USB dongle with virtual comm port. 2 stop bits\nare set automatically.\nMax of 42 channels at 9600 baud.\nMax of 260 channels at 57600 baud."));
 	    EnableRate=true;
 	} else if (NetName == _("OpenDMX")) {
 	    SetLabel(_("DMX controllers (or LOR or D-Light controllers in DMX mode)\nattached to an LOR dongle, D-Light dongle, HolidayCoro\nprogramming cable, or Entec Open DMX dongle"));
