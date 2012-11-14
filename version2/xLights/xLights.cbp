@@ -46,6 +46,7 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DWXUSINGDLL" />
+					<Add option="-DNDEBUG" />
 					<Add directory="$(#wx)/lib/gcc_dll/mswu" />
 				</Compiler>
 				<ResourceCompiler>

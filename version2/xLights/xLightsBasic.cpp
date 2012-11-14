@@ -174,7 +174,7 @@ protected:
         if(1 <= idx && idx <= playlist->GetItemCount()) {
             HostFrame->TxOverflowCnt = 0;
             wxString filename = playlist->GetItemText(idx-1);
-            wxString delay = _("0"); //playlist->GetCellValue(idx-1,1);
+            wxString delay = playlist->GetItemText(idx-1,1);  // requires 2.9.1
             long idelay;
             delay.ToLong(&idelay);
             HostFrame->Play(filename,idelay);

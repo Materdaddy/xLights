@@ -81,6 +81,7 @@ const long xLightsFrame::ID_BUTTON_ADD_DONGLE = wxNewId();
 const long xLightsFrame::ID_BUTTON_ADD_E131 = wxNewId();
 const long xLightsFrame::ID_BUTTON_NETWORK_CHANGE = wxNewId();
 const long xLightsFrame::ID_BUTTON_NETWORK_DELETE = wxNewId();
+const long xLightsFrame::ID_BUTTON_NETWORK_DELETE_ALL = wxNewId();
 const long xLightsFrame::ID_STATICTEXT4 = wxNewId();
 const long xLightsFrame::ID_RADIOBUTTON1 = wxNewId();
 const long xLightsFrame::ID_RADIOBUTTON2 = wxNewId();
@@ -318,6 +319,8 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     BoxSizer1->Add(ButtonNetworkChange, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     ButtonNetworkDelete = new wxButton(PanelSetup, ID_BUTTON_NETWORK_DELETE, _("Delete"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_NETWORK_DELETE"));
     BoxSizer1->Add(ButtonNetworkDelete, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
+    ButtonNetworkDeleteAll = new wxButton(PanelSetup, ID_BUTTON_NETWORK_DELETE_ALL, _("Delete All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_NETWORK_DELETE_ALL"));
+    BoxSizer1->Add(ButtonNetworkDeleteAll, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     FlexGridSizerNetworks->Add(BoxSizer1, 1, wxALIGN_LEFT|wxALIGN_TOP, 0);
     FlexGridSizer9 = new wxFlexGridSizer(0, 1, 0, 0);
     StaticText5 = new wxStaticText(PanelSetup, ID_STATICTEXT4, _("LOR\nSequence\nMapping"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -572,9 +575,11 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     ChoiceOutputFormat->Append(_("Vixen 2.1"));
     FlexGridSizer26->Add(ChoiceOutputFormat, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText20 = new wxStaticText(PanelConvert, ID_STATICTEXT20, _("Save channel names:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT20"));
+    StaticText20->Hide();
     FlexGridSizer26->Add(StaticText20, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     CheckBoxSaveChannelNames = new wxCheckBox(PanelConvert, ID_CHECKBOX_SAVE_CHANNEL_NAMES, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_SAVE_CHANNEL_NAMES"));
     CheckBoxSaveChannelNames->SetValue(false);
+    CheckBoxSaveChannelNames->Hide();
     FlexGridSizer26->Add(CheckBoxSaveChannelNames, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText17 = new wxStaticText(PanelConvert, ID_STATICTEXT17, _("All channels off at end:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT17"));
     FlexGridSizer26->Add(StaticText17, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -738,6 +743,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON_ADD_E131,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonAddE131Click);
     Connect(ID_BUTTON_NETWORK_CHANGE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonNetworkChangeClick);
     Connect(ID_BUTTON_NETWORK_DELETE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonNetworkDeleteClick);
+    Connect(ID_BUTTON_NETWORK_DELETE_ALL,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonNetworkDeleteAllClick);
     Connect(ID_RADIOBUTTON1,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnRadioButtonLorMapClick);
     Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnRadioButtonLorMapClick);
     Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonNetworkMoveUpClick);
@@ -779,7 +785,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_RADIOBUTTON27,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnRadioButtonDimSelect);
     Connect(ID_BUTTON_CHOOSE_FILE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonChooseFileClick);
     Connect(ID_BUTTON_START_CONVERSION,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonStartConversionClick);
-    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&xLightsFrame::OnListBoxSchedBeginDrag);
     Connect(ID_CHECKBOX_RUN_SCHEDULE,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBoxRunScheduleClick);
     Connect(ID_BUTTON_SAVE_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonSaveScheduleClick);
     Connect(ID_BUTTON_ADD_SHOW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonAddShowClick);
@@ -964,7 +969,7 @@ void xLightsFrame::SetPlayMode(play_modes newmode)
     ButtonChangeDir->Enable(newmode != play_sched && newmode != play_list && newmode != play_single);
     play_mode=newmode;
     starttime = wxDateTime::UNow();
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
     TextCtrlLog->AppendText(wxString::Format(_("SetPlayMode mode=%d state=%d\n"),play_mode,SeqPlayerState));
 #endif
 }
@@ -1005,11 +1010,40 @@ void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
 
 void xLightsFrame::OnBitmapButtonTabInfoClick(wxCommandEvent& event)
 {
+    wxString caption,msg,selectmethod;
 #ifdef __WXOSX__
-    wxMessageBox(_("1) To select multiple items, use cmd-click. Don't worry if date headings get selected - they will be ignored.\n\n2) The schedule is NOT SAVED until you click the save icon.\n\n3)  The schedule WILL NOT RUN unless the Run\nSchedule checkbox is checked."),_("Schedule Tab"));
+    selectmethod=_("cmd-click");
 #else
-    wxMessageBox(_("1) To select multiple items, use ctrl-click or shift-click. Don't worry if date headings get selected - they will be ignored.\n\n2) The schedule is NOT SAVED until you click the save icon.\n\n3)  The schedule WILL NOT RUN unless the Run\nSchedule checkbox is checked."),_("Schedule Tab"));
+    selectmethod=_("ctrl-click or shift-click");
 #endif
+    switch (Notebook1->GetSelection()) {
+    case SETUPTAB:
+        caption=_("Setup Tab");
+        msg=_("Show Directory\n\nThe first thing you need to know about xLights is that it expects you to organize all of your sequence files and associated audio or video files into a single directory. For example, you can have a directory called '2012 Show'. Once you have your show directory created and populated with the relevant files, start xLights. The first thing you need to do is to tell xLights where your new show directory is. To do this, click the 'Change' button on the Setup tab, navigate to your show directory, then click 'OK'.\n\nLighting Networks\n\nThe next thing you will need to do is define your lighting network(s). xLights ignores most of the information about your lighting network contained in your LOR or Vixen sequence. Thus this step is very important. Add a row in the lower half of the Setup tab for each network used in your display. xLights can drive a mixture of network types (for example, the first network can be DMX, and the second one LOR, and the third one Renard). When you are finished, do not forget to SAVE YOUR CHANGES by clicking the 'Save Setup' button!");
+        break;
+    case TESTTAB:
+        caption=_("Test Tab");
+        msg=_("In order to use the xLights Test module, you must first define your lighting network(s) on the Setup tab. You should also click the 'Output to Lights' checkbox. Next you will need to select which channels you want to test. You can select channels one at a time by clicking on the checkbox next to each channel. You can select multiple channels at a time by using ")+selectmethod+_(", then clicking any checkbox in the selected range. Click the checkbox again to unselect all channels in the range. Once that is done, use the radio buttons and slide bars to control your testing. You can change channel selections while the test is running.");
+        break;
+    case CONVERTTAB:
+        caption=_("Convert Tab");
+        msg=_("Use the Convert tab to convert sequence files from one format to another. Available input formats include LOR (.lms or .las), Vixen (.vix), Lynx Conductor (.seq), and xLights (.xseq). Output formats include Vixen (.vix), Lynx Conductor (.seq), and xLights (.xseq). The xLights scheduler will only play xLights sequences and media files (music and video).\n\nThe lighting networks you define on the Setup tab will guide the conversion - make sure you have your lighting networks defined accurately before you start a conversion.\n\nAs the conversion takes place, messages will appear on the right side informing you about the progress and any errors found.");
+        break;
+    case SEQUENCETAB:
+        caption=_("Sequence Tab");
+        msg=_("The Sequence tab can be used to create RGB sequences. This feature will be available in a later version.");
+        break;
+    case SCHEDULETAB:
+        caption=_("Schedule Tab");
+        msg=_("The xLights scheduler works by scheduling playlists. To create a playlist, select Playlist > Add from the menu. Once you have one or more playlists created, you are ready to build your schedule.\n\nStart building your schedule by defining your show start and end dates. Then click 'Schedule Playlist' to add playlists to the schedule. To alter the schedule, you may select multiple items using ")+selectmethod+_(". Don't worry if date headings get selected - they will be ignored. Then click 'Update Selected Items'.\n\nThe schedule is NOT SAVED until you click the 'Save Schedule' button (this also saves all playlists).\n\nThe schedule WILL NOT RUN unless the 'Run Schedule' checkbox is checked. You will also want to ensure 'Output to Lights' is checked.");
+        break;
+    default:
+        // playlist
+        caption=_("Playlist Tab");
+        msg=_("Files in your show directory are listed on the left. Click the 'Audio', 'Video', or 'xLights' checkbox to see files of the desired type. Files in the playlist are listed on the right. To move files between the left and right lists, use the arrow buttons in the middle. You can rename or delete a list by using the Playlist menu. Selecting Playlist > Save Playlists from the menu will save all playlists as well as the schedule. You can play a single item on the playlist by selecting it and then clicking 'Play Item'. Use 'Play All' to play the entire playlist. You can reorder the playlist by dragging items up or down, or selecting items and using the up/down buttons.");
+        break;
+    }
+    wxMessageBox(msg,caption);
 }
 
 void xLightsFrame::OnNotebook1PageChanged(wxNotebookEvent& event)
@@ -1136,7 +1170,3 @@ void xLightsFrame::OnMenuItemSavePlaylistsSelected(wxCommandEvent& event)
 #include "TabTest.cpp"
 #include "TabConvert.cpp"
 #include "TabSchedule.cpp"
-
-void xLightsFrame::OnListBoxSchedBeginDrag(wxTreeEvent& event)
-{
-}

@@ -242,29 +242,27 @@ void xLightsFrame::WriteConductorFile(const wxString& filename)
 {
     TextCtrlConversionStatus->AppendText(_("Writing Lynx Conductor sequence\n"));
     wxFile f;
-    wxUint8 buf[4];
+    wxUint8 buf[16384];
     size_t ch,i,j;
     if (!f.Create(filename,true)) {
         ConversionError(_("Unable to create file: ")+filename);
         return;
     }
     for (long period=0; period < SeqNumPeriods; period++) {
-        if (period % 500 == 499) TextCtrlConversionStatus->AppendText(wxString::Format(wxT("Writing time period %ld\n"),period+1));
+        //if (period % 500 == 499) TextCtrlConversionStatus->AppendText(wxString::Format(wxT("Writing time period %ld\n"),period+1));
         wxYield();
         for (i=0; i < 4096; i++) {
             for (j=0; j < 4; j++) {
                 ch=j * 4096 + i;
-                buf[j] = ch < SeqNumChannels ? SeqData[ch * SeqNumPeriods + period] : 0;
+                buf[i*4+j] = ch < SeqNumChannels ? SeqData[ch * SeqNumPeriods + period] : 0;
             }
-            f.Write(buf,4);
         }
+        f.Write(buf,16384);
     }
 
     // pad the end of the file with 512 bytes of 0's
-    memset(buf,0,4);
-    for (i=0; i < 128; i++) {
-        f.Write(buf,4);
-    }
+    memset(buf,0,512);
+    f.Write(buf,512);
     f.Close();
     TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+filename+_("\n"));
 }
@@ -742,6 +740,10 @@ void xLightsFrame::DoConversion(const wxString& Filename, const wxString& Output
         }
         ReadXlightsFile(Filename);
     } else if (ext == _("seq")) {
+        if (c == 'L') {
+            ConversionError(_("Cannot convert from Conductor file to Conductor file!"));
+            return;
+        }
         ReadConductorFile(Filename);
     } else if (ext == _("lms") || ext == _("las")) {
         ReadLorFile(Filename.char_str());

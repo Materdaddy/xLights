@@ -205,7 +205,7 @@ class xLightsFrame: public wxFrame
         void OnButtonGracefulStopClick(wxCommandEvent& event);
         void OnButtonSaveScheduleClick(wxCommandEvent& event);
         void OnMenuItemSavePlaylistsSelected(wxCommandEvent& event);
-        void OnListBoxSchedBeginDrag(wxTreeEvent& event);
+        void OnButtonNetworkDeleteAllClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xLightsFrame)
@@ -222,6 +222,7 @@ class xLightsFrame: public wxFrame
         static const long ID_BUTTON_ADD_E131;
         static const long ID_BUTTON_NETWORK_CHANGE;
         static const long ID_BUTTON_NETWORK_DELETE;
+        static const long ID_BUTTON_NETWORK_DELETE_ALL;
         static const long ID_STATICTEXT4;
         static const long ID_RADIOBUTTON1;
         static const long ID_RADIOBUTTON2;
@@ -385,6 +386,7 @@ class xLightsFrame: public wxFrame
         wxStaticText* StaticText19;
         wxSlider* SliderChaseSpeed;
         wxStaticText* StaticText8;
+        wxButton* ButtonNetworkDeleteAll;
         wxButton* ButtonStartConversion;
         wxStaticText* StaticText11;
         wxStaticText* StaticText18;
@@ -572,21 +574,20 @@ class xLightsFrame: public wxFrame
         int Time2Seconds(const wxString& hhmm);
         void ResetTimer(SeqPlayerStates newstate);
         void SaveScheduleFile();
-        void OnButtonPlaylistAddClick();
-        void OnButtonPlaylistAddAllClick();
-        void OnButtonPlaylistDeleteClick();
-        void OnButtonPlaylistDeleteAllClick();
+        void OnButtonPlaylistAddClick(wxCommandEvent& event);
+        void OnButtonPlaylistAddAllClick(wxCommandEvent& event);
+        void OnButtonPlaylistDeleteClick(wxCommandEvent& event);
+        void OnButtonPlaylistDeleteAllClick(wxCommandEvent& event);
         void OnButtonRemoveScriptClick(wxCommandEvent& event);
-        void OnButtonRunPlaylistClick();
-        void OnButtonPlayItemClick();
-        void OnButtonUpClick();
-        void OnButtonDownClick();
-        void OnButtonSetDelayClick();
-        void OnFileTypeButtonClicked();
+        void OnButtonRunPlaylistClick(wxCommandEvent& event);
+        void OnButtonPlayItemClick(wxCommandEvent& event);
+        void OnButtonUpClick(wxCommandEvent& event);
+        void OnButtonDownClick(wxCommandEvent& event);
+        void OnButtonSetDelayClick(wxCommandEvent& event);
+        void OnFileTypeButtonClicked(wxCommandEvent& event);
         void OnPlayListBeginDrag(wxListEvent& event);
         void OnPlayListDragEnd(wxMouseEvent& event);
         void OnPlayListDragQuit(wxMouseEvent& event);
-        void OnRunPlaylist(wxCommandEvent& event);
         void OnTimerPlaylist(long msec);
 
         DECLARE_EVENT_TABLE()

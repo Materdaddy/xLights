@@ -284,6 +284,17 @@ void xLightsFrame::OnButtonNetworkDeleteClick(wxCommandEvent& event)
     }
 }
 
+void xLightsFrame::OnButtonNetworkDeleteAllClick(wxCommandEvent& event)
+{
+    wxXmlNode* e;
+    wxXmlNode* root=NetworkXML.GetRoot();
+    while ( e=root->GetChildren() ) {
+        root->RemoveChild(e);
+    }
+    UnsavedChanges=true;
+    UpdateNetworkList();
+}
+
 void xLightsFrame::OnButtonNetworkMoveUpClick(wxCommandEvent& event)
 {
     long SelectedItem = GetNetworkSelection();
