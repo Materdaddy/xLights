@@ -88,35 +88,43 @@ void xLightsFrame::TestButtonsOff()
     TestFunc=OFF;
 }
 
-void xLightsFrame::OnButtonTestLoadClick(wxCommandEvent& event)
+// get list of test config names
+void xLightsFrame::GetTestPresetNames(wxArrayString& PresetNames)
 {
-    // get list of files in show directory
-    wxArrayString PresetNames;
-    wxString name,chidstr;
-    wxXmlNode* e;
+    wxString name;
     wxXmlNode* root=NetworkXML.GetRoot();
-    for( e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
+    if (!root) return;
+    for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == wxT("testpreset")) {
             name=e->GetAttribute(wxT("name"), wxT(""));
             if (!name.IsEmpty()) PresetNames.Add(name);
         }
     }
+}
 
+// Allow user to select test configuration located in Network config file
+void xLightsFrame::OnButtonTestLoadClick(wxCommandEvent& event)
+{
+    wxArrayString PresetNames;
+    GetTestPresetNames(PresetNames);
     if (PresetNames.Count() == 0) {
         wxMessageBox(_("No test configurations found"), _("Error"));
         return;
     }
 
     // get user selection
+    PresetNames.Sort();
     wxSingleChoiceDialog dialog(this, _("Select test configuration"), _("Load Test Settings"), PresetNames);
     if (dialog.ShowModal() != wxID_OK) return;
 
     // re-find testpreset node, then set channels
     SetTestCheckboxes(false);
-    name = dialog.GetStringSelection();
+    wxString name = dialog.GetStringSelection();
+    wxString chidstr;
     long chid;
     long ChCount = CheckListBoxTestChannels->GetCount();
-    for( e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
+    wxXmlNode* root=NetworkXML.GetRoot();
+    for( wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == wxT("testpreset") && e->GetAttribute(wxT("name"), wxT("")) == name) {
             for( wxXmlNode* c=e->GetChildren(); c!=NULL; c=c->GetNext() ) {
                 if (c->GetName() == wxT("channel") && c->GetAttribute(wxT("id"), &chidstr) && chidstr.ToLong(&chid) && chid >= 0 && chid < ChCount) {
@@ -128,11 +136,13 @@ void xLightsFrame::OnButtonTestLoadClick(wxCommandEvent& event)
     }
 }
 
-// needs to detect duplicate names
+// Save test configuration to Network config file
 void xLightsFrame::OnButtonTestSaveClick(wxCommandEvent& event)
 {
     wxString name;
     wxXmlNode *channel, *PresetNode;
+    wxArrayString PresetNames;
+    GetTestPresetNames(PresetNames);
     wxXmlNode* root=NetworkXML.GetRoot();
     wxTextEntryDialog NameDialog(this, _("Enter a name for this test configuration"), _("Save Test Settings"));
     if (NameDialog.ShowModal() != wxID_OK) return;
@@ -145,6 +155,8 @@ void xLightsFrame::OnButtonTestSaveClick(wxCommandEvent& event)
         wxMessageBox(_("Name is too long"), _("Error"));
     } else if (name.Find('"') != wxNOT_FOUND) {
         wxMessageBox(_("Name cannot contain quotes"), _("Error"));
+    } else if (PresetNames.Index(name,false) != wxNOT_FOUND) {
+        wxMessageBox(_("Name already exists, please enter a unique name"), _("Error"));
     } else {
         PresetNode = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("testpreset") );
         PresetNode->AddAttribute( wxT("name"), name);

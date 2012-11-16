@@ -505,6 +505,7 @@ class xLightsFrame: public wxFrame
         // test
         void SetTestCheckboxes(bool NewValue);
         void GetCheckedItems(wxArrayInt& chArray);
+        void GetTestPresetNames(wxArrayString& PresetNames);
         void TestButtonsOff();
         bool CheckChannelList;
         int ChaseGrouping;
