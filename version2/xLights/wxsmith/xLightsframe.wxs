@@ -102,7 +102,7 @@
 													</object>
 													<object class="sizeritem">
 														<object class="wxStaticText" name="ID_STATICTEXT_DIRNAME" variable="StaticTextDirName" member="yes">
-															<label>&lt;No directory selected&gt;</label>
+															<label>&lt;No directory selected - SET THIS FIRST&gt;</label>
 															<fg>#0000FF</fg>
 															<minsize>300,0</minsize>
 														</object>
@@ -1204,7 +1204,7 @@
 													<orientation>vertical</orientation>
 													<bg>wxSYS_COLOUR_SCROLLBAR</bg>
 													<minsize>10,10</minsize>
-													<style>wxSP_3DSASH|wxSP_NO_XP_THEME</style>
+													<style>wxSP_3DSASH|wxSP_NOBORDER|wxSP_NO_XP_THEME</style>
 													<object class="wxPanel" name="ID_PANEL3" variable="Panel3" member="yes">
 														<bg>wxSYS_COLOUR_SCROLLBAR</bg>
 														<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">

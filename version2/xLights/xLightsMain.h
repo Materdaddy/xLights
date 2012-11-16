@@ -38,6 +38,7 @@
 #include <wx/config.h>
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
+#include <wx/choicdlg.h>
 #include <wx/xml/xml.h>
 
 #include "../include/globals.h"

@@ -94,6 +94,8 @@ void xLightsFrame::SetDir(const wxString& newdir)
     while (Notebook1->GetPageCount() > FixedPages) {
         Notebook1->DeletePage(FixedPages);
     }
+    ButtonTestLoad->Enable(true);
+    ButtonTestSave->Enable(true);
     EnableNetworkChanges();
 
     // load network

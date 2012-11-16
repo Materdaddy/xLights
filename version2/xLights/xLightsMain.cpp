@@ -297,7 +297,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxFont StaticTextSetup1Font(10,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticTextSetup1->SetFont(StaticTextSetup1Font);
     StaticBoxSizer1->Add(StaticTextSetup1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticTextDirName = new wxStaticText(PanelSetup, ID_STATICTEXT_DIRNAME, _("<No directory selected>"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT_DIRNAME"));
+    StaticTextDirName = new wxStaticText(PanelSetup, ID_STATICTEXT_DIRNAME, _("<No directory selected - SET THIS FIRST>"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT_DIRNAME"));
     StaticTextDirName->SetMinSize(wxSize(300,0));
     StaticTextDirName->SetForegroundColour(wxColour(0,0,255));
     StaticBoxSizer1->Add(StaticTextDirName, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -608,7 +608,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer8 = new wxFlexGridSizer(2, 2, 0, 0);
     FlexGridSizer8->AddGrowableCol(0);
     FlexGridSizer8->AddGrowableRow(0);
-    SplitterWindow1 = new wxSplitterWindow(PanelCal, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH|wxSP_NO_XP_THEME, _T("ID_SPLITTERWINDOW1"));
+    SplitterWindow1 = new wxSplitterWindow(PanelCal, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH|wxSP_NOBORDER|wxSP_NO_XP_THEME, _T("ID_SPLITTERWINDOW1"));
     SplitterWindow1->SetMinSize(wxSize(10,10));
     SplitterWindow1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_SCROLLBAR));
     SplitterWindow1->SetMinimumPaneSize(10);
@@ -894,6 +894,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
         CheckRunSchedule();
     } else {
         Notebook1->ChangeSelection(SETUPTAB);
+        EnableNetworkChanges();
     }
 }
 
@@ -1019,7 +1020,7 @@ void xLightsFrame::OnBitmapButtonTabInfoClick(wxCommandEvent& event)
     switch (Notebook1->GetSelection()) {
     case SETUPTAB:
         caption=_("Setup Tab");
-        msg=_("Show Directory\n\nThe first thing you need to know about xLights is that it expects you to organize all of your sequence files and associated audio or video files into a single directory. For example, you can have a directory called '2012 Show'. Once you have your show directory created and populated with the relevant files, start xLights. The first thing you need to do is to tell xLights where your new show directory is. To do this, click the 'Change' button on the Setup tab, navigate to your show directory, then click 'OK'.\n\nLighting Networks\n\nThe next thing you will need to do is define your lighting network(s). xLights ignores most of the information about your lighting network contained in your LOR or Vixen sequence. Thus this step is very important. Add a row in the lower half of the Setup tab for each network used in your display. xLights can drive a mixture of network types (for example, the first network can be DMX, and the second one LOR, and the third one Renard). When you are finished, do not forget to SAVE YOUR CHANGES by clicking the 'Save Setup' button!");
+        msg=_("Show Directory\n\nThe first thing you need to know about xLights is that it expects you to organize all of your sequence files and associated audio or video files into a single directory. For example, you can have a directory called '2012 Show'. Once you have your show directory created and populated with the relevant files, you are ready to proceed. Tell xLights where your new show directory is by clicking the 'Change' button on the Setup tab, navigate to your show directory, then click 'OK'.\n\nLighting Networks\n\nThe next thing you will need to do is define your lighting network(s). xLights ignores most of the information about your lighting network contained in your LOR or Vixen sequence. Thus this step is very important! Add a row in the lower half of the Setup tab for each network used in your display. xLights can drive a mixture of network types (for example, the first network can be DMX, and the second one LOR, and the third one Renard). When you are finished, do not forget to SAVE YOUR CHANGES by clicking the 'Save Setup' button.");
         break;
     case TESTTAB:
         caption=_("Test Tab");
@@ -1120,13 +1121,20 @@ bool xLightsFrame::EnableOutputs()
 
 void xLightsFrame::EnableNetworkChanges()
 {
-    bool flag=(xout==0);
+    bool flag=(xout==0 && !CurrentDir.IsEmpty());
     ButtonAddDongle->Enable(flag);
     ButtonAddE131->Enable(flag);
     ButtonNetworkChange->Enable(flag);
     ButtonNetworkDelete->Enable(flag);
+    ButtonNetworkDeleteAll->Enable(flag);
     BitmapButtonMoveNetworkUp->Enable(flag);
     BitmapButtonMoveNetworkDown->Enable(flag);
+    RadioButtonLorMapSingle->Enable(flag);
+    RadioButtonLorMapMulti->Enable(flag);
+    ButtonSaveSetup->Enable(!CurrentDir.IsEmpty());
+    ButtonSaveSchedule->Enable(!CurrentDir.IsEmpty());
+    CheckBoxLightOutput->Enable(!CurrentDir.IsEmpty());
+    CheckBoxRunSchedule->Enable(!CurrentDir.IsEmpty());
 }
 
 void xLightsFrame::OnCheckBoxLightOutputClick(wxCommandEvent& event)

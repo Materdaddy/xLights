@@ -864,6 +864,10 @@ void xLightsFrame::OnButtonDownClick(wxCommandEvent& event)
 
 void xLightsFrame::OnMenuItemAddListSelected(wxCommandEvent& event)
 {
+    if (!scheduleFile.IsOk()) {
+        wxMessageBox(_("Please select a valid show directory before adding a playlist."));
+        return;
+    }
     wxTextEntryDialog dialog(this, _("Enter name for new playlist"), _("New Playlist"));
     if (dialog.ShowModal() != wxID_OK) return;
     wxString name=dialog.GetValue();
@@ -911,6 +915,10 @@ void xLightsFrame::OnMenuItemRenameListSelected(wxCommandEvent& event)
 
 void xLightsFrame::SaveScheduleFile()
 {
+    if (!scheduleFile.IsOk()) {
+        wxMessageBox(_("Please select a valid show directory before saving your schedule."));
+        return;
+    }
     wxListItem column1;
     unsigned int RowCount,baseid;
     wxString v;
@@ -987,6 +995,10 @@ void xLightsFrame::SaveScheduleFile()
 
 void xLightsFrame::LoadScheduleFile()
 {
+    if (!scheduleFile.IsOk()) {
+        wxMessageBox(_("Unable to load schedule file."));
+        return;
+    }
     wxXmlDocument doc;
     wxString name;
     if (doc.Load( scheduleFile.GetFullPath() )) {
