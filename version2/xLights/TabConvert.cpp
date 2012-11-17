@@ -534,7 +534,6 @@ void xLightsFrame::ReadLorFile(const char* filename)
 
     ConversionInit();
     TextCtrlConversionStatus->AppendText(_("Reading LOR sequence\n"));
-    bool LorMulti=RadioButtonLorMapMulti->GetValue();
     int centisec = GetLorTrack1Length(filename);
     if (centisec > 0) {
         SeqNumPeriods = centisec * 10 / XTIMER_INTERVAL;
@@ -578,23 +577,14 @@ void xLightsFrame::ReadLorFile(const char* filename)
                     chindex=(unit-1)*16+circuit-1;
                 }
                 if (chindex >= 0 && network < NetMaxChannel.size()) {
-                    if (LorMulti) {
-                        if (chindex < NetMaxChannel[network]) {
-                            MappedChannelCnt++;
-                            curchannel = chindex;
-                            for (i=0; i < network; i++) {
-                                curchannel += NetMaxChannel[i];
-                            }
-                        } else {
-                            curchannel = -1;
+                    if (chindex < NetMaxChannel[network]) {
+                        MappedChannelCnt++;
+                        curchannel = chindex;
+                        for (i=0; i < network; i++) {
+                            curchannel += NetMaxChannel[i];
                         }
                     } else {
-                        if (network==0 && chindex < TotChannels) {
-                            MappedChannelCnt++;
-                            curchannel = chindex;
-                        } else {
-                            curchannel = -1;
-                        }
+                        curchannel = -1;
                     }
                     //TextCtrlConversionStatus->AppendText(wxString::Format(_("curchannel %d\n"),curchannel));
                     ChannelName = wxString::FromAscii( xml->getAttributeValueSafe("name") );

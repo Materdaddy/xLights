@@ -219,6 +219,16 @@ protected:
   };
 
 public:
+
+  xNetwork_E131() {
+    datagram=0;
+    memset(data,0,sizeof(data));
+  };
+
+  ~xNetwork_E131() {
+    if (datagram) delete datagram;
+  };
+
   void InitNetwork(const wxString& ipaddr, wxUint16 UniverseNumber, wxUint16 NetNum) {
     if (UniverseNumber == 0 || UniverseNumber >= 64000) {
       throw "universe number must be between 1 and 63999";

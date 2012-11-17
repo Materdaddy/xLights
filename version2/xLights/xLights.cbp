@@ -102,8 +102,20 @@
 		</Compiler>
 		<Unit filename="AddShowDialog.cpp" />
 		<Unit filename="AddShowDialog.h" />
+		<Unit filename="ChannelLayoutDialog.cpp" />
+		<Unit filename="ChannelLayoutDialog.h" />
 		<Unit filename="E131Dialog.cpp" />
 		<Unit filename="E131Dialog.h" />
+		<Unit filename="EffectListDialog.cpp" />
+		<Unit filename="EffectListDialog.h" />
+		<Unit filename="ModelClass.cpp" />
+		<Unit filename="ModelClass.h" />
+		<Unit filename="ModelDialog.cpp" />
+		<Unit filename="ModelDialog.h" />
+		<Unit filename="ModelListDialog.cpp" />
+		<Unit filename="ModelListDialog.h" />
+		<Unit filename="PixelBuffer.cpp" />
+		<Unit filename="PixelBuffer.h" />
 		<Unit filename="PlaybackOptionsDialog.cpp" />
 		<Unit filename="PlaybackOptionsDialog.h" />
 		<Unit filename="PlayerFrame.cpp" />
@@ -117,6 +129,10 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="TabSchedule.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="TabSequence.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 		</Unit>
@@ -158,6 +174,10 @@
 					<wxDialog wxs="wxsmith/AddShowDialog.wxs" src="AddShowDialog.cpp" hdr="AddShowDialog.h" fwddecl="0" i18n="1" name="AddShowDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ShowDatesDialog.wxs" src="ShowDatesDialog.cpp" hdr="ShowDatesDialog.h" fwddecl="0" i18n="1" name="ShowDatesDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/PlaybackOptionsDialog.wxs" src="PlaybackOptionsDialog.cpp" hdr="PlaybackOptionsDialog.h" fwddecl="0" i18n="1" name="PlaybackOptionsDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ModelDialog.wxs" src="ModelDialog.cpp" hdr="ModelDialog.h" fwddecl="0" i18n="1" name="ModelDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ModelListDialog.wxs" src="ModelListDialog.cpp" hdr="ModelListDialog.h" fwddecl="0" i18n="1" name="ModelListDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EffectListDialog.wxs" src="EffectListDialog.cpp" hdr="EffectListDialog.h" fwddecl="0" i18n="1" name="EffectListDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChannelLayoutDialog.wxs" src="ChannelLayoutDialog.cpp" hdr="ChannelLayoutDialog.h" fwddecl="0" i18n="1" name="ChannelLayoutDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

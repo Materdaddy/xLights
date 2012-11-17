@@ -102,7 +102,6 @@ void xLightsFrame::SetDir(const wxString& newdir)
     wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Networks") );
     root->AddAttribute( wxT("computer"), wxGetHostName());
     NetworkXML.SetRoot( root ); // reset xml
-    UpdateLorMapping();
     networkFile.AssignDir( CurrentDir );
     networkFile.SetFullName(_(XLIGHTS_NETWORK_FILE));
     if (networkFile.FileExists()) {
@@ -121,20 +120,17 @@ void xLightsFrame::SetDir(const wxString& newdir)
         LoadScheduleFile();
     }
     DisplaySchedule();
-    Notebook1->ChangeSelection(SETUPTAB);
-}
 
-void xLightsFrame::UpdateLorMapping()
-{
-    wxXmlNode* root=NetworkXML.GetRoot();
-    wxString LorMappingStr = RadioButtonLorMapMulti->GetValue() ? wxT("2") : wxT("1");
-    root->DeleteAttribute(wxT("LorMapping"));
-    root->AddAttribute( wxT("LorMapping"), LorMappingStr);
+    // load sequence effects
+    LoadEffectsFile();
+    PresetsSelect();
+
+    Notebook1->ChangeSelection(SETUPTAB);
 }
 
 void xLightsFrame::UpdateNetworkList()
 {
-    long newidx,LorMapping,MaxChannels;
+    long newidx,MaxChannels;
     TotChannels=0;
     int NetCnt=0;
     //int MaxLorChannels=240*16;
@@ -143,13 +139,6 @@ void xLightsFrame::UpdateNetworkList()
     char c;
     wxString MaxChannelsStr,NetName,msg;
     wxXmlNode* e=NetworkXML.GetRoot();
-    wxString LorMappingStr=e->GetAttribute(wxT("LorMapping"), wxT("2"));
-    LorMappingStr.ToLong(&LorMapping);
-    if (LorMapping == XLIGHTS_LORMAP_SINGLE) {
-        RadioButtonLorMapSingle->SetValue(true);
-    } else {
-        RadioButtonLorMapMulti->SetValue(true);
-    }
     GridNetwork->DeleteAllItems();
     CheckListBoxTestChannels->Clear();
     NetMaxChannel.clear();
@@ -173,7 +162,7 @@ void xLightsFrame::UpdateNetworkList()
             }
 
             // LOR mapping
-            if (LorMapping == XLIGHTS_LORMAP_SINGLE || NetCnt==1) {
+            if (NetCnt==1) {
                 msg=_("LOR Regular");
                 if (TotChannels <= MaxDmxChannels) msg+=_(" or Univ 1");
             } else if (NetCnt <= 16) {
@@ -489,12 +478,6 @@ void xLightsFrame::SetupDongle(wxXmlNode* e)
 void xLightsFrame::OnButtonAddDongleClick(wxCommandEvent& event)
 {
     SetupDongle(0);
-}
-
-void xLightsFrame::OnRadioButtonLorMapClick(wxCommandEvent& event)
-{
-    UpdateLorMapping();
-    UpdateNetworkList();
 }
 
 void xLightsFrame::OnButtonSaveSetupClick(wxCommandEvent& event)
