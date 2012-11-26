@@ -52,7 +52,7 @@ public:
   wxString GetNetworkDesc();
   size_t GetChannelCount();
   virtual void SetChannelCount(size_t numchannels) = 0;
-  void InitSerialPort(const wxString& portname, int baudrate);
+  virtual void InitSerialPort(const wxString& portname, int baudrate);
   virtual void InitNetwork(const wxString& ipaddr, wxUint16 UniverseNumber, wxUint16 NetNum);
   void TimerStart(long msec);
   long GetTimer();

@@ -72,7 +72,7 @@ void xNetwork::ResetTimer() {
 
 
 // ***************************************************************************************
-// * This is the base class for all serial port (and virtual serial port) driven protocols
+// * This is the base class for all serial port (and virtual com port) driven protocols
 // ***************************************************************************************
 class xNetwork_Serial: public xNetwork {
 protected:

@@ -6,13 +6,26 @@
 
 #include <wx/string.h>
 
+#ifdef __WXMSW__
+#include <windows.h>
+#else
+#include <termios.h>
+#endif
+
 class SerialPort
 {
   protected:
-    int CloseDevice();
-    int OpenDevice( const wxString& portname, int baudrate, const char* protocol );
     wxString m_devname;
     int callback;  // used in basic script
+#ifdef __WXMSW__
+    HANDLE fd;
+    OVERLAPPED ov;
+    int rtsdtr_state;
+#else
+    int fd;
+    struct termios t;
+    speed_t AdaptBaudrate( int baud );
+#endif
 
   public:
     SerialPort();

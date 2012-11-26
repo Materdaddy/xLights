@@ -7,8 +7,6 @@
 // Licence:     wxWindows licence
 /////////////////////////////////////////////////////////////////////////////
 
-#include <string.h>
-#include <windows.h>
 
 // globals
 
@@ -33,46 +31,39 @@ enum SerialLineState
 };
 
 
- /*!
-\brief the win32 api equivalent for the Linux
-file descriptor
- */
-HANDLE SerialPort_fd;
-
- /*!
-\brief a special struct in the win32 api for controling
-an asynchronous serial communication through the com ports.
- */
-OVERLAPPED SerialPort_ov;
-
- /*!
-\brief The win32 API doesn't have any function to detect the
-current state of the output lines RST and DTR (if someone knows
-some function, please contact me).
-So we save the state always after changing one or both lines
-(for example, on Open, SetLineState and ChangeLineState)
- */
-int SerialPort_rtsdtr_state;
-
-
 // implementation of class methods
 
-int SerialPort::CloseDevice()
+SerialPort::SerialPort()
 {
-  if (SerialPort_fd != INVALID_HANDLE_VALUE) {
-    //::wxMessageBox(_("CloseDevice(): ") + m_devname, _("Debug"));
-    CloseHandle(SerialPort_ov.hEvent);
-    CloseHandle(SerialPort_fd);
-    SerialPort_fd = INVALID_HANDLE_VALUE;
-  }
-  return 0;
+    m_devname = wxT("");
+    callback = -1;
+    memset( &ov, 0, sizeof( OVERLAPPED ) );
+    fd = INVALID_HANDLE_VALUE;
+    rtsdtr_state = LinestateNull;
 };
 
-int SerialPort::OpenDevice(const wxString& devname, int baudrate, const char* protocol)
+SerialPort::~SerialPort()
+{
+    Close();
+};
+
+int SerialPort::Close()
+{
+    if (fd != INVALID_HANDLE_VALUE) {
+        //::wxMessageBox(_("CloseDevice(): ") + m_devname, _("Debug"));
+        CloseHandle(ov.hEvent);
+        CloseHandle(fd);
+        fd = INVALID_HANDLE_VALUE;
+    }
+    return 0;
+};
+
+// return 0 on success, negative value on error
+int SerialPort::Open(const wxString& devname, int baudrate, const char* protocol)
 {
   if (strlen(protocol) != 3) return -1;
 
-  SerialPort_fd = CreateFile(devname.c_str(),  // device name
+  fd = CreateFile(devname.c_str(),  // device name
     GENERIC_READ | GENERIC_WRITE,   // O_RDWR
     0,                              // not shared
     NULL,                           // default value for object security ?!?
@@ -80,7 +71,7 @@ int SerialPort::OpenDevice(const wxString& devname, int baudrate, const char* pr
     FILE_FLAG_OVERLAPPED,           // asynchron handling
     NULL);                          // no more handle flags
 
-  if(SerialPort_fd == INVALID_HANDLE_VALUE) {
+  if(fd == INVALID_HANDLE_VALUE) {
     return -1;
   }
   // save the device name
@@ -93,7 +84,7 @@ int SerialPort::OpenDevice(const wxString& devname, int baudrate, const char* pr
   dcb.BaudRate = baudrate;
   dcb.fBinary = 1;
 
-  SerialPort_rtsdtr_state = LinestateNull;
+  rtsdtr_state = LinestateNull;
 
   // Specifies whether the CTS (clear-to-send) signal is monitored
   // for output flow control. If this member is TRUE and CTS is turned
@@ -111,9 +102,9 @@ int SerialPort::OpenDevice(const wxString& devname, int baudrate, const char* pr
   //                       to adjust the line by using the
   //                       EscapeCommFunction function.
   dcb.fDtrControl = DTR_CONTROL_DISABLE;
-  SerialPort_rtsdtr_state |= LinestateDtr;
+  rtsdtr_state |= LinestateDtr;
   dcb.fRtsControl = RTS_CONTROL_DISABLE;
-  SerialPort_rtsdtr_state |= LinestateRts;
+  rtsdtr_state |= LinestateRts;
 
   // Specifies the XON/XOFF flow control.
   // If fOutX is true (the default is false), transmission stops when the
@@ -153,122 +144,110 @@ int SerialPort::OpenDevice(const wxString& devname, int baudrate, const char* pr
   // wordlen, valid values are 5,6,7,8
   dcb.ByteSize = protocol[0] - '0';
 
-  if (!SetCommState(SerialPort_fd,&dcb)) return -2;
+  if (!SetCommState(fd,&dcb)) return -2;
 
   // create event for overlapped I/O
   // we need a event object, which inform us about the
   // end of an operation (here reading device)
-  SerialPort_ov.hEvent = CreateEvent(NULL, // LPSECURITY_ATTRIBUTES lpsa
+  ov.hEvent = CreateEvent(NULL, // LPSECURITY_ATTRIBUTES lpsa
       TRUE,  // BOOL fManualReset
       TRUE,  // BOOL fInitialState
       NULL); // LPTSTR lpszEventName
-  if(SerialPort_ov.hEvent == INVALID_HANDLE_VALUE) {
+  if(ov.hEvent == INVALID_HANDLE_VALUE) {
     return -3;
   }
 
   /* THIS IS OBSOLETE!!!
   // event should be triggered, if there are some received data
-  if(!SetCommMask(SerialPort_fd,EV_RXCHAR))
+  if(!SetCommMask(fd,EV_RXCHAR))
   return -4;
   */
 
   COMMTIMEOUTS cto = {MAXDWORD,0,0,0,0};
-  if(!SetCommTimeouts(SerialPort_fd,&cto)) return -5;
+  if(!SetCommTimeouts(fd,&cto)) return -5;
 
   // for a better performance with win95/98 I increased the internal
   // buffer to SERIALPORT_BUFSIZE (normal size is 1024, but this can
   // be a little bit to small, if you use a higher baudrate like 115200)
-  if(!SetupComm(SerialPort_fd,SERIALPORT_BUFSIZE/2,SERIALPORT_BUFSIZE)) return -6;
+  if(!SetupComm(fd,SERIALPORT_BUFSIZE/2,SERIALPORT_BUFSIZE)) return -6;
 
   return 0;
 };
 
 
-SerialPort::SerialPort()
-{
-  memset( &SerialPort_ov, 0, sizeof( OVERLAPPED ) );
-  SerialPort_fd = INVALID_HANDLE_VALUE;
-  SerialPort_rtsdtr_state = LinestateNull;
-};
-
-SerialPort::~SerialPort()
-{
-  Close();
-};
-
 bool SerialPort::IsOpen()
 {
-  return (SerialPort_fd != INVALID_HANDLE_VALUE);
+    return (fd != INVALID_HANDLE_VALUE);
 };
 
 
 int SerialPort::AvailableToRead()
 {
-  COMSTAT comStat;
-  DWORD   dwErrors;
-  // Get and clear current errors on the port.
-  if (!ClearCommError(SerialPort_fd, &dwErrors, &comStat))
-      // Report error in ClearCommError.
-      return 0;
-  return comStat.cbInQue;
+    COMSTAT comStat;
+    DWORD   dwErrors;
+    // Get and clear current errors on the port.
+    if (!ClearCommError(fd, &dwErrors, &comStat)) {
+        // Report error in ClearCommError.
+        return 0;
+    }
+    return comStat.cbInQue;
 };
 
 int SerialPort::WaitingToWrite()
 {
-  COMSTAT comStat;
-  DWORD   dwErrors;
-  // Get and clear current errors on the port.
-  if (!ClearCommError(SerialPort_fd, &dwErrors, &comStat))
-      // Report error in ClearCommError.
-      return 0;
-  return comStat.cbOutQue;
+    COMSTAT comStat;
+    DWORD   dwErrors;
+    // Get and clear current errors on the port.
+    if (!ClearCommError(fd, &dwErrors, &comStat)) {
+        // Report error in ClearCommError.
+        return 0;
+    }
+    return comStat.cbOutQue;
 };
 
 int SerialPort::Read(char* buf,size_t len)
 {
-  DWORD read;
-  if(!ReadFile(SerialPort_fd,buf,len,&read,&SerialPort_ov)) {
-    // if we use a asynchrone reading, ReadFile always gives FALSE
-    // ERROR_IO_PENDING means ok, other values show an error
-    if(GetLastError() != ERROR_IO_PENDING) {
-      // oops..., error in communication
-      return -1;
+    DWORD read;
+    if(!ReadFile(fd,buf,len,&read,&ov)) {
+        // if we use a asynchrone reading, ReadFile always gives FALSE
+        // ERROR_IO_PENDING means ok, other values show an error
+        if(GetLastError() != ERROR_IO_PENDING) {
+          // oops..., error in communication
+          return -1;
+        }
+    } else {
+        // ok, we have read all wanted bytes
+        return (int)read;
     }
-  }
-  else {
-    // ok, we have read all wanted bytes
-    return (int)read;
-  }
-  return 0;
+    return 0;
 };
 
 int SerialPort::Write(char* buf,size_t len)
 {
- DWORD write;
- if(!WriteFile(SerialPort_fd,buf,len,&write,&SerialPort_ov)) {
-  if(GetLastError() != ERROR_IO_PENDING) {
-   return -1;
-  }
-  else {
-   // VERY IMPORTANT to flush the data out of the internal
-   // buffer
-   //FlushFileBuffers(SerialPort_fd);
-   // first you must call GetOverlappedResult, then you
-   // get the REALLY transmitted count of bytes
-   //if(!GetOverlappedResult(SerialPort_fd,&SerialPort_ov,&write,TRUE)) {
-  // ooops... something is going wrong
-  //return (int)write;
-   //}
-  }
- }
- return write;
+    DWORD write;
+    if(!WriteFile(fd,buf,len,&write,&ov)) {
+        if(GetLastError() != ERROR_IO_PENDING) {
+            return -1;
+        } else {
+            // VERY IMPORTANT to flush the data out of the internal
+            // buffer
+            //FlushFileBuffers(fd);
+            // first you must call GetOverlappedResult, then you
+            // get the REALLY transmitted count of bytes
+            //if(!GetOverlappedResult(fd,&ov,&write,TRUE)) {
+            // ooops... something is going wrong
+            //return (int)write;
+            //}
+        }
+    }
+    return write;
 };
 
 int SerialPort::SendBreak()
 {
- if(!SetCommBreak(SerialPort_fd)) return -1;
- wxMilliSleep(1);
- if(!ClearCommBreak(SerialPort_fd)) return -1;
- // no error
- return 0;
+    if(!SetCommBreak(fd)) return -1;
+    wxMilliSleep(1);
+    if(!ClearCommBreak(fd)) return -1;
+    // no error
+    return 0;
 };
