@@ -114,12 +114,18 @@
 		<Unit filename="ModelDialog.h" />
 		<Unit filename="ModelListDialog.cpp" />
 		<Unit filename="ModelListDialog.h" />
+		<Unit filename="NetInfo.cpp" />
+		<Unit filename="NetInfo.h" />
+		<Unit filename="PaletteMgmtDialog.cpp" />
+		<Unit filename="PaletteMgmtDialog.h" />
 		<Unit filename="PixelBuffer.cpp" />
 		<Unit filename="PixelBuffer.h" />
 		<Unit filename="PlaybackOptionsDialog.cpp" />
 		<Unit filename="PlaybackOptionsDialog.h" />
 		<Unit filename="PlayerFrame.cpp" />
 		<Unit filename="PlayerFrame.h" />
+		<Unit filename="SeqParmsDialog.cpp" />
+		<Unit filename="SeqParmsDialog.h" />
 		<Unit filename="SerialPortWithRate.cpp" />
 		<Unit filename="SerialPortWithRate.h" />
 		<Unit filename="ShowDatesDialog.cpp" />
@@ -150,8 +156,10 @@
 			<Option target="ReleaseWindows" />
 		</Unit>
 		<Unit filename="wx_pch.h" />
+		<Unit filename="wxsmith/PaletteMgmtDialog.wxs" />
 		<Unit filename="wxsmith/PlaybackOptionsDialog.wxs" />
 		<Unit filename="wxsmith/PlayerFrame.wxs" />
+		<Unit filename="wxsmith/SeqParmsDialog.wxs" />
 		<Unit filename="wxsmith/xLightsframe.wxs" />
 		<Unit filename="xLightsApp.cpp" />
 		<Unit filename="xLightsApp.h" />
@@ -178,6 +186,8 @@
 					<wxDialog wxs="wxsmith/ModelListDialog.wxs" src="ModelListDialog.cpp" hdr="ModelListDialog.h" fwddecl="0" i18n="1" name="ModelListDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EffectListDialog.wxs" src="EffectListDialog.cpp" hdr="EffectListDialog.h" fwddecl="0" i18n="1" name="EffectListDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChannelLayoutDialog.wxs" src="ChannelLayoutDialog.cpp" hdr="ChannelLayoutDialog.h" fwddecl="0" i18n="1" name="ChannelLayoutDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/PaletteMgmtDialog.wxs" src="PaletteMgmtDialog.cpp" hdr="PaletteMgmtDialog.h" fwddecl="0" i18n="1" name="PaletteMgmtDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/SeqParmsDialog.wxs" src="SeqParmsDialog.cpp" hdr="SeqParmsDialog.h" fwddecl="0" i18n="1" name="SeqParmsDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

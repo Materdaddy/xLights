@@ -384,6 +384,7 @@ void xLightsFrame::ReadXlightsFile(const wxString& FileName)
 
 void xLightsFrame::ConversionInit()
 {
+    long TotChannels=NetInfo.GetTotChannels();
     mediaFilename.clear();
     ChannelNames.Clear();
     ChannelNames.Add(wxEmptyString, TotChannels);
@@ -576,28 +577,19 @@ void xLightsFrame::ReadLorFile(const char* filename)
                 } else {
                     chindex=(unit-1)*16+circuit-1;
                 }
-                if (chindex >= 0 && network < NetMaxChannel.size()) {
-                    if (chindex < NetMaxChannel[network]) {
-                        MappedChannelCnt++;
-                        curchannel = chindex;
-                        for (i=0; i < network; i++) {
-                            curchannel += NetMaxChannel[i];
-                        }
-                    } else {
-                        curchannel = -1;
-                    }
+                ChannelName = wxString::FromAscii( xml->getAttributeValueSafe("name") );
+                curchannel = NetInfo.CalcAbsChannel(network,chindex);
+                if (curchannel >= 0) {
                     //TextCtrlConversionStatus->AppendText(wxString::Format(_("curchannel %d\n"),curchannel));
-                    ChannelName = wxString::FromAscii( xml->getAttributeValueSafe("name") );
-                    if (curchannel < 0) {
-                        TextCtrlConversionStatus->AppendText(_("WARNING: channel '")+ChannelName+_("' is unmapped\n"));
-                    } else if (curchannel < TotChannels) {
-                        if (!ChannelNames[curchannel].IsEmpty()) {
-                            TextCtrlConversionStatus->AppendText(_("WARNING: ")+ChannelNames[curchannel]+_(" and ")+ChannelName+_(" map to the same channel\n"));
-                        }
-                        ChannelNames[curchannel] = ChannelName;
-                        ChannelColor = xml->getAttributeValueAsInt("color");
-                        ChannelColors[curchannel] = ChannelColor;
+                    if (!ChannelNames[curchannel].IsEmpty()) {
+                        TextCtrlConversionStatus->AppendText(_("WARNING: ")+ChannelNames[curchannel]+_(" and ")+ChannelName+_(" map to the same channel\n"));
                     }
+                    MappedChannelCnt++;
+                    ChannelNames[curchannel] = ChannelName;
+                    ChannelColor = xml->getAttributeValueAsInt("color");
+                    ChannelColors[curchannel] = ChannelColor;
+                } else {
+                    TextCtrlConversionStatus->AppendText(_("WARNING: channel '")+ChannelName+_("' is unmapped\n"));
                 }
             }
             if (cnt > 1 && context[1] == _("channels") && NodeName == _("effect") && curchannel >= 0 && SeqData) {

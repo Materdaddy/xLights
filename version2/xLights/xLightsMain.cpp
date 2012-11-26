@@ -221,7 +221,7 @@ const long xLightsFrame::ID_SLIDER_Meteors1_Count = wxNewId();
 const long xLightsFrame::ID_STATICTEXT43 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Meteors1_Length = wxNewId();
 const long xLightsFrame::ID_PANEL18 = wxNewId();
-const long xLightsFrame::ID_BUTTON42 = wxNewId();
+const long xLightsFrame::ID_BUTTON_PICTURES1_FILENAME = wxNewId();
 const long xLightsFrame::ID_TEXTCTRL_Pictures1_Filename = wxNewId();
 const long xLightsFrame::ID_STATICTEXT46 = wxNewId();
 const long xLightsFrame::ID_CHOICE_Pictures1_Direction = wxNewId();
@@ -249,6 +249,8 @@ const long xLightsFrame::ID_STATICTEXT54 = wxNewId();
 const long xLightsFrame::ID_TEXTCTRL_Text1_Line2 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT57 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Text1_Top = wxNewId();
+const long xLightsFrame::ID_BUTTON_TEXT1_FONT = wxNewId();
+const long xLightsFrame::ID_TEXTCTRL_TEXT1_FONT = wxNewId();
 const long xLightsFrame::ID_PANEL7 = wxNewId();
 const long xLightsFrame::ID_CHOICEBOOK1 = wxNewId();
 const long xLightsFrame::ID_BUTTON_Palette1 = wxNewId();
@@ -306,7 +308,7 @@ const long xLightsFrame::ID_SLIDER_Meteors2_Count = wxNewId();
 const long xLightsFrame::ID_STATICTEXT66 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Meteors2_Length = wxNewId();
 const long xLightsFrame::ID_PANEL21 = wxNewId();
-const long xLightsFrame::ID_BUTTON47 = wxNewId();
+const long xLightsFrame::ID_BUTTON_PICTURES2_FILENAME = wxNewId();
 const long xLightsFrame::ID_TEXTCTRL_Pictures2_Filename = wxNewId();
 const long xLightsFrame::ID_STATICTEXT67 = wxNewId();
 const long xLightsFrame::ID_CHOICE_Pictures2_Direction = wxNewId();
@@ -334,6 +336,8 @@ const long xLightsFrame::ID_STATICTEXT75 = wxNewId();
 const long xLightsFrame::ID_TEXTCTRL_Text2_Line2 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT76 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Text2_Top = wxNewId();
+const long xLightsFrame::ID_BUTTON_TEXT2_FONT = wxNewId();
+const long xLightsFrame::ID_TEXTCTRL_TEXT2_FONT = wxNewId();
 const long xLightsFrame::ID_PANEL29 = wxNewId();
 const long xLightsFrame::ID_CHOICEBOOK2 = wxNewId();
 const long xLightsFrame::ID_BUTTON_Palette2 = wxNewId();
@@ -438,6 +442,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer62;
     wxFlexGridSizer* FlexGridSizer56;
     wxFlexGridSizer* FlexGridSizer9;
+    wxFlexGridSizer* FlexGridSizer66;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
     wxFlexGridSizer* FlexGridSizer53;
@@ -480,6 +485,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer17;
     wxStaticBoxSizer* StaticBoxSizer5;
     wxFlexGridSizer* FlexGridSizer32;
+    wxFlexGridSizer* FlexGridSizer65;
     wxFlexGridSizer* FlexGridSizer42;
     wxFlexGridSizer* FlexGridSizer58;
     wxFlexGridSizer* FlexGridSizer64;
@@ -771,7 +777,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     PanelConvert = new wxPanel(Notebook1, ID_PANEL_CONVERT, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_CONVERT"));
     FlexGridSizerConvert = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizerConvert->AddGrowableCol(0);
-    StaticText14 = new wxStaticText(PanelConvert, ID_STATICTEXT14, _("xLights File Converter"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+    StaticText14 = new wxStaticText(PanelConvert, ID_STATICTEXT14, _("Palette Management"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     wxFont StaticText14Font(12,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText14->SetFont(StaticText14Font);
     FlexGridSizerConvert->Add(StaticText14, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 10);
@@ -836,6 +842,8 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer30->Add(ScrolledWindow1, 1, wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 0);
     FlexGridSizer3->Add(FlexGridSizer30, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer32 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer32->AddGrowableCol(0);
+    FlexGridSizer32->AddGrowableRow(1);
     GridSizer1 = new wxGridSizer(2, 3, 0, 0);
     Button_PlaySelection = new wxButton(PanelSequence, ID_BUTTON5, _("Play Selection"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     Button_PlaySelection->SetBackgroundColour(wxColour(0,255,0));
@@ -843,21 +851,21 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Button_DisplayElements = new wxButton(PanelSequence, ID_BUTTON1, _("Display Elements"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     Button_DisplayElements->SetBackgroundColour(wxColour(224,224,224));
     GridSizer1->Add(Button_DisplayElements, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    Button_Open = new wxButton(PanelSequence, ID_BUTTON11, _("Open Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
-    Button_Open->SetBackgroundColour(wxColour(224,224,224));
-    GridSizer1->Add(Button_Open, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
+    ButtonOpenSequence = new wxButton(PanelSequence, ID_BUTTON11, _("Open Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
+    ButtonOpenSequence->SetBackgroundColour(wxColour(224,224,224));
+    GridSizer1->Add(ButtonOpenSequence, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     Button_PlayAll = new wxButton(PanelSequence, ID_BUTTON6, _("Play All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     Button_PlayAll->SetBackgroundColour(wxColour(0,255,0));
     GridSizer1->Add(Button_PlayAll, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     Button_TimeSlots = new wxButton(PanelSequence, ID_BUTTON2, _("Time Slots"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     Button_TimeSlots->SetBackgroundColour(wxColour(224,224,224));
     GridSizer1->Add(Button_TimeSlots, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    Button_Save = new wxButton(PanelSequence, ID_BUTTON12, _("Save Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
-    Button_Save->SetBackgroundColour(wxColour(224,224,224));
-    GridSizer1->Add(Button_Save, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    FlexGridSizer32->Add(GridSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    ButtonSaveSequence = new wxButton(PanelSequence, ID_BUTTON12, _("Save Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
+    ButtonSaveSequence->SetBackgroundColour(wxColour(224,224,224));
+    GridSizer1->Add(ButtonSaveSequence, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
+    FlexGridSizer32->Add(GridSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     Grid1 = new wxGrid(PanelSequence, ID_GRID1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_GRID1"));
-    Grid1->CreateGrid(6,2);
+    Grid1->CreateGrid(0,2);
     Grid1->EnableEditing(true);
     Grid1->EnableGridLines(true);
     Grid1->SetRowLabelSize(35);
@@ -865,7 +873,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Grid1->SetColLabelValue(1, _("Label"));
     Grid1->SetDefaultCellFont( Grid1->GetFont() );
     Grid1->SetDefaultCellTextColour( Grid1->GetForegroundColour() );
-    FlexGridSizer32->Add(Grid1, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    FlexGridSizer32->Add(Grid1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     FlexGridSizer3->Add(FlexGridSizer32, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, PanelSequence, _("Combined Effect"));
     FlexGridSizer33 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -884,10 +892,10 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Choice_Presets = new wxChoice(PanelSequence, ID_CHOICE2, wxDefaultPosition, wxDefaultSize, 0, 0, wxCB_SORT, wxDefaultValidator, _T("ID_CHOICE2"));
     FlexGridSizer33->Add(Choice_Presets, 1, wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer33->Add(-1,-1,1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Button_PresetAdd = new wxButton(PanelSequence, ID_BUTTON9, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON9"));
+    Button_PresetAdd = new wxButton(PanelSequence, ID_BUTTON9, _("Add Preset"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON9"));
     Button_PresetAdd->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer33->Add(Button_PresetAdd, 1, wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Button_PresetUpdate = new wxButton(PanelSequence, ID_BUTTON8, _("Update"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
+    Button_PresetUpdate = new wxButton(PanelSequence, ID_BUTTON8, _("Update Preset"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     Button_PresetUpdate->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer33->Add(Button_PresetUpdate, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Button_UpdateGrid = new wxButton(PanelSequence, ID_BUTTON10, _("Update Grid"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
@@ -1033,10 +1041,10 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Panel1_Pictures = new wxPanel(Choicebook1, ID_PANEL20, wxPoint(18,7), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL20"));
     FlexGridSizer42 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer42->AddGrowableCol(0);
-    Button_Pictures1_Filename = new wxButton(Panel1_Pictures, ID_BUTTON42, _("File name"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON42"));
+    Button_Pictures1_Filename = new wxButton(Panel1_Pictures, ID_BUTTON_PICTURES1_FILENAME, _("File name"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_PICTURES1_FILENAME"));
     Button_Pictures1_Filename->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer42->Add(Button_Pictures1_Filename, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
-    TextCtrl_Pictures1_Filename = new wxTextCtrl(Panel1_Pictures, ID_TEXTCTRL_Pictures1_Filename, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL_Pictures1_Filename"));
+    TextCtrl_Pictures1_Filename = new wxTextCtrl(Panel1_Pictures, ID_TEXTCTRL_Pictures1_Filename, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_Pictures1_Filename"));
     FlexGridSizer42->Add(TextCtrl_Pictures1_Filename, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
     FlexGridSizer31 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticText46 = new wxStaticText(Panel1_Pictures, ID_STATICTEXT46, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT46"));
@@ -1098,22 +1106,30 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer45->Fit(Panel1_Spirals);
     FlexGridSizer45->SetSizeHints(Panel1_Spirals);
     Panel1_Text = new wxPanel(Choicebook1, ID_PANEL7, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL7"));
-    FlexGridSizer46 = new wxFlexGridSizer(0, 2, 0, 0);
-    FlexGridSizer46->AddGrowableCol(1);
+    FlexGridSizer46 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer46->AddGrowableCol(0);
+    FlexGridSizer65 = new wxFlexGridSizer(0, 2, 0, 0);
+    FlexGridSizer65->AddGrowableCol(1);
     StaticText53 = new wxStaticText(Panel1_Text, ID_STATICTEXT53, _("Line 1"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT53"));
-    FlexGridSizer46->Add(StaticText53, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer65->Add(StaticText53, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     TextCtrl_Text1_Line1 = new wxTextCtrl(Panel1_Text, ID_TEXTCTRL_Text1_Line1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL_Text1_Line1"));
     TextCtrl_Text1_Line1->SetMaxLength(32);
-    FlexGridSizer46->Add(TextCtrl_Text1_Line1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer65->Add(TextCtrl_Text1_Line1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText54 = new wxStaticText(Panel1_Text, ID_STATICTEXT54, _("Line 2"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT54"));
-    FlexGridSizer46->Add(StaticText54, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer65->Add(StaticText54, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     TextCtrl_Text1_Line2 = new wxTextCtrl(Panel1_Text, ID_TEXTCTRL_Text1_Line2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL_Text1_Line2"));
     TextCtrl_Text1_Line2->SetMaxLength(32);
-    FlexGridSizer46->Add(TextCtrl_Text1_Line2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    StaticText57 = new wxStaticText(Panel1_Text, ID_STATICTEXT57, _("Top of Text"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT57"));
-    FlexGridSizer46->Add(StaticText57, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer65->Add(TextCtrl_Text1_Line2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    StaticText57 = new wxStaticText(Panel1_Text, ID_STATICTEXT57, _("Top"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT57"));
+    FlexGridSizer65->Add(StaticText57, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Slider_Text1_Top = new wxSlider(Panel1_Text, ID_SLIDER_Text1_Top, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Text1_Top"));
-    FlexGridSizer46->Add(Slider_Text1_Top, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer65->Add(Slider_Text1_Top, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer46->Add(FlexGridSizer65, 1, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Button_Text1_Font = new wxButton(Panel1_Text, ID_BUTTON_TEXT1_FONT, _("Font"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEXT1_FONT"));
+    Button_Text1_Font->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer46->Add(Button_Text1_Font, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    TextCtrl_Text1_Font = new wxTextCtrl(Panel1_Text, ID_TEXTCTRL_TEXT1_FONT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_TEXT1_FONT"));
+    FlexGridSizer46->Add(TextCtrl_Text1_Font, 1, wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel1_Text->SetSizer(FlexGridSizer46);
     FlexGridSizer46->Fit(Panel1_Text);
     FlexGridSizer46->SetSizeHints(Panel1_Text);
@@ -1307,10 +1323,10 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Panel2_Pictures = new wxPanel(Choicebook2, ID_PANEL23, wxPoint(3,25), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL23"));
     FlexGridSizer57 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer57->AddGrowableCol(0);
-    Button_Pictures2_Filename = new wxButton(Panel2_Pictures, ID_BUTTON47, _("File name"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON47"));
+    Button_Pictures2_Filename = new wxButton(Panel2_Pictures, ID_BUTTON_PICTURES2_FILENAME, _("File name"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_PICTURES2_FILENAME"));
     Button_Pictures2_Filename->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer57->Add(Button_Pictures2_Filename, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
-    TextCtrl_Pictures2_Filename = new wxTextCtrl(Panel2_Pictures, ID_TEXTCTRL_Pictures2_Filename, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL_Pictures2_Filename"));
+    TextCtrl_Pictures2_Filename = new wxTextCtrl(Panel2_Pictures, ID_TEXTCTRL_Pictures2_Filename, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_Pictures2_Filename"));
     FlexGridSizer57->Add(TextCtrl_Pictures2_Filename, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
     FlexGridSizer64 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText65 = new wxStaticText(Panel2_Pictures, ID_STATICTEXT67, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT67"));
@@ -1372,22 +1388,30 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer60->Fit(Panel2_Spirals);
     FlexGridSizer60->SetSizeHints(Panel2_Spirals);
     Panel2_Text = new wxPanel(Choicebook2, ID_PANEL29, wxPoint(31,4), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL29"));
-    FlexGridSizer61 = new wxFlexGridSizer(0, 2, 0, 0);
-    FlexGridSizer61->AddGrowableCol(1);
+    FlexGridSizer61 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer61->AddGrowableCol(0);
+    FlexGridSizer66 = new wxFlexGridSizer(0, 2, 0, 0);
+    FlexGridSizer66->AddGrowableCol(1);
     StaticText72 = new wxStaticText(Panel2_Text, ID_STATICTEXT74, _("Line 1"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT74"));
-    FlexGridSizer61->Add(StaticText72, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer66->Add(StaticText72, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     TextCtrl_Text2_Line1 = new wxTextCtrl(Panel2_Text, ID_TEXTCTRL_Text2_Line1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL_Text2_Line1"));
     TextCtrl_Text2_Line1->SetMaxLength(32);
-    FlexGridSizer61->Add(TextCtrl_Text2_Line1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer66->Add(TextCtrl_Text2_Line1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText73 = new wxStaticText(Panel2_Text, ID_STATICTEXT75, _("Line 2"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT75"));
-    FlexGridSizer61->Add(StaticText73, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer66->Add(StaticText73, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     TextCtrl_Text2_Line2 = new wxTextCtrl(Panel2_Text, ID_TEXTCTRL_Text2_Line2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL_Text2_Line2"));
     TextCtrl_Text2_Line2->SetMaxLength(32);
-    FlexGridSizer61->Add(TextCtrl_Text2_Line2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    StaticText74 = new wxStaticText(Panel2_Text, ID_STATICTEXT76, _("Top of Text"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT76"));
-    FlexGridSizer61->Add(StaticText74, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer66->Add(TextCtrl_Text2_Line2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    StaticText74 = new wxStaticText(Panel2_Text, ID_STATICTEXT76, _("Top"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT76"));
+    FlexGridSizer66->Add(StaticText74, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Slider_Text2_Top = new wxSlider(Panel2_Text, ID_SLIDER_Text2_Top, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Text2_Top"));
-    FlexGridSizer61->Add(Slider_Text2_Top, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer66->Add(Slider_Text2_Top, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    FlexGridSizer61->Add(FlexGridSizer66, 1, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Button_Text2_Font = new wxButton(Panel2_Text, ID_BUTTON_TEXT2_FONT, _("Font"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEXT2_FONT"));
+    Button_Text2_Font->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer61->Add(Button_Text2_Font, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    TextCtrl_Text2_Font = new wxTextCtrl(Panel2_Text, ID_TEXTCTRL_TEXT2_FONT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_TEXT2_FONT"));
+    FlexGridSizer61->Add(TextCtrl_Text2_Font, 1, wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2_Text->SetSizer(FlexGridSizer61);
     FlexGridSizer61->Fit(Panel2_Text);
     FlexGridSizer61->SetSizeHints(Panel2_Text);
@@ -1647,7 +1671,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON_CHOOSE_FILE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonChooseFileClick);
     Connect(ID_BUTTON_START_CONVERSION,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonStartConversionClick);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlaySelectionClick);
+    Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonOpenSequenceClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayAllClick);
+    Connect(ID_BUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonSaveSequenceClick);
     Connect(ID_BUTTON58,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ModelsClick);
     Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayEffectClick);
     Connect(ID_BUTTON59,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetsClick);
@@ -1656,6 +1682,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetUpdateClick);
     Connect(ID_CHOICE_LayerMethod,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_LayerMethodSelect);
     Connect(ID_BUTTON56,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_SaveEffectsClick);
+    Connect(ID_BUTTON_PICTURES1_FILENAME,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Pictures1_FilenameClick);
+    Connect(ID_BUTTON_TEXT1_FONT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Text1_FontClick);
+    Connect(ID_BUTTON_Palette1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Palette1Click);
     Connect(ID_CHECKBOX_Palette1_1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
     Connect(ID_BUTTON_Palette1_1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
@@ -1668,6 +1697,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON_Palette1_5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_6,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
     Connect(ID_BUTTON_Palette1_6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
+    Connect(ID_BUTTON_PICTURES2_FILENAME,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Pictures2_FilenameClick);
+    Connect(ID_BUTTON_TEXT2_FONT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Text2_FontClick);
+    Connect(ID_BUTTON_Palette2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Palette2Click);
     Connect(ID_CHECKBOX_Palette2_1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
     Connect(ID_BUTTON_Palette2_1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
@@ -1781,20 +1813,19 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     basic.setFrame(this);
     PlayerDlg = new PlayerFrame(this, ID_PLAYER_DIALOG);
     UpdateShowDates(wxDateTime::Now(),wxDateTime::Now());
-    Timer1.Start(XTIMER_INTERVAL, wxTIMER_CONTINUOUS);
 
     if (RunFlag && !ShowEvents.IsEmpty()) {
         // open ports
-        Notebook1->ChangeSelection(SEQUENCETAB);
-        if (EnableOutputs()) {
-            CheckBoxLightOutput->SetValue(true);
-        }
+        Notebook1->ChangeSelection(SCHEDULETAB);
+        CheckBoxLightOutput->SetValue(true);
         CheckBoxRunSchedule->SetValue(true);
+        EnableOutputs();
         CheckRunSchedule();
     } else {
         Notebook1->ChangeSelection(SETUPTAB);
         EnableNetworkChanges();
     }
+    Timer1.Start(XTIMER_INTERVAL, wxTIMER_CONTINUOUS);
 }
 
 xLightsFrame::~xLightsFrame()
@@ -1805,7 +1836,7 @@ xLightsFrame::~xLightsFrame()
 
 void xLightsFrame::OnQuit(wxCommandEvent& event)
 {
-    //Close();
+    Close();
 }
 
 void xLightsFrame::OnAbout(wxCommandEvent& event)
@@ -1961,9 +1992,7 @@ void xLightsFrame::OnNotebook1PageChanged(wxNotebookEvent& event)
 void xLightsFrame::OnButtonLightsOffClick(wxCommandEvent& event)
 {
     TestButtonsOff();
-    if (CheckBoxLightOutput->IsChecked() && xout) {
-        xout->alloff();
-    }
+    if (xout) xout->alloff();
 }
 
 bool xLightsFrame::EnableOutputs()
@@ -2076,3 +2105,4 @@ void xLightsFrame::OnMenuItemSavePlaylistsSelected(wxCommandEvent& event)
 #include "TabConvert.cpp"
 #include "TabSchedule.cpp"
 #include "TabSequence.cpp"
+

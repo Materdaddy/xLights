@@ -30,6 +30,7 @@
 #include <wx/colour.h>
 #include <wx/scrolwin.h>
 #include <wx/dcclient.h>
+#include <wx/dcmemory.h>
 #include <wx/pen.h>
 #include <wx/xml/xml.h>
 
@@ -205,12 +206,16 @@ private:
     wxScrolledWindow* DrawWindow;
     MeteorList meteors[2];
     PaletteClass palette[2];
+    wxImage image[2];
+    wxString PictureName[2];
     long BarState[2];
     long ButterflyState[2];
     long ColorWashState[2];
     long GarlandsState[2];
     long MeteorState[2];
+    long PictureState[2];
     long SpiralState[2];
+    long TextState[2];
 
     void SetPixel(int layer, int x, int y, wxColour &color);
     void SetPixel(int layer, int x, int y, wxImage::HSVValue& hsv);
@@ -232,7 +237,6 @@ public:
     void SetPalette(int layer, wxColourVector& newcolors);
     void SetSpeed(int newspeed);
     void SetSparkle(int freq);
-    void SetBgColor(wxString& NewBgColor);
     void SetWindow(wxScrolledWindow* ScrolledWindow);
     void RenderBars(int layer, int BarCount, int Direction, bool Highlight, bool Show3D);
     void RenderButterfly(int layer, int ColorScheme, int Style, int Chunks, int Skip);
@@ -241,11 +245,11 @@ public:
     void RenderGarlands(int layer, int GarlandType, int Spacing);
     void RenderLife(int layer, int Count, int Seed);
     void RenderMeteors(int layer, int MeteorType, int Count, int Length);
-    void RenderPictures(int layer);
+    void RenderPictures(int layer, int dir, const wxString& NewPictureName);
     void RenderSnowflakes(int layer);
     void RenderSnowstorm(int layer, int Count, int Length);
     void RenderSpirals(int layer, int Count, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
-    void RenderText(int layer, int Top, wxString& Line1, wxString& Line2);
+    void RenderText(int layer, int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString);
     void DisplayOutput();
 };
 

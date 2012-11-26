@@ -888,7 +888,7 @@ void xLightsFrame::OnMenuItemDelListSelected(wxCommandEvent& event)
         return;
     }
     int result = wxMessageBox(_("Are you sure you want to delete '") + Notebook1->GetPageText(idx) + _("'?"), _("Delete Playlist"), wxOK | wxCANCEL | wxCENTER);
-    if (result != wxID_OK) return;
+    if (result != wxOK) return;
     Notebook1->DeletePage(idx);
     UnsavedChanges=true;
 }

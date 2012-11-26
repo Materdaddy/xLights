@@ -199,11 +199,6 @@ void PixelBufferClass::SetSpeed(int newspeed)
     Speed=newspeed;
 }
 
-void PixelBufferClass::SetBgColor(wxString& NewBgColor)
-{
-
-}
-
 void PixelBufferClass::RenderBars(int layer, int BarCount, int Direction, bool Highlight, bool Show3D)
 {
     int x,y,n,pixel_ratio,ColorIdx;
@@ -326,13 +321,13 @@ void PixelBufferClass::RenderGarlands(int layer, int GarlandType, int Spacing)
     double ratio;
     wxColour color;
     int PixelSpacing=Spacing*BufferHt/100+3;
-    int limit=BufferHt*PixelSpacing;
-    GarlandsState[layer]=(GarlandsState[layer] + Speed*PixelSpacing/20 + 1) % limit;
+    int limit=BufferHt*PixelSpacing*4;
+    GarlandsState[layer]=(GarlandsState[layer] + Speed) % limit;
     // ring=0 is the top ring
     for (ring=0; ring<BufferHt; ring++) {
         ratio=double(ring)/double(BufferHt);
         GetMultiColorBlend(layer, ratio, false, color);
-        y=limit - ring*PixelSpacing - GarlandsState[layer];
+        y=(limit - GarlandsState[layer])/4 - ring*PixelSpacing;
         ylimit=BufferHt-ring-1;
         for (x=0; x<BufferWi; x++) {
             yadj=y;
@@ -432,9 +427,56 @@ void PixelBufferClass::RenderMeteors(int layer, int MeteorType, int Count, int L
     meteors[layer].remove_if(MeteorHasExpired(TailLength));
 }
 
-void PixelBufferClass::RenderPictures(int layer)
+void PixelBufferClass::RenderPictures(int layer, int dir, const wxString& NewPictureName)
 {
+    const int speedfactor=4;
+    if (NewPictureName != PictureName[layer]) {
+        if (!image[layer].LoadFile(NewPictureName)) {
+            //wxMessageBox("Error loading image file: "+NewPictureName);
+            image[layer].Clear();
+        }
+        PictureName[layer]=NewPictureName;
+    }
+    if (!image[layer].IsOk()) return;
+    int imgwidth=image[layer].GetWidth();
+    int imght=image[layer].GetHeight();
+    int yoffset=(BufferHt+imght)/2;
+    int xoffset=(imgwidth-BufferWi)/2;
+    int limit=(dir < 2) ? imgwidth+BufferWi : imght+BufferHt;
+    PictureState[layer]=(PictureState[layer]+Speed) % (limit*speedfactor);
+    int movement=PictureState[layer]/speedfactor;
 
+    // copy image to buffer
+    wxColour c;
+    for(int x=0; x<imgwidth; x++) {
+        for(int y=0; y<imght; y++) {
+            if (!image[layer].IsTransparent(x,y)) {
+                c.Set(image[layer].GetRed(x,y),image[layer].GetGreen(x,y),image[layer].GetBlue(x,y));
+                switch (dir) {
+                    case 0:
+                        // left
+                        SetPixel(layer,x+BufferWi-movement,yoffset-y,c);
+                        break;
+                    case 1:
+                        // right
+                        SetPixel(layer,x+movement-imgwidth,yoffset-y,c);
+                        break;
+                    case 2:
+                        // up
+                        SetPixel(layer,x-xoffset,movement-y,c);
+                        break;
+                    case 3:
+                        // down
+                        SetPixel(layer,x-xoffset,BufferHt+imght-y-movement,c);
+                        break;
+                    default:
+                        // no movement - centered
+                        SetPixel(layer,x-xoffset,yoffset-y,c);
+                        break;
+                }
+            }
+        }
+    }
 }
 
 void PixelBufferClass::RenderSnowflakes(int layer)
@@ -484,9 +526,33 @@ void PixelBufferClass::RenderSpirals(int layer, int Count, int Direction, int Ro
     }
 }
 
-void PixelBufferClass::RenderText(int layer, int Top, wxString& Line1, wxString& Line2)
+void PixelBufferClass::RenderText(int layer, int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString)
 {
+    wxColour c;
+    wxBitmap bitmap(BufferWi,BufferHt);
+    wxMemoryDC dc(bitmap);
+    wxFont font;
+    font.SetNativeFontInfoUserDesc(FontString);
+    dc.SetFont(font);
+    palette[layer].GetColor(0,c);
+    dc.SetTextForeground(c);
+    wxString msg = Line1;
+    if (!Line2.IsEmpty()) msg+=wxT("\n")+Line2;
+    wxSize sz1 = dc.GetTextExtent(Line1);
+    wxSize sz2 = dc.GetTextExtent(Line2);
+    int maxwidth=sz1.GetWidth() > sz2.GetWidth() ? sz1.GetWidth() : sz2.GetWidth();
+    int dctop=Top * BufferHt / 50 - BufferHt/2;
+    int limit=(BufferWi+maxwidth)*8 + 1;
+    TextState[layer]=(TextState[layer] + Speed) % limit;
+    dc.DrawText(msg,BufferWi-TextState[layer]/8,dctop);
 
+    // copy dc to buffer
+    for(wxCoord x=0; x<BufferWi; x++) {
+        for(wxCoord y=0; y<BufferHt; y++) {
+            dc.GetPixel(x,BufferHt-y-1,&c);
+            SetPixel(layer,x,y,c);
+        }
+    }
 }
 
 void PixelBufferClass::DisplayOutput()

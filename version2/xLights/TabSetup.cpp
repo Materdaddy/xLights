@@ -1,10 +1,4 @@
-/*
- * ********************************************
- * ********************************************
- * Process Setup Panel Events
- * ********************************************
- * ********************************************
- */
+// Process Setup Panel Events
 
 void xLightsFrame::OnMenuMRU(wxCommandEvent& event)
 {
@@ -131,17 +125,18 @@ void xLightsFrame::SetDir(const wxString& newdir)
 void xLightsFrame::UpdateNetworkList()
 {
     long newidx,MaxChannels;
-    TotChannels=0;
+    long TotChannels=0;
     int NetCnt=0;
     //int MaxLorChannels=240*16;
     int MaxDmxChannels=512;
     int StartChannel,ch;
     char c;
+    wxArrayString ChNames;
+
     wxString MaxChannelsStr,NetName,msg;
     wxXmlNode* e=NetworkXML.GetRoot();
     GridNetwork->DeleteAllItems();
-    CheckListBoxTestChannels->Clear();
-    NetMaxChannel.clear();
+    NetInfo.Clear();
     for( e=e->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == wxT("network")) {
             NetName=e->GetAttribute(wxT("NetworkType"), wxT(""));
@@ -151,15 +146,10 @@ void xLightsFrame::UpdateNetworkList()
             MaxChannelsStr=e->GetAttribute(wxT("MaxChannels"), wxT("0"));
             GridNetwork->SetItem(newidx,3,MaxChannelsStr);
             MaxChannelsStr.ToLong(&MaxChannels);
-            NetMaxChannel.push_back(MaxChannels);
+            NetInfo.AddNetwork(MaxChannels);
             StartChannel=TotChannels+1;
+            TotChannels+=MaxChannels;
             NetCnt++;
-
-            // Load channel list on Test tab
-            for(ch=1; ch<=MaxChannels; ch++) {
-                TotChannels++;
-                CheckListBoxTestChannels->Append(wxString::Format(_("Ch %d: Net %d #%d"),TotChannels,NetCnt,ch));
-            }
 
             // LOR mapping
             if (NetCnt==1) {
@@ -183,6 +173,10 @@ void xLightsFrame::UpdateNetworkList()
     }
     //GridNetwork->SetColumnWidth(0,wxLIST_AUTOSIZE);
     GridNetwork->SetColumnWidth(1,NetCnt > 0 ? wxLIST_AUTOSIZE : 100);
+
+    // reset test channel listbox
+    NetInfo.GetAllChannelNames(ChNames);
+    CheckListBoxTestChannels->Set(ChNames);
 }
 
 void xLightsFrame::OnMenuOpenFolderSelected(wxCommandEvent& event)
