@@ -155,6 +155,20 @@
 			<Option target="DebugWindows" />
 			<Option target="ReleaseWindows" />
 		</Unit>
+		<Unit filename="serial.cpp" />
+		<Unit filename="serial.h" />
+		<Unit filename="serial_osx.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="serial_posix.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="serial_win32.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="wx_pch.h" />
 		<Unit filename="wxsmith/PaletteMgmtDialog.wxs" />
 		<Unit filename="wxsmith/PlaybackOptionsDialog.wxs" />
@@ -169,6 +183,8 @@
 		</Unit>
 		<Unit filename="xLightsMain.cpp" />
 		<Unit filename="xLightsMain.h" />
+		<Unit filename="xlights_out.cpp" />
+		<Unit filename="xlights_out.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
