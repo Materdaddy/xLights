@@ -4,6 +4,7 @@
  */
 
 #include "../include/minibasic.cpp"
+#include "serial.h"
 
 
 class xlbasic: public MiniBasicClass {
@@ -12,7 +13,7 @@ protected:
 
     xLightsFrame* HostFrame;
     wxListCtrl* playlist;
-    std::vector<ctb::SerialPort> SerialPorts;
+    std::vector<SerialPort> SerialPorts;
     bool haltflag;
     int runstate;
     int playbackend_goto;
@@ -48,7 +49,7 @@ protected:
         if(!pSerialConfig) return 0;
         match(CPAREN);
 
-        ctb::SerialPort port;
+        SerialPort port;
         SerialPorts.push_back(port);
         int handle=SerialPorts.size()-1;
         int errcode=SerialPorts[handle].Open(portname, baudrate, pSerialConfig);

@@ -48,7 +48,7 @@
 #include <wx/dir.h>
 
 #include "../include/globals.h"
-#include "../include/xlights_out.cpp"
+#include "xlights_out.h"
 #include "PlayerFrame.h"
 #include "AddShowDialog.h"
 #include "ShowDatesDialog.h"

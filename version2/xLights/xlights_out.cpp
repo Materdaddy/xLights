@@ -24,70 +24,76 @@
     along with xLights.  If not, see <http://www.gnu.org/licenses/>.
  **************************************************************/
 
-#include "globals.h"
-#include "serial/serport.cpp"
-#include <vector>
-#include <time.h>
+#include "xlights_out.h"
 #include <wx/socket.h>
+#include "serial.h"
+
+bool xNetwork_E131_changed = false;
+
+// ***********************
+// * xNetwork (base class)
+// ***********************
+xNetwork::xNetwork() {
+  timer_msec=0;
+  num_channels=0;
+};
+
+xNetwork::~xNetwork() {
+};
+
+void xNetwork::SetNetworkDesc(wxString& NetworkDesc) {
+  netdesc=NetworkDesc;
+};
+
+wxString xNetwork::GetNetworkDesc() {
+  return netdesc;
+};
+
+size_t xNetwork::GetChannelCount() {
+  return num_channels;
+};
+
+void xNetwork::InitSerialPort(const wxString& portname, int baudrate) {
+};
+
+void xNetwork::InitNetwork(const wxString& ipaddr, wxUint16 UniverseNumber, wxUint16 NetNum) {
+};
+
+void xNetwork::TimerStart(long msec) {
+  timer_msec=msec;
+};
+
+long xNetwork::GetTimer() {
+  return timer_msec;
+};
+
+void xNetwork::ResetTimer() {
+};
 
 
-typedef std::pair<int, int> ChannelPair; // first is network #, second is channel #
-typedef std::vector<ChannelPair> ChannelVector;
-
-
-// *************************************************
-// * Base class to define a collection of channels
-// *************************************************
-class xNetwork {
+// ***************************************************************************************
+// * This is the base class for all serial port (and virtual serial port) driven protocols
+// ***************************************************************************************
+class xNetwork_Serial: public xNetwork {
 protected:
-  ctb::SerialPort* serptr;
+  SerialPort* serptr;
   char SerialConfig[4];
-  long timer_msec;
-  size_t num_channels;
-  wxString netdesc;
-  int datalen;
   bool changed;
 
 public:
-
-  xNetwork() {
+  xNetwork_Serial() {
     serptr=0;
-    timer_msec=0;
-    num_channels=0;
     strcpy(SerialConfig,"8N1");
   };
 
-  virtual ~xNetwork() {
+  virtual ~xNetwork_Serial() {
     if (serptr) delete serptr;
   };
-
-  void CloseSerialPort() {
-    if (serptr) serptr->Close();
-  };
-
-  bool TxEmpty() {
-    if (serptr) return (serptr->WaitingToWrite() == 0);
-    return true;
-  };
-
-  void SetNetworkDesc(wxString& NetworkDesc) {
-    netdesc=NetworkDesc;
-  };
-
-  wxString GetNetworkDesc() {
-    return netdesc;
-  };
-
-  size_t GetChannelCount() {
-    return num_channels;
-  };
-
-  virtual void SetChannelCount(size_t numchannels) = 0;
 
   void InitSerialPort(const wxString& portname, int baudrate) {
     static char errmsg[100];
     if (portname == wxT("NotConnected")) return;
-    serptr=new ctb::SerialPort();
+    serptr=new SerialPort();
     int errcode=serptr->Open(portname, baudrate, SerialConfig);
     if (errcode < 0) {
       sprintf(errmsg,"unable to open serial port, error code=%d",errcode);
@@ -95,35 +101,21 @@ public:
     }
   };
 
-  virtual void InitNetwork(const wxString& ipaddr, wxUint16 UniverseNumber, wxUint16 NetNum) {
+  bool TxEmpty() {
+    if (serptr) return (serptr->WaitingToWrite() == 0);
+    return true;
   };
-
-  void TimerStart(long msec) {
-    timer_msec=msec;
-  };
-
-  long GetTimer() {
-    return timer_msec;
-  };
-
-  virtual void TimerEnd() =0;
-
-  virtual void ResetTimer() {
-  };
-
-  virtual void SetIntensity (size_t chindex, wxByte intensity) = 0;
 
 };
 
 
-
-// ******************************************************
+// ***************************************************************************************
 // * This class represents a single DMX universe
 // * Compatible with Entec Pro, Lynx DMX, DIYC RPM, DMXking.com, and DIYblinky.com dongles
 // * Universes are exactly 512 bytes, except for DIYblinky, where they can be up to 3036 bytes
 // * Methods should be called with: 0 <= chindex < 3036
-// ******************************************************
-class xNetwork_DMXpro: public xNetwork {
+// ***************************************************************************************
+class xNetwork_DMXpro: public xNetwork_Serial {
 protected:
   wxByte data[3036+6];
 
@@ -165,7 +157,7 @@ public:
 // * and any other FTDI-based USB to RS-485 converter
 // * Methods should be called with: 0 <= chindex <= 511
 // ******************************************************
-class xNetwork_DMXopen: public xNetwork {
+class xNetwork_DMXopen: public xNetwork_Serial {
 protected:
   wxByte data[513];
 
@@ -215,11 +207,10 @@ protected:
 
   void SetIntensity(size_t chindex, wxByte intensity) {
     data[chindex+126]=intensity;
-    changed=true;
+    xNetwork_E131_changed=true;
   };
 
 public:
-
   xNetwork_E131() {
     datagram=0;
     memset(data,0,sizeof(data));
@@ -392,28 +383,30 @@ public:
     if (numchannels > 512) {
       throw "max channels on E1.31 is 512";
     }
-    changed=false;
     num_channels=numchannels;
   };
 
   void TimerEnd() {
     // skipping would cause ECG-DR4 (firmware version 1.30) to timeout
-    if (changed || SkipCount > 10) {
+    if (xNetwork_E131_changed || SkipCount > 10) {
       data[111]=SequenceNum;
       datagram->SendTo(remoteAddr, data, E131_PACKET_LEN);
       SequenceNum= SequenceNum==255 ? 0 : SequenceNum+1;
-      changed=false;
       SkipCount=0;
     } else {
       SkipCount++;
     }
   };
+
+  bool TxEmpty() {
+      return true;
+  }
 };
 
 
 
 // Should be called with: 0 <= chindex <= 1015 (max channels=127*8)
-class xNetwork_Renard: public xNetwork {
+class xNetwork_Renard: public xNetwork_Serial {
 protected:
   wxByte data[1024];
 
@@ -456,7 +449,7 @@ public:
 
 
 // Should be called with: 0 <= chindex <= 4095
-class xNetwork_Pixelnet: public xNetwork {
+class xNetwork_Pixelnet: public xNetwork_Serial {
 protected:
   wxByte data[4096];
   wxByte SerialBuffer[4097];
@@ -487,7 +480,7 @@ public:
 
 
 // Should be called with: 0 <= chindex <= 3839 (max channels=240*16)
-class xNetwork_LOR: public xNetwork {
+class xNetwork_LOR: public xNetwork_Serial {
 protected:
   long lastheartbeat;
   wxByte IntensityMap[256];
@@ -552,137 +545,125 @@ public:
 
 // xOutput should be a singleton
 // It contains references to all of the networks
-class xOutput {
-protected:
-  WX_DEFINE_ARRAY_PTR(xNetwork*, xNetworkArray);
-  xNetworkArray networks;
-  ChannelVector channels;
 
-public:
-  xOutput() {
-    srand((unsigned)time(NULL));
-  };
+xOutput::xOutput() {
+  srand((unsigned)time(NULL));
+};
 
-  ~xOutput() {
-    WX_CLEAR_ARRAY(networks);
-  };
+xOutput::~xOutput() {
+  WX_CLEAR_ARRAY(networks);
+};
 
-  size_t NetworkCount() {
-    return networks.GetCount();
-  };
+size_t xOutput::NetworkCount() {
+  return networks.GetCount();
+};
 
-  // returns the network index
-  size_t addnetwork (const wxString& NetworkType, int chcount, const wxString& portname, int baudrate) {
-    xNetwork* netobj;
-    wxString nettype3 = NetworkType.Upper().Left(3);
-    if (nettype3 == wxT("LOR")) {
-        netobj = new xNetwork_LOR();
-    } else if (nettype3 == wxT("D-L")) {
-        netobj = new xNetwork_LOR();
-    } else if (nettype3 == wxT("REN")) {
-        netobj = new xNetwork_Renard();
-    } else if (nettype3 == wxT("DMX")) {
-        netobj = new xNetwork_DMXpro();
-    } else if (nettype3 == wxT("OPE")) {
-        netobj = new xNetwork_DMXopen();
-    } else if (nettype3 == wxT("PIX")) {
-        netobj = new xNetwork_Pixelnet();
-    } else if (nettype3 == wxT("E13")) {
-        netobj = new xNetwork_E131();
-    } else {
-        throw "unknown network type";
-    }
-    size_t netnum = networks.GetCount();
-    networks.Add(netobj);
-    netobj->SetChannelCount(chcount);
-    for (int ch=0; ch<chcount; ch++) {
-        channels.push_back(std::make_pair(netnum, ch));
-    }
-    wxString description = NetworkType + _(" on ") + portname;
-    netobj->SetNetworkDesc(description);
-    if (nettype3 == wxT("E13")) {
-      netobj->InitNetwork(portname, baudrate, (wxUint16) netnum);  // portname is ip address and baudrate is universe number
-    } else {
-      netobj->InitSerialPort(portname, baudrate);
-    }
-    return netnum;
-  };
-
-  int GetChannelCount(size_t netnum) {
-    if (netnum >= networks.GetCount()) return 0;
-    return networks[netnum]->GetChannelCount();
-  };
-
-  wxString GetNetworkDesc(size_t netnum) {
-    if (netnum >= networks.GetCount()) return wxT("");
-    return networks[netnum]->GetNetworkDesc();
-  };
-
-  // absChNum starts at 0
-  // intensity is 0-255
-  void SetIntensity (size_t absChNum, wxByte intensity) {
-    if (absChNum <= channels.size())
-      networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, intensity);
-  };
-
-  // convenience function to turn a single channel off
-  void off (size_t absChNum) {
-    if (absChNum <= channels.size())
-      networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, 0);
-  };
-
-  // turns all channels off on all networks
-  void alloff () {
-    for(size_t absChNum=0; absChNum < channels.size(); ++absChNum) {
-      networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, 0);
-    }
-  };
-
-  // returns total number of channels across all networks
-  size_t TotalChannelCount() {
-    return channels.size();
+// returns the network index
+size_t xOutput::addnetwork (const wxString& NetworkType, int chcount, const wxString& portname, int baudrate) {
+  xNetwork* netobj;
+  wxString nettype3 = NetworkType.Upper().Left(3);
+  if (nettype3 == wxT("LOR")) {
+      netobj = new xNetwork_LOR();
+  } else if (nettype3 == wxT("D-L")) {
+      netobj = new xNetwork_LOR();
+  } else if (nettype3 == wxT("REN")) {
+      netobj = new xNetwork_Renard();
+  } else if (nettype3 == wxT("DMX")) {
+      netobj = new xNetwork_DMXpro();
+  } else if (nettype3 == wxT("OPE")) {
+      netobj = new xNetwork_DMXopen();
+  } else if (nettype3 == wxT("PIX")) {
+      netobj = new xNetwork_Pixelnet();
+  } else if (nettype3 == wxT("E13")) {
+      netobj = new xNetwork_E131();
+  } else {
+      throw "unknown network type";
   }
-
-  size_t AbsChannel2NetNum(size_t absChNum) {
-    return channels[absChNum].first;
+  size_t netnum = networks.GetCount();
+  networks.Add(netobj);
+  netobj->SetChannelCount(chcount);
+  for (int ch=0; ch<chcount; ch++) {
+      channels.push_back(std::make_pair(netnum, ch));
   }
-
-  size_t AbsChannel2NetCh(size_t absChNum) {
-    return channels[absChNum].second;
+  wxString description = NetworkType + wxT(" on ") + portname;
+  netobj->SetNetworkDesc(description);
+  if (nettype3 == wxT("E13")) {
+    netobj->InitNetwork(portname, baudrate, (wxUint16) netnum);  // portname is ip address and baudrate is universe number
+  } else {
+    netobj->InitSerialPort(portname, baudrate);
   }
+  return netnum;
+};
 
-  ChannelPair AbsChannelPair(size_t absChNum) {
-    return channels[absChNum];
+int xOutput::GetChannelCount(size_t netnum) {
+  if (netnum >= networks.GetCount()) return 0;
+  return networks[netnum]->GetChannelCount();
+};
+
+wxString xOutput::GetNetworkDesc(size_t netnum) {
+  if (netnum >= networks.GetCount()) return wxT("");
+  return networks[netnum]->GetNetworkDesc();
+};
+
+// absChNum starts at 0
+// intensity is 0-255
+void xOutput::SetIntensity (size_t absChNum, wxByte intensity) {
+  if (absChNum <= channels.size())
+    networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, intensity);
+};
+
+// convenience function to turn a single channel off
+void xOutput::off (size_t absChNum) {
+  if (absChNum <= channels.size())
+    networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, 0);
+};
+
+// turns all channels off on all networks
+void xOutput::alloff () {
+  for(size_t absChNum=0; absChNum < channels.size(); ++absChNum) {
+    networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, 0);
   }
+};
 
-  void ResetTimer() {
-    for(size_t i=0; i < networks.GetCount(); ++i) {
-      networks[i]->ResetTimer();
-    }
-  };
+// returns total number of channels across all networks
+size_t xOutput::TotalChannelCount() {
+  return channels.size();
+}
 
-  void TimerStart(long msec) {
-    for(size_t i=0; i < networks.GetCount(); ++i) {
-      networks[i]->TimerStart(msec);
-    }
-  };
+size_t xOutput::AbsChannel2NetNum(size_t absChNum) {
+  return channels[absChNum].first;
+}
 
-  void TimerEnd() {
-    for(size_t i=0; i < networks.GetCount(); ++i) {
-      networks[i]->TimerEnd();
-    }
-  };
+size_t xOutput::AbsChannel2NetCh(size_t absChNum) {
+  return channels[absChNum].second;
+}
 
-  void ClosePorts() {
-    for(size_t i=0; i < networks.GetCount(); ++i) {
-      networks[i]->CloseSerialPort();
-    }
-  };
+ChannelPair xOutput::AbsChannelPair(size_t absChNum) {
+  return channels[absChNum];
+}
 
-  bool TxEmpty() {
-    for(size_t i=0; i < networks.GetCount(); ++i) {
-      if (!networks[i]->TxEmpty()) return false;
-    }
-    return true;
-  };
+void xOutput::ResetTimer() {
+  for(size_t i=0; i < networks.GetCount(); ++i) {
+    networks[i]->ResetTimer();
+  }
+};
+
+void xOutput::TimerStart(long msec) {
+  xNetwork_E131_changed=false;
+  for(size_t i=0; i < networks.GetCount(); ++i) {
+    networks[i]->TimerStart(msec);
+  }
+};
+
+void xOutput::TimerEnd() {
+  for(size_t i=0; i < networks.GetCount(); ++i) {
+    networks[i]->TimerEnd();
+  }
+};
+
+bool xOutput::TxEmpty() {
+  for(size_t i=0; i < networks.GetCount(); ++i) {
+    if (!networks[i]->TxEmpty()) return false;
+  }
+  return true;
 };
