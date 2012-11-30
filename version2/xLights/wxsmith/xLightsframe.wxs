@@ -989,7 +989,7 @@
 											<growablecols>0</growablecols>
 											<object class="sizeritem">
 												<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
-													<label>Palette Management</label>
+													<label>xLights File Converter</label>
 													<font>
 														<size>12</size>
 														<style>normal</style>

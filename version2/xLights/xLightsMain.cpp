@@ -784,7 +784,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     PanelConvert = new wxPanel(Notebook1, ID_PANEL_CONVERT, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_CONVERT"));
     FlexGridSizerConvert = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizerConvert->AddGrowableCol(0);
-    StaticText14 = new wxStaticText(PanelConvert, ID_STATICTEXT14, _("Palette Management"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+    StaticText14 = new wxStaticText(PanelConvert, ID_STATICTEXT14, _("xLights File Converter"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     wxFont StaticText14Font(12,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText14->SetFont(StaticText14Font);
     FlexGridSizerConvert->Add(StaticText14, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 10);

@@ -471,6 +471,7 @@ void xLightsFrame::OnTimerPlaylist(long msec)
             }
             break;
         case STARTING_SEQ_ANIM:
+            LastIntensity.clear();
             LastIntensity.resize(SeqNumChannels,1);
             ResetTimer(PLAYING_SEQ_ANIM);
             break;
@@ -496,6 +497,7 @@ void xLightsFrame::OnTimerPlaylist(long msec)
             break;
         case STARTING_SEQ:
             if(PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING){
+                LastIntensity.clear();
                 LastIntensity.resize(SeqNumChannels,1);
                 ResetTimer(PLAYING_SEQ);
             } else {
