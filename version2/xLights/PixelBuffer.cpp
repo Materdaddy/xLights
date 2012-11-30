@@ -58,7 +58,9 @@ void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
         ColorWashState[i]=0;
         GarlandsState[i]=0;
         MeteorState[i]=0;
+        PictureState[i]=0;
         SpiralState[i]=0;
+        TextState[i]=0;
     }
 }
 
@@ -119,7 +121,7 @@ void PixelBufferClass::Clear()
 }
 
 // convert MixName to MixType enum
-void PixelBufferClass::SetMixType(wxString& MixName)
+void PixelBufferClass::SetMixType(const wxString& MixName)
 {
     if (MixName == wxT("Effect 1")) {
         MixType=Mix_Effect1;

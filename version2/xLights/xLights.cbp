@@ -104,6 +104,8 @@
 		<Unit filename="AddShowDialog.h" />
 		<Unit filename="ChannelLayoutDialog.cpp" />
 		<Unit filename="ChannelLayoutDialog.h" />
+		<Unit filename="ChannelMapDialog.cpp" />
+		<Unit filename="ChannelMapDialog.h" />
 		<Unit filename="E131Dialog.cpp" />
 		<Unit filename="E131Dialog.h" />
 		<Unit filename="EffectListDialog.cpp" />
@@ -170,6 +172,7 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="wx_pch.h" />
+		<Unit filename="wxsmith/ChannelMapDialog.wxs" />
 		<Unit filename="wxsmith/PaletteMgmtDialog.wxs" />
 		<Unit filename="wxsmith/PlaybackOptionsDialog.wxs" />
 		<Unit filename="wxsmith/PlayerFrame.wxs" />
@@ -204,6 +207,7 @@
 					<wxDialog wxs="wxsmith/ChannelLayoutDialog.wxs" src="ChannelLayoutDialog.cpp" hdr="ChannelLayoutDialog.h" fwddecl="0" i18n="1" name="ChannelLayoutDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/PaletteMgmtDialog.wxs" src="PaletteMgmtDialog.cpp" hdr="PaletteMgmtDialog.h" fwddecl="0" i18n="1" name="PaletteMgmtDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/SeqParmsDialog.wxs" src="SeqParmsDialog.cpp" hdr="SeqParmsDialog.h" fwddecl="0" i18n="1" name="SeqParmsDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChannelMapDialog.wxs" src="ChannelMapDialog.cpp" hdr="ChannelMapDialog.h" fwddecl="0" i18n="1" name="ChannelMapDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

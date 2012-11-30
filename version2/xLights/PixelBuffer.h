@@ -233,7 +233,7 @@ public:
     void InitBuffer(wxXmlNode* ModelNode);
     void Clear();
     size_t GetColorCount(int layer);
-    void SetMixType(wxString& MixName);
+    void SetMixType(const wxString& MixName);
     void SetPalette(int layer, wxColourVector& newcolors);
     void SetSpeed(int newspeed);
     void SetSparkle(int freq);

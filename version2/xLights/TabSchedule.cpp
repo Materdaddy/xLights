@@ -446,11 +446,9 @@ int xLightsFrame::FindNotebookPage(wxString& pagename)
 
 void xLightsFrame::OnTimerPlaylist(long msec)
 {
-    int period;
-    int netnum, chindex;
+    int period, chindex;
     static std::string LastIntensity;
     char intensity;
-    wxTimeSpan ts;
     switch (SeqPlayerState) {
         case DELAY_AFTER_PLAY:
             if (msec > DelayAfterPlayMSEC) {
@@ -692,6 +690,24 @@ void xLightsFrame::StopPlayback()
     ResetTimer(NO_SEQ);
 }
 
+// returns true on success
+bool xLightsFrame::PlayCurrentXlightsFile() {
+    if (SeqNumChannels <= 0) {
+        PlayerError(_("Unable to determine number of channels"));
+    } else if (mediaFilename.IsEmpty()) {
+        ResetTimer(STARTING_SEQ_ANIM);
+    } else if (!wxFile::Exists(mediaFilename)) {
+        PlayerError(_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences."));
+    } else if (!PlayerDlg->MediaCtrl->Load(mediaFilename)) {
+        PlayerError(_("Unable to play media file:\n")+mediaFilename);
+    } else {
+        ResetTimer(STARTING_SEQ);
+        return true;
+    }
+    return false;
+}
+
+// returns true on success
 // also called from script
 bool xLightsFrame::Play(wxString& filename, long delay) {
     DelayAfterPlayMSEC=delay*1000;  // convert seconds to milliseconds
@@ -709,18 +725,7 @@ bool xLightsFrame::Play(wxString& filename, long delay) {
             break;
         case 'X':
             ReadXlightsFile(fullpath);
-            if (SeqNumChannels <= 0) {
-                PlayerError(_("Unable to determine number of channels"));
-            } else if (mediaFilename.IsEmpty()) {
-                ResetTimer(STARTING_SEQ_ANIM);
-            } else if (!wxFile::Exists(mediaFilename)) {
-                PlayerError(_("Cannot locate media file:\n") + mediaFilename + _("\n\nMake sure your media files are in the same directory as your sequences."));
-            } else if (!PlayerDlg->MediaCtrl->Load(mediaFilename)) {
-                PlayerError(_("Unable to play media file:\n")+mediaFilename);
-            } else {
-                ResetTimer(STARTING_SEQ);
-                return true;
-            }
+            return PlayCurrentXlightsFile();
             break;
     }
     return false;

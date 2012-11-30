@@ -121,7 +121,6 @@ protected:
 
   void SetIntensity(size_t chindex, wxByte intensity) {
     data[chindex+5]=intensity;
-    //printf("DMXentec::SetIntensity channel=%d mapped-value=%d\n",chindex,(int)intensity);
     changed=true;
   };
 
@@ -163,7 +162,6 @@ protected:
 
   void SetIntensity(size_t chindex, wxByte intensity) {
     data[chindex+1]=intensity;
-    //printf("DMXentec::SetIntensity channel=%d mapped-value=%d\n",chindex,(int)intensity);
     changed=true;
   };
 
@@ -608,13 +606,13 @@ wxString xOutput::GetNetworkDesc(size_t netnum) {
 // absChNum starts at 0
 // intensity is 0-255
 void xOutput::SetIntensity (size_t absChNum, wxByte intensity) {
-  if (absChNum <= channels.size())
+  if (absChNum < channels.size())
     networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, intensity);
 };
 
 // convenience function to turn a single channel off
 void xOutput::off (size_t absChNum) {
-  if (absChNum <= channels.size())
+  if (absChNum < channels.size())
     networks[channels[absChNum].first]->SetIntensity(channels[absChNum].second, 0);
 };
 

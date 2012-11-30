@@ -6,17 +6,50 @@
 
 void xLightsFrame::OnButton_PlaySelectionClick(wxCommandEvent& event)
 {
+    if (xlightsFilename.IsEmpty()) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
     SetPlayMode(play_seqpartial);
 }
 
 void xLightsFrame::OnButton_PlayAllClick(wxCommandEvent& event)
 {
-    PlayerDlg->MediaCtrl->Play();
+    if (xlightsFilename.IsEmpty()) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+    wxArrayInt cols=Grid1->GetSelectedCols();
+    if (cols.GetCount() == 0 || cols[0] < 2) {
+        wxMessageBox(wxT("Select the column that will be modeled before clicking Play"), wxT("Error"));
+        return;
+    }
+
+    SeqPlayColumn=cols[0];
+    wxString ModelName=Grid1->GetColLabelValue(SeqPlayColumn);
+    Choice_Models->SetStringSelection(ModelName);
+    int sel=Choice_Models->GetSelection();
+    if (sel == wxNOT_FOUND) {
+        wxMessageBox(_("Can not find model: ")+ModelName, _("Error"));
+        return;
+    }
+    wxXmlNode* ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
+    buffer.InitBuffer(ModelXml);
+    //buffer.SetMixType(Choice_LayerMethod->GetStringSelection());
     SetPlayMode(play_seqall);
+    PlayCurrentXlightsFile();
 }
 
 void xLightsFrame::OnButton_PlayEffectClick(wxCommandEvent& event)
 {
+    int sel=Choice_Models->GetSelection();
+    if (sel == wxNOT_FOUND) {
+        wxMessageBox(_("No model is selected"), _("ERROR"));
+        return;
+    }
+    wxXmlNode* ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
+    buffer.InitBuffer(ModelXml);
+    buffer.SetMixType(Choice_LayerMethod->GetStringSelection());
     SetPlayMode(play_effect);
 }
 
@@ -84,6 +117,9 @@ void xLightsFrame::SetEffectControls(wxString settings)
                     } else if (name.StartsWith(wxT("ID_BUTTON"))) {
                         color.Set(value);
                         CtrlWin->SetBackgroundColour(color);
+                        // choose black or white foreground color
+                        int test=color.Red()*0.299 + color.Green()*0.587 + color.Blue()*0.114;
+                        CtrlWin->SetForegroundColour(test < 186 ? *wxWHITE : *wxBLACK);
                     } else if (name.StartsWith(wxT("ID_CHECKBOX"))) {
                         wxCheckBox* ctrl=(wxCheckBox*)CtrlWin;
                         if (value.ToLong(&TempLong)) ctrl->SetValue(TempLong!=0);
@@ -576,12 +612,78 @@ void xLightsFrame::TimerEffect()
     }
 }
 
-void xLightsFrame::TimerSeqPartial()
+void xLightsFrame::TimerSeqPartial(long msec)
 {
 }
 
-void xLightsFrame::TimerSeqAll()
+void xLightsFrame::TimerSeqAll(long msec)
 {
+    int period;
+    long StartTime;
+    double d;
+    int rowcnt=Grid1->GetNumberRows();
+    switch (SeqPlayerState) {
+        case STARTING_SEQ_ANIM:
+            NextGridRowToPlay=0;
+            ResetTimer(PLAYING_SEQ_ANIM);
+            break;
+        case PLAYING_SEQ_ANIM:
+            if (xout && !xout->TxEmpty()) {
+                TxOverflowCnt++;
+                break;
+            }
+            period = msec / XTIMER_INTERVAL;
+            if (period >= SeqNumPeriods) {
+                // sequence has finished
+                if (xout) xout->alloff();
+                SetPlayMode(play_off);
+            } else {
+                if (NextGridRowToPlay < rowcnt) {
+                    d=GetGridStartTime(NextGridRowToPlay);
+                    StartTime=long(d*1000.0);
+                    if (msec >= StartTime) {
+                        // start next effect
+                        SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
+                        NextGridRowToPlay++;
+                    }
+                }
+                TimerEffect();
+            }
+            break;
+        case STARTING_SEQ:
+            if(PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING){
+                NextGridRowToPlay=0;
+                ResetTimer(PLAYING_SEQ);
+            } else {
+                PlayerDlg->MediaCtrl->Play();
+            }
+            break;
+        case PLAYING_SEQ:
+            if (xout && !xout->TxEmpty()) {
+                TxOverflowCnt++;
+                break;
+            }
+            msec = PlayerDlg->MediaCtrl->Tell();
+            period = msec / XTIMER_INTERVAL;
+            if (period >= SeqNumPeriods || PlayerDlg->MediaCtrl->GetState() != wxMEDIASTATE_PLAYING) {
+                // sequence has finished
+                PlayerDlg->MediaCtrl->Stop();
+                if (xout) xout->alloff();
+                SetPlayMode(play_off);
+            } else {
+                if (NextGridRowToPlay < rowcnt) {
+                    d=GetGridStartTime(NextGridRowToPlay);
+                    StartTime=long(d*1000.0);
+                    if (msec >= StartTime) {
+                        // start next effect
+                        SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
+                        NextGridRowToPlay++;
+                    }
+                }
+                TimerEffect();
+            }
+            break;
+    }
 }
 
 void xLightsFrame::OpenPaletteDialog(const wxString& id1, const wxString& id2, wxSizer* PrimarySizer,wxSizer* SecondarySizer)
@@ -634,98 +736,325 @@ void xLightsFrame::OnButton_Pictures2_FilenameClick(wxCommandEvent& event)
     if (!filename.IsEmpty()) TextCtrl_Pictures2_Filename->SetValue(filename);
 }
 
-void xLightsFrame::OnButtonOpenSequenceClick(wxCommandEvent& event)
+void xLightsFrame::DisplayXlightsFilename(const wxString& filename)
 {
-    wxArrayString files;
-    wxString name;
-    wxXmlNode* root;
-    wxXmlNode* e;
-    SeqParmsDialog dialog(this);
-    wxDir::GetAllFiles(CurrentDir,&files,"*.xseq");
-    wxString filename = wxGetSingleChoice("Select xLights sequence to open","Open Sequence",files,this);
-    if (filename.IsEmpty()) return;
-    ReadXlightsFile(filename);
-    wxFileName FileObj(filename);
-    FileObj.SetExt("xml");
-    SeqXmlFileName=FileObj.GetFullPath();
-    if (FileObj.FileExists()) {
+    xlightsFilename=filename;
+    StaticTextSequenceFileName->SetLabel(filename);
+}
 
-        // read xml
-        if (!SequenceXml.Load(SeqXmlFileName)) {
-            wxMessageBox(_("Error loading: ")+SeqXmlFileName);
-            return;
-        }
-        root=SequenceXml.GetRoot();
-        wxString tempstr=root->GetAttribute(wxT("BaseChannel"), wxT("1"));
-        tempstr.ToLong(&SeqBaseChannel);
-
-    } else {
-
-        // prompt for model and channel info
-
-        // initialize and show dialog
-        for(e=ModelsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
-            if (e->GetName() == wxT("model")) {
-                name=e->GetAttribute(wxT("name"));
-                if (!name.IsEmpty()) {
-                    dialog.CheckListBox1->Append(name,e);
-                }
-            }
-        }
-        dialog.StaticText_Filename->SetLabel(filename);
-        dialog.SetNetInfo(&NetInfo);
-        dialog.ShowModal();
-
-        // create default xml
-        root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("xsequence") );
-        SequenceXml.SetRoot( root );
-        SeqBaseChannel=dialog.SpinCtrlBaseChannel->GetValue();
-        root->AddAttribute(wxT("BaseChannel"), wxString::Format(wxT("%ld"),SeqBaseChannel));
-        SeqModelsNode = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("models") );
-        root->AddChild( SeqModelsNode );
-
-        // add checked models to xml
-        size_t cnt = dialog.CheckListBox1->GetCount();
-        for (size_t i=0; i < cnt; i++) {
-            if (dialog.CheckListBox1->IsChecked(i)) {
-                e=(wxXmlNode*)dialog.CheckListBox1->GetClientData(i);
-                wxXmlNode* modelcopy=new wxXmlNode(wxXML_ELEMENT_NODE,wxT("model"));
-                modelcopy->AddAttribute(wxT("name"),e->GetAttribute(wxT("name")));
-                SeqModelsNode->AddChild(modelcopy);
-            }
-        }
-
-    }
-    SeqModelsNode=0;
-    SeqDataNode=0;
-    for(wxXmlNode* e=root->GetChildren(); e!=NULL; e=e->GetNext() ) {
-        if (e->GetName() == wxT("models")) SeqModelsNode=e;
-        if (e->GetName() == wxT("seqdata")) SeqDataNode=e;
-    }
-    if (SeqModelsNode == 0) {
-        SeqModelsNode = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("models") );
-        root->AddChild( SeqModelsNode );
-    } else {
-        // create grid columns for each model
-        int n=Grid1->GetNumberCols();
-        if (n > 2) Grid1->DeleteCols(2,n-2);
-        for(e=SeqModelsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
-            if (e->GetName() == wxT("model")) {
-                name=e->GetAttribute(wxT("name"));
-                Grid1->AppendCols();
-                Grid1->SetColLabelValue(Grid1->GetNumberCols()-1,name);
-            }
-        }
-    }
-    if (SeqDataNode == 0) {
-        SeqDataNode = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("seqdata") );
-        root->AddChild( SeqDataNode );
-    } else {
-        // populate sequence data in grid
+void xLightsFrame::GetGridColumnLabels(wxArrayString& a)
+{
+    int n=Grid1->GetNumberCols();
+    for(int i=2; i < n; i++) {
+        a.Add(Grid1->GetColLabelValue(i));
     }
 }
 
-void xLightsFrame::OnButtonSaveSequenceClick(wxCommandEvent& event)
+void xLightsFrame::ChooseModelsForSequence()
 {
-    SequenceXml.Save(SeqXmlFileName);
+    if (xlightsFilename.IsEmpty()) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+    SeqParmsDialog dialog(this);
+    wxXmlNode* e;
+    wxString name;
+    int idx;
+
+    // get list of models that are already in the grid
+    wxArrayString labels;
+    GetGridColumnLabels(labels);
+
+    // populate the listbox with all models
+    for(e=ModelsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() == wxT("model")) {
+            name=e->GetAttribute(wxT("name"));
+            if (!name.IsEmpty()) {
+                dialog.CheckListBox1->Append(name);
+                idx=dialog.CheckListBox1->FindString(name);
+                if (idx != wxNOT_FOUND && labels.Index(name,false) != wxNOT_FOUND) {
+                    dialog.CheckListBox1->Check(idx,true);
+                }
+            }
+        }
+    }
+
+
+    dialog.StaticText_Filename->SetLabel(xlightsFilename);
+    if (dialog.ShowModal() != wxID_OK) return;
+
+    // add checked models to grid
+    wxGridCellAttr* readonly=new wxGridCellAttr;
+    readonly->SetReadOnly();
+    size_t cnt = dialog.CheckListBox1->GetCount();
+    for (size_t i=0; i < cnt; i++) {
+        if (dialog.CheckListBox1->IsChecked(i)) {
+            name=dialog.CheckListBox1->GetString(i);
+            idx=labels.Index(name,false);
+            if (idx == wxNOT_FOUND) {
+                // newly checked item, so add it
+                Grid1->AppendCols();
+                int colnum=Grid1->GetNumberCols()-1;
+                Grid1->SetColLabelValue(colnum,name);
+                Grid1->SetColAttr(colnum,readonly);  // this only sets cells to ro that already exist (not insterted rows)
+            } else {
+                // item already exists
+                labels[idx].Clear();
+            }
+        }
+    }
+
+    // any non-empty entries in labels represent items that were unchecked - so delete them from grid
+    for(idx=labels.GetCount()-1; idx >= 0; idx--) {
+        if (!labels[idx].IsEmpty()) {
+            Grid1->DeleteCols(idx+2);
+        }
+    }
+}
+
+void xLightsFrame::OnButton_ChannelMapClick(wxCommandEvent& event)
+{
+    if (xlightsFilename.IsEmpty()) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+    ChannelMapDialog dialog(this);
+    dialog.SpinCtrlBaseChannel->SetValue(SeqBaseChannel);
+    dialog.SetNetInfo(&NetInfo);
+    if (dialog.ShowModal() != wxID_OK) return;
+    SeqBaseChannel=dialog.SpinCtrlBaseChannel->GetValue();
+}
+
+void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
+{
+    wxArrayString files;
+    wxDir::GetAllFiles(CurrentDir,&files,"*.xseq");
+    wxString filename = wxGetSingleChoice("Select xLights sequence to open","Open Sequence",files,this);
+    if (filename.IsEmpty()) return;  // user pressed cancel
+
+    // reset grid
+    int n;
+    n=Grid1->GetNumberCols();
+    if (n > 2) Grid1->DeleteCols(2, n-2);
+    n=Grid1->GetNumberRows();
+    if (n > 0) Grid1->DeleteRows(0, n);
+
+    // read xlights file
+    ReadXlightsFile(filename);
+    DisplayXlightsFilename(filename);
+    SeqBaseChannel=1;
+
+    // read xml sequence info
+    wxFileName FileObj(filename);
+    FileObj.SetExt("xml");
+    SeqXmlFileName=FileObj.GetFullPath();
+    if (!FileObj.FileExists()) {
+        ChooseModelsForSequence();
+        return;
+    }
+
+    // read xml
+    wxXmlDocument doc;
+    if (!doc.Load(SeqXmlFileName)) {
+        wxMessageBox(_("Error loading: ")+SeqXmlFileName);
+        return;
+    }
+    wxXmlNode* root=doc.GetRoot();
+    wxString tempstr=root->GetAttribute(wxT("BaseChannel"), wxT("1"));
+    tempstr.ToLong(&SeqBaseChannel);
+
+    wxXmlNode *tr, *td;
+    int r,c; // row 0=heading, >=1 are data rows
+    for(tr=root->GetChildren(), r=0; tr!=NULL; tr=tr->GetNext(), r++ ) {
+        if (tr->GetName() != wxT("tr")) continue;
+        if (r > 0) {
+            Grid1->AppendRows();
+        }
+        for(td=tr->GetChildren(), c=0; td!=NULL; td=td->GetNext(), c++ ) {
+            if (td->GetName() != wxT("td")) continue;
+            if (r==0) {
+                if (c >= 2) {
+                    Grid1->AppendCols();
+                    Grid1->SetColLabelValue(Grid1->GetNumberCols()-1, td->GetNodeContent());
+                }
+            } else {
+                Grid1->SetCellValue(r-1,c,td->GetNodeContent());
+            }
+        }
+    }
+
+    // make new columns read-only
+    wxGridCellAttr* readonly=new wxGridCellAttr;
+    readonly->SetReadOnly();
+    for (c=2; c < Grid1->GetNumberCols(); c++) {
+        Grid1->SetColAttr(c,readonly);
+    }
+}
+
+void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
+{
+    if (xlightsFilename.IsEmpty()) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+
+    // save Grid1 to xml
+    int rowcnt=Grid1->GetNumberRows();
+    int colcnt=Grid1->GetNumberCols();
+    int r,c;
+    wxXmlDocument doc;
+    wxXmlNode *tr, *td;
+    wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("xsequence") );
+    doc.SetRoot( root );
+    root->AddAttribute(wxT("BaseChannel"), wxString::Format(wxT("%ld"),SeqBaseChannel));
+
+    // new items get added to the TOP of the xml structure, so add everything in reverse order
+
+    // save data rows
+    for (r=rowcnt-1; r>=0; r--) {
+        tr=new wxXmlNode(root, wxXML_ELEMENT_NODE, wxT("tr"));
+        for (c=colcnt-1; c>=0; c--) {
+            td=new wxXmlNode(tr, wxXML_ELEMENT_NODE, wxT("td"));
+            td->AddChild(new wxXmlNode(td, wxXML_TEXT_NODE, wxEmptyString, Grid1->GetCellValue(r,c)));
+        }
+    }
+
+    // save labels to first row
+    tr=new wxXmlNode(root, wxXML_ELEMENT_NODE, wxT("tr"));
+    for (c=colcnt-1; c>=0; c--) {
+        td=new wxXmlNode(tr, wxXML_ELEMENT_NODE, wxT("td"));
+        td->AddChild(new wxXmlNode(td, wxXML_TEXT_NODE, wxEmptyString, Grid1->GetColLabelValue(c)));
+    }
+
+    doc.Save(SeqXmlFileName);
+
+    // incorporate effects into xseq file
+
+}
+
+void xLightsFrame::OnBitmapButtonInsertRowClick(wxCommandEvent& event)
+{
+    if (xlightsFilename.IsEmpty()) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+    int r=Grid1->GetGridCursorRow();
+    Grid1->InsertRows( r, 1 );
+    // only the first 2 columns are editable; set everything else to read-only
+    int n=Grid1->GetNumberCols();
+    for (int c=2; c < n; c++) {
+        Grid1->SetReadOnly(r,c);
+    }
+}
+
+void xLightsFrame::OnBitmapButtonDeleteRowClick(wxCommandEvent& event)
+{
+    if (xlightsFilename.IsEmpty()) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+    if ( Grid1->IsSelection() )
+    {
+        wxGridUpdateLocker locker(Grid1);
+        for ( int n = 0; n < Grid1->GetNumberRows(); )
+        {
+            if ( Grid1->IsInSelection( n , 0 ) )
+                Grid1->DeleteRows( n, 1 );
+            else
+                n++;
+        }
+    }
+}
+
+void xLightsFrame::OnButtonDisplayElementsClick(wxCommandEvent& event)
+{
+    if (xlightsFilename.IsEmpty()) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+    ChooseModelsForSequence();
+}
+
+//copy row2 to row1
+void xLightsFrame::CopyRow(int row1, int row2)
+{
+    int i, iMax;
+    iMax = Grid1->GetNumberCols();
+    for(i=0;i<iMax;i++) {
+        Grid1->SetCellValue(row1,i,Grid1->GetCellValue(row2,i));
+    }
+}
+
+double xLightsFrame::GetGridStartTime(int row)
+{
+    double d;
+    wxString s = Grid1->GetCellValue(row,0);
+    if (!s.IsEmpty() && s.ToDouble(&d)) return d;
+    return 999999.9;
+}
+
+// see http://en.wikipedia.org/wiki/Insertion_sort
+void xLightsFrame::NumericSort()
+{
+    //sort the table
+    int i, iHole;
+    double d;
+    int SortCol=0;
+
+    Grid1->BeginBatch();
+    int rowcnt = Grid1->GetNumberRows();
+    Grid1->AppendRows(1); // temp swap row
+
+    for (i=1; i < rowcnt; i++) {
+        d=GetGridStartTime(i);
+        CopyRow(rowcnt,i);
+        iHole = i;
+        while ((iHole > 0) && (GetGridStartTime(iHole-1) > d)) {
+            CopyRow(iHole,iHole-1);
+            iHole--;
+        }
+        CopyRow(iHole,rowcnt);
+    }
+    Grid1->DeleteRows(rowcnt,1);
+    Grid1->EndBatch();
+    Grid1->ForceRefresh();
+}
+
+void xLightsFrame::OnGrid1CellChange(wxGridEvent& event)
+{
+    int row = event.GetRow(),
+        col = event.GetCol();
+    if (col==0) {
+        // re-order table by start time (column 0)
+        Grid1->EnableEditing(false);
+        //StatusBar1->SetStatusText(_("New grid value=")+Grid1->GetCellValue(row,col));
+        NumericSort();
+        Grid1->EnableEditing(true);
+    }
+}
+
+void xLightsFrame::OnButton_UpdateGridClick(wxCommandEvent& event)
+{
+    int r,c;
+    wxString v=CreateEffectString();
+    if ( Grid1->IsSelection() ) {
+        // iterate over entire grid looking for selected cells
+        int nRows = Grid1->GetNumberRows();
+        int nCols = Grid1->GetNumberCols();
+        for (r=0; r<nRows; r++) {
+            for (c=2; c<nCols; c++) {
+                if (Grid1->IsInSelection(r,c)) {
+                    Grid1->SetCellValue(r,c,v);
+                }
+            }
+        }
+    } else {
+        // copy to current cell
+        //StatusBar1->SetStatusText(_("no cells selected"));
+        r=Grid1->GetGridCursorRow();
+        c=Grid1->GetGridCursorCol();
+        if (c >=2) {
+            Grid1->SetCellValue(r,c,v);
+        }
+    }
 }

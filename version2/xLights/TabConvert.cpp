@@ -355,6 +355,7 @@ void xLightsFrame::ReadXlightsFile(const wxString& FileName)
     char hdr[512],filetype[10];
     int fileversion,numch,numper,scancnt;
     size_t readcnt;
+    xlightsFilename=FileName;
     ConversionInit();
     if (f.Open(FileName.c_str())) {
         f.Read(hdr,512);
@@ -372,7 +373,7 @@ void xLightsFrame::ReadXlightsFile(const wxString& FileName)
             if (readcnt < SeqDataLen) {
                 PlayerError(_("Unable to read all event data from:\n")+FileName);
             }
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
             TextCtrlLog->AppendText(wxString::Format(_("ReadXlightsFile SeqNumPeriods=%ld SeqNumChannels=%ld\n"),SeqNumPeriods,SeqNumChannels));
 #endif
         }

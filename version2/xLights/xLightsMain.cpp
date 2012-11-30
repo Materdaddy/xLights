@@ -29,6 +29,10 @@ using namespace io;
 
 // image files
 #include "../include/xlights.xpm"
+#include "../include/open.xpm"
+#include "../include/save.xpm"
+#include "../include/insertrow.xpm"
+#include "../include/deleterow.xpm"
 
 //(*InternalHeaders(xLightsFrame)
 #include <wx/artprov.h>
@@ -161,12 +165,15 @@ const long xLightsFrame::ID_STATICTEXT18 = wxNewId();
 const long xLightsFrame::ID_TEXTCTRL_CONVERSION_STATUS = wxNewId();
 const long xLightsFrame::ID_PANEL_CONVERT = wxNewId();
 const long xLightsFrame::ID_SCROLLEDWINDOW1 = wxNewId();
-const long xLightsFrame::ID_BUTTON5 = wxNewId();
-const long xLightsFrame::ID_BUTTON1 = wxNewId();
-const long xLightsFrame::ID_BUTTON11 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT4 = wxNewId();
 const long xLightsFrame::ID_BUTTON6 = wxNewId();
+const long xLightsFrame::ID_BUTTON5 = wxNewId();
 const long xLightsFrame::ID_BUTTON2 = wxNewId();
-const long xLightsFrame::ID_BUTTON12 = wxNewId();
+const long xLightsFrame::ID_BUTTON1 = wxNewId();
+const long xLightsFrame::ID_BITMAPBUTTON7 = wxNewId();
+const long xLightsFrame::ID_BITMAPBUTTON9 = wxNewId();
+const long xLightsFrame::ID_BITMAPBUTTON3 = wxNewId();
+const long xLightsFrame::ID_BITMAPBUTTON4 = wxNewId();
 const long xLightsFrame::ID_GRID1 = wxNewId();
 const long xLightsFrame::ID_BUTTON58 = wxNewId();
 const long xLightsFrame::ID_CHOICE7 = wxNewId();
@@ -456,7 +463,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer29;
     wxFlexGridSizer* FlexGridSizer34;
     wxStaticBoxSizer* StaticBoxSizer3;
-    wxGridSizer* GridSizer1;
     wxFlexGridSizer* FlexGridSizer49;
     wxFlexGridSizer* FlexGridSizer15;
     wxFlexGridSizer* FlexGridSizer18;
@@ -490,6 +496,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer58;
     wxFlexGridSizer* FlexGridSizer64;
     wxFlexGridSizer* FlexGridSizer31;
+    wxFlexGridSizer* FlexGridSizer68;
     wxFlexGridSizer* FlexGridSizer40;
     wxFlexGridSizer* FlexGridSizer39;
     wxFlexGridSizer* FlexGridSizer28;
@@ -841,29 +848,42 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     ScrolledWindow1->SetBackgroundColour(wxColour(0,0,0));
     FlexGridSizer30->Add(ScrolledWindow1, 1, wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 0);
     FlexGridSizer3->Add(FlexGridSizer30, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizerSequenceButtons = new wxStaticBoxSizer(wxVERTICAL, PanelSequence, _("RGB Sequence"));
     FlexGridSizer32 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer32->AddGrowableCol(0);
-    FlexGridSizer32->AddGrowableRow(1);
-    GridSizer1 = new wxGridSizer(2, 3, 0, 0);
-    Button_PlaySelection = new wxButton(PanelSequence, ID_BUTTON5, _("Play Selection"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
-    Button_PlaySelection->SetBackgroundColour(wxColour(0,255,0));
-    GridSizer1->Add(Button_PlaySelection, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    Button_DisplayElements = new wxButton(PanelSequence, ID_BUTTON1, _("Display Elements"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-    Button_DisplayElements->SetBackgroundColour(wxColour(224,224,224));
-    GridSizer1->Add(Button_DisplayElements, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    ButtonOpenSequence = new wxButton(PanelSequence, ID_BUTTON11, _("Open Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
-    ButtonOpenSequence->SetBackgroundColour(wxColour(224,224,224));
-    GridSizer1->Add(ButtonOpenSequence, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
+    FlexGridSizer32->AddGrowableRow(2);
+    StaticTextSequenceFileName = new wxStaticText(PanelSequence, ID_STATICTEXT4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    FlexGridSizer32->Add(StaticTextSequenceFileName, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 3);
+    FlexGridSizer68 = new wxFlexGridSizer(0, 9, 0, 0);
     Button_PlayAll = new wxButton(PanelSequence, ID_BUTTON6, _("Play All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     Button_PlayAll->SetBackgroundColour(wxColour(0,255,0));
-    GridSizer1->Add(Button_PlayAll, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    Button_TimeSlots = new wxButton(PanelSequence, ID_BUTTON2, _("Time Slots"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-    Button_TimeSlots->SetBackgroundColour(wxColour(224,224,224));
-    GridSizer1->Add(Button_TimeSlots, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    ButtonSaveSequence = new wxButton(PanelSequence, ID_BUTTON12, _("Save Sequence"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
-    ButtonSaveSequence->SetBackgroundColour(wxColour(224,224,224));
-    GridSizer1->Add(ButtonSaveSequence, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    FlexGridSizer32->Add(GridSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer68->Add(Button_PlayAll, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
+    Button_PlaySelection = new wxButton(PanelSequence, ID_BUTTON5, _("Play Selection"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+    Button_PlaySelection->SetBackgroundColour(wxColour(0,255,0));
+    FlexGridSizer68->Add(Button_PlaySelection, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
+    ButtonDisplayElements = new wxButton(PanelSequence, ID_BUTTON2, _("Display Elements"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    ButtonDisplayElements->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer68->Add(ButtonDisplayElements, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Button_ChannelMap = new wxButton(PanelSequence, ID_BUTTON1, _("Chan Map"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    Button_ChannelMap->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer68->Add(Button_ChannelMap, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
+    BitmapButtonOpenSeq = new wxBitmapButton(PanelSequence, ID_BITMAPBUTTON7, open_xpm, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON7"));
+    BitmapButtonOpenSeq->SetDefault();
+    BitmapButtonOpenSeq->SetToolTip(_("Open Sequence"));
+    FlexGridSizer68->Add(BitmapButtonOpenSeq, 1, wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BitmapButtonSaveSeq = new wxBitmapButton(PanelSequence, ID_BITMAPBUTTON9, save_xpm, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON9"));
+    BitmapButtonSaveSeq->SetDefault();
+    BitmapButtonSaveSeq->SetToolTip(_("Save Sequence"));
+    FlexGridSizer68->Add(BitmapButtonSaveSeq, 1, wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BitmapButtonInsertRow = new wxBitmapButton(PanelSequence, ID_BITMAPBUTTON3, insertrow_xpm, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON3"));
+    BitmapButtonInsertRow->SetDefault();
+    BitmapButtonInsertRow->SetToolTip(_("Insert Row"));
+    FlexGridSizer68->Add(BitmapButtonInsertRow, 1, wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BitmapButtonDeleteRow = new wxBitmapButton(PanelSequence, ID_BITMAPBUTTON4, deleterow_xpm, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON4"));
+    BitmapButtonDeleteRow->SetDefault();
+    BitmapButtonDeleteRow->SetToolTip(_("Delete Row"));
+    FlexGridSizer68->Add(BitmapButtonDeleteRow, 1, wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer32->Add(FlexGridSizer68, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Grid1 = new wxGrid(PanelSequence, ID_GRID1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_GRID1"));
     Grid1->CreateGrid(0,2);
     Grid1->EnableEditing(true);
@@ -874,7 +894,8 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Grid1->SetDefaultCellFont( Grid1->GetFont() );
     Grid1->SetDefaultCellTextColour( Grid1->GetForegroundColour() );
     FlexGridSizer32->Add(Grid1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
-    FlexGridSizer3->Add(FlexGridSizer32, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizerSequenceButtons->Add(FlexGridSizer32, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer3->Add(StaticBoxSizerSequenceButtons, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, PanelSequence, _("Combined Effect"));
     FlexGridSizer33 = new wxFlexGridSizer(0, 3, 0, 0);
     Button_Models = new wxButton(PanelSequence, ID_BUTTON58, _("Models"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON58"));
@@ -1203,7 +1224,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer48->Add(Slider_Speed1, 1, wxTOP|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer34->Add(FlexGridSizer48, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
     StaticBoxSizer4->Add(FlexGridSizer34, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer5->Add(StaticBoxSizer4, 1, wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer5->Add(StaticBoxSizer4, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer5 = new wxStaticBoxSizer(wxVERTICAL, PanelSequence, _("Effect 2"));
     FlexGridSizer49 = new wxFlexGridSizer(0, 3, 0, 0);
     Choicebook2 = new wxChoicebook(PanelSequence, ID_CHOICEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_CHOICEBOOK2"));
@@ -1485,7 +1506,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer63->Add(Slider_Speed2, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer49->Add(FlexGridSizer63, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
     StaticBoxSizer5->Add(FlexGridSizer49, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer5->Add(StaticBoxSizer5, 1, wxLEFT|wxRIGHT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
+    BoxSizer5->Add(StaticBoxSizer5, 1, wxLEFT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
     FlexGridSizer3->Add(BoxSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     PanelSequence->SetSizer(FlexGridSizer3);
     FlexGridSizer3->Fit(PanelSequence);
@@ -1670,16 +1691,22 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_RADIOBUTTON27,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnRadioButtonDimSelect);
     Connect(ID_BUTTON_CHOOSE_FILE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonChooseFileClick);
     Connect(ID_BUTTON_START_CONVERSION,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonStartConversionClick);
-    Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlaySelectionClick);
-    Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonOpenSequenceClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayAllClick);
-    Connect(ID_BUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonSaveSequenceClick);
+    Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlaySelectionClick);
+    Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonDisplayElementsClick);
+    Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ChannelMapClick);
+    Connect(ID_BITMAPBUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonOpenSeqClick);
+    Connect(ID_BITMAPBUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonSaveSeqClick);
+    Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonInsertRowClick);
+    Connect(ID_BITMAPBUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonDeleteRowClick);
+    Connect(ID_GRID1,wxEVT_GRID_CELL_CHANGE,(wxObjectEventFunction)&xLightsFrame::OnGrid1CellChange);
     Connect(ID_BUTTON58,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ModelsClick);
     Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayEffectClick);
     Connect(ID_BUTTON59,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetsClick);
     Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_PresetsSelect);
     Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetAddClick);
     Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetUpdateClick);
+    Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_UpdateGridClick);
     Connect(ID_CHOICE_LayerMethod,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_LayerMethodSelect);
     Connect(ID_BUTTON56,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_SaveEffectsClick);
     Connect(ID_BUTTON_PICTURES1_FILENAME,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Pictures1_FilenameClick);
@@ -1771,6 +1798,8 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     GridNetwork->SetColumnWidth(4,150);
     GridNetwork->SetColumnWidth(5,150);
 
+    Grid1->SetColFormatFloat(0,7,3);
+
     // get list of most recently used directories
     wxString dir,mru_name;
     int menuID, idx;
@@ -1854,23 +1883,11 @@ double xLightsFrame::rand01()
 
 void xLightsFrame::SetPlayMode(play_modes newmode)
 {
-    int sel;
-    wxString s;
-    wxXmlNode* ModelXml;
     switch (newmode) {
         case play_off:
             StatusBar1->SetStatusText(_("Playback: off"));
             break;
         case play_effect:
-            sel=Choice_Models->GetSelection();
-            if (sel == wxNOT_FOUND) {
-                wxMessageBox(_("No model is selected"), _("ERROR"));
-                return;
-            }
-            ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
-            buffer.InitBuffer(ModelXml);
-            s=Choice_LayerMethod->GetStringSelection();
-            buffer.SetMixType(s);
             StatusBar1->SetStatusText(_("Playback: effect"));
             break;
         case play_seqpartial:
@@ -1921,10 +1938,10 @@ void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
             TimerEffect();
             break;
         case play_seqpartial:
-            //TimerSeqPartial();
+            TimerSeqPartial(curtime);
             break;
         case play_seqall:
-            //TimerSeqAll();
+            TimerSeqAll(curtime);
             break;
         case play_single:
         case play_list:

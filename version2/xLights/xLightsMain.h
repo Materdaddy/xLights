@@ -57,6 +57,7 @@
 #include "EffectListDialog.h"
 #include "PaletteMgmtDialog.h"
 #include "SeqParmsDialog.h"
+#include "ChannelMapDialog.h"
 #include "PixelBuffer.h"
 #include "NetInfo.h"
 
@@ -236,8 +237,14 @@ class xLightsFrame: public wxFrame
         void OnButton_Text2_FontClick(wxCommandEvent& event);
         void OnButton_Pictures1_FilenameClick(wxCommandEvent& event);
         void OnButton_Pictures2_FilenameClick(wxCommandEvent& event);
-        void OnButtonOpenSequenceClick(wxCommandEvent& event);
-        void OnButtonSaveSequenceClick(wxCommandEvent& event);
+        void OnButton_UpdateGridClick(wxCommandEvent& event);
+        void OnButton_ChannelMapClick(wxCommandEvent& event);
+        void OnBitmapButtonOpenSeqClick(wxCommandEvent& event);
+        void OnBitmapButtonSaveSeqClick(wxCommandEvent& event);
+        void OnBitmapButtonInsertRowClick(wxCommandEvent& event);
+        void OnBitmapButtonDeleteRowClick(wxCommandEvent& event);
+        void OnButtonDisplayElementsClick(wxCommandEvent& event);
+        void OnGrid1CellChange(wxGridEvent& event);
         //*)
 
         //(*Identifiers(xLightsFrame)
@@ -334,12 +341,15 @@ class xLightsFrame: public wxFrame
         static const long ID_TEXTCTRL_CONVERSION_STATUS;
         static const long ID_PANEL_CONVERT;
         static const long ID_SCROLLEDWINDOW1;
-        static const long ID_BUTTON5;
-        static const long ID_BUTTON1;
-        static const long ID_BUTTON11;
+        static const long ID_STATICTEXT4;
         static const long ID_BUTTON6;
+        static const long ID_BUTTON5;
         static const long ID_BUTTON2;
-        static const long ID_BUTTON12;
+        static const long ID_BUTTON1;
+        static const long ID_BITMAPBUTTON7;
+        static const long ID_BITMAPBUTTON9;
+        static const long ID_BITMAPBUTTON3;
+        static const long ID_BITMAPBUTTON4;
         static const long ID_GRID1;
         static const long ID_BUTTON58;
         static const long ID_CHOICE7;
@@ -584,10 +594,10 @@ class xLightsFrame: public wxFrame
         wxChoice* Choice_Butterfly1_Colors;
         wxCheckBox* CheckBox_Palette2_6;
         wxCheckBox* CheckBoxSaveChannelNames;
+        wxStaticBoxSizer* StaticBoxSizerSequenceButtons;
         wxStaticText* StaticText68;
-        wxSlider* SliderBgIntensity;
-        wxButton* Button_DisplayElements;
         wxSlider* Slider_Snowstorm1_Length;
+        wxSlider* SliderBgIntensity;
         wxCheckBox* CheckBox_Palette1_3;
         wxStaticText* StaticText71;
         wxStaticText* StaticText32;
@@ -607,6 +617,7 @@ class xLightsFrame: public wxFrame
         wxSlider* Slider_Life1_Count;
         wxButton* Button_PlayAll;
         wxTextCtrl* TextCtrlFilename;
+        wxBitmapButton* BitmapButtonDeleteRow;
         wxSlider* Slider_Butterfly2_Chunks;
         wxSlider* Slider_Snowstorm2_Count;
         wxStaticText* StaticText41;
@@ -657,15 +668,18 @@ class xLightsFrame: public wxFrame
         wxChoice* Choice_Bars1_Direction;
         wxButton* ButtonSaveSetup;
         wxButton* ButtonStartConversion;
+        wxBitmapButton* BitmapButtonInsertRow;
         wxSlider* Slider_Life1_Seed;
         wxStaticText* StaticText19;
         wxPanel* Panel2_Butterfly;
         wxButton* ButtonDeleteShow;
         wxChoice* Choice_Bars2_Direction;
+        wxStaticText* StaticTextSequenceFileName;
         wxStaticText* StaticText39;
         wxSlider* Slider_Meteors1_Length;
         wxRadioButton* RadioButtonRgbShimmer;
         wxCheckBox* CheckBox_Bars1_Highlight;
+        wxButton* ButtonDisplayElements;
         wxChoicebook* Choicebook1;
         wxButton* Button_Palette2_2;
         wxPanel* Panel2_Meteors;
@@ -673,7 +687,6 @@ class xLightsFrame: public wxFrame
         wxButton* Button_Palette1_6;
         wxStaticText* StaticText35;
         wxFlexGridSizer* FlexGridSizer_Palette1;
-        wxButton* ButtonOpenSequence;
         wxChoice* ChoiceOutputFormat;
         wxCheckBox* CheckBox_ColorWash2_VFade;
         wxDirDialog* DirDialog1;
@@ -694,7 +707,9 @@ class xLightsFrame: public wxFrame
         wxNotebook* NotebookTest;
         wxRadioButton* RadioButtonTwinkle25;
         wxButton* Button_Palette1_3;
+        wxButton* Button_ChannelMap;
         wxPanel* Panel1_Meteors;
+        wxBitmapButton* BitmapButtonSaveSeq;
         wxSlider* SliderChaseSpeed;
         wxButton* Button_Pictures1_Filename;
         wxButton* Button_Palette1_2;
@@ -778,7 +793,6 @@ class xLightsFrame: public wxFrame
         wxButton* Button_Palette2_3;
         wxStaticText* StaticText74;
         wxButton* Button_Palette1_5;
-        wxButton* Button_TimeSlots;
         wxSlider* Slider_Text1_Top;
         wxPanel* Panel2_Snowflakes;
         wxStaticText* StaticText67;
@@ -813,6 +827,7 @@ class xLightsFrame: public wxFrame
         wxStaticText* StaticText66;
         wxPanel* Panel2_Pictures;
         wxSlider* Slider_Bars2_BarCount;
+        wxBitmapButton* BitmapButtonOpenSeq;
         wxCheckBox* CheckBox_Spirals2_3D;
         wxStaticText* StaticText15;
         wxStaticText* StaticText26;
@@ -867,7 +882,6 @@ class xLightsFrame: public wxFrame
         wxButton* ButtonGracefulStop;
         wxBitmapButton* BitmapButtonMoveNetworkDown;
         wxCheckBox* CheckBox_Bars1_3D;
-        wxButton* ButtonSaveSequence;
         wxStaticText* StaticText9;
         wxButton* ButtonNetworkDeleteAll;
         wxRadioButton* RadioButtonRgbChaseOff;
@@ -950,6 +964,7 @@ class xLightsFrame: public wxFrame
         std::string base64_decode(const wxString& encoded_string);
 
         wxString mediaFilename;
+        wxString xlightsFilename;
         wxUint8 * SeqData;
         long SeqDataLen;
         long SeqNumPeriods;
@@ -984,6 +999,7 @@ class xLightsFrame: public wxFrame
         void AddPlaylist(const wxString& name);
         wxString OnOffString(bool b);
         wxString CreateScript(wxString ListName, bool Repeat, bool FirstItemOnce, bool LastItemOnce, bool LightsOff, bool Random);
+        bool PlayCurrentXlightsFile();
         void RunPlaylist(int nbidx, wxString& script);
         void PlayerError(const wxString& msg);
         void SendToLogAndStatusBar(const wxString& msg);
@@ -1022,29 +1038,33 @@ class xLightsFrame: public wxFrame
         wxString SizerControlsToString(wxSizer* sizer);
         void LoadSizerControlsToAttr(wxSizer* sizer,wxXmlNode* x);
         void TimerEffect();
-        void TimerSeqPartial();
-        void TimerSeqAll();
+        void TimerSeqPartial(long msec);
+        void TimerSeqAll(long msec);
         void UpdateBufferPalette();
         void SetChoicebook(wxChoicebook* cb, wxString& PageName);
         void SetEffectControls(wxString settings);
         wxXmlNode* CreateEffectNode(wxString& name);
         wxString CreateEffectString();
         void OpenPaletteDialog(const wxString& id1, const wxString& id2, wxSizer* PrimarySizer,wxSizer* SecondarySizer);
+        void ChooseModelsForSequence();
+        void GetGridColumnLabels(wxArrayString& a);
+        void DisplayXlightsFilename(const wxString& filename);
+        void CopyRow(int row1, int row2);
+        void NumericSort();
+        double GetGridStartTime(int row);
 
-        wxXmlDocument SequenceXml;
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;
         wxXmlNode* ModelsNode;
         wxXmlNode* PalettesNode;
-        wxXmlNode* SeqModelsNode;
-        wxXmlNode* SeqDataNode;
         bool PaletteChanged;
         bool MixTypeChanged;
         long SeqBaseChannel;
         wxString SeqXmlFileName;
         PixelBufferClass buffer;
         wxHtmlEasyPrinting* HtmlEasyPrint;
-
+        int NextGridRowToPlay;
+        int SeqPlayColumn;
 
 
         DECLARE_EVENT_TABLE()
