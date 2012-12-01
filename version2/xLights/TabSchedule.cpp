@@ -286,14 +286,15 @@ void xLightsFrame::OnButtonPlaylistDeleteAllClick(wxCommandEvent& event) {
     ScanForFiles();
 }
 
-void xLightsFrame::ResetTimer(SeqPlayerStates newstate) {
+void xLightsFrame::ResetTimer(SeqPlayerStates newstate, long OffsetMsec) {
     SeqPlayerState = newstate;
 #ifndef NDEBUG
     TextCtrlLog->AppendText(wxString::Format(_("ResetTimer mode=%d state=%d\n"),play_mode,SeqPlayerState));
 #endif
     //if (newstate == NO_SEQ) SetPlayMode(play_off);
     if (xout) xout->ResetTimer();
-    starttime = wxDateTime::UNow();
+    wxTimeSpan offset(0,0,0,OffsetMsec);
+    starttime = wxDateTime::UNow() - offset;
 }
 
 long xLightsFrame::DiffSeconds(wxString& strTime, wxTimeSpan& tsCurrent)

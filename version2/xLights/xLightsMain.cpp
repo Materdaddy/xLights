@@ -165,9 +165,19 @@ const long xLightsFrame::ID_STATICTEXT18 = wxNewId();
 const long xLightsFrame::ID_TEXTCTRL_CONVERSION_STATUS = wxNewId();
 const long xLightsFrame::ID_PANEL_CONVERT = wxNewId();
 const long xLightsFrame::ID_SCROLLEDWINDOW1 = wxNewId();
+const long xLightsFrame::ID_BUTTON13 = wxNewId();
+const long xLightsFrame::ID_BUTTON58 = wxNewId();
+const long xLightsFrame::ID_CHOICE7 = wxNewId();
+const long xLightsFrame::ID_BUTTON59 = wxNewId();
+const long xLightsFrame::ID_CHOICE2 = wxNewId();
+const long xLightsFrame::ID_BUTTON9 = wxNewId();
+const long xLightsFrame::ID_BUTTON8 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT23 = wxNewId();
+const long xLightsFrame::ID_CHOICE_LayerMethod = wxNewId();
+const long xLightsFrame::ID_STATICTEXT24 = wxNewId();
+const long xLightsFrame::ID_SLIDER_SparkleFrequency = wxNewId();
 const long xLightsFrame::ID_STATICTEXT4 = wxNewId();
-const long xLightsFrame::ID_BUTTON6 = wxNewId();
-const long xLightsFrame::ID_BUTTON5 = wxNewId();
+const long xLightsFrame::ID_BUTTON_PLAY_RGB_SEQ = wxNewId();
 const long xLightsFrame::ID_BUTTON2 = wxNewId();
 const long xLightsFrame::ID_BUTTON1 = wxNewId();
 const long xLightsFrame::ID_BITMAPBUTTON7 = wxNewId();
@@ -175,19 +185,6 @@ const long xLightsFrame::ID_BITMAPBUTTON9 = wxNewId();
 const long xLightsFrame::ID_BITMAPBUTTON3 = wxNewId();
 const long xLightsFrame::ID_BITMAPBUTTON4 = wxNewId();
 const long xLightsFrame::ID_GRID1 = wxNewId();
-const long xLightsFrame::ID_BUTTON58 = wxNewId();
-const long xLightsFrame::ID_CHOICE7 = wxNewId();
-const long xLightsFrame::ID_BUTTON13 = wxNewId();
-const long xLightsFrame::ID_BUTTON59 = wxNewId();
-const long xLightsFrame::ID_CHOICE2 = wxNewId();
-const long xLightsFrame::ID_BUTTON9 = wxNewId();
-const long xLightsFrame::ID_BUTTON8 = wxNewId();
-const long xLightsFrame::ID_BUTTON10 = wxNewId();
-const long xLightsFrame::ID_STATICTEXT23 = wxNewId();
-const long xLightsFrame::ID_CHOICE_LayerMethod = wxNewId();
-const long xLightsFrame::ID_BUTTON56 = wxNewId();
-const long xLightsFrame::ID_STATICTEXT24 = wxNewId();
-const long xLightsFrame::ID_SLIDER_SparkleFrequency = wxNewId();
 const long xLightsFrame::ID_PANEL4 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT25 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Bars1_BarCount = wxNewId();
@@ -411,7 +408,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
 {
 
     //(*Initialize(xLightsFrame)
+    wxBoxSizer* BoxSizer4;
     wxStaticBoxSizer* StaticBoxSizer2;
+    wxBoxSizer* BoxSizer6;
     wxMenu* MenuHelp;
     wxFlexGridSizer* FlexGridSizer4;
     wxFlexGridSizer* FlexGridSizer45;
@@ -838,16 +837,58 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizerConvert->Fit(PanelConvert);
     FlexGridSizerConvert->SetSizeHints(PanelConvert);
     PanelSequence = new wxPanel(Notebook1, ID_PANEL_SEQUENCE, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL_SEQUENCE"));
-    FlexGridSizer3 = new wxFlexGridSizer(2, 2, 0, 0);
+    FlexGridSizer3 = new wxFlexGridSizer(2, 4, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
     FlexGridSizer3->AddGrowableRow(0);
+    BoxSizer6 = new wxBoxSizer(wxVERTICAL);
     FlexGridSizer30 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer30->AddGrowableCol(0);
     FlexGridSizer30->AddGrowableRow(0);
     ScrolledWindow1 = new wxScrolledWindow(PanelSequence, ID_SCROLLEDWINDOW1, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxVSCROLL|wxHSCROLL, _T("ID_SCROLLEDWINDOW1"));
     ScrolledWindow1->SetBackgroundColour(wxColour(0,0,0));
     FlexGridSizer30->Add(ScrolledWindow1, 1, wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 0);
-    FlexGridSizer3->Add(FlexGridSizer30, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer6->Add(FlexGridSizer30, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, PanelSequence, _("Combined Effect"));
+    FlexGridSizer33 = new wxFlexGridSizer(0, 2, 0, 0);
+    Button_PlayEffect = new wxButton(PanelSequence, ID_BUTTON13, _("Play Effect"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON13"));
+    Button_PlayEffect->Disable();
+    Button_PlayEffect->SetBackgroundColour(wxColour(0,255,0));
+    FlexGridSizer33->Add(Button_PlayEffect, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer33->Add(-1,-1,1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Button_Models = new wxButton(PanelSequence, ID_BUTTON58, _("Models"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON58"));
+    Button_Models->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer33->Add(Button_Models, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Choice_Models = new wxChoice(PanelSequence, ID_CHOICE7, wxDefaultPosition, wxDefaultSize, 0, 0, wxCB_SORT, wxDefaultValidator, _T("ID_CHOICE7"));
+    FlexGridSizer33->Add(Choice_Models, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Button_Presets = new wxButton(PanelSequence, ID_BUTTON59, _("Effect Presets"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON59"));
+    Button_Presets->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer33->Add(Button_Presets, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Choice_Presets = new wxChoice(PanelSequence, ID_CHOICE2, wxDefaultPosition, wxDefaultSize, 0, 0, wxCB_SORT, wxDefaultValidator, _T("ID_CHOICE2"));
+    FlexGridSizer33->Add(Choice_Presets, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Button_PresetAdd = new wxButton(PanelSequence, ID_BUTTON9, _("New Preset"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON9"));
+    Button_PresetAdd->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer33->Add(Button_PresetAdd, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Button_PresetUpdate = new wxButton(PanelSequence, ID_BUTTON8, _("Update"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
+    Button_PresetUpdate->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer33->Add(Button_PresetUpdate, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText21 = new wxStaticText(PanelSequence, ID_STATICTEXT23, _("Layer Method"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT23"));
+    FlexGridSizer33->Add(StaticText21, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Choice_LayerMethod = new wxChoice(PanelSequence, ID_CHOICE_LayerMethod, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_LayerMethod"));
+    Choice_LayerMethod->SetSelection( Choice_LayerMethod->Append(_("Effect 1")) );
+    Choice_LayerMethod->Append(_("Effect 2"));
+    Choice_LayerMethod->Append(_("1 is Mask"));
+    Choice_LayerMethod->Append(_("2 is Mask"));
+    Choice_LayerMethod->Append(_("Layered"));
+    Choice_LayerMethod->Append(_("Average"));
+    FlexGridSizer33->Add(Choice_LayerMethod, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText22 = new wxStaticText(PanelSequence, ID_STATICTEXT24, _("Sparkles"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT24"));
+    FlexGridSizer33->Add(StaticText22, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Slider_SparkleFrequency = new wxSlider(PanelSequence, ID_SLIDER_SparkleFrequency, 200, 10, 200, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE, wxDefaultValidator, _T("ID_SLIDER_SparkleFrequency"));
+    FlexGridSizer33->Add(Slider_SparkleFrequency, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer3->Add(FlexGridSizer33, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer6->Add(StaticBoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer3->Add(BoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer4 = new wxBoxSizer(wxVERTICAL);
     StaticBoxSizerSequenceButtons = new wxStaticBoxSizer(wxVERTICAL, PanelSequence, _("RGB Sequence"));
     FlexGridSizer32 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer32->AddGrowableCol(0);
@@ -855,16 +896,14 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticTextSequenceFileName = new wxStaticText(PanelSequence, ID_STATICTEXT4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer32->Add(StaticTextSequenceFileName, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 3);
     FlexGridSizer68 = new wxFlexGridSizer(0, 9, 0, 0);
-    Button_PlayAll = new wxButton(PanelSequence, ID_BUTTON6, _("Play All"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
-    Button_PlayAll->SetBackgroundColour(wxColour(0,255,0));
-    FlexGridSizer68->Add(Button_PlayAll, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
-    Button_PlaySelection = new wxButton(PanelSequence, ID_BUTTON5, _("Play Selection"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
-    Button_PlaySelection->SetBackgroundColour(wxColour(0,255,0));
-    FlexGridSizer68->Add(Button_PlaySelection, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
+    Button_PlayRgbSeq = new wxButton(PanelSequence, ID_BUTTON_PLAY_RGB_SEQ, _("Play"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_PLAY_RGB_SEQ"));
+    Button_PlayRgbSeq->SetBackgroundColour(wxColour(0,255,0));
+    Button_PlayRgbSeq->SetToolTip(_("Play from current grid cell"));
+    FlexGridSizer68->Add(Button_PlayRgbSeq, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     ButtonDisplayElements = new wxButton(PanelSequence, ID_BUTTON2, _("Display Elements"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     ButtonDisplayElements->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer68->Add(ButtonDisplayElements, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Button_ChannelMap = new wxButton(PanelSequence, ID_BUTTON1, _("Chan Map"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    Button_ChannelMap = new wxButton(PanelSequence, ID_BUTTON1, _("Channel Map"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     Button_ChannelMap->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer68->Add(Button_ChannelMap, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     BitmapButtonOpenSeq = new wxBitmapButton(PanelSequence, ID_BITMAPBUTTON7, open_xpm, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON7"));
@@ -884,7 +923,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     BitmapButtonDeleteRow->SetToolTip(_("Delete Row"));
     FlexGridSizer68->Add(BitmapButtonDeleteRow, 1, wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer32->Add(FlexGridSizer68, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Grid1 = new wxGrid(PanelSequence, ID_GRID1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_GRID1"));
+    Grid1 = new wxGrid(PanelSequence, ID_GRID1, wxDefaultPosition, wxDefaultSize, wxVSCROLL|wxFULL_REPAINT_ON_RESIZE, _T("ID_GRID1"));
     Grid1->CreateGrid(0,2);
     Grid1->EnableEditing(true);
     Grid1->EnableGridLines(true);
@@ -895,53 +934,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Grid1->SetDefaultCellTextColour( Grid1->GetForegroundColour() );
     FlexGridSizer32->Add(Grid1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizerSequenceButtons->Add(FlexGridSizer32, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer3->Add(StaticBoxSizerSequenceButtons, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, PanelSequence, _("Combined Effect"));
-    FlexGridSizer33 = new wxFlexGridSizer(0, 3, 0, 0);
-    Button_Models = new wxButton(PanelSequence, ID_BUTTON58, _("Models"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON58"));
-    Button_Models->SetBackgroundColour(wxColour(224,224,224));
-    FlexGridSizer33->Add(Button_Models, 1, wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Choice_Models = new wxChoice(PanelSequence, ID_CHOICE7, wxDefaultPosition, wxDefaultSize, 0, 0, wxCB_SORT, wxDefaultValidator, _T("ID_CHOICE7"));
-    FlexGridSizer33->Add(Choice_Models, 1, wxBOTTOM|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Button_PlayEffect = new wxButton(PanelSequence, ID_BUTTON13, _("Play Effect"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON13"));
-    Button_PlayEffect->Disable();
-    Button_PlayEffect->SetBackgroundColour(wxColour(0,255,0));
-    FlexGridSizer33->Add(Button_PlayEffect, 1, wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Button_Presets = new wxButton(PanelSequence, ID_BUTTON59, _("Effect Presets"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON59"));
-    Button_Presets->SetBackgroundColour(wxColour(224,224,224));
-    FlexGridSizer33->Add(Button_Presets, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Choice_Presets = new wxChoice(PanelSequence, ID_CHOICE2, wxDefaultPosition, wxDefaultSize, 0, 0, wxCB_SORT, wxDefaultValidator, _T("ID_CHOICE2"));
-    FlexGridSizer33->Add(Choice_Presets, 1, wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer33->Add(-1,-1,1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Button_PresetAdd = new wxButton(PanelSequence, ID_BUTTON9, _("Add Preset"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON9"));
-    Button_PresetAdd->SetBackgroundColour(wxColour(224,224,224));
-    FlexGridSizer33->Add(Button_PresetAdd, 1, wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Button_PresetUpdate = new wxButton(PanelSequence, ID_BUTTON8, _("Update Preset"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
-    Button_PresetUpdate->SetBackgroundColour(wxColour(224,224,224));
-    FlexGridSizer33->Add(Button_PresetUpdate, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Button_UpdateGrid = new wxButton(PanelSequence, ID_BUTTON10, _("Update Grid"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
-    Button_UpdateGrid->SetBackgroundColour(wxColour(224,224,224));
-    FlexGridSizer33->Add(Button_UpdateGrid, 1, wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText21 = new wxStaticText(PanelSequence, ID_STATICTEXT23, _("Layer Method"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT23"));
-    FlexGridSizer33->Add(StaticText21, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Choice_LayerMethod = new wxChoice(PanelSequence, ID_CHOICE_LayerMethod, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_LayerMethod"));
-    Choice_LayerMethod->SetSelection( Choice_LayerMethod->Append(_("Effect 1")) );
-    Choice_LayerMethod->Append(_("Effect 2"));
-    Choice_LayerMethod->Append(_("1 is Mask"));
-    Choice_LayerMethod->Append(_("2 is Mask"));
-    Choice_LayerMethod->Append(_("Layered"));
-    Choice_LayerMethod->Append(_("Average"));
-    FlexGridSizer33->Add(Choice_LayerMethod, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Button_SaveEffects = new wxButton(PanelSequence, ID_BUTTON56, _("Save File"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON56"));
-    Button_SaveEffects->SetBackgroundColour(wxColour(224,224,224));
-    FlexGridSizer33->Add(Button_SaveEffects, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText22 = new wxStaticText(PanelSequence, ID_STATICTEXT24, _("Sparkles"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT24"));
-    FlexGridSizer33->Add(StaticText22, 1, wxBOTTOM|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Slider_SparkleFrequency = new wxSlider(PanelSequence, ID_SLIDER_SparkleFrequency, 200, 10, 200, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE, wxDefaultValidator, _T("ID_SLIDER_SparkleFrequency"));
-    FlexGridSizer33->Add(Slider_SparkleFrequency, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer33->Add(-1,-1,1, wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer3->Add(FlexGridSizer33, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer3->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
+    BoxSizer4->Add(StaticBoxSizerSequenceButtons, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
     StaticBoxSizer4 = new wxStaticBoxSizer(wxVERTICAL, PanelSequence, _("Effect 1"));
     FlexGridSizer34 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -1224,7 +1217,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer48->Add(Slider_Speed1, 1, wxTOP|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer34->Add(FlexGridSizer48, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
     StaticBoxSizer4->Add(FlexGridSizer34, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer5->Add(StaticBoxSizer4, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer5->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer5 = new wxStaticBoxSizer(wxVERTICAL, PanelSequence, _("Effect 2"));
     FlexGridSizer49 = new wxFlexGridSizer(0, 3, 0, 0);
     Choicebook2 = new wxChoicebook(PanelSequence, ID_CHOICEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_CHOICEBOOK2"));
@@ -1506,8 +1499,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer63->Add(Slider_Speed2, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer49->Add(FlexGridSizer63, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
     StaticBoxSizer5->Add(FlexGridSizer49, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer5->Add(StaticBoxSizer5, 1, wxLEFT|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
-    FlexGridSizer3->Add(BoxSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer5->Add(StaticBoxSizer5, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
+    BoxSizer4->Add(BoxSizer5, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer3->Add(BoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     PanelSequence->SetSizer(FlexGridSizer3);
     FlexGridSizer3->Fit(PanelSequence);
     FlexGridSizer3->SetSizeHints(PanelSequence);
@@ -1691,8 +1685,14 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_RADIOBUTTON27,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnRadioButtonDimSelect);
     Connect(ID_BUTTON_CHOOSE_FILE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonChooseFileClick);
     Connect(ID_BUTTON_START_CONVERSION,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonStartConversionClick);
-    Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayAllClick);
-    Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlaySelectionClick);
+    Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayEffectClick);
+    Connect(ID_BUTTON58,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ModelsClick);
+    Connect(ID_BUTTON59,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetsClick);
+    Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_PresetsSelect);
+    Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetAddClick);
+    Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetUpdateClick);
+    Connect(ID_CHOICE_LayerMethod,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_LayerMethodSelect);
+    Connect(ID_BUTTON_PLAY_RGB_SEQ,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayAllClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonDisplayElementsClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ChannelMapClick);
     Connect(ID_BITMAPBUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonOpenSeqClick);
@@ -1700,15 +1700,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonInsertRowClick);
     Connect(ID_BITMAPBUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonDeleteRowClick);
     Connect(ID_GRID1,wxEVT_GRID_CELL_CHANGE,(wxObjectEventFunction)&xLightsFrame::OnGrid1CellChange);
-    Connect(ID_BUTTON58,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ModelsClick);
-    Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayEffectClick);
-    Connect(ID_BUTTON59,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetsClick);
-    Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_PresetsSelect);
-    Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetAddClick);
-    Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetUpdateClick);
-    Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_UpdateGridClick);
-    Connect(ID_CHOICE_LayerMethod,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_LayerMethodSelect);
-    Connect(ID_BUTTON56,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_SaveEffectsClick);
     Connect(ID_BUTTON_PICTURES1_FILENAME,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Pictures1_FilenameClick);
     Connect(ID_BUTTON_TEXT1_FONT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Text1_FontClick);
     Connect(ID_BUTTON_Palette1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Palette1Click);
@@ -1890,16 +1881,12 @@ void xLightsFrame::SetPlayMode(play_modes newmode)
         case play_effect:
             StatusBar1->SetStatusText(_("Playback: effect"));
             break;
-        case play_seqpartial:
-            StatusBar1->SetStatusText(_("Playback: sequence selection"));
-            break;
-        case play_seqall:
-            StatusBar1->SetStatusText(_("Playback: complete sequence"));
+        case play_rgbseq:
+            StatusBar1->SetStatusText(_("Playback: RGB sequence"));
             break;
     }
     Button_PlayEffect->Enable(newmode == play_off && Choice_Models->GetCount() > 0);
-    Button_PlaySelection->Enable(newmode == play_off);
-    Button_PlayAll->Enable(newmode == play_off);
+    Button_PlayRgbSeq->Enable(newmode == play_off);
     Button_Models->Enable(newmode == play_off);
     Button_Presets->Enable(newmode == play_off);
     Choice_Models->Enable(newmode == play_off);
@@ -1921,9 +1908,11 @@ void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
 {
     wxCriticalSectionLocker locker(gs_xoutCriticalSection);
     static int CheckSchedCount=1;
+    bool OneSecondUpdate=false;
     if (--CheckSchedCount <= 0) {
         CheckSchedule();
         CheckSchedCount=20;  // check every 20 ticks
+        OneSecondUpdate=true;
     }
     wxTimeSpan ts = wxDateTime::UNow() - starttime;
     long curtime = ts.GetMilliseconds().ToLong();
@@ -1937,11 +1926,8 @@ void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
         case play_effect:
             TimerEffect();
             break;
-        case play_seqpartial:
-            TimerSeqPartial(curtime);
-            break;
-        case play_seqall:
-            TimerSeqAll(curtime);
+        case play_rgbseq:
+            TimerRgbSeq(curtime,OneSecondUpdate);
             break;
         case play_single:
         case play_list:
@@ -2091,6 +2077,8 @@ void xLightsFrame::OnButtonStopNowClick(wxCommandEvent& event)
     if (play_mode == play_sched) {
         CheckBoxRunSchedule->SetValue(false);
         CheckRunSchedule();
+    } else if (play_mode == play_rgbseq) {
+        PlayerDlg->MediaCtrl->Stop();
     } else {
         basic.halt();
     }

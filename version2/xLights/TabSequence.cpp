@@ -4,28 +4,19 @@
     EffectsXml.SetRoot( root );
 }
 
-void xLightsFrame::OnButton_PlaySelectionClick(wxCommandEvent& event)
-{
-    if (xlightsFilename.IsEmpty()) {
-        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
-        return;
-    }
-    SetPlayMode(play_seqpartial);
-}
-
 void xLightsFrame::OnButton_PlayAllClick(wxCommandEvent& event)
 {
     if (xlightsFilename.IsEmpty()) {
         wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
         return;
     }
-    wxArrayInt cols=Grid1->GetSelectedCols();
-    if (cols.GetCount() == 0 || cols[0] < 2) {
-        wxMessageBox(wxT("Select the column that will be modeled before clicking Play"), wxT("Error"));
+    SeqPlayColumn=Grid1->GetGridCursorCol();
+    if (SeqPlayColumn < 2) {
+        wxMessageBox(wxT("Select a cell in a display element column before clicking Play"), wxT("Error"));
         return;
     }
+    NextGridRowToPlay=Grid1->GetGridCursorRow();
 
-    SeqPlayColumn=cols[0];
     wxString ModelName=Grid1->GetColLabelValue(SeqPlayColumn);
     Choice_Models->SetStringSelection(ModelName);
     int sel=Choice_Models->GetSelection();
@@ -36,7 +27,7 @@ void xLightsFrame::OnButton_PlayAllClick(wxCommandEvent& event)
     wxXmlNode* ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
     buffer.InitBuffer(ModelXml);
     //buffer.SetMixType(Choice_LayerMethod->GetStringSelection());
-    SetPlayMode(play_seqall);
+    SetPlayMode(play_rgbseq);
     PlayCurrentXlightsFile();
 }
 
@@ -68,6 +59,7 @@ void xLightsFrame::OnButton_PresetsClick(wxCommandEvent& event)
     dialog.ShowModal();
     UpdateEffectsList();
     PresetsSelect();
+    SaveEffectsFile();
 }
 
 void xLightsFrame::SetChoicebook(wxChoicebook* cb, wxString& PageName)
@@ -137,7 +129,7 @@ void xLightsFrame::SetEffectControls(wxString settings)
 void xLightsFrame::PresetsSelect()
 {
     int NameIdx=Choice_Presets->GetSelection();
-    if (NameIdx != wxNOT_FOUND) {
+    if (NameIdx != wxNOT_FOUND && NameIdx > 0) {
         wxXmlNode* x=(wxXmlNode*)Choice_Presets->GetClientData(NameIdx);
         SetEffectControls(x->GetAttribute("settings"));
     }
@@ -179,6 +171,7 @@ void xLightsFrame::OnButton_PresetAddClick(wxCommandEvent& event)
     EffectsNode->AddChild(CreateEffectNode(name));
     UpdateEffectsList();
     Choice_Presets->SetStringSelection(name);
+    SaveEffectsFile();
 }
 
 wxXmlNode* xLightsFrame::CreateEffectNode(wxString& name)
@@ -211,7 +204,31 @@ void xLightsFrame::OnButton_PresetUpdateClick(wxCommandEvent& event)
     int NameIdx=Choice_Presets->GetSelection();
     if (NameIdx == wxNOT_FOUND) {
         wxMessageBox(_("No preset name is selected"), _("ERROR"));
+    } else if (NameIdx == 0) {
+        // update grid
+        int r,c;
+        wxString v=CreateEffectString();
+        if ( Grid1->IsSelection() ) {
+            // iterate over entire grid looking for selected cells
+            int nRows = Grid1->GetNumberRows();
+            int nCols = Grid1->GetNumberCols();
+            for (r=0; r<nRows; r++) {
+                for (c=2; c<nCols; c++) {
+                    if (Grid1->IsInSelection(r,c)) {
+                        Grid1->SetCellValue(r,c,v);
+                    }
+                }
+            }
+        } else {
+            // copy to current cell
+            r=Grid1->GetGridCursorRow();
+            c=Grid1->GetGridCursorCol();
+            if (c >=2) {
+                Grid1->SetCellValue(r,c,v);
+            }
+        }
     } else {
+        // update preset
         // delete old xml entry
         wxXmlNode* OldXml=(wxXmlNode*)Choice_Presets->GetClientData(NameIdx);
         EffectsNode->RemoveChild(OldXml);
@@ -221,17 +238,13 @@ void xLightsFrame::OnButton_PresetUpdateClick(wxCommandEvent& event)
         EffectsNode->AddChild(CreateEffectNode(name));
         UpdateEffectsList();
         Choice_Presets->SetStringSelection(name);
+        SaveEffectsFile();
     }
 }
 
 void xLightsFrame::OnChoice_LayerMethodSelect(wxCommandEvent& event)
 {
     MixTypeChanged=true;
-}
-
-void xLightsFrame::OnButton_SaveEffectsClick(wxCommandEvent& event)
-{
-    SaveEffectsFile();
 }
 
 void xLightsFrame::OnButton_ModelsClick(wxCommandEvent& event)
@@ -282,6 +295,7 @@ void xLightsFrame::UpdateEffectsList()
     wxString name;
     wxString SelectedStr=Choice_Presets->GetStringSelection();
     Choice_Presets->Clear();
+    Choice_Presets->Append(wxT(" <grid>"));
     for(wxXmlNode* e=EffectsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == wxT("effect")) {
             name=e->GetAttribute(wxT("name"));
@@ -612,20 +626,21 @@ void xLightsFrame::TimerEffect()
     }
 }
 
-void xLightsFrame::TimerSeqPartial(long msec)
+void xLightsFrame::UpdateRgbPlaybackStatus(int seconds, const wxString& seqtype)
 {
+    int m=seconds/60;
+    int s=seconds%60;
+    StatusBar1->SetStatusText(wxString::Format(wxT("Playback: RGB ")+seqtype+wxT(" sequence %d:%02d"),m,s));
 }
 
-void xLightsFrame::TimerSeqAll(long msec)
+void xLightsFrame::TimerRgbSeq(long msec, bool OneSecondUpdate)
 {
     int period;
     long StartTime;
-    double d;
     int rowcnt=Grid1->GetNumberRows();
     switch (SeqPlayerState) {
         case STARTING_SEQ_ANIM:
-            NextGridRowToPlay=0;
-            ResetTimer(PLAYING_SEQ_ANIM);
+            ResetTimer(PLAYING_SEQ_ANIM, GetGridStartTimeMSec(NextGridRowToPlay));
             break;
         case PLAYING_SEQ_ANIM:
             if (xout && !xout->TxEmpty()) {
@@ -638,23 +653,23 @@ void xLightsFrame::TimerSeqAll(long msec)
                 if (xout) xout->alloff();
                 SetPlayMode(play_off);
             } else {
-                if (NextGridRowToPlay < rowcnt) {
-                    d=GetGridStartTime(NextGridRowToPlay);
-                    StartTime=long(d*1000.0);
-                    if (msec >= StartTime) {
-                        // start next effect
-                        SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
-                        NextGridRowToPlay++;
-                    }
+                if (NextGridRowToPlay < rowcnt && msec >= GetGridStartTimeMSec(NextGridRowToPlay)) {
+                    // start next effect
+                    Grid1->MakeCellVisible(NextGridRowToPlay,SeqPlayColumn);
+                    Grid1->SelectBlock(NextGridRowToPlay,SeqPlayColumn,NextGridRowToPlay,SeqPlayColumn);
+                    SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
+                    NextGridRowToPlay++;
                 }
                 TimerEffect();
+                if (OneSecondUpdate) UpdateRgbPlaybackStatus(period/20,wxT("animation"));
             }
             break;
         case STARTING_SEQ:
+            StartTime=GetGridStartTimeMSec(NextGridRowToPlay);
             if(PlayerDlg->MediaCtrl->GetState() == wxMEDIASTATE_PLAYING){
-                NextGridRowToPlay=0;
-                ResetTimer(PLAYING_SEQ);
+                ResetTimer(PLAYING_SEQ, StartTime);
             } else {
+                PlayerDlg->MediaCtrl->Seek(StartTime);
                 PlayerDlg->MediaCtrl->Play();
             }
             break;
@@ -671,16 +686,15 @@ void xLightsFrame::TimerSeqAll(long msec)
                 if (xout) xout->alloff();
                 SetPlayMode(play_off);
             } else {
-                if (NextGridRowToPlay < rowcnt) {
-                    d=GetGridStartTime(NextGridRowToPlay);
-                    StartTime=long(d*1000.0);
-                    if (msec >= StartTime) {
-                        // start next effect
-                        SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
-                        NextGridRowToPlay++;
-                    }
+                if (NextGridRowToPlay < rowcnt && msec >= GetGridStartTimeMSec(NextGridRowToPlay)) {
+                    // start next effect
+                    Grid1->MakeCellVisible(NextGridRowToPlay,SeqPlayColumn);
+                    Grid1->SelectBlock(NextGridRowToPlay,SeqPlayColumn,NextGridRowToPlay,SeqPlayColumn);
+                    SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
+                    NextGridRowToPlay++;
                 }
                 TimerEffect();
+                if (OneSecondUpdate) UpdateRgbPlaybackStatus(period/20,wxT("music"));
             }
             break;
     }
@@ -985,6 +999,14 @@ void xLightsFrame::CopyRow(int row1, int row2)
     }
 }
 
+// returns time in milliseconds
+long xLightsFrame::GetGridStartTimeMSec(int row)
+{
+    double d=GetGridStartTime(row);
+    return long(d*1000.0);
+}
+
+// returns time in seconds
 double xLightsFrame::GetGridStartTime(int row)
 {
     double d;
@@ -1030,31 +1052,5 @@ void xLightsFrame::OnGrid1CellChange(wxGridEvent& event)
         //StatusBar1->SetStatusText(_("New grid value=")+Grid1->GetCellValue(row,col));
         NumericSort();
         Grid1->EnableEditing(true);
-    }
-}
-
-void xLightsFrame::OnButton_UpdateGridClick(wxCommandEvent& event)
-{
-    int r,c;
-    wxString v=CreateEffectString();
-    if ( Grid1->IsSelection() ) {
-        // iterate over entire grid looking for selected cells
-        int nRows = Grid1->GetNumberRows();
-        int nCols = Grid1->GetNumberCols();
-        for (r=0; r<nRows; r++) {
-            for (c=2; c<nCols; c++) {
-                if (Grid1->IsInSelection(r,c)) {
-                    Grid1->SetCellValue(r,c,v);
-                }
-            }
-        }
-    } else {
-        // copy to current cell
-        //StatusBar1->SetStatusText(_("no cells selected"));
-        r=Grid1->GetGridCursorRow();
-        c=Grid1->GetGridCursorCol();
-        if (c >=2) {
-            Grid1->SetCellValue(r,c,v);
-        }
     }
 }

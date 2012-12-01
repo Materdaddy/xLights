@@ -78,8 +78,7 @@ static wxCriticalSection gs_xoutCriticalSection;
 enum play_modes {
     play_off,
     play_effect,
-    play_seqpartial,
-    play_seqall,
+    play_rgbseq,
     play_test,
     play_single,
     play_list,
@@ -221,7 +220,6 @@ class xLightsFrame: public wxFrame
         void OnButtonSaveScheduleClick(wxCommandEvent& event);
         void OnMenuItemSavePlaylistsSelected(wxCommandEvent& event);
         void OnButtonNetworkDeleteAllClick(wxCommandEvent& event);
-        void OnButton_PlaySelectionClick(wxCommandEvent& event);
         void OnButton_PlayAllClick(wxCommandEvent& event);
         void OnButton_PlayEffectClick(wxCommandEvent& event);
         void OnButton_PresetsClick(wxCommandEvent& event);
@@ -229,7 +227,6 @@ class xLightsFrame: public wxFrame
         void OnButton_PresetAddClick(wxCommandEvent& event);
         void OnButton_PresetUpdateClick(wxCommandEvent& event);
         void OnChoice_LayerMethodSelect(wxCommandEvent& event);
-        void OnButton_SaveEffectsClick(wxCommandEvent& event);
         void OnButton_ModelsClick(wxCommandEvent& event);
         void OnButton_Palette1Click(wxCommandEvent& event);
         void OnButton_Palette2Click(wxCommandEvent& event);
@@ -341,9 +338,19 @@ class xLightsFrame: public wxFrame
         static const long ID_TEXTCTRL_CONVERSION_STATUS;
         static const long ID_PANEL_CONVERT;
         static const long ID_SCROLLEDWINDOW1;
+        static const long ID_BUTTON13;
+        static const long ID_BUTTON58;
+        static const long ID_CHOICE7;
+        static const long ID_BUTTON59;
+        static const long ID_CHOICE2;
+        static const long ID_BUTTON9;
+        static const long ID_BUTTON8;
+        static const long ID_STATICTEXT23;
+        static const long ID_CHOICE_LayerMethod;
+        static const long ID_STATICTEXT24;
+        static const long ID_SLIDER_SparkleFrequency;
         static const long ID_STATICTEXT4;
-        static const long ID_BUTTON6;
-        static const long ID_BUTTON5;
+        static const long ID_BUTTON_PLAY_RGB_SEQ;
         static const long ID_BUTTON2;
         static const long ID_BUTTON1;
         static const long ID_BITMAPBUTTON7;
@@ -351,19 +358,6 @@ class xLightsFrame: public wxFrame
         static const long ID_BITMAPBUTTON3;
         static const long ID_BITMAPBUTTON4;
         static const long ID_GRID1;
-        static const long ID_BUTTON58;
-        static const long ID_CHOICE7;
-        static const long ID_BUTTON13;
-        static const long ID_BUTTON59;
-        static const long ID_CHOICE2;
-        static const long ID_BUTTON9;
-        static const long ID_BUTTON8;
-        static const long ID_BUTTON10;
-        static const long ID_STATICTEXT23;
-        static const long ID_CHOICE_LayerMethod;
-        static const long ID_BUTTON56;
-        static const long ID_STATICTEXT24;
-        static const long ID_SLIDER_SparkleFrequency;
         static const long ID_PANEL4;
         static const long ID_STATICTEXT25;
         static const long ID_SLIDER_Bars1_BarCount;
@@ -596,14 +590,15 @@ class xLightsFrame: public wxFrame
         wxCheckBox* CheckBoxSaveChannelNames;
         wxStaticBoxSizer* StaticBoxSizerSequenceButtons;
         wxStaticText* StaticText68;
-        wxSlider* Slider_Snowstorm1_Length;
         wxSlider* SliderBgIntensity;
+        wxSlider* Slider_Snowstorm1_Length;
         wxCheckBox* CheckBox_Palette1_3;
         wxStaticText* StaticText71;
         wxStaticText* StaticText32;
         wxCheckBox* CheckBox_Palette1_5;
         wxChoice* Choice_Butterfly2_Colors;
         wxStaticText* StaticText36;
+        wxButton* Button_PlayRgbSeq;
         wxPanel* Panel2;
         wxButton* ButtonTestSelectAll;
         wxButton* Button_Palette2_4;
@@ -615,7 +610,6 @@ class xLightsFrame: public wxFrame
         wxPanel* Panel1_Garlands;
         wxButton* ButtonAddE131;
         wxSlider* Slider_Life1_Count;
-        wxButton* Button_PlayAll;
         wxTextCtrl* TextCtrlFilename;
         wxBitmapButton* BitmapButtonDeleteRow;
         wxSlider* Slider_Butterfly2_Chunks;
@@ -635,7 +629,6 @@ class xLightsFrame: public wxFrame
         wxRadioButton* RadioButtonChase3;
         wxRadioButton* RadioButtonChase4;
         wxStaticText* StaticText46;
-        wxButton* Button_PlaySelection;
         wxCheckBox* CheckBox_Palette2_1;
         wxSlider* Slider_Meteors2_Count;
         wxSlider* Slider_Garlands1_Type;
@@ -720,7 +713,6 @@ class xLightsFrame: public wxFrame
         wxButton* Button_PresetAdd;
         wxButton* ButtonAddShow;
         wxScrolledWindow* ScrolledWindow1;
-        wxButton* Button_UpdateGrid;
         wxCheckBox* CheckBox_Palette1_6;
         wxPanel* Panel2_Fire;
         wxRadioButton* RadioButtonDim;
@@ -873,7 +865,6 @@ class xLightsFrame: public wxFrame
         wxCheckBox* CheckBox_Palette2_2;
         wxBitmapButton* BitmapButtonTabInfo;
         wxStaticText* StaticText11;
-        wxButton* Button_SaveEffects;
         wxSlider* Slider_Spirals2_Thickness;
         wxButton* Button_Text2_Font;
         wxSlider* Slider_Snowstorm2_Length;
@@ -1006,7 +997,7 @@ class xLightsFrame: public wxFrame
         void ScanForFiles();
         long DiffSeconds(wxString& strTime, wxTimeSpan& tsCurrent);
         int Time2Seconds(const wxString& hhmm);
-        void ResetTimer(SeqPlayerStates newstate);
+        void ResetTimer(SeqPlayerStates newstate, long OffsetMsec=0);
         void SaveScheduleFile();
         void OnButtonPlaylistAddClick(wxCommandEvent& event);
         void OnButtonPlaylistAddAllClick(wxCommandEvent& event);
@@ -1038,8 +1029,7 @@ class xLightsFrame: public wxFrame
         wxString SizerControlsToString(wxSizer* sizer);
         void LoadSizerControlsToAttr(wxSizer* sizer,wxXmlNode* x);
         void TimerEffect();
-        void TimerSeqPartial(long msec);
-        void TimerSeqAll(long msec);
+        void TimerRgbSeq(long msec, bool OneSecondUpdate);
         void UpdateBufferPalette();
         void SetChoicebook(wxChoicebook* cb, wxString& PageName);
         void SetEffectControls(wxString settings);
@@ -1052,6 +1042,8 @@ class xLightsFrame: public wxFrame
         void CopyRow(int row1, int row2);
         void NumericSort();
         double GetGridStartTime(int row);
+        long GetGridStartTimeMSec(int row);
+        void UpdateRgbPlaybackStatus(int seconds, const wxString& seqtype);
 
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;
