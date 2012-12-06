@@ -878,6 +878,8 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Choice_LayerMethod->Append(_("Effect 2"));
     Choice_LayerMethod->Append(_("1 is Mask"));
     Choice_LayerMethod->Append(_("2 is Mask"));
+    Choice_LayerMethod->Append(_("1 is Unmask"));
+    Choice_LayerMethod->Append(_("2 is Unmask"));
     Choice_LayerMethod->Append(_("Layered"));
     Choice_LayerMethod->Append(_("Average"));
     FlexGridSizer33->Add(Choice_LayerMethod, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -904,6 +906,8 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     ButtonDisplayElements->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer68->Add(ButtonDisplayElements, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_ChannelMap = new wxButton(PanelSequence, ID_BUTTON1, _("Channel Map"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    Button_ChannelMap->Disable();
+    Button_ChannelMap->Hide();
     Button_ChannelMap->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer68->Add(Button_ChannelMap, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     BitmapButtonOpenSeq = new wxBitmapButton(PanelSequence, ID_BITMAPBUTTON7, open_xpm, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON7"));
@@ -942,9 +946,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Panel1_None = new wxPanel(Choicebook1, ID_PANEL4, wxPoint(0,6), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
     Panel1_Bars = new wxPanel(Choicebook1, ID_PANEL8, wxPoint(30,18), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL8"));
     FlexGridSizer35 = new wxFlexGridSizer(0, 2, 0, 0);
-    StaticText23 = new wxStaticText(Panel1_Bars, ID_STATICTEXT25, _("# of Bars"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT25"));
+    StaticText23 = new wxStaticText(Panel1_Bars, ID_STATICTEXT25, _("Palette Rep"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT25"));
     FlexGridSizer35->Add(StaticText23, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Bars1_BarCount = new wxSlider(Panel1_Bars, ID_SLIDER_Bars1_BarCount, 2, 1, 10, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Bars1_BarCount"));
+    Slider_Bars1_BarCount = new wxSlider(Panel1_Bars, ID_SLIDER_Bars1_BarCount, 1, 1, 5, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Bars1_BarCount"));
     FlexGridSizer35->Add(Slider_Bars1_BarCount, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText24 = new wxStaticText(Panel1_Bars, ID_STATICTEXT26, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT26"));
     FlexGridSizer35->Add(StaticText24, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -1094,9 +1098,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer44->SetSizeHints(Panel1_Snowstorm);
     Panel1_Spirals = new wxPanel(Choicebook1, ID_PANEL26, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL26"));
     FlexGridSizer45 = new wxFlexGridSizer(0, 2, 0, 0);
-    StaticText34 = new wxStaticText(Panel1_Spirals, ID_STATICTEXT38, _("# of Spirals"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT38"));
+    StaticText34 = new wxStaticText(Panel1_Spirals, ID_STATICTEXT38, _("Palette Rep"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT38"));
     FlexGridSizer45->Add(StaticText34, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Slider_Spirals1_Count = new wxSlider(Panel1_Spirals, ID_SLIDER_Spirals1_Count, 2, 1, 9, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Spirals1_Count"));
+    Slider_Spirals1_Count = new wxSlider(Panel1_Spirals, ID_SLIDER_Spirals1_Count, 1, 1, 5, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Spirals1_Count"));
     FlexGridSizer45->Add(Slider_Spirals1_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText36 = new wxStaticText(Panel1_Spirals, ID_STATICTEXT40, _("Rotations"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT40"));
     FlexGridSizer45->Add(StaticText36, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -1171,42 +1175,36 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer_Palette1->Add(CheckBox_Palette1_1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette1_1 = new wxButton(PanelSequence, ID_BUTTON_Palette1_1, _("1"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette1_1"));
     Button_Palette1_1->SetMinSize(wxSize(30,20));
-    Button_Palette1_1->SetBackgroundColour(wxColour(255,0,0));
     FlexGridSizer_Palette1->Add(Button_Palette1_1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette1_2 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette1_2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette1_2"));
     CheckBox_Palette1_2->SetValue(true);
     FlexGridSizer_Palette1->Add(CheckBox_Palette1_2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette1_2 = new wxButton(PanelSequence, ID_BUTTON_Palette1_2, _("2"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette1_2"));
     Button_Palette1_2->SetMinSize(wxSize(30,20));
-    Button_Palette1_2->SetBackgroundColour(wxColour(0,255,0));
     FlexGridSizer_Palette1->Add(Button_Palette1_2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette1_3 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette1_3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette1_3"));
     CheckBox_Palette1_3->SetValue(false);
     FlexGridSizer_Palette1->Add(CheckBox_Palette1_3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette1_3 = new wxButton(PanelSequence, ID_BUTTON_Palette1_3, _("3"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette1_3"));
     Button_Palette1_3->SetMinSize(wxSize(30,20));
-    Button_Palette1_3->SetBackgroundColour(wxColour(0,0,255));
     FlexGridSizer_Palette1->Add(Button_Palette1_3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette1_4 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette1_4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette1_4"));
     CheckBox_Palette1_4->SetValue(false);
     FlexGridSizer_Palette1->Add(CheckBox_Palette1_4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette1_4 = new wxButton(PanelSequence, ID_BUTTON_Palette1_4, _("4"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette1_4"));
     Button_Palette1_4->SetMinSize(wxSize(30,20));
-    Button_Palette1_4->SetBackgroundColour(wxColour(255,255,0));
     FlexGridSizer_Palette1->Add(Button_Palette1_4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette1_5 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette1_5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette1_5"));
     CheckBox_Palette1_5->SetValue(false);
     FlexGridSizer_Palette1->Add(CheckBox_Palette1_5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette1_5 = new wxButton(PanelSequence, ID_BUTTON_Palette1_5, _("5"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette1_5"));
     Button_Palette1_5->SetMinSize(wxSize(30,20));
-    Button_Palette1_5->SetBackgroundColour(wxColour(255,255,255));
     FlexGridSizer_Palette1->Add(Button_Palette1_5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette1_6 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette1_6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette1_6"));
     CheckBox_Palette1_6->SetValue(false);
     FlexGridSizer_Palette1->Add(CheckBox_Palette1_6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette1_6 = new wxButton(PanelSequence, ID_BUTTON_Palette1_6, _("6"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette1_6"));
     Button_Palette1_6->SetMinSize(wxSize(30,20));
-    Button_Palette1_6->SetBackgroundColour(wxColour(0,0,0));
     FlexGridSizer_Palette1->Add(Button_Palette1_6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     FlexGridSizer47->Add(FlexGridSizer_Palette1, 1, wxTOP|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
     FlexGridSizer34->Add(FlexGridSizer47, 1, wxTOP|wxBOTTOM|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
@@ -1224,9 +1222,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Panel2_None = new wxPanel(Choicebook2, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL6"));
     Panel2_Bars = new wxPanel(Choicebook2, ID_PANEL9, wxPoint(1,9), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL9"));
     FlexGridSizer50 = new wxFlexGridSizer(0, 2, 0, 0);
-    StaticText42 = new wxStaticText(Panel2_Bars, ID_STATICTEXT47, _("# of Bars"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT47"));
+    StaticText42 = new wxStaticText(Panel2_Bars, ID_STATICTEXT47, _("Palette Rep"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT47"));
     FlexGridSizer50->Add(StaticText42, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Bars2_BarCount = new wxSlider(Panel2_Bars, ID_SLIDER_Bars2_BarCount, 2, 1, 10, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Bars2_BarCount"));
+    Slider_Bars2_BarCount = new wxSlider(Panel2_Bars, ID_SLIDER_Bars2_BarCount, 1, 1, 5, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Bars2_BarCount"));
     FlexGridSizer50->Add(Slider_Bars2_BarCount, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText44 = new wxStaticText(Panel2_Bars, ID_STATICTEXT48, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT48"));
     FlexGridSizer50->Add(StaticText44, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -1376,9 +1374,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer59->SetSizeHints(Panel2_Snowstorm);
     Panel2_Spirals = new wxPanel(Choicebook2, ID_PANEL28, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL28"));
     FlexGridSizer60 = new wxFlexGridSizer(0, 2, 0, 0);
-    StaticText68 = new wxStaticText(Panel2_Spirals, ID_STATICTEXT70, _("# of Spirals"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT70"));
+    StaticText68 = new wxStaticText(Panel2_Spirals, ID_STATICTEXT70, _("Palette Rep"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT70"));
     FlexGridSizer60->Add(StaticText68, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Spirals2_Count = new wxSlider(Panel2_Spirals, ID_SLIDER_Spirals2_Count, 2, 1, 9, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Spirals2_Count"));
+    Slider_Spirals2_Count = new wxSlider(Panel2_Spirals, ID_SLIDER_Spirals2_Count, 1, 1, 5, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Spirals2_Count"));
     FlexGridSizer60->Add(Slider_Spirals2_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText69 = new wxStaticText(Panel2_Spirals, ID_STATICTEXT71, _("Rotations"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT71"));
     FlexGridSizer60->Add(StaticText69, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -1453,42 +1451,36 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer_Palette2->Add(CheckBox_Palette2_1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette2_1 = new wxButton(PanelSequence, ID_BUTTON_Palette2_1, _("1"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette2_1"));
     Button_Palette2_1->SetMinSize(wxSize(30,20));
-    Button_Palette2_1->SetBackgroundColour(wxColour(255,0,0));
     FlexGridSizer_Palette2->Add(Button_Palette2_1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette2_2 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette2_2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette2_2"));
     CheckBox_Palette2_2->SetValue(true);
     FlexGridSizer_Palette2->Add(CheckBox_Palette2_2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette2_2 = new wxButton(PanelSequence, ID_BUTTON_Palette2_2, _("2"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette2_2"));
     Button_Palette2_2->SetMinSize(wxSize(30,20));
-    Button_Palette2_2->SetBackgroundColour(wxColour(0,255,0));
     FlexGridSizer_Palette2->Add(Button_Palette2_2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette2_3 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette2_3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette2_3"));
     CheckBox_Palette2_3->SetValue(false);
     FlexGridSizer_Palette2->Add(CheckBox_Palette2_3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette2_3 = new wxButton(PanelSequence, ID_BUTTON_Palette2_3, _("3"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette2_3"));
     Button_Palette2_3->SetMinSize(wxSize(30,20));
-    Button_Palette2_3->SetBackgroundColour(wxColour(0,0,255));
     FlexGridSizer_Palette2->Add(Button_Palette2_3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette2_4 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette2_4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette2_4"));
     CheckBox_Palette2_4->SetValue(false);
     FlexGridSizer_Palette2->Add(CheckBox_Palette2_4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette2_4 = new wxButton(PanelSequence, ID_BUTTON_Palette2_4, _("4"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette2_4"));
     Button_Palette2_4->SetMinSize(wxSize(30,20));
-    Button_Palette2_4->SetBackgroundColour(wxColour(255,255,0));
     FlexGridSizer_Palette2->Add(Button_Palette2_4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette2_5 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette2_5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette2_5"));
     CheckBox_Palette2_5->SetValue(false);
     FlexGridSizer_Palette2->Add(CheckBox_Palette2_5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette2_5 = new wxButton(PanelSequence, ID_BUTTON_Palette2_5, _("5"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette2_5"));
     Button_Palette2_5->SetMinSize(wxSize(30,20));
-    Button_Palette2_5->SetBackgroundColour(wxColour(255,255,255));
     FlexGridSizer_Palette2->Add(Button_Palette2_5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     CheckBox_Palette2_6 = new wxCheckBox(PanelSequence, ID_CHECKBOX_Palette2_6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Palette2_6"));
     CheckBox_Palette2_6->SetValue(false);
     FlexGridSizer_Palette2->Add(CheckBox_Palette2_6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Palette2_6 = new wxButton(PanelSequence, ID_BUTTON_Palette2_6, _("6"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_Palette2_6"));
     Button_Palette2_6->SetMinSize(wxSize(30,20));
-    Button_Palette2_6->SetBackgroundColour(wxColour(0,0,0));
     FlexGridSizer_Palette2->Add(Button_Palette2_6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     FlexGridSizer62->Add(FlexGridSizer_Palette2, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer49->Add(FlexGridSizer62, 1, wxTOP|wxBOTTOM|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
@@ -1704,32 +1696,20 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON_TEXT1_FONT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Text1_FontClick);
     Connect(ID_BUTTON_Palette1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Palette1Click);
     Connect(ID_CHECKBOX_Palette1_1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette1_1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette1_2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_3,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette1_3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_4,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette1_4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_5,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette1_5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_6,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette1_6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_BUTTON_PICTURES2_FILENAME,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Pictures2_FilenameClick);
     Connect(ID_BUTTON_TEXT2_FONT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Text2_FontClick);
     Connect(ID_BUTTON_Palette2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Palette2Click);
     Connect(ID_CHECKBOX_Palette2_1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette2_1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette2_2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_3,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette2_3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_4,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette2_4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_5,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette2_5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_6,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
-    Connect(ID_BUTTON_Palette2_6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_RUN_SCHEDULE,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBoxRunScheduleClick);
     Connect(ID_BUTTON_SAVE_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonSaveScheduleClick);
     Connect(ID_BUTTON_ADD_SHOW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonAddShowClick);
@@ -1894,6 +1874,11 @@ void xLightsFrame::SetPlayMode(play_modes newmode)
     TextCtrl_Pictures1_Filename->Enable(newmode == play_off);
     Button_Pictures2_Filename->Enable(newmode == play_off);
     TextCtrl_Pictures2_Filename->Enable(newmode == play_off);
+    BitmapButtonOpenSeq->Enable(newmode == play_off);
+    BitmapButtonSaveSeq->Enable(newmode == play_off);
+    BitmapButtonInsertRow->Enable(newmode == play_off);
+    BitmapButtonDeleteRow->Enable(newmode == play_off);
+    ButtonDisplayElements->Enable(newmode == play_off);
 
     ButtonGracefulStop->Enable(newmode == play_sched || newmode == play_list);
     ButtonChangeDir->Enable(newmode != play_sched && newmode != play_list && newmode != play_single);
@@ -1921,7 +1906,7 @@ void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
         case play_off:
             break;
         case play_test:
-            OnTimerTest();
+            OnTimerTest(curtime);
             break;
         case play_effect:
             TimerEffect();
@@ -1980,13 +1965,13 @@ void xLightsFrame::OnNotebook1PageChanged(wxNotebookEvent& event)
 {
     switch (Notebook1->GetSelection()) {
         case TESTTAB:
-            SetPlayMode(play_test);
-            if (!xout) {
-                StatusBar1->SetStatusText(_("Testing disabled - Output to Lights is not checked"));
+            if (play_mode != play_test) {
+                SetPlayMode(play_test);
+                if (!xout) StatusBar1->SetStatusText(_("Testing disabled - Output to Lights is not checked"));
             }
             break;
         default:
-            if (play_mode == play_test) SetPlayMode(play_off);
+            //if (play_mode == play_test) SetPlayMode(play_off);
             break;
     }
 }
@@ -2074,7 +2059,10 @@ void xLightsFrame::OnCheckBoxLightOutputClick(wxCommandEvent& event)
 
 void xLightsFrame::OnButtonStopNowClick(wxCommandEvent& event)
 {
-    if (play_mode == play_sched) {
+    if (play_mode == play_test) {
+        TestButtonsOff();
+        if (Notebook1->GetSelection() == TESTTAB) return;
+    } else if (play_mode == play_sched) {
         CheckBoxRunSchedule->SetValue(false);
         CheckRunSchedule();
     } else if (play_mode == play_rgbseq) {
@@ -2089,9 +2077,11 @@ void xLightsFrame::OnButtonGracefulStopClick(wxCommandEvent& event)
 {
     if (play_mode == play_sched) {
         EndTimeSec = 0;
-    } else {
+    } else if (basic.IsRunning()) {
         SecondsRemaining = 0;
         StatusBar1->SetStatusText(_("Finishing playlist"));
+    } else {
+        wxMessageBox(_("Graceful Stop is only useful when a schedule or playlist is running"));
     }
 }
 

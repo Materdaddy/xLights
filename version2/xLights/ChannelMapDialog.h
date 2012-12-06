@@ -4,6 +4,7 @@
 //(*Headers(ChannelMapDialog)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/checkbox.h>
 #include <wx/spinctrl.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -38,6 +39,7 @@ class ChannelMapDialog: public wxDialog
 		wxStaticText* StaticText_CH2;
 		wxStaticText* StaticText_CH4;
 		wxStaticText* StaticText31;
+		wxCheckBox* CheckBox_EnableColor;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText27;
 		wxStaticText* StaticText_CH1;
@@ -55,6 +57,7 @@ class ChannelMapDialog: public wxDialog
 		wxStaticText* StaticText25;
 		wxStaticText* StaticText17;
 		wxStaticText* StaticText4;
+		wxCheckBox* CheckBox_EnableBasic;
 		wxStaticText* StaticText_CH7;
 		wxStaticText* StaticText_CH3;
 		//*)
@@ -62,11 +65,12 @@ class ChannelMapDialog: public wxDialog
 	protected:
 
 		//(*Identifiers(ChannelMapDialog)
-		static const long ID_BUTTON1;
 		static const long ID_STATICTEXT1;
 		static const long ID_SPINCTRL_BASE_CHANNEL;
 		static const long ID_STATICTEXT5;
 		static const long ID_STATICTEXT_CH0;
+		static const long ID_BUTTON1;
+		static const long ID_CHECKBOX_ENABLE_BASIC;
 		static const long ID_STATICTEXT2;
 		static const long ID_STATICTEXT_CH1;
 		static const long ID_STATICTEXT4;
@@ -75,6 +79,7 @@ class ChannelMapDialog: public wxDialog
 		static const long ID_STATICTEXT_CH3;
 		static const long ID_STATICTEXT21;
 		static const long ID_STATICTEXT_CH4;
+		static const long ID_CHECKBOX_ENABLE_COLOR;
 		static const long ID_STATICTEXT8;
 		static const long ID_STATICTEXT_CH5;
 		static const long ID_STATICTEXT10;

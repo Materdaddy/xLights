@@ -41,6 +41,8 @@ enum MixTypes {
     Mix_Effect2,
     Mix_Mask1,
     Mix_Mask2,
+    Mix_Unmask1,
+    Mix_Unmask2,
     Mix_Layered,
     Mix_Average,
 };
@@ -154,7 +156,7 @@ public:
                 c=color[1];
                 break;
             case Mix_Mask1:
-                // first is mask
+                // first masks second
                 if (color[0].GetRGB() == 0) {
                     c=color[1];
                 } else {
@@ -162,8 +164,24 @@ public:
                 }
                 break;
             case Mix_Mask2:
-                // second is mask
+                // second masks first
                 if (color[1].GetRGB() == 0) {
+                    c=color[0];
+                } else {
+                    c.Set(0);
+                }
+                break;
+            case Mix_Unmask1:
+                // first unmasks second
+                if (color[0].GetRGB() != 0) {
+                    c=color[1];
+                } else {
+                    c.Set(0);
+                }
+                break;
+            case Mix_Unmask2:
+                // second unmasks first
+                if (color[1].GetRGB() != 0) {
                     c=color[0];
                 } else {
                     c.Set(0);
@@ -238,7 +256,7 @@ public:
     void SetSpeed(int newspeed);
     void SetSparkle(int freq);
     void SetWindow(wxScrolledWindow* ScrolledWindow);
-    void RenderBars(int layer, int BarCount, int Direction, bool Highlight, bool Show3D);
+    void RenderBars(int layer, int PaletteRepeat, int Direction, bool Highlight, bool Show3D);
     void RenderButterfly(int layer, int ColorScheme, int Style, int Chunks, int Skip);
     void RenderColorWash(int layer, bool HorizFade, bool VertFade);
     void RenderFire(int layer);
@@ -248,7 +266,7 @@ public:
     void RenderPictures(int layer, int dir, const wxString& NewPictureName);
     void RenderSnowflakes(int layer);
     void RenderSnowstorm(int layer, int Count, int Length);
-    void RenderSpirals(int layer, int Count, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
+    void RenderSpirals(int layer, int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
     void RenderText(int layer, int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString);
     void DisplayOutput();
 };

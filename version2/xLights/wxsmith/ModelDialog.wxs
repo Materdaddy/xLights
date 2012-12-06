@@ -194,9 +194,24 @@
 							<content>
 								<item>None</item>
 								<item>2x</item>
-								<item>4x</item>
 							</content>
 							<selection>0</selection>
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText7" member="yes">
+							<label>Part of my display</label>
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBox_MyDisplay" member="yes">
+							<checked>1</checked>
 						</object>
 						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

@@ -46,6 +46,7 @@
 #include <wx/xml/xml.h>
 #include <wx/fontdlg.h>
 #include <wx/dir.h>
+#include <map>
 
 #include "../include/globals.h"
 #include "xlights_out.h"
@@ -58,6 +59,7 @@
 #include "PaletteMgmtDialog.h"
 #include "SeqParmsDialog.h"
 #include "ChannelMapDialog.h"
+#include "SeqElementMismatchDialog.h"
 #include "PixelBuffer.h"
 #include "NetInfo.h"
 
@@ -74,6 +76,8 @@
 #define FixedPages 5
 
 static wxCriticalSection gs_xoutCriticalSection;
+
+typedef std::map<wxString,wxString> MapStringString;
 
 enum play_modes {
     play_off,
@@ -924,6 +928,7 @@ class xLightsFrame: public wxFrame
         void OnGridNetworkDragEnd(wxMouseEvent& event);
         void SetupDongle(wxXmlNode* e);
         void SetupE131(wxXmlNode* e);
+        void SetChannelNamesForRgbModel(wxArrayString& ChNames, wxXmlNode* ModelNode);
 
         // test
         void SetTestCheckboxes(bool NewValue);
@@ -934,7 +939,7 @@ class xLightsFrame: public wxFrame
         int ChaseGrouping;
         int TwinkleRatio;
         TestFunctions TestFunc;
-        void OnTimerTest();
+        void OnTimerTest(long curtime);
 
         // convert
         bool LoadVixenProfile(const wxString& ProfileName, wxArrayInt& VixChannels);
@@ -1038,12 +1043,17 @@ class xLightsFrame: public wxFrame
         void OpenPaletteDialog(const wxString& id1, const wxString& id2, wxSizer* PrimarySizer,wxSizer* SecondarySizer);
         void ChooseModelsForSequence();
         void GetGridColumnLabels(wxArrayString& a);
+        void GetModelNames(wxArrayString& a);
+        wxXmlNode* GetModelNode(const wxString& name);
         void DisplayXlightsFilename(const wxString& filename);
         void CopyRow(int row1, int row2);
         void NumericSort();
         double GetGridStartTime(int row);
         long GetGridStartTimeMSec(int row);
         void UpdateRgbPlaybackStatus(int seconds, const wxString& seqtype);
+        void SetTextColor(wxWindow* w);
+        void LoadEffectFromString(wxString settings, MapStringString& SettingsMap);
+        void UpdateBufferPaletteFromMap(int PaletteNum, MapStringString& SettingsMap);
 
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;
@@ -1052,6 +1062,8 @@ class xLightsFrame: public wxFrame
         bool PaletteChanged;
         bool MixTypeChanged;
         long SeqBaseChannel;
+        bool SeqChanCtrlBasic;
+        bool SeqChanCtrlColor;
         wxString SeqXmlFileName;
         PixelBufferClass buffer;
         wxHtmlEasyPrinting* HtmlEasyPrint;

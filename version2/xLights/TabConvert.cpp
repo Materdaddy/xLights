@@ -217,7 +217,6 @@ void xLightsFrame::WriteVixenFile(const wxString& filename)
 
 void xLightsFrame::WriteXLightsFile(const wxString& filename)
 {
-    TextCtrlConversionStatus->AppendText(_("Writing xLights sequence\n"));
     wxFile f;
     char hdr[512];
     memset(hdr,0,512);
@@ -235,7 +234,6 @@ void xLightsFrame::WriteXLightsFile(const wxString& filename)
     f.Write(hdr,512);
     f.Write(SeqData,SeqDataLen);
     f.Close();
-    TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+filename+_("\n"));
 }
 
 void xLightsFrame::WriteConductorFile(const wxString& filename)
@@ -699,6 +697,7 @@ void xLightsFrame::ClearLastPeriod()
 void xLightsFrame::DoConversion(const wxString& Filename, const wxString& OutputFormat)
 {
     char c;
+    wxString fullpath;
 #if wxCHECK_VERSION(2,9,1)
     OutputFormat[0].GetAsChar(&c);
 #else
@@ -757,7 +756,10 @@ void xLightsFrame::DoConversion(const wxString& Filename, const wxString& Output
     {
         case 'x':
             oName.SetExt(_(XLIGHTS_SEQUENCE_EXT));
-            WriteXLightsFile(oName.GetFullPath());
+            fullpath=oName.GetFullPath();
+            TextCtrlConversionStatus->AppendText(_("Writing xLights sequence\n"));
+            WriteXLightsFile(fullpath);
+            TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+fullpath+_("\n"));
             break;
         case 'L':
             oName.SetExt(_("seq"));

@@ -131,6 +131,10 @@ void PixelBufferClass::SetMixType(const wxString& MixName)
         MixType=Mix_Mask1;
     } else if (MixName == wxT("2 is Mask")) {
         MixType=Mix_Mask2;
+    } else if (MixName == wxT("1 is Unmask")) {
+        MixType=Mix_Unmask1;
+    } else if (MixName == wxT("2 is Unmask")) {
+        MixType=Mix_Unmask2;
     } else if (MixName == wxT("Layered")) {
         MixType=Mix_Layered;
     } else if (MixName == wxT("Average")) {
@@ -201,12 +205,13 @@ void PixelBufferClass::SetSpeed(int newspeed)
     Speed=newspeed;
 }
 
-void PixelBufferClass::RenderBars(int layer, int BarCount, int Direction, bool Highlight, bool Show3D)
+void PixelBufferClass::RenderBars(int layer, int PaletteRepeat, int Direction, bool Highlight, bool Show3D)
 {
     int x,y,n,pixel_ratio,ColorIdx;
     bool IsMovingDown,IsHighlightRow;
     wxImage::HSVValue hsv;
     size_t colorcnt=GetColorCount(layer);
+    int BarCount = PaletteRepeat * colorcnt;
     int BarWidth = BufferHt/BarCount+1;
     int HalfHt = BufferHt/2;
     BarState[layer]+=Speed;
@@ -491,16 +496,17 @@ void PixelBufferClass::RenderSnowstorm(int layer, int Count, int Length)
 
 }
 
-void PixelBufferClass::RenderSpirals(int layer, int Count, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D)
+void PixelBufferClass::RenderSpirals(int layer, int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D)
 {
     int strand_base,strand,thick,x,y,ColorIdx;
-    int deltaStrands=BufferWi / Count;
-    int SpiralThickness=(deltaStrands * Thickness / 100) + 1;
     size_t colorcnt=GetColorCount(layer);
+    int SpiralCount=colorcnt * PaletteRepeat;
+    int deltaStrands=BufferWi / SpiralCount;
+    int SpiralThickness=(deltaStrands * Thickness / 100) + 1;
     SpiralState[layer]+=Speed*Direction;
     wxImage::HSVValue hsv;
     wxColour color;
-    for(int ns=0; ns < Count; ns++) {
+    for(int ns=0; ns < SpiralCount; ns++) {
         strand_base=ns * deltaStrands;
         ColorIdx=ns % colorcnt;
         palette[layer].GetColor(ColorIdx,color);

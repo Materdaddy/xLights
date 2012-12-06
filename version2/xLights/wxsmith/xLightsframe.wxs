@@ -1278,6 +1278,8 @@
 																				<item>Effect 2</item>
 																				<item>1 is Mask</item>
 																				<item>2 is Mask</item>
+																				<item>1 is Unmask</item>
+																				<item>2 is Unmask</item>
 																				<item>Layered</item>
 																				<item>Average</item>
 																			</content>
@@ -1368,6 +1370,8 @@
 																			<object class="sizeritem">
 																				<object class="wxButton" name="ID_BUTTON1" variable="Button_ChannelMap" member="yes">
 																					<label>Channel Map</label>
+																					<enabled>0</enabled>
+																					<hidden>1</hidden>
 																					<bg>#E0E0E0</bg>
 																					<handler function="OnButton_ChannelMapClick" entry="EVT_BUTTON" />
 																				</object>
@@ -1473,7 +1477,7 @@
 																								<cols>2</cols>
 																								<object class="sizeritem">
 																									<object class="wxStaticText" name="ID_STATICTEXT25" variable="StaticText23" member="yes">
-																										<label># of Bars</label>
+																										<label>Palette Rep</label>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
@@ -1481,9 +1485,9 @@
 																								</object>
 																								<object class="sizeritem">
 																									<object class="wxSlider" name="ID_SLIDER_Bars1_BarCount" variable="Slider_Bars1_BarCount" member="yes">
-																										<value>2</value>
+																										<value>1</value>
 																										<min>1</min>
-																										<max>10</max>
+																										<max>5</max>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
@@ -1914,7 +1918,7 @@
 																								<cols>2</cols>
 																								<object class="sizeritem">
 																									<object class="wxStaticText" name="ID_STATICTEXT38" variable="StaticText34" member="yes">
-																										<label># of Spirals</label>
+																										<label>Palette Rep</label>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>5</border>
@@ -1922,9 +1926,9 @@
 																								</object>
 																								<object class="sizeritem">
 																									<object class="wxSlider" name="ID_SLIDER_Spirals1_Count" variable="Slider_Spirals1_Count" member="yes">
-																										<value>2</value>
+																										<value>1</value>
 																										<min>1</min>
-																										<max>9</max>
+																										<max>5</max>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
@@ -2117,9 +2121,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette1_1" variable="Button_Palette1_1" member="yes">
 																									<label>1</label>
-																									<bg>#FF0000</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2137,9 +2139,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette1_2" variable="Button_Palette1_2" member="yes">
 																									<label>2</label>
-																									<bg>#00FF00</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2156,9 +2156,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette1_3" variable="Button_Palette1_3" member="yes">
 																									<label>3</label>
-																									<bg>#0000FF</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2175,9 +2173,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette1_4" variable="Button_Palette1_4" member="yes">
 																									<label>4</label>
-																									<bg>#FFFF00</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2194,9 +2190,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette1_5" variable="Button_Palette1_5" member="yes">
 																									<label>5</label>
-																									<bg>#FFFFFF</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2213,9 +2207,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette1_6" variable="Button_Palette1_6" member="yes">
 																									<label>6</label>
-																									<bg>#000000</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2289,7 +2281,7 @@
 																								<cols>2</cols>
 																								<object class="sizeritem">
 																									<object class="wxStaticText" name="ID_STATICTEXT47" variable="StaticText42" member="yes">
-																										<label># of Bars</label>
+																										<label>Palette Rep</label>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
@@ -2297,9 +2289,9 @@
 																								</object>
 																								<object class="sizeritem">
 																									<object class="wxSlider" name="ID_SLIDER_Bars2_BarCount" variable="Slider_Bars2_BarCount" member="yes">
-																										<value>2</value>
+																										<value>1</value>
 																										<min>1</min>
-																										<max>10</max>
+																										<max>5</max>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
@@ -2730,7 +2722,7 @@
 																								<cols>2</cols>
 																								<object class="sizeritem">
 																									<object class="wxStaticText" name="ID_STATICTEXT70" variable="StaticText68" member="yes">
-																										<label># of Spirals</label>
+																										<label>Palette Rep</label>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
@@ -2738,9 +2730,9 @@
 																								</object>
 																								<object class="sizeritem">
 																									<object class="wxSlider" name="ID_SLIDER_Spirals2_Count" variable="Slider_Spirals2_Count" member="yes">
-																										<value>2</value>
+																										<value>1</value>
 																										<min>1</min>
-																										<max>9</max>
+																										<max>5</max>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
@@ -2934,9 +2926,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette2_1" variable="Button_Palette2_1" member="yes">
 																									<label>1</label>
-																									<bg>#FF0000</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2954,9 +2944,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette2_2" variable="Button_Palette2_2" member="yes">
 																									<label>2</label>
-																									<bg>#00FF00</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2973,9 +2961,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette2_3" variable="Button_Palette2_3" member="yes">
 																									<label>3</label>
-																									<bg>#0000FF</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -2992,9 +2978,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette2_4" variable="Button_Palette2_4" member="yes">
 																									<label>4</label>
-																									<bg>#FFFF00</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -3011,9 +2995,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette2_5" variable="Button_Palette2_5" member="yes">
 																									<label>5</label>
-																									<bg>#FFFFFF</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>
@@ -3030,9 +3012,7 @@
 																							<object class="sizeritem">
 																								<object class="wxButton" name="ID_BUTTON_Palette2_6" variable="Button_Palette2_6" member="yes">
 																									<label>6</label>
-																									<bg>#000000</bg>
 																									<minsize>30,20</minsize>
-																									<handler function="OnButton_ColorClick" entry="EVT_BUTTON" />
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>3</border>

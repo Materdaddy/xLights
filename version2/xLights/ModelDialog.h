@@ -5,6 +5,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/checkbox.h>
 #include <wx/spinctrl.h>
 #include <wx/radiobut.h>
 #include <wx/choice.h>
@@ -30,7 +31,9 @@ class ModelDialog: public wxDialog
 		wxRadioButton* RadioButton_RtoL;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxCheckBox* CheckBox_MyDisplay;
 		wxStaticText* StaticText5;
+		wxStaticText* StaticText7;
 		wxChoice* Choice_Order;
 		wxChoice* Choice_Antialias;
 		wxChoice* Choice_DisplayAs;
@@ -63,6 +66,8 @@ class ModelDialog: public wxDialog
 		static const long ID_RADIOBUTTON2;
 		static const long ID_STATICTEXT9;
 		static const long ID_CHOICE3;
+		static const long ID_STATICTEXT10;
+		static const long ID_CHECKBOX1;
 		//*)
 
 	private:

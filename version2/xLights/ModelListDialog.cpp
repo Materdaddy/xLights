@@ -107,6 +107,7 @@ void ModelListDialog::OnButton_NewClick(wxCommandEvent& event)
                 e->AddAttribute(wxT("Order"), dialog.Choice_Order->GetStringSelection());
                 e->AddAttribute(wxT("Dir"), dialog.RadioButton_LtoR->GetValue() ? wxT("L") : wxT("R"));
                 e->AddAttribute(wxT("Antialias"), wxString::Format(wxT("%d"),dialog.Choice_Antialias->GetSelection()));
+                e->AddAttribute(wxT("MyDisplay"), dialog.CheckBox_MyDisplay->GetValue() ? wxT("1") : wxT("0"));
                 ListBox1->Append(name,e);
             }
         }
@@ -142,6 +143,7 @@ void ModelListDialog::OnButton_ModifyClick(wxCommandEvent& event)
         //dialog.RadioButton_LtoR->SetValue(false);
         dialog.RadioButton_RtoL->SetValue(true);
     }
+    dialog.CheckBox_MyDisplay->SetValue(e->GetAttribute(wxT("MyDisplay"),wxT("0")) == wxT("1"));
     dialog.UpdateLabels();
     do {
         ok=true;
@@ -157,6 +159,7 @@ void ModelListDialog::OnButton_ModifyClick(wxCommandEvent& event)
                 e->DeleteAttribute(wxT("Order"));
                 e->DeleteAttribute(wxT("Dir"));
                 e->DeleteAttribute(wxT("Antialias"));
+                e->DeleteAttribute(wxT("MyDisplay"));
                 e->AddAttribute(wxT("DisplayAs"), dialog.Choice_DisplayAs->GetStringSelection());
                 e->AddAttribute(wxT("parm1"), wxString::Format(wxT("%d"),dialog.SpinCtrl_parm1->GetValue()));
                 e->AddAttribute(wxT("parm2"), wxString::Format(wxT("%d"),dialog.SpinCtrl_parm2->GetValue()));
@@ -165,6 +168,7 @@ void ModelListDialog::OnButton_ModifyClick(wxCommandEvent& event)
                 e->AddAttribute(wxT("Order"), dialog.Choice_Order->GetStringSelection());
                 e->AddAttribute(wxT("Dir"), dialog.RadioButton_LtoR->GetValue() ? wxT("L") : wxT("R"));
                 e->AddAttribute(wxT("Antialias"), wxString::Format(wxT("%d"),dialog.Choice_Antialias->GetSelection()));
+                e->AddAttribute(wxT("MyDisplay"), dialog.CheckBox_MyDisplay->GetValue() ? wxT("1") : wxT("0"));
             }
         }
     } while (DlgResult == wxID_OK && !ok);
@@ -223,7 +227,7 @@ void ModelListDialog::OnButton_RenameClick(wxCommandEvent& event)
 
 void ModelListDialog::OnButton_LayoutClick(wxCommandEvent& event)
 {
-    size_t i,NodeCount,idx;
+    size_t i,idx;
     int n,x,y;
     int sel=ListBox1->GetSelection();
     std::vector<int> chmap;
@@ -234,7 +238,7 @@ void ModelListDialog::OnButton_LayoutClick(wxCommandEvent& event)
     wxXmlNode* ModelNode=(wxXmlNode*)ListBox1->GetClientData(sel);
     ModelClass model;
     model.SetFromXml(ModelNode);
-    NodeCount=model.GetNodeCount();
+    size_t NodeCount=model.GetNodeCount();
     chmap.resize(model.BufferHt * model.BufferWi);
     wxString direction=wxT("left to right");
     if (!model.IsLtoR) direction=wxT("right to left");

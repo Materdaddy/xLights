@@ -126,6 +126,8 @@
 		<Unit filename="PlaybackOptionsDialog.h" />
 		<Unit filename="PlayerFrame.cpp" />
 		<Unit filename="PlayerFrame.h" />
+		<Unit filename="SeqElementMismatchDialog.cpp" />
+		<Unit filename="SeqElementMismatchDialog.h" />
 		<Unit filename="SeqParmsDialog.cpp" />
 		<Unit filename="SeqParmsDialog.h" />
 		<Unit filename="SerialPortWithRate.cpp" />
@@ -176,6 +178,7 @@
 		<Unit filename="wxsmith/PaletteMgmtDialog.wxs" />
 		<Unit filename="wxsmith/PlaybackOptionsDialog.wxs" />
 		<Unit filename="wxsmith/PlayerFrame.wxs" />
+		<Unit filename="wxsmith/SeqElementMismatchDialog.wxs" />
 		<Unit filename="wxsmith/SeqParmsDialog.wxs" />
 		<Unit filename="wxsmith/xLightsframe.wxs" />
 		<Unit filename="xLightsApp.cpp" />
@@ -208,6 +211,7 @@
 					<wxDialog wxs="wxsmith/PaletteMgmtDialog.wxs" src="PaletteMgmtDialog.cpp" hdr="PaletteMgmtDialog.h" fwddecl="0" i18n="1" name="PaletteMgmtDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/SeqParmsDialog.wxs" src="SeqParmsDialog.cpp" hdr="SeqParmsDialog.h" fwddecl="0" i18n="1" name="SeqParmsDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChannelMapDialog.wxs" src="ChannelMapDialog.cpp" hdr="ChannelMapDialog.h" fwddecl="0" i18n="1" name="ChannelMapDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/SeqElementMismatchDialog.wxs" src="SeqElementMismatchDialog.cpp" hdr="SeqElementMismatchDialog.h" fwddecl="0" i18n="1" name="SeqElementMismatchDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

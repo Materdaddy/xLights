@@ -109,6 +109,7 @@ public:
     int AliasFactor;        // factor to expand buffer (2 ^ Antialias)
     int TreeDegrees,FrameWidth;
     RgbNodeVector Nodes;
+    bool MyDisplay;
 
     void SetFromXml(wxXmlNode* ModelNode);
     size_t GetNodeCount();

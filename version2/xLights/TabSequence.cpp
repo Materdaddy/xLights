@@ -4,6 +4,17 @@
     EffectsXml.SetRoot( root );
 }
 
+wxXmlNode* xLightsFrame::GetModelNode(const wxString& name)
+{
+    wxXmlNode* e;
+    for(e=ModelsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() == wxT("model")) {
+            if (name == e->GetAttribute(wxT("name"))) return e;
+        }
+    }
+    return NULL;
+}
+
 void xLightsFrame::OnButton_PlayAllClick(wxCommandEvent& event)
 {
     if (xlightsFilename.IsEmpty()) {
@@ -109,9 +120,7 @@ void xLightsFrame::SetEffectControls(wxString settings)
                     } else if (name.StartsWith(wxT("ID_BUTTON"))) {
                         color.Set(value);
                         CtrlWin->SetBackgroundColour(color);
-                        // choose black or white foreground color
-                        int test=color.Red()*0.299 + color.Green()*0.587 + color.Blue()*0.114;
-                        CtrlWin->SetForegroundColour(test < 186 ? *wxWHITE : *wxBLACK);
+                        SetTextColor(CtrlWin);
                     } else if (name.StartsWith(wxT("ID_CHECKBOX"))) {
                         wxCheckBox* ctrl=(wxCheckBox*)CtrlWin;
                         if (value.ToLong(&TempLong)) ctrl->SetValue(TempLong!=0);
@@ -124,6 +133,14 @@ void xLightsFrame::SetEffectControls(wxString settings)
     }
     PaletteChanged=true;
     MixTypeChanged=true;
+}
+
+// Set text to a color that contrasts with background
+void xLightsFrame::SetTextColor(wxWindow* w)
+{
+    wxColour color=w->GetBackgroundColour();
+    int test=color.Red()*0.299 + color.Green()*0.587 + color.Blue()*0.114;
+    w->SetForegroundColour(test < 186 ? *wxWHITE : *wxBLACK);
 }
 
 void xLightsFrame::PresetsSelect()
@@ -270,6 +287,7 @@ void xLightsFrame::OnButton_ModelsClick(wxCommandEvent& event)
             ModelsNode->AddChild(e);
         }
     }
+    SaveEffectsFile();
     UpdateModelsList();
 }
 
@@ -438,6 +456,18 @@ bool xLightsFrame::SaveEffectsFile()
     }
     UnsavedChanges=false;
     return true;
+}
+
+// PaletteNum should be 1 or 2
+void xLightsFrame::UpdateBufferPaletteFromMap(int PaletteNum, MapStringString& SettingsMap)
+{
+    wxColourVector newcolors;
+    for (int i=1; i<=6; i++) {
+        if (SettingsMap[wxString::Format(wxT("ID_CHECKBOX_Palette%d_%d"),PaletteNum,i)] ==  wxT("1")) {
+            newcolors.push_back(wxColour(SettingsMap[wxString::Format(wxT("ID_BUTTON_Palette%d_%d"),PaletteNum,i)]));
+        }
+    }
+    buffer.SetPalette(PaletteNum-1,newcolors);
 }
 
 void xLightsFrame::UpdateBufferPalette()
@@ -756,6 +786,19 @@ void xLightsFrame::DisplayXlightsFilename(const wxString& filename)
     StaticTextSequenceFileName->SetLabel(filename);
 }
 
+void xLightsFrame::GetModelNames(wxArrayString& a)
+{
+    wxString name;
+    for(wxXmlNode* e=ModelsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() == wxT("model")) {
+            name=e->GetAttribute(wxT("name"));
+            if (!name.IsEmpty()) {
+                a.Add(name);
+            }
+        }
+    }
+}
+
 void xLightsFrame::GetGridColumnLabels(wxArrayString& a)
 {
     int n=Grid1->GetNumberCols();
@@ -783,6 +826,8 @@ void xLightsFrame::ChooseModelsForSequence()
     for(e=ModelsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == wxT("model")) {
             name=e->GetAttribute(wxT("name"));
+            // allow only models where MyDisplay is set?
+            //if (!name.IsEmpty() && e->GetAttribute(wxT("MyDisplay"),wxT("0"))==wxT("1")) {
             if (!name.IsEmpty()) {
                 dialog.CheckListBox1->Append(name);
                 idx=dialog.CheckListBox1->FindString(name);
@@ -834,9 +879,13 @@ void xLightsFrame::OnButton_ChannelMapClick(wxCommandEvent& event)
     }
     ChannelMapDialog dialog(this);
     dialog.SpinCtrlBaseChannel->SetValue(SeqBaseChannel);
+    dialog.CheckBox_EnableBasic->SetValue(SeqChanCtrlBasic);
+    dialog.CheckBox_EnableColor->SetValue(SeqChanCtrlColor);
     dialog.SetNetInfo(&NetInfo);
     if (dialog.ShowModal() != wxID_OK) return;
     SeqBaseChannel=dialog.SpinCtrlBaseChannel->GetValue();
+    SeqChanCtrlBasic=dialog.CheckBox_EnableBasic->GetValue();
+    SeqChanCtrlColor=dialog.CheckBox_EnableColor->GetValue();
 }
 
 void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
@@ -857,6 +906,8 @@ void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
     ReadXlightsFile(filename);
     DisplayXlightsFilename(filename);
     SeqBaseChannel=1;
+    SeqChanCtrlBasic=false;
+    SeqChanCtrlColor=false;
 
     // read xml sequence info
     wxFileName FileObj(filename);
@@ -876,8 +927,19 @@ void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
     wxXmlNode* root=doc.GetRoot();
     wxString tempstr=root->GetAttribute(wxT("BaseChannel"), wxT("1"));
     tempstr.ToLong(&SeqBaseChannel);
+    tempstr=root->GetAttribute(wxT("ChanCtrlBasic"), wxT("0"));
+    SeqChanCtrlBasic=tempstr!=wxT("0");
+    tempstr=root->GetAttribute(wxT("ChanCtrlColor"), wxT("0"));
+    SeqChanCtrlColor=tempstr!=wxT("0");
 
     wxXmlNode *tr, *td;
+    wxString ColName;
+    wxArrayInt DeleteCols;
+    wxArrayString ModelNames;
+    GetModelNames(ModelNames);
+    SeqElementMismatchDialog dialog(this);
+    dialog.ChoiceModels->Set(ModelNames);
+    if (ModelNames.Count() > 0) dialog.ChoiceModels->SetSelection(0);
     int r,c; // row 0=heading, >=1 are data rows
     for(tr=root->GetChildren(), r=0; tr!=NULL; tr=tr->GetNext(), r++ ) {
         if (tr->GetName() != wxT("tr")) continue;
@@ -888,10 +950,25 @@ void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
             if (td->GetName() != wxT("td")) continue;
             if (r==0) {
                 if (c >= 2) {
-                    Grid1->AppendCols();
-                    Grid1->SetColLabelValue(Grid1->GetNumberCols()-1, td->GetNodeContent());
+                    ColName=td->GetNodeContent();
+                    if (ModelNames.Index(ColName) == wxNOT_FOUND) {
+                        dialog.StaticTextMessage->SetLabel(wxT("Element '")+ColName+wxT("'\ndoes not exist in your list of models"));
+                        dialog.Fit();
+                        dialog.ShowModal();
+                        if (dialog.RadioButtonAdd->GetValue()) {
+                        } else if (dialog.RadioButtonDelete->GetValue()) {
+                            DeleteCols.Add(c);
+                        } else {
+                            // rename
+                            Grid1->AppendCols();
+                            Grid1->SetColLabelValue(Grid1->GetNumberCols()-1, dialog.ChoiceModels->GetStringSelection());
+                        }
+                    } else {
+                        Grid1->AppendCols();
+                        Grid1->SetColLabelValue(Grid1->GetNumberCols()-1, ColName);
+                    }
                 }
-            } else {
+            } else if (DeleteCols.Index(c) == wxNOT_FOUND) {
                 Grid1->SetCellValue(r-1,c,td->GetNodeContent());
             }
         }
@@ -921,6 +998,8 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
     wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("xsequence") );
     doc.SetRoot( root );
     root->AddAttribute(wxT("BaseChannel"), wxString::Format(wxT("%ld"),SeqBaseChannel));
+    root->AddAttribute(wxT("ChanCtrlBasic"), SeqChanCtrlBasic ? wxT("1") : wxT("0"));
+    root->AddAttribute(wxT("ChanCtrlColor"), SeqChanCtrlColor ? wxT("1") : wxT("0"));
 
     // new items get added to the TOP of the xml structure, so add everything in reverse order
 
@@ -944,6 +1023,61 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
 
     // incorporate effects into xseq file
 
+    MapStringString SettingsMap;
+    wxString ColName;
+    long msec,TempLong;
+    LoadEffectFromString(wxT("None,None,Effect 1"), SettingsMap);
+    for (c=2; c<colcnt; c++) {
+        ColName=Grid1->GetColLabelValue(c);
+        td=GetModelNode(ColName);
+        if (!td) continue;
+        buffer.InitBuffer(td);
+        if (!buffer.MyDisplay) continue;
+        NextGridRowToPlay=0;
+        for (int p=0; p<SeqNumPeriods; p++) {
+            msec=p * XTIMER_INTERVAL;
+            if (NextGridRowToPlay < rowcnt && msec >= GetGridStartTimeMSec(NextGridRowToPlay)) {
+                // start next effect
+                wxYield();
+                LoadEffectFromString(Grid1->GetCellValue(NextGridRowToPlay,c), SettingsMap);
+                UpdateBufferPaletteFromMap(1,SettingsMap);
+                UpdateBufferPaletteFromMap(2,SettingsMap);
+                buffer.SetMixType(SettingsMap["LayerMethod"]);
+                NextGridRowToPlay++;
+            }
+        }
+    }
+    WriteXLightsFile(xlightsFilename);
+    StatusBar1->SetStatusText(_("Updated ")+xlightsFilename);
+}
+
+void xLightsFrame::LoadEffectFromString(wxString settings, MapStringString& SettingsMap)
+{
+    wxString before,after,name,value;
+    int cnt=0;
+    while (!settings.IsEmpty()) {
+        before=settings.BeforeFirst(',');
+        after=settings.AfterFirst(',');
+        switch (cnt) {
+            case 0:
+                SettingsMap.clear();
+                SettingsMap["effect1"]=before;
+                break;
+            case 1:
+                SettingsMap["effect2"]=before;
+                break;
+            case 2:
+                SettingsMap["LayerMethod"]=before;
+                break;
+            default:
+                name=before.BeforeFirst('=');
+                value=before.AfterFirst('=');
+                SettingsMap[name]=value;
+                break;
+        }
+        settings=after;
+        cnt++;
+    }
 }
 
 void xLightsFrame::OnBitmapButtonInsertRowClick(wxCommandEvent& event)

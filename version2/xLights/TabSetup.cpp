@@ -104,7 +104,6 @@ void xLightsFrame::SetDir(const wxString& newdir)
             wxMessageBox(_("Unable to load network definition file"), _("Error"));
         }
     }
-    UpdateNetworkList();
 
     // load schedule
     UpdateShowDates(wxDateTime::Now(),wxDateTime::Now());
@@ -117,8 +116,23 @@ void xLightsFrame::SetDir(const wxString& newdir)
     DisplaySchedule();
 
     // load sequence effects
+    wxWindow* w;
+    int ColorIdx;
+    for(i=0; i<12; i++) {
+        w=wxWindow::FindWindowByName(wxString::Format(wxT("ID_BUTTON_Palette%d_%d"),int(i/6+1),int(i%6+1)));
+        switch (i%6) {
+            case 0: w->SetBackgroundColour(*wxRED); break;
+            case 1: w->SetBackgroundColour(*wxGREEN); break;
+            case 2: w->SetBackgroundColour(*wxBLUE); break;
+            case 3: w->SetBackgroundColour(*wxYELLOW); break;
+            case 4: w->SetBackgroundColour(*wxWHITE); break;
+            case 5: w->SetBackgroundColour(*wxBLACK); break;
+        }
+        SetTextColor(w);
+    }
     LoadEffectsFile();
     PresetsSelect();
+    UpdateNetworkList();
 
     Notebook1->ChangeSelection(SETUPTAB);
 }
@@ -177,7 +191,32 @@ void xLightsFrame::UpdateNetworkList()
 
     // reset test channel listbox
     NetInfo.GetAllChannelNames(ChNames);
+    // update names with RGB models where MyDisplay is checked
+    wxString MyDisplay;
+    for(e=ModelsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
+        if (e->GetName() == wxT("model")) {
+            MyDisplay=e->GetAttribute(wxT("MyDisplay"));
+            if (MyDisplay == wxT("1")) {
+                SetChannelNamesForRgbModel(ChNames,e);
+            }
+        }
+    }
     CheckListBoxTestChannels->Set(ChNames);
+}
+
+void xLightsFrame::SetChannelNamesForRgbModel(wxArrayString& ChNames, wxXmlNode* ModelNode)
+{
+    ModelClass model;
+    model.SetFromXml(ModelNode);
+    size_t ChannelNum=model.StartChannel-1;
+    size_t NodeCount=model.GetNodeCount();
+    wxString FormatSpec = wxT("Ch %d: ")+model.name+wxT(" node %d %c");
+    for(size_t i=0; i < NodeCount && ChannelNum+2 < ChNames.Count(); i++) {
+        for(size_t j=0; j < 3; j++) {
+            ChNames[ChannelNum] = wxString::Format(FormatSpec,ChannelNum+1,i+1,model.RGBorder[j]);
+            ChannelNum++;
+        }
+    }
 }
 
 void xLightsFrame::OnMenuOpenFolderSelected(wxCommandEvent& event)

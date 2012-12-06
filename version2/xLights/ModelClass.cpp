@@ -43,6 +43,7 @@ void ModelClass::SetFromXml(wxXmlNode* ModelNode)
     tempstr=ModelNode->GetAttribute(wxT("Antialias"),wxT("0"));
     tempstr.ToLong(&Antialias);
     AliasFactor=1 << Antialias;
+    MyDisplay=(ModelNode->GetAttribute(wxT("MyDisplay"),wxT("0")) == wxT("1"));
 
     if (DisplayAs == wxT("Tree 360")) {
         InitVMatrix();

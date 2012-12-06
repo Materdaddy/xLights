@@ -26,6 +26,8 @@ const long ModelDialog::ID_RADIOBUTTON1 = wxNewId();
 const long ModelDialog::ID_RADIOBUTTON2 = wxNewId();
 const long ModelDialog::ID_STATICTEXT9 = wxNewId();
 const long ModelDialog::ID_CHOICE3 = wxNewId();
+const long ModelDialog::ID_STATICTEXT10 = wxNewId();
+const long ModelDialog::ID_CHECKBOX1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(ModelDialog,wxDialog)
@@ -106,8 +108,12 @@ ModelDialog::ModelDialog(wxWindow* parent,wxWindowID id)
 	Choice_Antialias = new wxChoice(this, ID_CHOICE3, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE3"));
 	Choice_Antialias->SetSelection( Choice_Antialias->Append(_("None")) );
 	Choice_Antialias->Append(_("2x"));
-	Choice_Antialias->Append(_("4x"));
 	FlexGridSizer2->Add(Choice_Antialias, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText7 = new wxStaticText(this, ID_STATICTEXT10, _("Part of my display"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+	FlexGridSizer2->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	CheckBox_MyDisplay = new wxCheckBox(this, ID_CHECKBOX1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	CheckBox_MyDisplay->SetValue(true);
+	FlexGridSizer2->Add(CheckBox_MyDisplay, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StdDialogButtonSizer1 = new wxStdDialogButtonSizer();
 	StdDialogButtonSizer1->AddButton(new wxButton(this, wxID_OK, wxEmptyString));

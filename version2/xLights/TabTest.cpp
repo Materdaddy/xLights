@@ -242,7 +242,7 @@ void xLightsFrame::OnRadioButtonDimSelect(wxCommandEvent& event)
 }
 
 // called on each Timer tick while Test dialog is open
-void xLightsFrame::OnTimerTest()
+void xLightsFrame::OnTimerTest(long curtime)
 {
     static int LastNotebookSelection = -1;
     static int LastBgIntensity,LastFgIntensity,LastBgColor[3],LastFgColor[3],*ShimColor,ShimIntensity;
@@ -258,9 +258,6 @@ void xLightsFrame::OnTimerTest()
     bool ColorChange;
 
     if (!xout) return;
-    wxDateTime TimerStartTime = wxDateTime::UNow();
-    wxTimeSpan ts = TimerStartTime - starttime;
-    long curtime = ts.GetMilliseconds().ToLong();
     xout->TimerStart(curtime);
     int NotebookSelection = NotebookTest->GetSelection();
     if (NotebookSelection != LastNotebookSelection) {
@@ -273,6 +270,7 @@ void xLightsFrame::OnTimerTest()
         LastFunc = TestFunc;
         rgbCycle=0;
         CheckChannelList = true;
+        NextSequenceStart = -1;
     }
 
     if (CheckChannelList) {
@@ -290,7 +288,7 @@ void xLightsFrame::OnTimerTest()
         if (!CheckBoxLightOutput->IsChecked()) {
             StatusBar1->SetStatusText(_("Testing disabled - Output to Lights is not checked"));
         } else if (TestFunc == OFF) {
-            StatusBar1->SetStatusText(_("All lights off"));
+            StatusBar1->SetStatusText(_("Testing off"));
         } else {
             StatusBar1->SetStatusText(wxString::Format(_("Testing %ld channels"),static_cast<long>(chArray.Count())));
         }
@@ -358,6 +356,7 @@ void xLightsFrame::OnTimerTest()
                     break;
 
                 case CHASE:
+                    StatusBar1->SetStatusText(wxString::Format(_("chase curtime=%ld, NextSequenceStart=%ld"),curtime,NextSequenceStart));
                     if (ColorChange || curtime >= NextSequenceStart) {
                         for (i=0; i < chArray.Count(); i++) {
                             v = (i % ChaseGrouping) == TestSeqIdx ? FgIntensity : BgIntensity;
@@ -499,9 +498,4 @@ void xLightsFrame::OnTimerTest()
             break;
     }
     xout->TimerEnd();
-    ts = wxDateTime::UNow() - TimerStartTime;
-    curtime = ts.GetMilliseconds().ToLong();
-    //StatusBar1->SetStatusText(wxString::Format(_("Timer took %ld msec"),curtime));
-    //wxLogTrace(wxT("xout"),wxT("Ending OnTimer"));
-    //StatusBar1->SetStatusText(ts.Format(_("%S.%l")));
 }
