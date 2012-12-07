@@ -194,7 +194,7 @@ const long xLightsFrame::ID_CHECKBOX_Bars1_Highlight = wxNewId();
 const long xLightsFrame::ID_CHECKBOX_Bars1_3D = wxNewId();
 const long xLightsFrame::ID_PANEL8 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT27 = wxNewId();
-const long xLightsFrame::ID_CHOICE1 = wxNewId();
+const long xLightsFrame::ID_CHOICE_Butterfly1_Colors = wxNewId();
 const long xLightsFrame::ID_STATICTEXT28 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Butterfly1_Style = wxNewId();
 const long xLightsFrame::ID_STATICTEXT30 = wxNewId();
@@ -254,7 +254,7 @@ const long xLightsFrame::ID_TEXTCTRL_Text1_Line2 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT57 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Text1_Top = wxNewId();
 const long xLightsFrame::ID_BUTTON_TEXT1_FONT = wxNewId();
-const long xLightsFrame::ID_TEXTCTRL_TEXT1_FONT = wxNewId();
+const long xLightsFrame::ID_TEXTCTRL_Text1_Font = wxNewId();
 const long xLightsFrame::ID_PANEL7 = wxNewId();
 const long xLightsFrame::ID_CHOICEBOOK1 = wxNewId();
 const long xLightsFrame::ID_BUTTON_Palette1 = wxNewId();
@@ -281,7 +281,7 @@ const long xLightsFrame::ID_CHECKBOX_Bars2_Highlight = wxNewId();
 const long xLightsFrame::ID_CHECKBOX_Bars2_3D = wxNewId();
 const long xLightsFrame::ID_PANEL9 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT49 = wxNewId();
-const long xLightsFrame::ID_CHOICE3 = wxNewId();
+const long xLightsFrame::ID_CHOICE_Butterfly2_Colors = wxNewId();
 const long xLightsFrame::ID_STATICTEXT50 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Butterfly2_Style = wxNewId();
 const long xLightsFrame::ID_STATICTEXT52 = wxNewId();
@@ -341,7 +341,7 @@ const long xLightsFrame::ID_TEXTCTRL_Text2_Line2 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT76 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Text2_Top = wxNewId();
 const long xLightsFrame::ID_BUTTON_TEXT2_FONT = wxNewId();
-const long xLightsFrame::ID_TEXTCTRL_TEXT2_FONT = wxNewId();
+const long xLightsFrame::ID_TEXTCTRL_Text2_Font = wxNewId();
 const long xLightsFrame::ID_PANEL29 = wxNewId();
 const long xLightsFrame::ID_CHOICEBOOK2 = wxNewId();
 const long xLightsFrame::ID_BUTTON_Palette2 = wxNewId();
@@ -953,10 +953,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText24 = new wxStaticText(Panel1_Bars, ID_STATICTEXT26, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT26"));
     FlexGridSizer35->Add(StaticText24, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Choice_Bars1_Direction = new wxChoice(Panel1_Bars, ID_CHOICE_Bars1_Direction, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Bars1_Direction"));
-    Choice_Bars1_Direction->SetSelection( Choice_Bars1_Direction->Append(_("up")) );
-    Choice_Bars1_Direction->Append(_("down"));
-    Choice_Bars1_Direction->Append(_("expand"));
-    Choice_Bars1_Direction->Append(_("compress"));
     FlexGridSizer35->Add(Choice_Bars1_Direction, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     CheckBox_Bars1_Highlight = new wxCheckBox(Panel1_Bars, ID_CHECKBOX_Bars1_Highlight, _("Highlight"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Bars1_Highlight"));
     CheckBox_Bars1_Highlight->SetValue(false);
@@ -971,9 +967,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer36 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticText25 = new wxStaticText(Panel1_Butterfly, ID_STATICTEXT27, _("Colors"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT27"));
     FlexGridSizer36->Add(StaticText25, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Choice_Butterfly1_Colors = new wxChoice(Panel1_Butterfly, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
-    Choice_Butterfly1_Colors->SetSelection( Choice_Butterfly1_Colors->Append(_("Rainbow")) );
-    Choice_Butterfly1_Colors->Append(_("Palette"));
+    Choice_Butterfly1_Colors = new wxChoice(Panel1_Butterfly, ID_CHOICE_Butterfly1_Colors, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Butterfly1_Colors"));
     FlexGridSizer36->Add(Choice_Butterfly1_Colors, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText26 = new wxStaticText(Panel1_Butterfly, ID_STATICTEXT28, _("Style"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT28"));
     FlexGridSizer36->Add(StaticText26, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -1041,9 +1035,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText39 = new wxStaticText(Panel1_Meteors, ID_STATICTEXT39, _("Type"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT39"));
     FlexGridSizer41->Add(StaticText39, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Choice_Meteors1_Type = new wxChoice(Panel1_Meteors, ID_CHOICE_Meteors1_Type, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Meteors1_Type"));
-    Choice_Meteors1_Type->Append(_("Rainbow"));
-    Choice_Meteors1_Type->Append(_("Range"));
-    Choice_Meteors1_Type->SetSelection( Choice_Meteors1_Type->Append(_("Palette")) );
     FlexGridSizer41->Add(Choice_Meteors1_Type, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText41 = new wxStaticText(Panel1_Meteors, ID_STATICTEXT41, _("Count"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT41"));
     FlexGridSizer41->Add(StaticText41, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -1068,11 +1059,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText46 = new wxStaticText(Panel1_Pictures, ID_STATICTEXT46, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT46"));
     FlexGridSizer31->Add(StaticText46, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Choice_Pictures1_Direction = new wxChoice(Panel1_Pictures, ID_CHOICE_Pictures1_Direction, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Pictures1_Direction"));
-    Choice_Pictures1_Direction->SetSelection( Choice_Pictures1_Direction->Append(_("left")) );
-    Choice_Pictures1_Direction->Append(_("right"));
-    Choice_Pictures1_Direction->Append(_("up"));
-    Choice_Pictures1_Direction->Append(_("down"));
-    Choice_Pictures1_Direction->Append(_("none"));
     FlexGridSizer31->Add(Choice_Pictures1_Direction, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer42->Add(FlexGridSizer31, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel1_Pictures->SetSizer(FlexGridSizer42);
@@ -1146,7 +1132,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Button_Text1_Font = new wxButton(Panel1_Text, ID_BUTTON_TEXT1_FONT, _("Font"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEXT1_FONT"));
     Button_Text1_Font->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer46->Add(Button_Text1_Font, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    TextCtrl_Text1_Font = new wxTextCtrl(Panel1_Text, ID_TEXTCTRL_TEXT1_FONT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_TEXT1_FONT"));
+    TextCtrl_Text1_Font = new wxTextCtrl(Panel1_Text, ID_TEXTCTRL_Text1_Font, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_Text1_Font"));
     FlexGridSizer46->Add(TextCtrl_Text1_Font, 1, wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel1_Text->SetSizer(FlexGridSizer46);
     FlexGridSizer46->Fit(Panel1_Text);
@@ -1229,10 +1215,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText44 = new wxStaticText(Panel2_Bars, ID_STATICTEXT48, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT48"));
     FlexGridSizer50->Add(StaticText44, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Choice_Bars2_Direction = new wxChoice(Panel2_Bars, ID_CHOICE_Bars2_Direction, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Bars2_Direction"));
-    Choice_Bars2_Direction->SetSelection( Choice_Bars2_Direction->Append(_("up")) );
-    Choice_Bars2_Direction->Append(_("down"));
-    Choice_Bars2_Direction->Append(_("expand"));
-    Choice_Bars2_Direction->Append(_("compress"));
     FlexGridSizer50->Add(Choice_Bars2_Direction, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     CheckBox_Bars2_Highlight = new wxCheckBox(Panel2_Bars, ID_CHECKBOX_Bars2_Highlight, _("Highlight"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_Bars2_Highlight"));
     CheckBox_Bars2_Highlight->SetValue(false);
@@ -1247,9 +1229,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer51 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticText47 = new wxStaticText(Panel2_Butterfly, ID_STATICTEXT49, _("Colors"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT49"));
     FlexGridSizer51->Add(StaticText47, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Choice_Butterfly2_Colors = new wxChoice(Panel2_Butterfly, ID_CHOICE3, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE3"));
-    Choice_Butterfly2_Colors->SetSelection( Choice_Butterfly2_Colors->Append(_("Rainbow")) );
-    Choice_Butterfly2_Colors->Append(_("Palette"));
+    Choice_Butterfly2_Colors = new wxChoice(Panel2_Butterfly, ID_CHOICE_Butterfly2_Colors, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Butterfly2_Colors"));
     FlexGridSizer51->Add(Choice_Butterfly2_Colors, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText48 = new wxStaticText(Panel2_Butterfly, ID_STATICTEXT50, _("Style"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT50"));
     FlexGridSizer51->Add(StaticText48, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -1317,9 +1297,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText62 = new wxStaticText(Panel2_Meteors, ID_STATICTEXT64, _("Type"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT64"));
     FlexGridSizer56->Add(StaticText62, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Choice_Meteors2_Type = new wxChoice(Panel2_Meteors, ID_CHOICE_Meteors2_Type, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Meteors2_Type"));
-    Choice_Meteors2_Type->Append(_("Rainbow"));
-    Choice_Meteors2_Type->Append(_("Range"));
-    Choice_Meteors2_Type->SetSelection( Choice_Meteors2_Type->Append(_("Palette")) );
     FlexGridSizer56->Add(Choice_Meteors2_Type, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText63 = new wxStaticText(Panel2_Meteors, ID_STATICTEXT65, _("Count"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT65"));
     FlexGridSizer56->Add(StaticText63, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -1344,11 +1321,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText65 = new wxStaticText(Panel2_Pictures, ID_STATICTEXT67, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT67"));
     FlexGridSizer64->Add(StaticText65, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Choice_Pictures2_Direction = new wxChoice(Panel2_Pictures, ID_CHOICE_Pictures2_Direction, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Pictures2_Direction"));
-    Choice_Pictures2_Direction->SetSelection( Choice_Pictures2_Direction->Append(_("left")) );
-    Choice_Pictures2_Direction->Append(_("right"));
-    Choice_Pictures2_Direction->Append(_("up"));
-    Choice_Pictures2_Direction->Append(_("down"));
-    Choice_Pictures2_Direction->Append(_("none"));
     FlexGridSizer64->Add(Choice_Pictures2_Direction, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer57->Add(FlexGridSizer64, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2_Pictures->SetSizer(FlexGridSizer57);
@@ -1422,7 +1394,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Button_Text2_Font = new wxButton(Panel2_Text, ID_BUTTON_TEXT2_FONT, _("Font"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEXT2_FONT"));
     Button_Text2_Font->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer61->Add(Button_Text2_Font, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    TextCtrl_Text2_Font = new wxTextCtrl(Panel2_Text, ID_TEXTCTRL_TEXT2_FONT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_TEXT2_FONT"));
+    TextCtrl_Text2_Font = new wxTextCtrl(Panel2_Text, ID_TEXTCTRL_Text2_Font, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_Text2_Font"));
     FlexGridSizer61->Add(TextCtrl_Text2_Font, 1, wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2_Text->SetSizer(FlexGridSizer61);
     FlexGridSizer61->Fit(Panel2_Text);
@@ -1795,6 +1767,42 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     }
     FileDialogConvert->SetDirectory(ConvertDir);
 
+    // initialize all effect wxChoice lists
+
+    BarEffectDirections.Add("up");
+    BarEffectDirections.Add("down");
+    BarEffectDirections.Add("expand");
+    BarEffectDirections.Add("compress");
+    Choice_Bars1_Direction->Set(BarEffectDirections);
+    Choice_Bars1_Direction->SetSelection(0);
+    Choice_Bars2_Direction->Set(BarEffectDirections);
+    Choice_Bars2_Direction->SetSelection(0);
+
+    ButterflyEffectColors.Add("Rainbow");
+    ButterflyEffectColors.Add("Palette");
+    Choice_Butterfly1_Colors->Set(ButterflyEffectColors);
+    Choice_Butterfly1_Colors->SetSelection(0);
+    Choice_Butterfly2_Colors->Set(ButterflyEffectColors);
+    Choice_Butterfly2_Colors->SetSelection(0);
+
+    MeteorsEffectTypes.Add("Rainbow");
+    MeteorsEffectTypes.Add("Range");
+    MeteorsEffectTypes.Add("Palette");
+    Choice_Meteors1_Type->Set(MeteorsEffectTypes);
+    Choice_Meteors1_Type->SetSelection(0);
+    Choice_Meteors2_Type->Set(MeteorsEffectTypes);
+    Choice_Meteors2_Type->SetSelection(0);
+
+    PictureEffectDirections.Add("left");
+    PictureEffectDirections.Add("right");
+    PictureEffectDirections.Add("up");
+    PictureEffectDirections.Add("down");
+    PictureEffectDirections.Add("none");
+    Choice_Pictures1_Direction->Set(PictureEffectDirections);
+    Choice_Pictures1_Direction->SetSelection(0);
+    Choice_Pictures2_Direction->Set(PictureEffectDirections);
+    Choice_Pictures2_Direction->SetSelection(0);
+
     // Check if schedule should be running
     xout=0;
     long RunFlag=0;
@@ -1999,7 +2007,7 @@ bool xLightsFrame::EnableOutputs()
                 wxString NetworkType=e->GetAttribute(wxT("NetworkType"), wxT(""));
                 wxString ComPort=e->GetAttribute(wxT("ComPort"), wxT(""));
                 wxString BaudRate=e->GetAttribute(wxT("BaudRate"), wxT(""));
-                int baud = (BaudRate == _("n/a")) ? 115200 : atoi(BaudRate.mb_str(wxConvUTF8));
+                int baud = (BaudRate == _("n/a")) ? 115200 : wxAtoi(BaudRate);
                 wxString msg = _("Error occurred while connecting to ") + NetworkType+ _(" network on ") + ComPort +
                     _("\n\nThings to check:\n1. Are all required cables plugged in?") +
                     _("\n2. Is there another program running that is accessing the port (like the LOR Control Panel)? If so, then you must close the other program and then restart xLights.") +

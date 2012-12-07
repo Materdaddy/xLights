@@ -371,7 +371,7 @@ class xLightsFrame: public wxFrame
         static const long ID_CHECKBOX_Bars1_3D;
         static const long ID_PANEL8;
         static const long ID_STATICTEXT27;
-        static const long ID_CHOICE1;
+        static const long ID_CHOICE_Butterfly1_Colors;
         static const long ID_STATICTEXT28;
         static const long ID_SLIDER_Butterfly1_Style;
         static const long ID_STATICTEXT30;
@@ -431,7 +431,7 @@ class xLightsFrame: public wxFrame
         static const long ID_STATICTEXT57;
         static const long ID_SLIDER_Text1_Top;
         static const long ID_BUTTON_TEXT1_FONT;
-        static const long ID_TEXTCTRL_TEXT1_FONT;
+        static const long ID_TEXTCTRL_Text1_Font;
         static const long ID_PANEL7;
         static const long ID_CHOICEBOOK1;
         static const long ID_BUTTON_Palette1;
@@ -458,7 +458,7 @@ class xLightsFrame: public wxFrame
         static const long ID_CHECKBOX_Bars2_3D;
         static const long ID_PANEL9;
         static const long ID_STATICTEXT49;
-        static const long ID_CHOICE3;
+        static const long ID_CHOICE_Butterfly2_Colors;
         static const long ID_STATICTEXT50;
         static const long ID_SLIDER_Butterfly2_Style;
         static const long ID_STATICTEXT52;
@@ -518,7 +518,7 @@ class xLightsFrame: public wxFrame
         static const long ID_STATICTEXT76;
         static const long ID_SLIDER_Text2_Top;
         static const long ID_BUTTON_TEXT2_FONT;
-        static const long ID_TEXTCTRL_TEXT2_FONT;
+        static const long ID_TEXTCTRL_Text2_Font;
         static const long ID_PANEL29;
         static const long ID_CHOICEBOOK2;
         static const long ID_BUTTON_Palette2;
@@ -1054,6 +1054,7 @@ class xLightsFrame: public wxFrame
         void SetTextColor(wxWindow* w);
         void LoadEffectFromString(wxString settings, MapStringString& SettingsMap);
         void UpdateBufferPaletteFromMap(int PaletteNum, MapStringString& SettingsMap);
+        void RenderEffectFromString(int layer, MapStringString& SettingsMap);
 
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;
@@ -1069,6 +1070,10 @@ class xLightsFrame: public wxFrame
         wxHtmlEasyPrinting* HtmlEasyPrint;
         int NextGridRowToPlay;
         int SeqPlayColumn;
+        wxArrayString BarEffectDirections;
+        wxArrayString ButterflyEffectColors;
+        wxArrayString MeteorsEffectTypes;
+        wxArrayString PictureEffectDirections;
 
 
         DECLARE_EVENT_TABLE()

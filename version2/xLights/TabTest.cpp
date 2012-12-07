@@ -356,7 +356,7 @@ void xLightsFrame::OnTimerTest(long curtime)
                     break;
 
                 case CHASE:
-                    StatusBar1->SetStatusText(wxString::Format(_("chase curtime=%ld, NextSequenceStart=%ld"),curtime,NextSequenceStart));
+                    //StatusBar1->SetStatusText(wxString::Format(_("chase curtime=%ld, NextSequenceStart=%ld"),curtime,NextSequenceStart));
                     if (ColorChange || curtime >= NextSequenceStart) {
                         for (i=0; i < chArray.Count(); i++) {
                             v = (i % ChaseGrouping) == TestSeqIdx ? FgIntensity : BgIntensity;

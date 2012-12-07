@@ -220,6 +220,7 @@ private:
     PixelVector pixels; // this is the calculation buffer
 
     int sparkle_count,Speed;
+    int CurrentLayer;  // 0 or 1
     MixTypes MixType;
     wxScrolledWindow* DrawWindow;
     MeteorList meteors[2];
@@ -235,15 +236,15 @@ private:
     long SpiralState[2];
     long TextState[2];
 
-    void SetPixel(int layer, int x, int y, wxColour &color);
-    void SetPixel(int layer, int x, int y, wxImage::HSVValue& hsv);
+    void SetPixel(int x, int y, wxColour &color);
+    void SetPixel(int x, int y, wxImage::HSVValue& hsv);
     void SetRangeColor(const wxImage::HSVValue& hsv1, const wxImage::HSVValue& hsv2, wxImage::HSVValue& newhsv);
     double RandomRange(double num1, double num2);
     void Color2HSV(const wxColour& color, wxImage::HSVValue& hsv);
     double rand01();
     wxByte ChannelBlend(wxByte c1, wxByte c2, double ratio);
-    void Get2ColorBlend(int layer, int coloridx1, int coloridx2, double ratio, wxColour &color);
-    void GetMultiColorBlend(int layer, double n, bool circular, wxColour &color);
+    void Get2ColorBlend(int coloridx1, int coloridx2, double ratio, wxColour &color);
+    void GetMultiColorBlend(double n, bool circular, wxColour &color);
 
 public:
     PixelBufferClass();
@@ -254,20 +255,21 @@ public:
     void SetMixType(const wxString& MixName);
     void SetPalette(int layer, wxColourVector& newcolors);
     void SetSpeed(int newspeed);
+    void SetLayer(int newlayer);
     void SetSparkle(int freq);
     void SetWindow(wxScrolledWindow* ScrolledWindow);
-    void RenderBars(int layer, int PaletteRepeat, int Direction, bool Highlight, bool Show3D);
-    void RenderButterfly(int layer, int ColorScheme, int Style, int Chunks, int Skip);
-    void RenderColorWash(int layer, bool HorizFade, bool VertFade);
-    void RenderFire(int layer);
-    void RenderGarlands(int layer, int GarlandType, int Spacing);
-    void RenderLife(int layer, int Count, int Seed);
-    void RenderMeteors(int layer, int MeteorType, int Count, int Length);
-    void RenderPictures(int layer, int dir, const wxString& NewPictureName);
-    void RenderSnowflakes(int layer);
-    void RenderSnowstorm(int layer, int Count, int Length);
-    void RenderSpirals(int layer, int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
-    void RenderText(int layer, int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString);
+    void RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D);
+    void RenderButterfly(int ColorScheme, int Style, int Chunks, int Skip);
+    void RenderColorWash(bool HorizFade, bool VertFade);
+    void RenderFire();
+    void RenderGarlands(int GarlandType, int Spacing);
+    void RenderLife(int Count, int Seed);
+    void RenderMeteors(int MeteorType, int Count, int Length);
+    void RenderPictures(int dir, const wxString& NewPictureName);
+    void RenderSnowflakes();
+    void RenderSnowstorm(int Count, int Length);
+    void RenderSpirals(int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
+    void RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString);
     void DisplayOutput();
 };
 

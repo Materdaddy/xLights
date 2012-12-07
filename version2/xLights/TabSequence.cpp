@@ -494,6 +494,54 @@ void xLightsFrame::UpdateBufferPalette()
     buffer.SetPalette(1,newcolors);
 }
 
+void xLightsFrame::RenderEffectFromString(int layer, MapStringString& SettingsMap)
+{
+    buffer.SetLayer(layer);
+    wxString LayerStr=layer==0 ? wxT("1") : wxT("2");
+    wxString effect=SettingsMap[wxT("effect")+LayerStr];
+    if (effect == wxT("Bars")) {
+        buffer.RenderBars(wxAtoi(SettingsMap[wxT("ID_SLIDER_Bars")+LayerStr+wxT("_BarCount")]),
+                          BarEffectDirections.Index(SettingsMap[wxT("ID_CHOICE_Bars")+LayerStr+wxT("_Direction")]),
+                          SettingsMap[wxT("ID_CHECKBOX_Bars")+LayerStr+wxT("_Highlight")]==wxT("1"),
+                          SettingsMap[wxT("ID_CHECKBOX_Bars")+LayerStr+wxT("_3D")]==wxT("1"));
+    } else if (effect == wxT("Butterfly")) {
+        buffer.RenderButterfly(ButterflyEffectColors.Index(SettingsMap[wxT("ID_CHOICE_Butterfly")+LayerStr+wxT("_Colors")]),
+                               wxAtoi(SettingsMap[wxT("ID_SLIDER_Butterfly")+LayerStr+wxT("_Style")]),
+                               wxAtoi(SettingsMap[wxT("ID_SLIDER_Butterfly")+LayerStr+wxT("_Chunks")]),
+                               wxAtoi(SettingsMap[wxT("ID_SLIDER_Butterfly")+LayerStr+wxT("_Skip")]));
+    } else if (effect == wxT("Color Wash")) {
+        buffer.RenderColorWash(SettingsMap[wxT("ID_CHECKBOX_ColorWash")+LayerStr+wxT("_HFade")]==wxT("1"),
+                               SettingsMap[wxT("ID_CHECKBOX_ColorWash")+LayerStr+wxT("_VFade")]==wxT("1"));
+    } else if (effect == wxT("Fire")) {
+        buffer.RenderFire();
+    } else if (effect == wxT("Garlands")) {
+        buffer.RenderGarlands(wxAtoi(SettingsMap[wxT("ID_SLIDER_Garlands")+LayerStr+wxT("_Type")]),
+                              wxAtoi(SettingsMap[wxT("ID_SLIDER_Garlands")+LayerStr+wxT("_Spacing")]));
+    } else if (effect == wxT("Life")) {
+    } else if (effect == wxT("Meteors")) {
+        buffer.RenderMeteors(MeteorsEffectTypes.Index(SettingsMap[wxT("ID_CHOICE_Meteors")+LayerStr+wxT("_Type")]),
+                             wxAtoi(SettingsMap[wxT("Slider_Meteors")+LayerStr+wxT("_Count")]),
+                             wxAtoi(SettingsMap[wxT("Slider_Meteors")+LayerStr+wxT("_Length")]));
+    } else if (effect == wxT("Pictures")) {
+        buffer.RenderPictures(PictureEffectDirections.Index(SettingsMap[wxT("ID_CHOICE_Pictures")+LayerStr+wxT("_Direction")]),
+                              SettingsMap[wxT("ID_TEXTCTRL_Pictures")+LayerStr+wxT("_Filename")]);
+    } else if (effect == wxT("Snowflakes")) {
+    } else if (effect == wxT("Snowstorm")) {
+    } else if (effect == wxT("Spirals")) {
+        buffer.RenderSpirals(wxAtoi(SettingsMap[wxT("ID_SLIDER_Spirals")+LayerStr+wxT("_Count")]),
+                             wxAtoi(SettingsMap[wxT("ID_SLIDER_Spirals")+LayerStr+wxT("_Direction")]),
+                             wxAtoi(SettingsMap[wxT("ID_SLIDER_Spirals")+LayerStr+wxT("_Rotation")]),
+                             wxAtoi(SettingsMap[wxT("ID_SLIDER_Spirals")+LayerStr+wxT("_Thickness")]),
+                             SettingsMap[wxT("ID_CHECKBOX_Spirals")+LayerStr+wxT("_Blend")]==wxT("1"),
+                             SettingsMap[wxT("ID_CHECKBOX_Spirals")+LayerStr+wxT("_3D")]==wxT("1"));
+    } else if (effect == wxT("Text")) {
+        buffer.RenderText(wxAtoi(SettingsMap[wxT("ID_SLIDER_Text")+LayerStr+wxT("_Top")]),
+                          SettingsMap[wxT("ID_TEXTCTRL_Text")+LayerStr+wxT("_Line1")],
+                          SettingsMap[wxT("ID_TEXTCTRL_Text")+LayerStr+wxT("_Line2")],
+                          SettingsMap[wxT("ID_TEXTCTRL_Text")+LayerStr+wxT("_Font")]);
+    }
+}
+
 void xLightsFrame::TimerEffect()
 {
     wxString s;
@@ -516,54 +564,55 @@ void xLightsFrame::TimerEffect()
 
     // render effect 1
     buffer.SetSpeed(Slider_Speed1->GetValue());
+    buffer.SetLayer(0);
     switch (Choicebook1->GetSelection())
     {
         case 0: break;   // none
         case 1:
-            buffer.RenderBars(0, Slider_Bars1_BarCount->GetValue(),
+            buffer.RenderBars(Slider_Bars1_BarCount->GetValue(),
                               Choice_Bars1_Direction->GetSelection(),
                               CheckBox_Bars1_Highlight->GetValue(),
                               CheckBox_Bars1_3D->GetValue());
             break;
         case 2:
-            buffer.RenderButterfly(0, Choice_Butterfly1_Colors->GetSelection(),
+            buffer.RenderButterfly(Choice_Butterfly1_Colors->GetSelection(),
                                    Slider_Butterfly1_Style->GetValue(),
                                    Slider_Butterfly1_Chunks->GetValue(),
                                    Slider_Butterfly1_Skip->GetValue());
             break;
         case 3:
-            buffer.RenderColorWash(0,CheckBox_ColorWash1_HFade->GetValue(),
+            buffer.RenderColorWash(CheckBox_ColorWash1_HFade->GetValue(),
                                    CheckBox_ColorWash1_VFade->GetValue());
             break;
         case 4:
-            buffer.RenderFire(0);
+            buffer.RenderFire();
             break;
         case 5:
-            buffer.RenderGarlands(0,Slider_Garlands1_Type->GetValue(),
+            buffer.RenderGarlands(Slider_Garlands1_Type->GetValue(),
                                   Slider_Garlands1_Spacing->GetValue());
             break;
         case 6:
-            buffer.RenderLife(0,Slider_Life1_Count->GetValue(),
+            buffer.RenderLife(Slider_Life1_Count->GetValue(),
                               Slider_Life1_Seed->GetValue());
             break;
         case 7:
-            buffer.RenderMeteors(0,Choice_Meteors1_Type->GetSelection(),
+            buffer.RenderMeteors(Choice_Meteors1_Type->GetSelection(),
                                  Slider_Meteors1_Count->GetValue(),
                                  Slider_Meteors1_Length->GetValue());
             break;
         case 8:
-            buffer.RenderPictures(0,Choice_Pictures1_Direction->GetSelection(),
+            buffer.RenderPictures(Choice_Pictures1_Direction->GetSelection(),
                                   TextCtrl_Pictures1_Filename->GetValue());
             break;
         case 9:
-            buffer.RenderSnowflakes(0);
+            buffer.RenderSnowflakes();
             break;
         case 10:
-            buffer.RenderSnowstorm(0,Slider_Snowstorm1_Count->GetValue(),
+            buffer.RenderSnowstorm(Slider_Snowstorm1_Count->GetValue(),
                                    Slider_Snowstorm1_Length->GetValue());
             break;
         case 11:
-            buffer.RenderSpirals(0,Slider_Spirals1_Count->GetValue(),
+            buffer.RenderSpirals(Slider_Spirals1_Count->GetValue(),
                                  Slider_Spirals1_Direction->GetValue(),
                                  Slider_Spirals1_Rotation->GetValue(),
                                  Slider_Spirals1_Thickness->GetValue(),
@@ -571,7 +620,7 @@ void xLightsFrame::TimerEffect()
                                  CheckBox_Spirals1_3D->GetValue());
             break;
         case 12:
-            buffer.RenderText(0,Slider_Text1_Top->GetValue(),
+            buffer.RenderText(Slider_Text1_Top->GetValue(),
                               TextCtrl_Text1_Line1->GetValue(),
                               TextCtrl_Text1_Line2->GetValue(),
                               TextCtrl_Text1_Font->GetValue());
@@ -580,54 +629,55 @@ void xLightsFrame::TimerEffect()
 
     // render effect 2
     buffer.SetSpeed(Slider_Speed2->GetValue());
+    buffer.SetLayer(1);
     switch (Choicebook2->GetSelection())
     {
         case 0: break;   // none
         case 1:
-            buffer.RenderBars(1, Slider_Bars2_BarCount->GetValue(),
+            buffer.RenderBars(Slider_Bars2_BarCount->GetValue(),
                               Choice_Bars2_Direction->GetSelection(),
                               CheckBox_Bars2_Highlight->GetValue(),
                               CheckBox_Bars2_3D->GetValue());
             break;
         case 2:
-            buffer.RenderButterfly(1, Choice_Butterfly2_Colors->GetSelection(),
+            buffer.RenderButterfly(Choice_Butterfly2_Colors->GetSelection(),
                                    Slider_Butterfly2_Style->GetValue(),
                                    Slider_Butterfly2_Chunks->GetValue(),
                                    Slider_Butterfly2_Skip->GetValue());
             break;
         case 3:
-            buffer.RenderColorWash(1,CheckBox_ColorWash2_HFade->GetValue(),
+            buffer.RenderColorWash(CheckBox_ColorWash2_HFade->GetValue(),
                                    CheckBox_ColorWash2_VFade->GetValue());
             break;
         case 4:
-            buffer.RenderFire(1);
+            buffer.RenderFire();
             break;
         case 5:
-            buffer.RenderGarlands(1,Slider_Garlands2_Type->GetValue(),
+            buffer.RenderGarlands(Slider_Garlands2_Type->GetValue(),
                                   Slider_Garlands2_Spacing->GetValue());
             break;
         case 6:
-            buffer.RenderLife(1,Slider_Life2_Count->GetValue(),
+            buffer.RenderLife(Slider_Life2_Count->GetValue(),
                               Slider_Life2_Seed->GetValue());
             break;
         case 7:
-            buffer.RenderMeteors(1,Choice_Meteors2_Type->GetSelection(),
+            buffer.RenderMeteors(Choice_Meteors2_Type->GetSelection(),
                                  Slider_Meteors2_Count->GetValue(),
                                  Slider_Meteors2_Length->GetValue());
             break;
         case 8:
-            buffer.RenderPictures(1,Choice_Pictures2_Direction->GetSelection(),
+            buffer.RenderPictures(Choice_Pictures2_Direction->GetSelection(),
                                   TextCtrl_Pictures2_Filename->GetValue());
             break;
         case 9:
-            buffer.RenderSnowflakes(1);
+            buffer.RenderSnowflakes();
             break;
         case 10:
-            buffer.RenderSnowstorm(1,Slider_Snowstorm2_Count->GetValue(),
+            buffer.RenderSnowstorm(Slider_Snowstorm2_Count->GetValue(),
                                    Slider_Snowstorm2_Length->GetValue());
             break;
         case 11:
-            buffer.RenderSpirals(1,Slider_Spirals2_Count->GetValue(),
+            buffer.RenderSpirals(Slider_Spirals2_Count->GetValue(),
                                  Slider_Spirals2_Direction->GetValue(),
                                  Slider_Spirals2_Rotation->GetValue(),
                                  Slider_Spirals2_Thickness->GetValue(),
@@ -635,7 +685,7 @@ void xLightsFrame::TimerEffect()
                                  CheckBox_Spirals2_3D->GetValue());
             break;
         case 12:
-            buffer.RenderText(1,Slider_Text2_Top->GetValue(),
+            buffer.RenderText(Slider_Text2_Top->GetValue(),
                               TextCtrl_Text2_Line1->GetValue(),
                               TextCtrl_Text2_Line2->GetValue(),
                               TextCtrl_Text2_Font->GetValue());
@@ -1036,6 +1086,7 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
         NextGridRowToPlay=0;
         for (int p=0; p<SeqNumPeriods; p++) {
             msec=p * XTIMER_INTERVAL;
+            buffer.Clear();
             if (NextGridRowToPlay < rowcnt && msec >= GetGridStartTimeMSec(NextGridRowToPlay)) {
                 // start next effect
                 wxYield();
@@ -1043,8 +1094,15 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
                 UpdateBufferPaletteFromMap(1,SettingsMap);
                 UpdateBufferPaletteFromMap(2,SettingsMap);
                 buffer.SetMixType(SettingsMap["LayerMethod"]);
+                // update SparkleFrequency
+                int freq=wxAtoi(SettingsMap["ID_SLIDER_SparkleFrequency"]);
+                if (freq == Slider_SparkleFrequency->GetMax()) freq=0;
+                buffer.SetSparkle(freq);
                 NextGridRowToPlay++;
             }
+            RenderEffectFromString(0, SettingsMap);
+            RenderEffectFromString(1, SettingsMap);
+            // update SeqData with contents of buffer
         }
     }
     WriteXLightsFile(xlightsFilename);

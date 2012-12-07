@@ -1503,12 +1503,6 @@
 																								</object>
 																								<object class="sizeritem">
 																									<object class="wxChoice" name="ID_CHOICE_Bars1_Direction" variable="Choice_Bars1_Direction" member="yes">
-																										<content>
-																											<item>up</item>
-																											<item>down</item>
-																											<item>expand</item>
-																											<item>compress</item>
-																										</content>
 																										<selection>0</selection>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1549,11 +1543,7 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxChoice" name="ID_CHOICE1" variable="Choice_Butterfly1_Colors" member="yes">
-																										<content>
-																											<item>Rainbow</item>
-																											<item>Palette</item>
-																										</content>
+																									<object class="wxChoice" name="ID_CHOICE_Butterfly1_Colors" variable="Choice_Butterfly1_Colors" member="yes">
 																										<selection>0</selection>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1758,11 +1748,6 @@
 																								</object>
 																								<object class="sizeritem">
 																									<object class="wxChoice" name="ID_CHOICE_Meteors1_Type" variable="Choice_Meteors1_Type" member="yes">
-																										<content>
-																											<item>Rainbow</item>
-																											<item>Range</item>
-																											<item>Palette</item>
-																										</content>
 																										<selection>2</selection>
 																									</object>
 																									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -1844,13 +1829,6 @@
 																										</object>
 																										<object class="sizeritem">
 																											<object class="wxChoice" name="ID_CHOICE_Pictures1_Direction" variable="Choice_Pictures1_Direction" member="yes">
-																												<content>
-																													<item>left</item>
-																													<item>right</item>
-																													<item>up</item>
-																													<item>down</item>
-																													<item>none</item>
-																												</content>
 																												<selection>0</selection>
 																											</object>
 																											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -2077,7 +2055,7 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxTextCtrl" name="ID_TEXTCTRL_TEXT1_FONT" variable="TextCtrl_Text1_Font" member="yes">
+																									<object class="wxTextCtrl" name="ID_TEXTCTRL_Text1_Font" variable="TextCtrl_Text1_Font" member="yes">
 																										<style>wxTE_READONLY</style>
 																									</object>
 																									<flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -2307,12 +2285,6 @@
 																								</object>
 																								<object class="sizeritem">
 																									<object class="wxChoice" name="ID_CHOICE_Bars2_Direction" variable="Choice_Bars2_Direction" member="yes">
-																										<content>
-																											<item>up</item>
-																											<item>down</item>
-																											<item>expand</item>
-																											<item>compress</item>
-																										</content>
 																										<selection>0</selection>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -2353,11 +2325,7 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxChoice" name="ID_CHOICE3" variable="Choice_Butterfly2_Colors" member="yes">
-																										<content>
-																											<item>Rainbow</item>
-																											<item>Palette</item>
-																										</content>
+																									<object class="wxChoice" name="ID_CHOICE_Butterfly2_Colors" variable="Choice_Butterfly2_Colors" member="yes">
 																										<selection>0</selection>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -2562,11 +2530,6 @@
 																								</object>
 																								<object class="sizeritem">
 																									<object class="wxChoice" name="ID_CHOICE_Meteors2_Type" variable="Choice_Meteors2_Type" member="yes">
-																										<content>
-																											<item>Rainbow</item>
-																											<item>Range</item>
-																											<item>Palette</item>
-																										</content>
 																										<selection>2</selection>
 																									</object>
 																									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -2648,13 +2611,6 @@
 																										</object>
 																										<object class="sizeritem">
 																											<object class="wxChoice" name="ID_CHOICE_Pictures2_Direction" variable="Choice_Pictures2_Direction" member="yes">
-																												<content>
-																													<item>left</item>
-																													<item>right</item>
-																													<item>up</item>
-																													<item>down</item>
-																													<item>none</item>
-																												</content>
 																												<selection>0</selection>
 																											</object>
 																											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -2882,7 +2838,7 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxTextCtrl" name="ID_TEXTCTRL_TEXT2_FONT" variable="TextCtrl_Text2_Font" member="yes">
+																									<object class="wxTextCtrl" name="ID_TEXTCTRL_Text2_Font" variable="TextCtrl_Text2_Font" member="yes">
 																										<style>wxTE_READONLY</style>
 																									</object>
 																									<flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
