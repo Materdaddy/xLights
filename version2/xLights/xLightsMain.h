@@ -47,6 +47,7 @@
 #include <wx/fontdlg.h>
 #include <wx/dir.h>
 #include <map>
+#include <vector>
 
 #include "../include/globals.h"
 #include "xlights_out.h"
@@ -78,6 +79,7 @@
 static wxCriticalSection gs_xoutCriticalSection;
 
 typedef std::map<wxString,wxString> MapStringString;
+typedef std::vector<wxUint8> SeqDataType;
 
 enum play_modes {
     play_off,
@@ -246,6 +248,7 @@ class xLightsFrame: public wxFrame
         void OnBitmapButtonDeleteRowClick(wxCommandEvent& event);
         void OnButtonDisplayElementsClick(wxCommandEvent& event);
         void OnGrid1CellChange(wxGridEvent& event);
+        void OnGrid1CellLeftClick(wxGridEvent& event);
         //*)
 
         //(*Identifiers(xLightsFrame)
@@ -956,12 +959,12 @@ class xLightsFrame: public wxFrame
         void ConversionInit();
         void DoConversion(const wxString& FileName, const wxString& OutputFormat);
         void ConversionError(const wxString& msg);
-        wxString base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
+        wxString base64_encode();
         std::string base64_decode(const wxString& encoded_string);
 
         wxString mediaFilename;
         wxString xlightsFilename;
-        wxUint8 * SeqData;
+        SeqDataType SeqData;
         long SeqDataLen;
         long SeqNumPeriods;
         long SeqNumChannels;
@@ -1055,6 +1058,8 @@ class xLightsFrame: public wxFrame
         void LoadEffectFromString(wxString settings, MapStringString& SettingsMap);
         void UpdateBufferPaletteFromMap(int PaletteNum, MapStringString& SettingsMap);
         void RenderEffectFromString(int layer, MapStringString& SettingsMap);
+        void ClearEffectWindow();
+        void DisplayEffectOnWindow();
 
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;

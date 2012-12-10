@@ -222,7 +222,6 @@ private:
     int sparkle_count,Speed;
     int CurrentLayer;  // 0 or 1
     MixTypes MixType;
-    wxScrolledWindow* DrawWindow;
     MeteorList meteors[2];
     PaletteClass palette[2];
     wxImage image[2];
@@ -257,7 +256,6 @@ public:
     void SetSpeed(int newspeed);
     void SetLayer(int newlayer);
     void SetSparkle(int freq);
-    void SetWindow(wxScrolledWindow* ScrolledWindow);
     void RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D);
     void RenderButterfly(int ColorScheme, int Style, int Chunks, int Skip);
     void RenderColorWash(bool HorizFade, bool VertFade);
@@ -270,7 +268,7 @@ public:
     void RenderSnowstorm(int Count, int Length);
     void RenderSpirals(int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
     void RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString);
-    void DisplayOutput();
+    void CalcOutput();
 };
 
 #endif // PIXELBUFFER_H

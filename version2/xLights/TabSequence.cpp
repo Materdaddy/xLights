@@ -37,7 +37,7 @@ void xLightsFrame::OnButton_PlayAllClick(wxCommandEvent& event)
     }
     wxXmlNode* ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
     buffer.InitBuffer(ModelXml);
-    //buffer.SetMixType(Choice_LayerMethod->GetStringSelection());
+    ClearEffectWindow();
     SetPlayMode(play_rgbseq);
     PlayCurrentXlightsFile();
 }
@@ -51,6 +51,7 @@ void xLightsFrame::OnButton_PlayEffectClick(wxCommandEvent& event)
     }
     wxXmlNode* ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
     buffer.InitBuffer(ModelXml);
+    ClearEffectWindow();
     buffer.SetMixType(Choice_LayerMethod->GetStringSelection());
     SetPlayMode(play_effect);
 }
@@ -124,7 +125,11 @@ void xLightsFrame::SetEffectControls(wxString settings)
                     } else if (name.StartsWith(wxT("ID_CHECKBOX"))) {
                         wxCheckBox* ctrl=(wxCheckBox*)CtrlWin;
                         if (value.ToLong(&TempLong)) ctrl->SetValue(TempLong!=0);
+                    } else {
+                        wxMessageBox(wxT("Unknown type: ")+name, wxT("Internal Error"));
                     }
+                } else {
+                    wxMessageBox(wxT("Unable to find: ")+name, wxT("Internal Error"));
                 }
                 break;
         }
@@ -498,7 +503,9 @@ void xLightsFrame::RenderEffectFromString(int layer, MapStringString& SettingsMa
 {
     buffer.SetLayer(layer);
     wxString LayerStr=layer==0 ? wxT("1") : wxT("2");
+    buffer.SetSpeed(wxAtoi(SettingsMap[wxT("ID_SLIDER_Speed")+LayerStr]));
     wxString effect=SettingsMap[wxT("effect")+LayerStr];
+    SendToLogAndStatusBar(wxT("effect")+LayerStr+wxT("=")+effect);
     if (effect == wxT("Bars")) {
         buffer.RenderBars(wxAtoi(SettingsMap[wxT("ID_SLIDER_Bars")+LayerStr+wxT("_BarCount")]),
                           BarEffectDirections.Index(SettingsMap[wxT("ID_CHOICE_Bars")+LayerStr+wxT("_Direction")]),
@@ -691,7 +698,8 @@ void xLightsFrame::TimerEffect()
                               TextCtrl_Text2_Font->GetValue());
             break;
     }
-    buffer.DisplayOutput();
+    buffer.CalcOutput();
+    DisplayEffectOnWindow();
     if (CheckBoxLightOutput->IsChecked() && xout) {
         size_t ChannelNum=buffer.StartChannel-1;
         size_t NodeCnt=buffer.GetNodeCount();
@@ -1075,7 +1083,8 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
 
     MapStringString SettingsMap;
     wxString ColName;
-    long msec,TempLong;
+    long msec;
+    size_t ChannelNum, NodeCnt;
     LoadEffectFromString(wxT("None,None,Effect 1"), SettingsMap);
     for (c=2; c<colcnt; c++) {
         ColName=Grid1->GetColLabelValue(c);
@@ -1083,6 +1092,15 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
         if (!td) continue;
         buffer.InitBuffer(td);
         if (!buffer.MyDisplay) continue;
+        NodeCnt=buffer.GetNodeCount();
+        ChannelNum=buffer.StartChannel-1+NodeCnt*3; // last channel
+        if (ChannelNum > SeqNumChannels) {
+            // need to add more channels to existing sequence
+            wxMessageBox(wxString::Format(wxT("Increasing sequence channel count from %ld to %d"),SeqNumChannels,ChannelNum));
+            SeqNumChannels=ChannelNum;
+            SeqDataLen=SeqNumChannels*SeqNumPeriods;
+            SeqData.resize(SeqDataLen,0);
+        }
         NextGridRowToPlay=0;
         for (int p=0; p<SeqNumPeriods; p++) {
             msec=p * XTIMER_INTERVAL;
@@ -1102,7 +1120,17 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
             }
             RenderEffectFromString(0, SettingsMap);
             RenderEffectFromString(1, SettingsMap);
+            buffer.CalcOutput();
             // update SeqData with contents of buffer
+            ChannelNum=buffer.StartChannel-1;
+            for(int n=0; n<NodeCnt; n++) {
+                SeqData[ChannelNum*SeqNumPeriods+p]=buffer.Nodes[n].GetChannel(0);
+                ChannelNum++;
+                SeqData[ChannelNum*SeqNumPeriods+p]=buffer.Nodes[n].GetChannel(1);
+                ChannelNum++;
+                SeqData[ChannelNum*SeqNumPeriods+p]=buffer.Nodes[n].GetChannel(2);
+                ChannelNum++;
+            }
         }
     }
     WriteXLightsFile(xlightsFilename);
@@ -1244,5 +1272,74 @@ void xLightsFrame::OnGrid1CellChange(wxGridEvent& event)
         //StatusBar1->SetStatusText(_("New grid value=")+Grid1->GetCellValue(row,col));
         NumericSort();
         Grid1->EnableEditing(true);
+    }
+}
+
+void xLightsFrame::OnGrid1CellLeftClick(wxGridEvent& event)
+{
+    int row = event.GetRow(),
+        col = event.GetCol();
+    if (col >= 2) {
+        wxString EffectString=Grid1->GetCellValue(row,col);
+        if (!EffectString.IsEmpty()) {
+            Choice_Presets->SetSelection(0);  // set to <grid>
+            SetEffectControls(EffectString);
+        }
+    }
+    event.Skip();
+}
+
+void xLightsFrame::ClearEffectWindow()
+{
+    wxClientDC dc(ScrolledWindow1);
+    dc.Clear();
+}
+
+void xLightsFrame::DisplayEffectOnWindow()
+{
+    wxPen pen;
+    wxClientDC dc(ScrolledWindow1);
+    wxColour color;
+    wxCoord w, h;
+    static wxCoord lastw, lasth;
+    dc.GetSize(&w, &h);
+    if (w!=lastw || h!=lasth) {
+        // window was resized
+        dc.Clear();
+        lastw=w;
+        lasth=h;
+    }
+    dc.SetAxisOrientation(true,true);
+    if (buffer.RenderHt==1) {
+        dc.SetDeviceOrigin(w/2,h/2); // set origin at center
+    } else {
+        dc.SetDeviceOrigin(w/2,h-1); // set origin at bottom center
+    }
+    double scaleX = double(w) / buffer.RenderWi;
+    double scaleY = double(h) / buffer.RenderHt;
+    double scale=scaleY < scaleX ? scaleY : scaleX;
+    //scale=0.25;
+    dc.SetUserScale(scale,scale);
+
+/*
+        // check that origin is in the right place
+        dc.SetUserScale(4,4);
+        color.Set(0,0,255);
+        pen.SetColour(color);
+        dc.SetPen(pen);
+        dc.DrawPoint(0,0);
+        dc.DrawPoint(1,1);
+        dc.DrawPoint(2,2);
+        return;
+*/
+    // layer calculation and map to output
+    size_t NodeCount=buffer.Nodes.size();
+    for(size_t i=0; i<NodeCount; i++) {
+        // draw node on screen
+        buffer.Nodes[i].GetColor(color);
+        pen.SetColour(color);
+        dc.SetPen(pen);
+        //dc.DrawCircle(Nodes[i].screenX, Nodes[i].screenY,1);
+        dc.DrawPoint(buffer.Nodes[i].screenX, buffer.Nodes[i].screenY);
     }
 }

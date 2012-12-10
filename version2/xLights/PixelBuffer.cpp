@@ -32,16 +32,9 @@ PixelBufferClass::~PixelBufferClass()
 {
 }
 
-void PixelBufferClass::SetWindow(wxScrolledWindow* ScrolledWindow)
-{
-    DrawWindow = ScrolledWindow;
-}
-
 void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
 {
     size_t i;
-    wxClientDC dc(DrawWindow);
-    dc.Clear();
     SetFromXml(ModelNode);
     pixels.resize(BufferHt * BufferWi);
     size_t NodeCount=GetNodeCount();
@@ -171,15 +164,6 @@ void PixelBufferClass::Get2ColorBlend(int coloridx1, int coloridx2, double ratio
 // 0 <= n < 1
 void PixelBufferClass::GetMultiColorBlend(double n, bool circular, wxColour &color)
 {
-    /*
-    // debug
-    wxClientDC dc(DrawWindow);
-    wxString msg=wxString::Format(wxT("%6.4f"),n);
-    wxColour txtcolor(255,255,255);
-    dc.Clear();
-    dc.SetTextForeground(txtcolor);
-    dc.DrawText(msg,0,0);
-    */
     size_t colorcnt=GetColorCount(CurrentLayer);
     if (colorcnt <= 1) {
         palette[CurrentLayer].GetColor(0,color);
@@ -568,43 +552,9 @@ void PixelBufferClass::RenderText(int Top, const wxString& Line1, const wxString
     }
 }
 
-void PixelBufferClass::DisplayOutput()
+void PixelBufferClass::CalcOutput()
 {
-    wxPen pen;
-    wxClientDC dc(DrawWindow);
     wxColour color;
-    wxCoord w, h;
-    static wxCoord lastw, lasth;
-    dc.GetSize(&w, &h);
-    if (w!=lastw || h!=lasth) {
-        // window was resized
-        dc.Clear();
-        lastw=w;
-        lasth=h;
-    }
-    dc.SetAxisOrientation(true,true);
-    if (RenderHt==1) {
-        dc.SetDeviceOrigin(w/2,h/2); // set origin at center
-    } else {
-        dc.SetDeviceOrigin(w/2,h-1); // set origin at bottom center
-    }
-    double scaleX = double(w) / RenderWi;
-    double scaleY = double(h) / RenderHt;
-    double scale=scaleY < scaleX ? scaleY : scaleX;
-    //scale=0.25;
-    dc.SetUserScale(scale,scale);
-
-/*
-        // check that origin is in the right place
-        dc.SetUserScale(4,4);
-        color.Set(0,0,255);
-        pen.SetColour(color);
-        dc.SetPen(pen);
-        dc.DrawPoint(0,0);
-        dc.DrawPoint(1,1);
-        dc.DrawPoint(2,2);
-        return;
-*/
     // layer calculation and map to output
     size_t NodeCount=Nodes.size();
     for(size_t i=0; i<NodeCount; i++) {
@@ -638,11 +588,6 @@ void PixelBufferClass::DisplayOutput()
             }
             // set color for physical output
             Nodes[i].SetColor(color);
-            // draw node on screen
-            pen.SetColour(color);
-            dc.SetPen(pen);
-            //dc.DrawCircle(Nodes[i].screenX, Nodes[i].screenY,1);
-            dc.DrawPoint(Nodes[i].screenX, Nodes[i].screenY);
         }
     }
 }
