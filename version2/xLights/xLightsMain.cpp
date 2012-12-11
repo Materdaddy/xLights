@@ -1820,7 +1820,6 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     HtmlEasyPrint=new wxHtmlEasyPrinting(wxT("xLights Printing"), this);
     basic.setFrame(this);
     PlayerDlg = new PlayerFrame(this, ID_PLAYER_DIALOG);
-    UpdateShowDates(wxDateTime::Now(),wxDateTime::Now());
 
     if (RunFlag && !ShowEvents.IsEmpty()) {
         // open ports
@@ -1900,13 +1899,7 @@ void xLightsFrame::SetPlayMode(play_modes newmode)
 void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
 {
     wxCriticalSectionLocker locker(gs_xoutCriticalSection);
-    static int CheckSchedCount=1;
-    bool OneSecondUpdate=false;
-    if (--CheckSchedCount <= 0) {
-        CheckSchedule();
-        CheckSchedCount=20;  // check every 20 ticks
-        OneSecondUpdate=true;
-    }
+    if (CheckBoxRunSchedule->IsChecked()) CheckSchedule();
     wxTimeSpan ts = wxDateTime::UNow() - starttime;
     long curtime = ts.GetMilliseconds().ToLong();
     if (xout) xout->TimerStart(curtime);
@@ -1920,7 +1913,7 @@ void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
             TimerEffect();
             break;
         case play_rgbseq:
-            TimerRgbSeq(curtime,OneSecondUpdate);
+            TimerRgbSeq(curtime);
             break;
         case play_single:
         case play_list:

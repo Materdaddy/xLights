@@ -314,20 +314,19 @@ void xLightsFrame::CheckSchedule()
 {
     wxString StartTime, EndTime, userscript;
     int i,cnt;
-    bool CheckSchedule = false;
+    bool CheckScheduleNow = false;
     wxTextCtrl* LogicCtl;
 
-    static wxString RepeatOptions, Playlist, strStartTime, strEndTime, StartMoDay;
+    static wxString EventString, RepeatOptions, Playlist, strStartTime, strEndTime, StartMoDay;
     static wxDateTime LastTime = wxDateTime::Now();  // last time this method was called
     static long StartTimeSec;
+    static long LastSecPastMidnight=-1;
     static wxArrayString AlreadyPlayed;
     static bool MoreShowsToday = true;
 
-    if (!CheckBoxRunSchedule->IsChecked()) return;
-    if (play_mode!=play_sched && play_mode!=play_off) return;
-
     wxDateTime n=wxDateTime::Now();
     long SecPastMidnight=n.GetHour()*60*60 + n.GetMinute()*60 + n.GetSecond();
+    if (LastSecPastMidnight == SecPastMidnight) return;
     wxString CurrentMoDay = n.Format(wxT("%m%d"));
     //StatusBar1->SetStatusText(_("OnSchedTimer: ") + n.FormatISOTime());
 
@@ -355,17 +354,17 @@ void xLightsFrame::CheckSchedule()
         // should we check ShowEvents[]?
         if (LastMoDay != CurrentMoDay) {
             // either the Run Schedule button was just pressed, or we just passed midnight
-            CheckSchedule = true;
+            CheckScheduleNow = true;
             LastMoDay = CurrentMoDay;
         } else {
             // has computer has been sleeping?
             wxTimeSpan TimeDiff=n.Subtract(LastTime);
-            if (TimeDiff.GetSeconds().ToLong() > 10) CheckSchedule = true;
+            if (TimeDiff.GetSeconds().ToLong() > 10) CheckScheduleNow = true;
         }
         LastTime=n;
         SecondsRemaining=24*60*60 - SecPastMidnight;
 
-        if (CheckSchedule) {
+        if (CheckScheduleNow) {
             // find first event for the day
             MoreShowsToday = false;
             cnt=ShowEvents.Count();
@@ -377,10 +376,11 @@ void xLightsFrame::CheckSchedule()
                 return;
             }
             do {
-                UnpackSchedCode(ShowEvents[i], StartTime, EndTime, RepeatOptions, Playlist);
+                EventString=ShowEvents[i];
+                UnpackSchedCode(EventString, StartTime, EndTime, RepeatOptions, Playlist);
                 StartTimeSec=Time2Seconds(StartTime);
                 EndTimeSec=Time2Seconds(EndTime);
-                if (SecPastMidnight < EndTimeSec && AlreadyPlayed.Index(ShowEvents[i]) == wxNOT_FOUND) {
+                if (SecPastMidnight < EndTimeSec && AlreadyPlayed.Index(EventString) == wxNOT_FOUND) {
                     MoreShowsToday = true;
                     strStartTime = StartTime.Left(2) + wxT(":") + StartTime.Right(2);
                     strEndTime = EndTime.Left(2) + wxT(":") + EndTime.Right(2);
@@ -393,19 +393,16 @@ void xLightsFrame::CheckSchedule()
                 SetPlayMode(play_off);
                 return;
             }
-        } // CheckSchedule
+        } // CheckScheduleNow
 
         if (MoreShowsToday) {
             if (SecPastMidnight < StartTimeSec) {
                 // have not reached show start time
                 SecondsRemaining=StartTimeSec - SecPastMidnight;
-                int minutes= (SecondsRemaining + 59) / 60;  // round up
-                if (minutes > 60) {
+                if (SecondsRemaining >= 3600) {
                     StatusBar1->SetStatusText(_("Next show will start at: ") + strStartTime, 1);
-                } else if (minutes > 1) {
-                    StatusBar1->SetStatusText(wxString::Format(_("Next show will start in %d minutes"),minutes), 1);
                 } else {
-                    StatusBar1->SetStatusText(wxString::Format(_("Next show will start in %ld seconds"),SecondsRemaining), 1);
+                    StatusBar1->SetStatusText(wxString::Format(_("Next show starts in %d:%02d"),int(SecondsRemaining/60),int(SecondsRemaining%60)), 1);
                 }
             } else if (SecPastMidnight < EndTimeSec) {
                 // start show
@@ -421,7 +418,7 @@ void xLightsFrame::CheckSchedule()
                         userscript=CreateScript(Notebook1->GetPageText(nbidx),RepeatOptions[0]=='R',RepeatOptions[1]=='F',RepeatOptions[2]=='L',false,RepeatOptions[3]=='X');
                     }
                     StartMoDay=CurrentMoDay;
-                    AlreadyPlayed.Add(ShowEvents[i]);
+                    AlreadyPlayed.Add(EventString);
                     RunPlaylist(nbidx,userscript);
                 } else {
                     StatusBar1->SetStatusText(_("ERROR: cannot find playlist ") + Playlist, 1);

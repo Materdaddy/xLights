@@ -721,7 +721,7 @@ void xLightsFrame::UpdateRgbPlaybackStatus(int seconds, const wxString& seqtype)
     StatusBar1->SetStatusText(wxString::Format(wxT("Playback: RGB ")+seqtype+wxT(" sequence %d:%02d"),m,s));
 }
 
-void xLightsFrame::TimerRgbSeq(long msec, bool OneSecondUpdate)
+void xLightsFrame::TimerRgbSeq(long msec)
 {
     int period;
     long StartTime;
@@ -749,7 +749,7 @@ void xLightsFrame::TimerRgbSeq(long msec, bool OneSecondUpdate)
                     NextGridRowToPlay++;
                 }
                 TimerEffect();
-                if (OneSecondUpdate) UpdateRgbPlaybackStatus(period/20,wxT("animation"));
+                if (period % 20 == 0) UpdateRgbPlaybackStatus(period/20,wxT("animation"));
             }
             break;
         case STARTING_SEQ:
@@ -782,7 +782,7 @@ void xLightsFrame::TimerRgbSeq(long msec, bool OneSecondUpdate)
                     NextGridRowToPlay++;
                 }
                 TimerEffect();
-                if (OneSecondUpdate) UpdateRgbPlaybackStatus(period/20,wxT("music"));
+                if (period % 20 == 0) UpdateRgbPlaybackStatus(period/20,wxT("music"));
             }
             break;
     }

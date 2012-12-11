@@ -122,7 +122,10 @@ protected:
         if(!pName) return 0;
         wxString name(pName,wxConvUTF8);
         int nbidx=HostFrame->FindNotebookPage(name);
-        if (nbidx < FixedPages) return 0;
+        if (nbidx < FixedPages) {
+            seterror(ERR_ILLEGALOFFSET);
+            return 0;
+        }
         playlist = (wxListCtrl*)HostFrame->FindNotebookControl(nbidx,HostFrame->PLAYLIST_LISTBOX);
         return EXEC_NEXTLINE;
     }

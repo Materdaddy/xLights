@@ -1037,7 +1037,7 @@ class xLightsFrame: public wxFrame
         wxString SizerControlsToString(wxSizer* sizer);
         void LoadSizerControlsToAttr(wxSizer* sizer,wxXmlNode* x);
         void TimerEffect();
-        void TimerRgbSeq(long msec, bool OneSecondUpdate);
+        void TimerRgbSeq(long msec);
         void UpdateBufferPalette();
         void SetChoicebook(wxChoicebook* cb, wxString& PageName);
         void SetEffectControls(wxString settings);
