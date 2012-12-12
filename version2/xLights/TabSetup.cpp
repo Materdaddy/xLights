@@ -132,6 +132,7 @@ void xLightsFrame::SetDir(const wxString& newdir)
     }
     LoadEffectsFile();
     PresetsSelect();
+    EnableSequenceControls(true);
     UpdateNetworkList();
 
     Notebook1->ChangeSelection(SETUPTAB);

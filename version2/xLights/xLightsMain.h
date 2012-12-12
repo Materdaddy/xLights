@@ -83,9 +83,6 @@ typedef std::vector<wxUint8> SeqDataType;
 
 enum play_modes {
     play_off,
-    play_effect,
-    play_rgbseq,
-    play_test,
     play_single,
     play_list,
     play_sched
@@ -111,7 +108,8 @@ enum SeqPlayerStates {
     STARTING_SEQ_ANIM,
     PLAYING_SEQ_ANIM,
     PAUSE_SEQ,
-    DELAY_AFTER_PLAY
+    DELAY_AFTER_PLAY,
+    PLAYING_EFFECT
 };
 
 class SchedTreeData : public wxTreeItemData
@@ -920,6 +918,7 @@ class xLightsFrame: public wxFrame
         double rand01();
         bool EnableOutputs();
         void EnableNetworkChanges();
+        void AllLightsOff();
 
         // setup
         void OnMenuMRU(wxCommandEvent& event);
@@ -1036,7 +1035,7 @@ class xLightsFrame: public wxFrame
         wxString PageControlsToString(wxWindow* page);
         wxString SizerControlsToString(wxSizer* sizer);
         void LoadSizerControlsToAttr(wxSizer* sizer,wxXmlNode* x);
-        void TimerEffect();
+        void PlayRgbEffect();
         void TimerRgbSeq(long msec);
         void UpdateBufferPalette();
         void SetChoicebook(wxChoicebook* cb, wxString& PageName);
@@ -1060,6 +1059,7 @@ class xLightsFrame: public wxFrame
         void RenderEffectFromString(int layer, MapStringString& SettingsMap);
         void ClearEffectWindow();
         void DisplayEffectOnWindow();
+        void EnableSequenceControls(bool enable);
 
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;

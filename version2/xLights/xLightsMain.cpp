@@ -1811,10 +1811,10 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     delete config;  // close config before calling SetDir, which will open config
 
     SetPlayMode(play_off);
+    EnableSequenceControls(true);
     if (ok && !dir.IsEmpty()) {
         SetDir(dir);
     }
-
     PaletteChanged=true;
     MixTypeChanged=true;
     HtmlEasyPrint=new wxHtmlEasyPrinting(wxT("xLights Printing"), this);
@@ -1865,27 +1865,7 @@ void xLightsFrame::SetPlayMode(play_modes newmode)
         case play_off:
             StatusBar1->SetStatusText(_("Playback: off"));
             break;
-        case play_effect:
-            StatusBar1->SetStatusText(_("Playback: effect"));
-            break;
-        case play_rgbseq:
-            StatusBar1->SetStatusText(_("Playback: RGB sequence"));
-            break;
     }
-    Button_PlayEffect->Enable(newmode == play_off && Choice_Models->GetCount() > 0);
-    Button_PlayRgbSeq->Enable(newmode == play_off);
-    Button_Models->Enable(newmode == play_off);
-    Button_Presets->Enable(newmode == play_off);
-    Choice_Models->Enable(newmode == play_off);
-    Button_Pictures1_Filename->Enable(newmode == play_off);
-    TextCtrl_Pictures1_Filename->Enable(newmode == play_off);
-    Button_Pictures2_Filename->Enable(newmode == play_off);
-    TextCtrl_Pictures2_Filename->Enable(newmode == play_off);
-    BitmapButtonOpenSeq->Enable(newmode == play_off);
-    BitmapButtonSaveSeq->Enable(newmode == play_off);
-    BitmapButtonInsertRow->Enable(newmode == play_off);
-    BitmapButtonDeleteRow->Enable(newmode == play_off);
-    ButtonDisplayElements->Enable(newmode == play_off);
 
     ButtonGracefulStop->Enable(newmode == play_sched || newmode == play_list);
     ButtonChangeDir->Enable(newmode != play_sched && newmode != play_list && newmode != play_single);
@@ -1903,25 +1883,29 @@ void xLightsFrame::OnTimer1Trigger(wxTimerEvent& event)
     wxTimeSpan ts = wxDateTime::UNow() - starttime;
     long curtime = ts.GetMilliseconds().ToLong();
     if (xout) xout->TimerStart(curtime);
-    switch (play_mode) {
-        case play_off:
-            break;
-        case play_test:
+    switch (Notebook1->GetSelection()) {
+        case TESTTAB:
             OnTimerTest(curtime);
             break;
-        case play_effect:
-            TimerEffect();
-            break;
-        case play_rgbseq:
+        case SEQUENCETAB:
             TimerRgbSeq(curtime);
             break;
-        case play_single:
-        case play_list:
-        case play_sched:
+        default:
             OnTimerPlaylist(curtime);
             break;
     }
     if (xout) xout->TimerEnd();
+}
+
+void xLightsFrame::ResetTimer(SeqPlayerStates newstate, long OffsetMsec) {
+    SeqPlayerState = newstate;
+#ifndef NDEBUG
+    TextCtrlLog->AppendText(wxString::Format(_("ResetTimer mode=%d state=%d\n"),play_mode,SeqPlayerState));
+#endif
+    //if (newstate == NO_SEQ) SetPlayMode(play_off);
+    if (xout) xout->ResetTimer();
+    wxTimeSpan offset(0,0,0,OffsetMsec);
+    starttime = wxDateTime::UNow() - offset;
 }
 
 void xLightsFrame::OnBitmapButtonTabInfoClick(wxCommandEvent& event)
@@ -1962,26 +1946,26 @@ void xLightsFrame::OnBitmapButtonTabInfoClick(wxCommandEvent& event)
     wxMessageBox(msg,caption);
 }
 
+void xLightsFrame::AllLightsOff()
+{
+    TestButtonsOff();
+    if (xout) xout->alloff();
+}
+
 void xLightsFrame::OnNotebook1PageChanged(wxNotebookEvent& event)
 {
-    switch (Notebook1->GetSelection()) {
-        case TESTTAB:
-            if (play_mode != play_test) {
-                SetPlayMode(play_test);
-                if (!xout) StatusBar1->SetStatusText(_("Testing disabled - Output to Lights is not checked"));
-            }
-            break;
-        default:
-            //if (play_mode == play_test) SetPlayMode(play_off);
-            break;
+    if (Notebook1->GetSelection() == TESTTAB && !xout) {
+        StatusBar1->SetStatusText(_("Testing disabled - Output to Lights is not checked"));
+    }
+    if (event.GetOldSelection() == TESTTAB) {
+        AllLightsOff();
     }
 }
 
 
 void xLightsFrame::OnButtonLightsOffClick(wxCommandEvent& event)
 {
-    TestButtonsOff();
-    if (xout) xout->alloff();
+    AllLightsOff();
 }
 
 bool xLightsFrame::EnableOutputs()
@@ -2060,18 +2044,18 @@ void xLightsFrame::OnCheckBoxLightOutputClick(wxCommandEvent& event)
 
 void xLightsFrame::OnButtonStopNowClick(wxCommandEvent& event)
 {
-    if (play_mode == play_test) {
-        TestButtonsOff();
-        if (Notebook1->GetSelection() == TESTTAB) return;
-    } else if (play_mode == play_sched) {
+    PlayerDlg->MediaCtrl->Stop();
+    if (play_mode == play_sched) {
         CheckBoxRunSchedule->SetValue(false);
         CheckRunSchedule();
-    } else if (play_mode == play_rgbseq) {
-        PlayerDlg->MediaCtrl->Stop();
-    } else {
-        basic.halt();
     }
+    if (basic.IsRunning()) basic.halt();
     SetPlayMode(play_off);
+    ResetTimer(NO_SEQ);
+    switch (Notebook1->GetSelection()) {
+        case TESTTAB: TestButtonsOff(); break;
+        case SEQUENCETAB: EnableSequenceControls(true); break;
+    }
 }
 
 void xLightsFrame::OnButtonGracefulStopClick(wxCommandEvent& event)

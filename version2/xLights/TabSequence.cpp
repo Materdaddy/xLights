@@ -38,7 +38,8 @@ void xLightsFrame::OnButton_PlayAllClick(wxCommandEvent& event)
     wxXmlNode* ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
     buffer.InitBuffer(ModelXml);
     ClearEffectWindow();
-    SetPlayMode(play_rgbseq);
+    StatusBar1->SetStatusText(_("Playback: RGB sequence"));
+    EnableSequenceControls(false);
     PlayCurrentXlightsFile();
 }
 
@@ -53,7 +54,27 @@ void xLightsFrame::OnButton_PlayEffectClick(wxCommandEvent& event)
     buffer.InitBuffer(ModelXml);
     ClearEffectWindow();
     buffer.SetMixType(Choice_LayerMethod->GetStringSelection());
-    SetPlayMode(play_effect);
+    StatusBar1->SetStatusText(_("Playback: effect"));
+    EnableSequenceControls(false);
+    ResetTimer(PLAYING_EFFECT);
+}
+
+void xLightsFrame::EnableSequenceControls(bool enable)
+{
+    Button_PlayEffect->Enable(enable && Choice_Models->GetCount() > 0);
+    Button_PlayRgbSeq->Enable(enable && Grid1->GetNumberCols() > 2);
+    Button_Models->Enable(enable);
+    Button_Presets->Enable(enable);
+    Choice_Models->Enable(enable);
+    Button_Pictures1_Filename->Enable(enable);
+    TextCtrl_Pictures1_Filename->Enable(enable);
+    Button_Pictures2_Filename->Enable(enable);
+    TextCtrl_Pictures2_Filename->Enable(enable);
+    BitmapButtonOpenSeq->Enable(enable);
+    BitmapButtonSaveSeq->Enable(enable);
+    BitmapButtonInsertRow->Enable(enable);
+    BitmapButtonDeleteRow->Enable(enable);
+    ButtonDisplayElements->Enable(enable);
 }
 
 void xLightsFrame::OnButton_PresetsClick(wxCommandEvent& event)
@@ -294,6 +315,7 @@ void xLightsFrame::OnButton_ModelsClick(wxCommandEvent& event)
     }
     SaveEffectsFile();
     UpdateModelsList();
+    EnableSequenceControls(true);
 }
 
 void xLightsFrame::OnCheckBox_PaletteClick(wxCommandEvent& event)
@@ -549,7 +571,7 @@ void xLightsFrame::RenderEffectFromString(int layer, MapStringString& SettingsMa
     }
 }
 
-void xLightsFrame::TimerEffect()
+void xLightsFrame::PlayRgbEffect()
 {
     wxString s;
     buffer.Clear();
@@ -727,6 +749,9 @@ void xLightsFrame::TimerRgbSeq(long msec)
     long StartTime;
     int rowcnt=Grid1->GetNumberRows();
     switch (SeqPlayerState) {
+        case PLAYING_EFFECT:
+            PlayRgbEffect();
+            break;
         case STARTING_SEQ_ANIM:
             ResetTimer(PLAYING_SEQ_ANIM, GetGridStartTimeMSec(NextGridRowToPlay));
             break;
@@ -739,7 +764,8 @@ void xLightsFrame::TimerRgbSeq(long msec)
             if (period >= SeqNumPeriods) {
                 // sequence has finished
                 if (xout) xout->alloff();
-                SetPlayMode(play_off);
+                ResetTimer(NO_SEQ);
+                EnableSequenceControls(true);
             } else {
                 if (NextGridRowToPlay < rowcnt && msec >= GetGridStartTimeMSec(NextGridRowToPlay)) {
                     // start next effect
@@ -748,7 +774,7 @@ void xLightsFrame::TimerRgbSeq(long msec)
                     SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
                     NextGridRowToPlay++;
                 }
-                TimerEffect();
+                PlayRgbEffect();
                 if (period % 20 == 0) UpdateRgbPlaybackStatus(period/20,wxT("animation"));
             }
             break;
@@ -772,7 +798,8 @@ void xLightsFrame::TimerRgbSeq(long msec)
                 // sequence has finished
                 PlayerDlg->MediaCtrl->Stop();
                 if (xout) xout->alloff();
-                SetPlayMode(play_off);
+                ResetTimer(NO_SEQ);
+                EnableSequenceControls(true);
             } else {
                 if (NextGridRowToPlay < rowcnt && msec >= GetGridStartTimeMSec(NextGridRowToPlay)) {
                     // start next effect
@@ -781,7 +808,7 @@ void xLightsFrame::TimerRgbSeq(long msec)
                     SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
                     NextGridRowToPlay++;
                 }
-                TimerEffect();
+                PlayRgbEffect();
                 if (period % 20 == 0) UpdateRgbPlaybackStatus(period/20,wxT("music"));
             }
             break;
@@ -1038,6 +1065,7 @@ void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
     for (c=2; c < Grid1->GetNumberCols(); c++) {
         Grid1->SetColAttr(c,readonly);
     }
+    EnableSequenceControls(true);
 }
 
 void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
