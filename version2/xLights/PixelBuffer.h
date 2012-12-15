@@ -219,21 +219,14 @@ class PixelBufferClass : public ModelClass
 private:
     PixelVector pixels; // this is the calculation buffer
 
-    int sparkle_count,Speed;
+    int sparkle_count;
     int CurrentLayer;  // 0 or 1
     MixTypes MixType;
     MeteorList meteors[2];
     PaletteClass palette[2];
     wxImage image[2];
     wxString PictureName[2];
-    long BarState[2];
-    long ButterflyState[2];
-    long ColorWashState[2];
-    long GarlandsState[2];
-    long MeteorState[2];
-    long PictureState[2];
-    long SpiralState[2];
-    long TextState[2];
+    long state[2];
 
     void SetPixel(int x, int y, wxColour &color);
     void SetPixel(int x, int y, wxImage::HSVValue& hsv);
@@ -253,12 +246,11 @@ public:
     size_t GetColorCount(int layer);
     void SetMixType(const wxString& MixName);
     void SetPalette(int layer, wxColourVector& newcolors);
-    void SetSpeed(int newspeed);
-    void SetLayer(int newlayer);
+    void SetLayer(int newlayer, int period, int speed, bool ResetState);
     void SetSparkle(int freq);
     void RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D);
     void RenderButterfly(int ColorScheme, int Style, int Chunks, int Skip);
-    void RenderColorWash(bool HorizFade, bool VertFade);
+    void RenderColorWash(bool HorizFade, bool VertFade, int RepeatCount);
     void RenderFire();
     void RenderGarlands(int GarlandType, int Spacing);
     void RenderLife(int Count, int Seed);
@@ -267,7 +259,7 @@ public:
     void RenderSnowflakes();
     void RenderSnowstorm(int Count, int Length);
     void RenderSpirals(int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
-    void RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString);
+    void RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString, int dir);
     void CalcOutput();
 };
 

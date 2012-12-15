@@ -247,6 +247,8 @@ class xLightsFrame: public wxFrame
         void OnButtonDisplayElementsClick(wxCommandEvent& event);
         void OnGrid1CellChange(wxGridEvent& event);
         void OnGrid1CellLeftClick(wxGridEvent& event);
+        void OnButton_ColorClick(wxCommandEvent& event);
+        void OnChoicebookEffectPageChanged(wxChoicebookEvent& event);
         //*)
 
         //(*Identifiers(xLightsFrame)
@@ -380,6 +382,8 @@ class xLightsFrame: public wxFrame
         static const long ID_STATICTEXT31;
         static const long ID_SLIDER_Butterfly1_Skip;
         static const long ID_PANEL10;
+        static const long ID_STATICTEXT21;
+        static const long ID_SLIDER_ColorWash1_Count;
         static const long ID_STATICTEXT32;
         static const long ID_CHECKBOX_ColorWash1_HFade;
         static const long ID_STATICTEXT33;
@@ -433,6 +437,8 @@ class xLightsFrame: public wxFrame
         static const long ID_SLIDER_Text1_Top;
         static const long ID_BUTTON_TEXT1_FONT;
         static const long ID_TEXTCTRL_Text1_Font;
+        static const long ID_STATICTEXT79;
+        static const long ID_CHOICE_Text1_Dir;
         static const long ID_PANEL7;
         static const long ID_CHOICEBOOK1;
         static const long ID_BUTTON_Palette1;
@@ -467,6 +473,8 @@ class xLightsFrame: public wxFrame
         static const long ID_STATICTEXT55;
         static const long ID_SLIDER_Butterfly2_Skip;
         static const long ID_PANEL11;
+        static const long ID_STATICTEXT22;
+        static const long ID_SLIDER_ColorWash2_Count;
         static const long ID_STATICTEXT56;
         static const long ID_CHECKBOX_ColorWash2_HFade;
         static const long ID_STATICTEXT58;
@@ -520,6 +528,8 @@ class xLightsFrame: public wxFrame
         static const long ID_SLIDER_Text2_Top;
         static const long ID_BUTTON_TEXT2_FONT;
         static const long ID_TEXTCTRL_Text2_Font;
+        static const long ID_STATICTEXT78;
+        static const long ID_CHOICE_Text2_Dir;
         static const long ID_PANEL29;
         static const long ID_CHOICEBOOK2;
         static const long ID_BUTTON_Palette2;
@@ -594,9 +604,10 @@ class xLightsFrame: public wxFrame
         wxCheckBox* CheckBox_Palette2_6;
         wxCheckBox* CheckBoxSaveChannelNames;
         wxStaticBoxSizer* StaticBoxSizerSequenceButtons;
+        wxSlider* Slider_ColorWash1_Count;
         wxStaticText* StaticText68;
-        wxSlider* SliderBgIntensity;
         wxSlider* Slider_Snowstorm1_Length;
+        wxSlider* SliderBgIntensity;
         wxCheckBox* CheckBox_Palette1_3;
         wxStaticText* StaticText71;
         wxStaticText* StaticText32;
@@ -650,6 +661,7 @@ class xLightsFrame: public wxFrame
         wxButton* ButtonChooseFile;
         wxSlider* Slider_Butterfly2_Style;
         wxRadioButton* RadioButtonRgbDim;
+        wxStaticText* StaticText5;
         wxSlider* Slider_Speed2;
         wxTextCtrl* TextCtrl_Text1_Line2;
         wxCheckBox* CheckBox_Palette2_3;
@@ -690,6 +702,7 @@ class xLightsFrame: public wxFrame
         wxDirDialog* DirDialog1;
         wxStaticText* StaticTextSetup1;
         wxPanel* Panel2_Life;
+        wxStaticText* StaticText78;
         wxCheckListBox* CheckListBoxTestChannels;
         wxStaticText* StaticText23;
         wxStaticText* StaticText33;
@@ -702,6 +715,7 @@ class xLightsFrame: public wxFrame
         wxButton* Button_Palette1_4;
         wxTreeCtrl* ListBoxSched;
         wxStaticText* StaticText56;
+        wxStaticText* StaticText76;
         wxNotebook* NotebookTest;
         wxRadioButton* RadioButtonTwinkle25;
         wxButton* Button_Palette1_3;
@@ -748,6 +762,7 @@ class xLightsFrame: public wxFrame
         wxCheckBox* CheckBox_ColorWash1_VFade;
         wxButton* Button_Palette2_1;
         wxSlider* SliderFgColorB;
+        wxChoice* Choice_Text1_Dir;
         wxSlider* Slider_Spirals2_Count;
         wxStaticText* StaticText65;
         wxRadioButton* RadioButtonShimmer;
@@ -790,6 +805,7 @@ class xLightsFrame: public wxFrame
         wxButton* Button_Palette2_3;
         wxStaticText* StaticText74;
         wxButton* Button_Palette1_5;
+        wxChoice* Choice_Text2_Dir;
         wxSlider* Slider_Text1_Top;
         wxPanel* Panel2_Snowflakes;
         wxStaticText* StaticText67;
@@ -809,6 +825,7 @@ class xLightsFrame: public wxFrame
         wxStaticText* StaticText4;
         wxRadioButton* RadioButtonAlt;
         wxChoice* Choice_LayerMethod;
+        wxStaticText* StaticText77;
         wxPanel* PanelRgbCycle;
         wxRadioButton* RadioButtonRgbChase3;
         wxCheckBox* CheckBoxRunSchedule;
@@ -888,6 +905,7 @@ class xLightsFrame: public wxFrame
         wxSlider* Slider_Garlands2_Spacing;
         wxRadioButton* RadioButtonRgbCycle3;
         wxTextCtrl* TextCtrl_Text2_Line2;
+        wxSlider* Slider_ColorWash2_Count;
         wxCheckBox* CheckBox_Bars2_3D;
         wxPanel* Panel1_Bars;
         wxSlider* Slider_Butterfly2_Skip;
@@ -1024,7 +1042,6 @@ class xLightsFrame: public wxFrame
 
         // sequence
         void OnCheckBox_PaletteClick(wxCommandEvent& event);
-        void OnButton_ColorClick(wxCommandEvent& event);
         void PresetsSelect();
         void LoadEffectsFile();
         bool SaveEffectsFile();
@@ -1035,7 +1052,7 @@ class xLightsFrame: public wxFrame
         wxString PageControlsToString(wxWindow* page);
         wxString SizerControlsToString(wxSizer* sizer);
         void LoadSizerControlsToAttr(wxSizer* sizer,wxXmlNode* x);
-        void PlayRgbEffect();
+        void PlayRgbEffect(int EffectPeriod);
         void TimerRgbSeq(long msec);
         void UpdateBufferPalette();
         void SetChoicebook(wxChoicebook* cb, wxString& PageName);
@@ -1056,10 +1073,12 @@ class xLightsFrame: public wxFrame
         void SetTextColor(wxWindow* w);
         void LoadEffectFromString(wxString settings, MapStringString& SettingsMap);
         void UpdateBufferPaletteFromMap(int PaletteNum, MapStringString& SettingsMap);
-        void RenderEffectFromString(int layer, MapStringString& SettingsMap);
+        void RenderEffectFromString(int layer, int period, MapStringString& SettingsMap);
         void ClearEffectWindow();
         void DisplayEffectOnWindow();
         void EnableSequenceControls(bool enable);
+        void UpdateFont(wxTextCtrl* FontCtrl);
+        void ResetEffectStates();
 
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;
@@ -1075,10 +1094,11 @@ class xLightsFrame: public wxFrame
         wxHtmlEasyPrinting* HtmlEasyPrint;
         int NextGridRowToPlay;
         int SeqPlayColumn;
+        bool ResetEffectState[2];
         wxArrayString BarEffectDirections;
         wxArrayString ButterflyEffectColors;
         wxArrayString MeteorsEffectTypes;
-        wxArrayString PictureEffectDirections;
+        wxArrayString EffectDirections;
 
 
         DECLARE_EVENT_TABLE()

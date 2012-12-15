@@ -46,14 +46,7 @@ void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
         Nodes[i].sparkle = rand() % 10000;
     }
     for(i=0; i<2; i++) {
-        BarState[i]=0;
-        ButterflyState[i]=0;
-        ColorWashState[i]=0;
-        GarlandsState[i]=0;
-        MeteorState[i]=0;
-        PictureState[i]=0;
-        SpiralState[i]=0;
-        TextState[i]=0;
+        state[i]=0;
     }
 }
 
@@ -184,14 +177,16 @@ void PixelBufferClass::SetSparkle(int freq)
     sparkle_count=freq;
 }
 
-void PixelBufferClass::SetSpeed(int newspeed)
+void PixelBufferClass::SetLayer(int newlayer, int period, int speed, bool ResetState)
 {
-    Speed=newspeed;
-}
-
-void PixelBufferClass::SetLayer(int newlayer)
-{
+    static int lastperiod = 0;
     CurrentLayer=newlayer & 1;  // only 0 or 1 is allowed
+    if (ResetState) {
+        state[CurrentLayer]=0;
+    } else {
+        state[CurrentLayer]+=(period-lastperiod) * speed;
+    }
+    lastperiod=period;
 }
 
 void PixelBufferClass::RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D)
@@ -201,34 +196,32 @@ void PixelBufferClass::RenderBars(int PaletteRepeat, int Direction, bool Highlig
     wxImage::HSVValue hsv;
     size_t colorcnt=GetColorCount(CurrentLayer);
     int BarCount = PaletteRepeat * colorcnt;
-    int BarWidth = BufferHt/BarCount+1;
+    int BarHt = BufferHt/BarCount+1;
     int HalfHt = BufferHt/2;
-    BarState[CurrentLayer]+=Speed;
-    int f_offset = BarState[CurrentLayer]/4 % BufferHt;
-    for (x=0; x<BufferWi; x++) {
-        for (y=0; y<BufferHt; y++) {
-            ColorIdx=(y/BarWidth) % colorcnt;
-            palette[CurrentLayer].GetHSV(ColorIdx, hsv);
-            switch (Direction) {
-                case 1: IsMovingDown=true; break;
-                case 2: IsMovingDown=(y <= HalfHt); break;
-                case 3: IsMovingDown=(y > HalfHt); break;
-                default: IsMovingDown=false; break;
-            }
-            if (IsMovingDown) {
-                n=y-f_offset;
-                pixel_ratio = BarWidth - y%BarWidth;
-                IsHighlightRow=y % BarWidth == 0;
-            } else {
-                n=y+f_offset;
-                pixel_ratio = y%BarWidth;
-                IsHighlightRow=(y % BarWidth == BarWidth-1) || (y == BufferHt-1);
-            }
-            if (Highlight && IsHighlightRow) hsv.saturation=0.0;
-            if (Show3D) hsv.value *= double(pixel_ratio) / BarWidth;
-            n=n % BufferHt;
-            if (n < 0) n+=BufferHt;
-            SetPixel(x,n,hsv);
+    int BlockHt=colorcnt * BarHt;
+    int f_offset = state[CurrentLayer]/4 % BlockHt;
+    for (y=0; y<BufferHt; y++) {
+        switch (Direction) {
+            case 1: IsMovingDown=true; break;
+            case 2: IsMovingDown=(y <= HalfHt); break;
+            case 3: IsMovingDown=(y > HalfHt); break;
+            default: IsMovingDown=false; break;
+        }
+        if (IsMovingDown) {
+            n=y+f_offset;
+            pixel_ratio = BarHt - n%BarHt - 1;
+            IsHighlightRow=n % BarHt == 0;
+        } else {
+            n=y-f_offset+BlockHt;
+            pixel_ratio = n%BarHt;
+            IsHighlightRow=(n % BarHt == BarHt-1); // || (y == BufferHt-1);
+        }
+        ColorIdx=(n % BlockHt) / BarHt;
+        palette[CurrentLayer].GetHSV(ColorIdx, hsv);
+        if (Highlight && IsHighlightRow) hsv.saturation=0.0;
+        if (Show3D) hsv.value *= double(pixel_ratio) / BarHt;
+        for (x=0; x<BufferWi; x++) {
+            SetPixel(x,y,hsv);
         }
     }
 }
@@ -242,9 +235,8 @@ void PixelBufferClass::RenderButterfly(int ColorScheme, int Style, int Chunks, i
     wxColour color;
     wxImage::HSVValue hsv;
     int maxframe=BufferHt*2;
-    ButterflyState[CurrentLayer]+=Speed;
-    int frame=(BufferHt * ButterflyState[CurrentLayer] / 200)%maxframe;
-    double offset=double(ButterflyState[CurrentLayer])/100.0;
+    int frame=(BufferHt * state[CurrentLayer] / 200)%maxframe;
+    double offset=double(state[CurrentLayer])/100.0;
 
     for (x=0; x<BufferWi; x++) {
         for (y=0; y<BufferHt; y++) {
@@ -283,16 +275,19 @@ void PixelBufferClass::RenderButterfly(int ColorScheme, int Style, int Chunks, i
     }
 }
 
-void PixelBufferClass::RenderColorWash(bool HorizFade, bool VertFade)
+void PixelBufferClass::RenderColorWash(bool HorizFade, bool VertFade, int RepeatCount)
 {
+    static int SpeedFactor=200;
     int x,y;
     wxColour color;
     wxImage::HSVValue hsv,hsv2;
     size_t colorcnt=GetColorCount(CurrentLayer);
-    int CycleLen=colorcnt*100;
-    ColorWashState[CurrentLayer]+=Speed;
-    double ratio= double(ColorWashState[CurrentLayer]/4 % CycleLen) / double(CycleLen);
-    GetMultiColorBlend(ratio, true, color);
+    int CycleLen=colorcnt*SpeedFactor;
+    if (state[CurrentLayer] > (colorcnt-1)*SpeedFactor*RepeatCount && RepeatCount < 10) {
+        GetMultiColorBlend(double(RepeatCount%2), false, color);
+    } else {
+        GetMultiColorBlend(double(state[CurrentLayer] % CycleLen) / double(CycleLen), true, color);
+    }
     Color2HSV(color,hsv);
     double HalfHt=double(BufferHt-1)/2.0;
     double HalfWi=double(BufferWi-1)/2.0;
@@ -318,12 +313,12 @@ void PixelBufferClass::RenderGarlands(int GarlandType, int Spacing)
     wxColour color;
     int PixelSpacing=Spacing*BufferHt/100+3;
     int limit=BufferHt*PixelSpacing*4;
-    GarlandsState[CurrentLayer]=(GarlandsState[CurrentLayer] + Speed) % limit;
+    int GarlandsState=(limit - (state[CurrentLayer] % limit))/4;
     // ring=0 is the top ring
     for (ring=0; ring<BufferHt; ring++) {
         ratio=double(ring)/double(BufferHt);
         GetMultiColorBlend(ratio, false, color);
-        y=(limit - GarlandsState[CurrentLayer])/4 - ring*PixelSpacing;
+        y=GarlandsState - ring*PixelSpacing;
         ylimit=BufferHt-ring-1;
         for (x=0; x<BufferWi; x++) {
             yadj=y;
@@ -371,9 +366,8 @@ void PixelBufferClass::RenderLife(int Count, int Seed)
 
 void PixelBufferClass::RenderMeteors(int MeteorType, int Count, int Length)
 {
-    MeteorState[CurrentLayer]+=Speed;
-    int mspeed=MeteorState[CurrentLayer]/4;
-    MeteorState[CurrentLayer]-=mspeed*4;
+    int mspeed=state[CurrentLayer]/4;
+    state[CurrentLayer]-=mspeed*4;
 
     // create new meteors
     MeteorClass m;
@@ -439,8 +433,7 @@ void PixelBufferClass::RenderPictures(int dir, const wxString& NewPictureName)
     int yoffset=(BufferHt+imght)/2;
     int xoffset=(imgwidth-BufferWi)/2;
     int limit=(dir < 2) ? imgwidth+BufferWi : imght+BufferHt;
-    PictureState[CurrentLayer]=(PictureState[CurrentLayer]+Speed) % (limit*speedfactor);
-    int movement=PictureState[CurrentLayer]/speedfactor;
+    int movement=(state[CurrentLayer] % (limit*speedfactor)) / speedfactor;
 
     // copy image to buffer
     wxColour c;
@@ -492,7 +485,7 @@ void PixelBufferClass::RenderSpirals(int PaletteRepeat, int Direction, int Rotat
     int SpiralCount=colorcnt * PaletteRepeat;
     int deltaStrands=BufferWi / SpiralCount;
     int SpiralThickness=(deltaStrands * Thickness / 100) + 1;
-    SpiralState[CurrentLayer]+=Speed*Direction;
+    long SpiralState=state[CurrentLayer]*Direction;
     wxImage::HSVValue hsv;
     wxColour color;
     for(int ns=0; ns < SpiralCount; ns++) {
@@ -502,7 +495,7 @@ void PixelBufferClass::RenderSpirals(int PaletteRepeat, int Direction, int Rotat
         for(thick=0; thick < SpiralThickness; thick++) {
             strand = (strand_base + thick) % BufferWi;
             for(y=0; y < BufferHt; y++) {
-                x=(strand + SpiralState[CurrentLayer]/10 + y*Rotation/BufferHt) % BufferWi;
+                x=(strand + SpiralState/10 + y*Rotation/BufferHt) % BufferWi;
                 if (x < 0) x += BufferWi;
                 if (Blend) {
                     GetMultiColorBlend(double(BufferHt-y-1)/double(BufferHt), false, color);
@@ -523,7 +516,7 @@ void PixelBufferClass::RenderSpirals(int PaletteRepeat, int Direction, int Rotat
     }
 }
 
-void PixelBufferClass::RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString)
+void PixelBufferClass::RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString, int dir)
 {
     wxColour c;
     wxBitmap bitmap(BufferWi,BufferHt);
@@ -538,10 +531,33 @@ void PixelBufferClass::RenderText(int Top, const wxString& Line1, const wxString
     wxSize sz1 = dc.GetTextExtent(Line1);
     wxSize sz2 = dc.GetTextExtent(Line2);
     int maxwidth=sz1.GetWidth() > sz2.GetWidth() ? sz1.GetWidth() : sz2.GetWidth();
+    int maxht=sz1.GetHeight() > sz2.GetHeight() ? sz1.GetHeight() : sz2.GetHeight();
     int dctop=Top * BufferHt / 50 - BufferHt/2;
-    int limit=(BufferWi+maxwidth)*8 + 1;
-    TextState[CurrentLayer]=(TextState[CurrentLayer] + Speed) % limit;
-    dc.DrawText(msg,BufferWi-TextState[CurrentLayer]/8,dctop);
+    int xlimit=(BufferWi+maxwidth)*8 + 1;
+    int ylimit=(BufferHt+maxht)*8 + 1;
+    int xcentered=(BufferWi-maxwidth)/2;
+    switch (dir) {
+        case 0:
+            // left
+            dc.DrawText(msg,BufferWi-state[CurrentLayer] % xlimit/8,dctop);
+            break;
+        case 1:
+            // right
+            dc.DrawText(msg,state[CurrentLayer] % xlimit/8-BufferWi,dctop);
+            break;
+        case 2:
+            // up
+            dc.DrawText(msg,xcentered,BufferHt-state[CurrentLayer] % ylimit/8);
+            break;
+        case 3:
+            // down
+            dc.DrawText(msg,xcentered,state[CurrentLayer] % ylimit / 8 - BufferHt);
+            break;
+        default:
+            // no movement - centered
+            dc.DrawText(msg,xcentered,dctop);
+            break;
+    }
 
     // copy dc to buffer
     for(wxCoord x=0; x<BufferWi; x++) {

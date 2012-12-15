@@ -39,6 +39,14 @@
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
+				<object class="wxCheckBox" name="ID_CHECKBOX1" variable="CheckBoxLightsOff" member="yes">
+					<label>Lights off after each song</label>
+				</object>
+				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
 				<object class="wxStdDialogButtonSizer" variable="StdDialogButtonSizer1" member="no">
 					<object class="button">
 						<object class="wxButton" name="wxID_OK">

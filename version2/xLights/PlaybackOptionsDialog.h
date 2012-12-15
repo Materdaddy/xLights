@@ -18,6 +18,7 @@ class PlaybackOptionsDialog: public wxDialog
 		wxCheckBox* CheckBoxFirstItem;
 		wxCheckBox* CheckBoxRepeat;
 		wxCheckBox* CheckBoxLastItem;
+		wxCheckBox* CheckBoxLightsOff;
 		wxCheckBox* CheckBoxRandom;
 		//*)
 
@@ -28,6 +29,7 @@ class PlaybackOptionsDialog: public wxDialog
 		static const long ID_CHECKBOX_FIRSTITEM;
 		static const long ID_CHECKBOX_LASTITEM;
 		static const long ID_CHECKBOX_RANDOM;
+		static const long ID_CHECKBOX1;
 		//*)
 
 	private:

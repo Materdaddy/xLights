@@ -1111,7 +1111,7 @@ void xLightsFrame::RunPlaylist(int nbidx, wxString& script)
 
 void xLightsFrame::SendToLogAndStatusBar(const wxString& msg)
 {
-    TextCtrlLog->AppendText(msg + _("\n"));
+    TextCtrlLog->AppendText(msg + wxT("\n"));
     StatusBar1->SetStatusText(msg);
 }
 
@@ -1259,7 +1259,12 @@ void xLightsFrame::OnButtonRunPlaylistClick(wxCommandEvent& event)
         // get playback options, run generic script
         PlaybackOptionsDialog dialog(this);
         if (dialog.ShowModal() != wxID_OK) return;
-        userscript=CreateScript(Notebook1->GetPageText(selidx),dialog.CheckBoxRepeat->IsChecked(),dialog.CheckBoxFirstItem->IsChecked(),dialog.CheckBoxLastItem->IsChecked(),false,dialog.CheckBoxRandom->IsChecked());
+        userscript=CreateScript(Notebook1->GetPageText(selidx),
+                                dialog.CheckBoxRepeat->IsChecked(),
+                                dialog.CheckBoxFirstItem->IsChecked(),
+                                dialog.CheckBoxLastItem->IsChecked(),
+                                dialog.CheckBoxLightsOff->IsChecked(),
+                                dialog.CheckBoxRandom->IsChecked());
     }
     SetPlayMode(play_list);
     SecondsRemaining=1;
@@ -1544,7 +1549,11 @@ void xLightsFrame::OnMenuItemCustomScriptSelected(wxCommandEvent& event)
     PlaybackOptionsDialog dialog(this);
     wxString nbName=Notebook1->GetPageText(nbIdx);
     if (dialog.ShowModal() != wxID_OK) return;
-    TextCtrlLogic->ChangeValue(CreateScript(nbName,dialog.CheckBoxRepeat->IsChecked(),dialog.CheckBoxFirstItem->IsChecked(),dialog.CheckBoxLastItem->IsChecked(),false,dialog.CheckBoxRandom->IsChecked()));
+    TextCtrlLogic->ChangeValue(CreateScript(nbName,dialog.CheckBoxRepeat->IsChecked(),
+                                            dialog.CheckBoxFirstItem->IsChecked(),
+                                            dialog.CheckBoxLastItem->IsChecked(),
+                                            dialog.CheckBoxLightsOff->IsChecked(),
+                                            dialog.CheckBoxRandom->IsChecked()));
     TextCtrlLogic->Show();
     wxButton* ButtonRemoveScript=(wxButton*)FindNotebookControl(nbIdx,REMOVE_SCRIPT_BUTTON);
     ButtonRemoveScript->Show();

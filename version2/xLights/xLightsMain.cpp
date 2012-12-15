@@ -202,6 +202,8 @@ const long xLightsFrame::ID_SLIDER_Butterfly1_Chunks = wxNewId();
 const long xLightsFrame::ID_STATICTEXT31 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Butterfly1_Skip = wxNewId();
 const long xLightsFrame::ID_PANEL10 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT21 = wxNewId();
+const long xLightsFrame::ID_SLIDER_ColorWash1_Count = wxNewId();
 const long xLightsFrame::ID_STATICTEXT32 = wxNewId();
 const long xLightsFrame::ID_CHECKBOX_ColorWash1_HFade = wxNewId();
 const long xLightsFrame::ID_STATICTEXT33 = wxNewId();
@@ -255,6 +257,8 @@ const long xLightsFrame::ID_STATICTEXT57 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Text1_Top = wxNewId();
 const long xLightsFrame::ID_BUTTON_TEXT1_FONT = wxNewId();
 const long xLightsFrame::ID_TEXTCTRL_Text1_Font = wxNewId();
+const long xLightsFrame::ID_STATICTEXT79 = wxNewId();
+const long xLightsFrame::ID_CHOICE_Text1_Dir = wxNewId();
 const long xLightsFrame::ID_PANEL7 = wxNewId();
 const long xLightsFrame::ID_CHOICEBOOK1 = wxNewId();
 const long xLightsFrame::ID_BUTTON_Palette1 = wxNewId();
@@ -289,6 +293,8 @@ const long xLightsFrame::ID_SLIDER_Butterfly2_Chunks = wxNewId();
 const long xLightsFrame::ID_STATICTEXT55 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Butterfly2_Skip = wxNewId();
 const long xLightsFrame::ID_PANEL11 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT22 = wxNewId();
+const long xLightsFrame::ID_SLIDER_ColorWash2_Count = wxNewId();
 const long xLightsFrame::ID_STATICTEXT56 = wxNewId();
 const long xLightsFrame::ID_CHECKBOX_ColorWash2_HFade = wxNewId();
 const long xLightsFrame::ID_STATICTEXT58 = wxNewId();
@@ -342,6 +348,8 @@ const long xLightsFrame::ID_STATICTEXT76 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Text2_Top = wxNewId();
 const long xLightsFrame::ID_BUTTON_TEXT2_FONT = wxNewId();
 const long xLightsFrame::ID_TEXTCTRL_Text2_Font = wxNewId();
+const long xLightsFrame::ID_STATICTEXT78 = wxNewId();
+const long xLightsFrame::ID_CHOICE_Text2_Dir = wxNewId();
 const long xLightsFrame::ID_PANEL29 = wxNewId();
 const long xLightsFrame::ID_CHOICEBOOK2 = wxNewId();
 const long xLightsFrame::ID_BUTTON_Palette2 = wxNewId();
@@ -450,6 +458,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer66;
     wxFlexGridSizer* FlexGridSizer2;
+    wxFlexGridSizer* FlexGridSizer69;
     wxBoxSizer* BoxSizer2;
     wxFlexGridSizer* FlexGridSizer53;
     wxFlexGridSizer* FlexGridSizer7;
@@ -504,6 +513,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer26;
     wxFlexGridSizer* FlexGridSizer60;
     wxFlexGridSizer* FlexGridSizer30;
+    wxFlexGridSizer* FlexGridSizer67;
 
     Create(parent, wxID_ANY, _("xLights"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(2, 1, 0, 0);
@@ -968,7 +978,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText25 = new wxStaticText(Panel1_Butterfly, ID_STATICTEXT27, _("Colors"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT27"));
     FlexGridSizer36->Add(StaticText25, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Choice_Butterfly1_Colors = new wxChoice(Panel1_Butterfly, ID_CHOICE_Butterfly1_Colors, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Butterfly1_Colors"));
-    FlexGridSizer36->Add(Choice_Butterfly1_Colors, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer36->Add(Choice_Butterfly1_Colors, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText26 = new wxStaticText(Panel1_Butterfly, ID_STATICTEXT28, _("Style"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT28"));
     FlexGridSizer36->Add(StaticText26, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Slider_Butterfly1_Style = new wxSlider(Panel1_Butterfly, ID_SLIDER_Butterfly1_Style, 1, 1, 3, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Butterfly1_Style"));
@@ -986,6 +996,10 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer36->SetSizeHints(Panel1_Butterfly);
     Panel1_ColorWash = new wxPanel(Choicebook1, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL5"));
     FlexGridSizer37 = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText5 = new wxStaticText(Panel1_ColorWash, ID_STATICTEXT21, _("Count"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
+    FlexGridSizer37->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Slider_ColorWash1_Count = new wxSlider(Panel1_ColorWash, ID_SLIDER_ColorWash1_Count, 1, 1, 10, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_ColorWash1_Count"));
+    FlexGridSizer37->Add(Slider_ColorWash1_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText30 = new wxStaticText(Panel1_ColorWash, ID_STATICTEXT32, _("Horizontal"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT32"));
     FlexGridSizer37->Add(StaticText30, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     CheckBox_ColorWash1_HFade = new wxCheckBox(Panel1_ColorWash, ID_CHECKBOX_ColorWash1_HFade, _("Fade"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_ColorWash1_HFade"));
@@ -1035,7 +1049,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText39 = new wxStaticText(Panel1_Meteors, ID_STATICTEXT39, _("Type"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT39"));
     FlexGridSizer41->Add(StaticText39, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Choice_Meteors1_Type = new wxChoice(Panel1_Meteors, ID_CHOICE_Meteors1_Type, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Meteors1_Type"));
-    FlexGridSizer41->Add(Choice_Meteors1_Type, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer41->Add(Choice_Meteors1_Type, 1, wxTOP|wxBOTTOM|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText41 = new wxStaticText(Panel1_Meteors, ID_STATICTEXT41, _("Count"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT41"));
     FlexGridSizer41->Add(StaticText41, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Slider_Meteors1_Count = new wxSlider(Panel1_Meteors, ID_SLIDER_Meteors1_Count, 10, 1, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Meteors1_Count"));
@@ -1134,6 +1148,12 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer46->Add(Button_Text1_Font, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     TextCtrl_Text1_Font = new wxTextCtrl(Panel1_Text, ID_TEXTCTRL_Text1_Font, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_Text1_Font"));
     FlexGridSizer46->Add(TextCtrl_Text1_Font, 1, wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer69 = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText78 = new wxStaticText(Panel1_Text, ID_STATICTEXT79, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT79"));
+    FlexGridSizer69->Add(StaticText78, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    Choice_Text1_Dir = new wxChoice(Panel1_Text, ID_CHOICE_Text1_Dir, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Text1_Dir"));
+    FlexGridSizer69->Add(Choice_Text1_Dir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer46->Add(FlexGridSizer69, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel1_Text->SetSizer(FlexGridSizer46);
     FlexGridSizer46->Fit(Panel1_Text);
     FlexGridSizer46->SetSizeHints(Panel1_Text);
@@ -1230,7 +1250,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText47 = new wxStaticText(Panel2_Butterfly, ID_STATICTEXT49, _("Colors"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT49"));
     FlexGridSizer51->Add(StaticText47, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Choice_Butterfly2_Colors = new wxChoice(Panel2_Butterfly, ID_CHOICE_Butterfly2_Colors, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Butterfly2_Colors"));
-    FlexGridSizer51->Add(Choice_Butterfly2_Colors, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer51->Add(Choice_Butterfly2_Colors, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText48 = new wxStaticText(Panel2_Butterfly, ID_STATICTEXT50, _("Style"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT50"));
     FlexGridSizer51->Add(StaticText48, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Slider_Butterfly2_Style = new wxSlider(Panel2_Butterfly, ID_SLIDER_Butterfly2_Style, 1, 1, 3, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Butterfly2_Style"));
@@ -1248,6 +1268,10 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer51->SetSizeHints(Panel2_Butterfly);
     Panel2_ColorWash = new wxPanel(Choicebook2, ID_PANEL13, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL13"));
     FlexGridSizer52 = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText76 = new wxStaticText(Panel2_ColorWash, ID_STATICTEXT22, _("Count"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT22"));
+    FlexGridSizer52->Add(StaticText76, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Slider_ColorWash2_Count = new wxSlider(Panel2_ColorWash, ID_SLIDER_ColorWash2_Count, 1, 1, 10, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_ColorWash2_Count"));
+    FlexGridSizer52->Add(Slider_ColorWash2_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText52 = new wxStaticText(Panel2_ColorWash, ID_STATICTEXT56, _("Horizontal"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT56"));
     FlexGridSizer52->Add(StaticText52, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     CheckBox_ColorWash2_HFade = new wxCheckBox(Panel2_ColorWash, ID_CHECKBOX_ColorWash2_HFade, _("Fade"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_ColorWash2_HFade"));
@@ -1297,7 +1321,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     StaticText62 = new wxStaticText(Panel2_Meteors, ID_STATICTEXT64, _("Type"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT64"));
     FlexGridSizer56->Add(StaticText62, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Choice_Meteors2_Type = new wxChoice(Panel2_Meteors, ID_CHOICE_Meteors2_Type, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Meteors2_Type"));
-    FlexGridSizer56->Add(Choice_Meteors2_Type, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer56->Add(Choice_Meteors2_Type, 1, wxTOP|wxBOTTOM|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText63 = new wxStaticText(Panel2_Meteors, ID_STATICTEXT65, _("Count"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT65"));
     FlexGridSizer56->Add(StaticText63, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Slider_Meteors2_Count = new wxSlider(Panel2_Meteors, ID_SLIDER_Meteors2_Count, 10, 1, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Meteors2_Count"));
@@ -1396,6 +1420,12 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer61->Add(Button_Text2_Font, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     TextCtrl_Text2_Font = new wxTextCtrl(Panel2_Text, ID_TEXTCTRL_Text2_Font, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL_Text2_Font"));
     FlexGridSizer61->Add(TextCtrl_Text2_Font, 1, wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer67 = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText77 = new wxStaticText(Panel2_Text, ID_STATICTEXT78, _("Direction"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT78"));
+    FlexGridSizer67->Add(StaticText77, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    Choice_Text2_Dir = new wxChoice(Panel2_Text, ID_CHOICE_Text2_Dir, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE_Text2_Dir"));
+    FlexGridSizer67->Add(Choice_Text2_Dir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer61->Add(FlexGridSizer67, 1, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2_Text->SetSizer(FlexGridSizer61);
     FlexGridSizer61->Fit(Panel2_Text);
     FlexGridSizer61->SetSizeHints(Panel2_Text);
@@ -1667,22 +1697,36 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_GRID1,wxEVT_GRID_CELL_CHANGE,(wxObjectEventFunction)&xLightsFrame::OnGrid1CellChange);
     Connect(ID_BUTTON_PICTURES1_FILENAME,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Pictures1_FilenameClick);
     Connect(ID_BUTTON_TEXT1_FONT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Text1_FontClick);
+    Connect(ID_CHOICEBOOK1,wxEVT_COMMAND_CHOICEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&xLightsFrame::OnChoicebookEffectPageChanged);
     Connect(ID_BUTTON_Palette1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Palette1Click);
     Connect(ID_CHECKBOX_Palette1_1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette1_1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette1_2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_3,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette1_3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_4,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette1_4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_5,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette1_5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette1_6,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette1_6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_BUTTON_PICTURES2_FILENAME,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Pictures2_FilenameClick);
     Connect(ID_BUTTON_TEXT2_FONT,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Text2_FontClick);
+    Connect(ID_CHOICEBOOK2,wxEVT_COMMAND_CHOICEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&xLightsFrame::OnChoicebookEffectPageChanged);
     Connect(ID_BUTTON_Palette2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_Palette2Click);
     Connect(ID_CHECKBOX_Palette2_1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette2_1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette2_2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_3,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette2_3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_4,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette2_4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_5,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette2_5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_Palette2_6,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBox_PaletteClick);
+    Connect(ID_BUTTON_Palette2_6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ColorClick);
     Connect(ID_CHECKBOX_RUN_SCHEDULE,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnCheckBoxRunScheduleClick);
     Connect(ID_BUTTON_SAVE_SCHEDULE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonSaveScheduleClick);
     Connect(ID_BUTTON_ADD_SHOW,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonAddShowClick);
@@ -1794,15 +1838,19 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Choice_Meteors2_Type->Set(MeteorsEffectTypes);
     Choice_Meteors2_Type->SetSelection(0);
 
-    PictureEffectDirections.Add("left");
-    PictureEffectDirections.Add("right");
-    PictureEffectDirections.Add("up");
-    PictureEffectDirections.Add("down");
-    PictureEffectDirections.Add("none");
-    Choice_Pictures1_Direction->Set(PictureEffectDirections);
+    EffectDirections.Add("left");
+    EffectDirections.Add("right");
+    EffectDirections.Add("up");
+    EffectDirections.Add("down");
+    EffectDirections.Add("none");
+    Choice_Pictures1_Direction->Set(EffectDirections);
     Choice_Pictures1_Direction->SetSelection(0);
-    Choice_Pictures2_Direction->Set(PictureEffectDirections);
+    Choice_Pictures2_Direction->Set(EffectDirections);
     Choice_Pictures2_Direction->SetSelection(0);
+    Choice_Text1_Dir->Set(EffectDirections);
+    Choice_Text1_Dir->SetSelection(0);
+    Choice_Text2_Dir->Set(EffectDirections);
+    Choice_Text2_Dir->SetSelection(0);
 
     // Check if schedule should be running
     xout=0;
@@ -1931,7 +1979,7 @@ void xLightsFrame::OnBitmapButtonTabInfoClick(wxCommandEvent& event)
         break;
     case SEQUENCETAB:
         caption=_("Sequence Tab");
-        msg=_("The Sequence tab can be used to create RGB sequences. This feature will be available in a later version.");
+        msg=_("The Sequence tab can be used to create RGB sequences. First, create a model of your RGB display element(s) by clicking on the Models button. Then try the different effects and settings until you create something you like. You can save the settings as a preset by clicking the New Preset button. From then on, that preset will be available in the presets drop-down list. You can combine effects by creating a second effect in the Effect 2 area, then choosing a Layering Method. To create a series of effects that will be used in a sequence, click the open file icon to open an xLights (.xseq) sequence. Choose which display elements/models you will use in this sequence. Then click the insert rows icon and type in the start time in seconds when that effect should begin. Rows will automatically sort by start time. To add an effect to the sequence, click on the grid cell in the desired display model column and the desired start time row, then click the Update button. When you are done creating effects for the sequence, click the save icon and the xLights sequence will be updated with the effects you stored in the grid.");
         break;
     case SCHEDULETAB:
         caption=_("Schedule Tab");
@@ -2080,9 +2128,20 @@ void xLightsFrame::OnMenuItemSavePlaylistsSelected(wxCommandEvent& event)
     SaveScheduleFile();
 }
 
+// displays color chooser and updates the button's background color with the return value
+void xLightsFrame::OnButton_ColorClick(wxCommandEvent& event)
+{
+    wxWindow* w=(wxWindow*)event.GetEventObject();
+    if (ColourDialog1->ShowModal() == wxID_OK) {
+        wxColourData retData = ColourDialog1->GetColourData();
+        wxColour color = retData.GetColour();
+        w->SetBackgroundColour(color);
+        PaletteChanged=true;
+    }
+}
+
 #include "TabSetup.cpp"
 #include "TabTest.cpp"
 #include "TabConvert.cpp"
 #include "TabSchedule.cpp"
 #include "TabSequence.cpp"
-

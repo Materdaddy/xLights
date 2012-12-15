@@ -43,6 +43,12 @@ void xLightsFrame::OnButton_PlayAllClick(wxCommandEvent& event)
     PlayCurrentXlightsFile();
 }
 
+void xLightsFrame::ResetEffectStates()
+{
+    ResetEffectState[0]=true;
+    ResetEffectState[1]=true;
+}
+
 void xLightsFrame::OnButton_PlayEffectClick(wxCommandEvent& event)
 {
     int sel=Choice_Models->GetSelection();
@@ -52,6 +58,7 @@ void xLightsFrame::OnButton_PlayEffectClick(wxCommandEvent& event)
     }
     wxXmlNode* ModelXml=(wxXmlNode*)Choice_Models->GetClientData(sel);
     buffer.InitBuffer(ModelXml);
+    ResetEffectStates();
     ClearEffectWindow();
     buffer.SetMixType(Choice_LayerMethod->GetStringSelection());
     StatusBar1->SetStatusText(_("Playback: effect"));
@@ -159,6 +166,7 @@ void xLightsFrame::SetEffectControls(wxString settings)
     }
     PaletteChanged=true;
     MixTypeChanged=true;
+    ResetEffectStates();
 }
 
 // Set text to a color that contrasts with background
@@ -321,18 +329,6 @@ void xLightsFrame::OnButton_ModelsClick(wxCommandEvent& event)
 void xLightsFrame::OnCheckBox_PaletteClick(wxCommandEvent& event)
 {
     PaletteChanged=true;
-}
-
-// displays color chooser and updates the button's background color with the return value
-void xLightsFrame::OnButton_ColorClick(wxCommandEvent& event)
-{
-    wxWindow* w=(wxWindow*)event.GetEventObject();
-    if (ColourDialog1->ShowModal() == wxID_OK) {
-        wxColourData retData = ColourDialog1->GetColourData();
-        wxColour color = retData.GetColour();
-        w->SetBackgroundColour(color);
-        PaletteChanged=true;
-    }
 }
 
 void xLightsFrame::UpdateEffectsList()
@@ -521,13 +517,13 @@ void xLightsFrame::UpdateBufferPalette()
     buffer.SetPalette(1,newcolors);
 }
 
-void xLightsFrame::RenderEffectFromString(int layer, MapStringString& SettingsMap)
+void xLightsFrame::RenderEffectFromString(int layer, int period, MapStringString& SettingsMap)
 {
-    buffer.SetLayer(layer);
     wxString LayerStr=layer==0 ? wxT("1") : wxT("2");
-    buffer.SetSpeed(wxAtoi(SettingsMap[wxT("ID_SLIDER_Speed")+LayerStr]));
+    wxString SpeedStr=SettingsMap[wxT("ID_SLIDER_Speed")+LayerStr];
+    buffer.SetLayer(layer,period,wxAtoi(SpeedStr),ResetEffectState[layer]);
+    ResetEffectState[layer]=false;
     wxString effect=SettingsMap[wxT("effect")+LayerStr];
-    SendToLogAndStatusBar(wxT("effect")+LayerStr+wxT("=")+effect);
     if (effect == wxT("Bars")) {
         buffer.RenderBars(wxAtoi(SettingsMap[wxT("ID_SLIDER_Bars")+LayerStr+wxT("_BarCount")]),
                           BarEffectDirections.Index(SettingsMap[wxT("ID_CHOICE_Bars")+LayerStr+wxT("_Direction")]),
@@ -540,7 +536,8 @@ void xLightsFrame::RenderEffectFromString(int layer, MapStringString& SettingsMa
                                wxAtoi(SettingsMap[wxT("ID_SLIDER_Butterfly")+LayerStr+wxT("_Skip")]));
     } else if (effect == wxT("Color Wash")) {
         buffer.RenderColorWash(SettingsMap[wxT("ID_CHECKBOX_ColorWash")+LayerStr+wxT("_HFade")]==wxT("1"),
-                               SettingsMap[wxT("ID_CHECKBOX_ColorWash")+LayerStr+wxT("_VFade")]==wxT("1"));
+                               SettingsMap[wxT("ID_CHECKBOX_ColorWash")+LayerStr+wxT("_VFade")]==wxT("1"),
+                               wxAtoi(SettingsMap[wxT("ID_SLIDER_ColorWash")+LayerStr+wxT("_Count")]));
     } else if (effect == wxT("Fire")) {
         buffer.RenderFire();
     } else if (effect == wxT("Garlands")) {
@@ -552,7 +549,7 @@ void xLightsFrame::RenderEffectFromString(int layer, MapStringString& SettingsMa
                              wxAtoi(SettingsMap[wxT("Slider_Meteors")+LayerStr+wxT("_Count")]),
                              wxAtoi(SettingsMap[wxT("Slider_Meteors")+LayerStr+wxT("_Length")]));
     } else if (effect == wxT("Pictures")) {
-        buffer.RenderPictures(PictureEffectDirections.Index(SettingsMap[wxT("ID_CHOICE_Pictures")+LayerStr+wxT("_Direction")]),
+        buffer.RenderPictures(EffectDirections.Index(SettingsMap[wxT("ID_CHOICE_Pictures")+LayerStr+wxT("_Direction")]),
                               SettingsMap[wxT("ID_TEXTCTRL_Pictures")+LayerStr+wxT("_Filename")]);
     } else if (effect == wxT("Snowflakes")) {
     } else if (effect == wxT("Snowstorm")) {
@@ -567,11 +564,12 @@ void xLightsFrame::RenderEffectFromString(int layer, MapStringString& SettingsMa
         buffer.RenderText(wxAtoi(SettingsMap[wxT("ID_SLIDER_Text")+LayerStr+wxT("_Top")]),
                           SettingsMap[wxT("ID_TEXTCTRL_Text")+LayerStr+wxT("_Line1")],
                           SettingsMap[wxT("ID_TEXTCTRL_Text")+LayerStr+wxT("_Line2")],
-                          SettingsMap[wxT("ID_TEXTCTRL_Text")+LayerStr+wxT("_Font")]);
+                          SettingsMap[wxT("ID_TEXTCTRL_Text")+LayerStr+wxT("_Font")],
+                          EffectDirections.Index(SettingsMap[wxT("ID_CHOICE_Text")+LayerStr+wxT("_Dir")]));
     }
 }
 
-void xLightsFrame::PlayRgbEffect()
+void xLightsFrame::PlayRgbEffect(int EffectPeriod)
 {
     wxString s;
     buffer.Clear();
@@ -592,8 +590,8 @@ void xLightsFrame::PlayRgbEffect()
     }
 
     // render effect 1
-    buffer.SetSpeed(Slider_Speed1->GetValue());
-    buffer.SetLayer(0);
+    buffer.SetLayer(0,EffectPeriod,Slider_Speed1->GetValue(),ResetEffectState[0]);
+    ResetEffectState[0]=false;
     switch (Choicebook1->GetSelection())
     {
         case 0: break;   // none
@@ -611,7 +609,8 @@ void xLightsFrame::PlayRgbEffect()
             break;
         case 3:
             buffer.RenderColorWash(CheckBox_ColorWash1_HFade->GetValue(),
-                                   CheckBox_ColorWash1_VFade->GetValue());
+                                   CheckBox_ColorWash1_VFade->GetValue(),
+                                   Slider_ColorWash1_Count->GetValue());
             break;
         case 4:
             buffer.RenderFire();
@@ -652,13 +651,14 @@ void xLightsFrame::PlayRgbEffect()
             buffer.RenderText(Slider_Text1_Top->GetValue(),
                               TextCtrl_Text1_Line1->GetValue(),
                               TextCtrl_Text1_Line2->GetValue(),
-                              TextCtrl_Text1_Font->GetValue());
+                              TextCtrl_Text1_Font->GetValue(),
+                              Choice_Text1_Dir->GetSelection());
             break;
     }
 
     // render effect 2
-    buffer.SetSpeed(Slider_Speed2->GetValue());
-    buffer.SetLayer(1);
+    buffer.SetLayer(1,EffectPeriod,Slider_Speed2->GetValue(),ResetEffectState[1]);
+    ResetEffectState[1]=false;
     switch (Choicebook2->GetSelection())
     {
         case 0: break;   // none
@@ -676,7 +676,8 @@ void xLightsFrame::PlayRgbEffect()
             break;
         case 3:
             buffer.RenderColorWash(CheckBox_ColorWash2_HFade->GetValue(),
-                                   CheckBox_ColorWash2_VFade->GetValue());
+                                   CheckBox_ColorWash2_VFade->GetValue(),
+                                   Slider_ColorWash2_Count->GetValue());
             break;
         case 4:
             buffer.RenderFire();
@@ -717,7 +718,8 @@ void xLightsFrame::PlayRgbEffect()
             buffer.RenderText(Slider_Text2_Top->GetValue(),
                               TextCtrl_Text2_Line1->GetValue(),
                               TextCtrl_Text2_Line2->GetValue(),
-                              TextCtrl_Text2_Font->GetValue());
+                              TextCtrl_Text2_Font->GetValue(),
+                              Choice_Text2_Dir->GetSelection());
             break;
     }
     buffer.CalcOutput();
@@ -745,12 +747,14 @@ void xLightsFrame::UpdateRgbPlaybackStatus(int seconds, const wxString& seqtype)
 
 void xLightsFrame::TimerRgbSeq(long msec)
 {
-    int period;
     long StartTime;
+    int EffectPeriod;
+    static int s_period=0;
     int rowcnt=Grid1->GetNumberRows();
     switch (SeqPlayerState) {
         case PLAYING_EFFECT:
-            PlayRgbEffect();
+            PlayRgbEffect(s_period);
+            s_period++;
             break;
         case STARTING_SEQ_ANIM:
             ResetTimer(PLAYING_SEQ_ANIM, GetGridStartTimeMSec(NextGridRowToPlay));
@@ -760,8 +764,8 @@ void xLightsFrame::TimerRgbSeq(long msec)
                 TxOverflowCnt++;
                 break;
             }
-            period = msec / XTIMER_INTERVAL;
-            if (period >= SeqNumPeriods) {
+            EffectPeriod = msec / XTIMER_INTERVAL;
+            if (EffectPeriod >= SeqNumPeriods) {
                 // sequence has finished
                 if (xout) xout->alloff();
                 ResetTimer(NO_SEQ);
@@ -774,8 +778,8 @@ void xLightsFrame::TimerRgbSeq(long msec)
                     SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
                     NextGridRowToPlay++;
                 }
-                PlayRgbEffect();
-                if (period % 20 == 0) UpdateRgbPlaybackStatus(period/20,wxT("animation"));
+                PlayRgbEffect(EffectPeriod);
+                if (EffectPeriod % 20 == 0) UpdateRgbPlaybackStatus(EffectPeriod/20,wxT("animation"));
             }
             break;
         case STARTING_SEQ:
@@ -793,8 +797,8 @@ void xLightsFrame::TimerRgbSeq(long msec)
                 break;
             }
             msec = PlayerDlg->MediaCtrl->Tell();
-            period = msec / XTIMER_INTERVAL;
-            if (period >= SeqNumPeriods || PlayerDlg->MediaCtrl->GetState() != wxMEDIASTATE_PLAYING) {
+            EffectPeriod = msec / XTIMER_INTERVAL;
+            if (EffectPeriod >= SeqNumPeriods || PlayerDlg->MediaCtrl->GetState() != wxMEDIASTATE_PLAYING) {
                 // sequence has finished
                 PlayerDlg->MediaCtrl->Stop();
                 if (xout) xout->alloff();
@@ -808,8 +812,9 @@ void xLightsFrame::TimerRgbSeq(long msec)
                     SetEffectControls(Grid1->GetCellValue(NextGridRowToPlay,SeqPlayColumn));
                     NextGridRowToPlay++;
                 }
-                PlayRgbEffect();
-                if (period % 20 == 0) UpdateRgbPlaybackStatus(period/20,wxT("music"));
+                PlayRgbEffect(EffectPeriod);
+                //TextCtrlLog->AppendText(wxString::Format(wxT("msec=%ld, period=%d\n"),msec,EffectPeriod));
+                if (EffectPeriod % 20 == 0) UpdateRgbPlaybackStatus(EffectPeriod/20,wxT("music"));
             }
             break;
     }
@@ -833,24 +838,26 @@ void xLightsFrame::OnButton_Palette2Click(wxCommandEvent& event)
     OpenPaletteDialog(wxT("2"),wxT("1"),FlexGridSizer_Palette2,FlexGridSizer_Palette1);
 }
 
-void xLightsFrame::OnButton_Text1_FontClick(wxCommandEvent& event)
+void xLightsFrame::UpdateFont(wxTextCtrl* FontCtrl)
 {
     wxFont oldfont,newfont;
-    oldfont.SetNativeFontInfoUserDesc(TextCtrl_Text1_Font->GetValue());
+    oldfont.SetNativeFontInfoUserDesc(FontCtrl->GetValue());
     newfont=wxGetFontFromUser(this,oldfont);
     if (newfont.IsOk()) {
-        TextCtrl_Text1_Font->SetValue(newfont.GetNativeFontInfoUserDesc());
+        wxString FontDesc=newfont.GetNativeFontInfoUserDesc();
+        FontDesc.Replace(wxT(" unknown-90"),wxT(""));
+        FontCtrl->SetValue(FontDesc);
     }
+}
+
+void xLightsFrame::OnButton_Text1_FontClick(wxCommandEvent& event)
+{
+    UpdateFont(TextCtrl_Text1_Font);
 }
 
 void xLightsFrame::OnButton_Text2_FontClick(wxCommandEvent& event)
 {
-    wxFont oldfont,newfont;
-    oldfont.SetNativeFontInfoUserDesc(TextCtrl_Text2_Font->GetValue());
-    newfont=wxGetFontFromUser(this,oldfont);
-    if (newfont.IsOk()) {
-        TextCtrl_Text2_Font->SetValue(newfont.GetNativeFontInfoUserDesc());
-    }
+    UpdateFont(TextCtrl_Text2_Font);
 }
 
 void xLightsFrame::OnButton_Pictures1_FilenameClick(wxCommandEvent& event)
@@ -1137,17 +1144,19 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
                 // start next effect
                 wxYield();
                 LoadEffectFromString(Grid1->GetCellValue(NextGridRowToPlay,c), SettingsMap);
+                // TextCtrlLog->AppendText(wxT("effect")+LayerStr+wxT("=")+effect+wxT(", speed=")+SpeedStr+wxT("\n"));
                 UpdateBufferPaletteFromMap(1,SettingsMap);
                 UpdateBufferPaletteFromMap(2,SettingsMap);
                 buffer.SetMixType(SettingsMap["LayerMethod"]);
+                ResetEffectStates();
                 // update SparkleFrequency
                 int freq=wxAtoi(SettingsMap["ID_SLIDER_SparkleFrequency"]);
                 if (freq == Slider_SparkleFrequency->GetMax()) freq=0;
                 buffer.SetSparkle(freq);
                 NextGridRowToPlay++;
             }
-            RenderEffectFromString(0, SettingsMap);
-            RenderEffectFromString(1, SettingsMap);
+            RenderEffectFromString(0, p, SettingsMap);
+            RenderEffectFromString(1, p, SettingsMap);
             buffer.CalcOutput();
             // update SeqData with contents of buffer
             ChannelNum=buffer.StartChannel-1;
@@ -1370,4 +1379,9 @@ void xLightsFrame::DisplayEffectOnWindow()
         //dc.DrawCircle(Nodes[i].screenX, Nodes[i].screenY,1);
         dc.DrawPoint(buffer.Nodes[i].screenX, buffer.Nodes[i].screenY);
     }
+}
+
+void xLightsFrame::OnChoicebookEffectPageChanged(wxChoicebookEvent& event)
+{
+    ResetEffectStates();
 }

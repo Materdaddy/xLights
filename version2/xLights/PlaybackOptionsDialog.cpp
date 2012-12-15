@@ -11,6 +11,7 @@ const long PlaybackOptionsDialog::ID_CHECKBOX_REPEAT = wxNewId();
 const long PlaybackOptionsDialog::ID_CHECKBOX_FIRSTITEM = wxNewId();
 const long PlaybackOptionsDialog::ID_CHECKBOX_LASTITEM = wxNewId();
 const long PlaybackOptionsDialog::ID_CHECKBOX_RANDOM = wxNewId();
+const long PlaybackOptionsDialog::ID_CHECKBOX1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(PlaybackOptionsDialog,wxDialog)
@@ -40,6 +41,9 @@ PlaybackOptionsDialog::PlaybackOptionsDialog(wxWindow* parent,wxWindowID id,cons
 	CheckBoxRandom = new wxCheckBox(this, ID_CHECKBOX_RANDOM, _("Random Order"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX_RANDOM"));
 	CheckBoxRandom->SetValue(false);
 	FlexGridSizer1->Add(CheckBoxRandom, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	CheckBoxLightsOff = new wxCheckBox(this, ID_CHECKBOX1, _("Lights off after each song"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	CheckBoxLightsOff->SetValue(false);
+	FlexGridSizer1->Add(CheckBoxLightsOff, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StdDialogButtonSizer1 = new wxStdDialogButtonSizer();
 	StdDialogButtonSizer1->AddButton(new wxButton(this, wxID_OK, wxEmptyString));
 	StdDialogButtonSizer1->AddButton(new wxButton(this, wxID_CANCEL, wxEmptyString));
