@@ -209,6 +209,8 @@ const long xLightsFrame::ID_CHECKBOX_ColorWash1_HFade = wxNewId();
 const long xLightsFrame::ID_STATICTEXT33 = wxNewId();
 const long xLightsFrame::ID_CHECKBOX_ColorWash1_VFade = wxNewId();
 const long xLightsFrame::ID_PANEL5 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT84 = wxNewId();
+const long xLightsFrame::ID_SLIDER_Fire1_Height = wxNewId();
 const long xLightsFrame::ID_PANEL12 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT34 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Garlands1_Type = wxNewId();
@@ -232,6 +234,10 @@ const long xLightsFrame::ID_TEXTCTRL_Pictures1_Filename = wxNewId();
 const long xLightsFrame::ID_STATICTEXT46 = wxNewId();
 const long xLightsFrame::ID_CHOICE_Pictures1_Direction = wxNewId();
 const long xLightsFrame::ID_PANEL20 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT80 = wxNewId();
+const long xLightsFrame::ID_SLIDER_Snowflakes1_Count = wxNewId();
+const long xLightsFrame::ID_STATICTEXT81 = wxNewId();
+const long xLightsFrame::ID_SLIDER_Snowflakes1_Type = wxNewId();
 const long xLightsFrame::ID_PANEL22 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT45 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Snowstorm1_Count = wxNewId();
@@ -300,6 +306,8 @@ const long xLightsFrame::ID_CHECKBOX_ColorWash2_HFade = wxNewId();
 const long xLightsFrame::ID_STATICTEXT58 = wxNewId();
 const long xLightsFrame::ID_CHECKBOX_ColorWash2_VFade = wxNewId();
 const long xLightsFrame::ID_PANEL13 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT85 = wxNewId();
+const long xLightsFrame::ID_SLIDER_Fire2_Height = wxNewId();
 const long xLightsFrame::ID_PANEL15 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT59 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Garlands2_Type = wxNewId();
@@ -323,6 +331,10 @@ const long xLightsFrame::ID_TEXTCTRL_Pictures2_Filename = wxNewId();
 const long xLightsFrame::ID_STATICTEXT67 = wxNewId();
 const long xLightsFrame::ID_CHOICE_Pictures2_Direction = wxNewId();
 const long xLightsFrame::ID_PANEL23 = wxNewId();
+const long xLightsFrame::ID_STATICTEXT82 = wxNewId();
+const long xLightsFrame::ID_SLIDER_Snowflakes2_Count = wxNewId();
+const long xLightsFrame::ID_STATICTEXT83 = wxNewId();
+const long xLightsFrame::ID_SLIDER_Snowflakes2_Type = wxNewId();
 const long xLightsFrame::ID_PANEL25 = wxNewId();
 const long xLightsFrame::ID_STATICTEXT68 = wxNewId();
 const long xLightsFrame::ID_SLIDER_Snowstorm2_Count = wxNewId();
@@ -1015,6 +1027,10 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer37->SetSizeHints(Panel1_ColorWash);
     Panel1_Fire = new wxPanel(Choicebook1, ID_PANEL12, wxPoint(11,13), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL12"));
     FlexGridSizer38 = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText83 = new wxStaticText(Panel1_Fire, ID_STATICTEXT84, _("Height"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT84"));
+    FlexGridSizer38->Add(StaticText83, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    Slider_Fire1_Height = new wxSlider(Panel1_Fire, ID_SLIDER_Fire1_Height, 50, 10, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Fire1_Height"));
+    FlexGridSizer38->Add(Slider_Fire1_Height, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Panel1_Fire->SetSizer(FlexGridSizer38);
     FlexGridSizer38->Fit(Panel1_Fire);
     FlexGridSizer38->SetSizeHints(Panel1_Fire);
@@ -1080,6 +1096,14 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer42->SetSizeHints(Panel1_Pictures);
     Panel1_Snowflakes = new wxPanel(Choicebook1, ID_PANEL22, wxPoint(17,17), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL22"));
     FlexGridSizer43 = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText79 = new wxStaticText(Panel1_Snowflakes, ID_STATICTEXT80, _("Max flakes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT80"));
+    FlexGridSizer43->Add(StaticText79, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    Slider_Snowflakes1_Count = new wxSlider(Panel1_Snowflakes, ID_SLIDER_Snowflakes1_Count, 5, 1, 20, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowflakes1_Count"));
+    FlexGridSizer43->Add(Slider_Snowflakes1_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    StaticText80 = new wxStaticText(Panel1_Snowflakes, ID_STATICTEXT81, _("Type"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT81"));
+    FlexGridSizer43->Add(StaticText80, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    Slider_Snowflakes1_Type = new wxSlider(Panel1_Snowflakes, ID_SLIDER_Snowflakes1_Type, 1, 0, 5, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowflakes1_Type"));
+    FlexGridSizer43->Add(Slider_Snowflakes1_Type, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Panel1_Snowflakes->SetSizer(FlexGridSizer43);
     FlexGridSizer43->Fit(Panel1_Snowflakes);
     FlexGridSizer43->SetSizeHints(Panel1_Snowflakes);
@@ -1287,6 +1311,10 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer52->SetSizeHints(Panel2_ColorWash);
     Panel2_Fire = new wxPanel(Choicebook2, ID_PANEL15, wxPoint(13,7), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL15"));
     FlexGridSizer53 = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText84 = new wxStaticText(Panel2_Fire, ID_STATICTEXT85, _("Height"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT85"));
+    FlexGridSizer53->Add(StaticText84, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    Slider_Fire2_Height = new wxSlider(Panel2_Fire, ID_SLIDER_Fire2_Height, 50, 10, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Fire2_Height"));
+    FlexGridSizer53->Add(Slider_Fire2_Height, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Panel2_Fire->SetSizer(FlexGridSizer53);
     FlexGridSizer53->Fit(Panel2_Fire);
     FlexGridSizer53->SetSizeHints(Panel2_Fire);
@@ -1352,6 +1380,14 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer57->SetSizeHints(Panel2_Pictures);
     Panel2_Snowflakes = new wxPanel(Choicebook2, ID_PANEL25, wxPoint(10,21), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL25"));
     FlexGridSizer58 = new wxFlexGridSizer(0, 2, 0, 0);
+    StaticText81 = new wxStaticText(Panel2_Snowflakes, ID_STATICTEXT82, _("Max flakes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT82"));
+    FlexGridSizer58->Add(StaticText81, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    Slider_Snowflakes2_Count = new wxSlider(Panel2_Snowflakes, ID_SLIDER_Snowflakes2_Count, 5, 1, 20, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowflakes2_Count"));
+    FlexGridSizer58->Add(Slider_Snowflakes2_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    StaticText82 = new wxStaticText(Panel2_Snowflakes, ID_STATICTEXT83, _("Type"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT83"));
+    FlexGridSizer58->Add(StaticText82, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+    Slider_Snowflakes2_Type = new wxSlider(Panel2_Snowflakes, ID_SLIDER_Snowflakes2_Type, 1, 0, 5, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowflakes2_Type"));
+    FlexGridSizer58->Add(Slider_Snowflakes2_Type, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Panel2_Snowflakes->SetSizer(FlexGridSizer58);
     FlexGridSizer58->Fit(Panel2_Snowflakes);
     FlexGridSizer58->SetSizeHints(Panel2_Snowflakes);
@@ -2145,3 +2181,4 @@ void xLightsFrame::OnButton_ColorClick(wxCommandEvent& event)
 #include "TabConvert.cpp"
 #include "TabSchedule.cpp"
 #include "TabSequence.cpp"
+

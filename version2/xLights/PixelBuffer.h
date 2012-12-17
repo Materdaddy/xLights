@@ -212,12 +212,16 @@ public:
 
 typedef std::vector<PixelClass> PixelVector;
 typedef std::list<MeteorClass> MeteorList;
+typedef std::vector<int> FireVector;
 
 
 class PixelBufferClass : public ModelClass
 {
 private:
     PixelVector pixels; // this is the calculation buffer
+    wxColourVector snowflakes[2];
+    wxColourVector FirePalette;
+    FireVector FireBuffer[2];
 
     int sparkle_count;
     int CurrentLayer;  // 0 or 1
@@ -226,6 +230,8 @@ private:
     PaletteClass palette[2];
     wxImage image[2];
     wxString PictureName[2];
+    int LastSnowflakeCount[2];
+    int LastSnowflakeType[2];
     long state[2];
 
     void SetPixel(int x, int y, wxColour &color);
@@ -237,6 +243,11 @@ private:
     wxByte ChannelBlend(wxByte c1, wxByte c2, double ratio);
     void Get2ColorBlend(int coloridx1, int coloridx2, double ratio, wxColour &color);
     void GetMultiColorBlend(double n, bool circular, wxColour &color);
+    void SetSnowflake(int x, int y, wxColour &color);
+    void GetSnowflake(int x, int y, wxColour &color);
+    wxUint32 GetSnowflakeRGB(int x, int y);
+    void SetFireBuffer(int x, int y, int PaletteIdx);
+    int GetFireBuffer(int x, int y);
 
 public:
     PixelBufferClass();
@@ -251,12 +262,12 @@ public:
     void RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D);
     void RenderButterfly(int ColorScheme, int Style, int Chunks, int Skip);
     void RenderColorWash(bool HorizFade, bool VertFade, int RepeatCount);
-    void RenderFire();
+    void RenderFire(int HeightPct);
     void RenderGarlands(int GarlandType, int Spacing);
     void RenderLife(int Count, int Seed);
     void RenderMeteors(int MeteorType, int Count, int Length);
     void RenderPictures(int dir, const wxString& NewPictureName);
-    void RenderSnowflakes();
+    void RenderSnowflakes(int Count, int SnowflakeType);
     void RenderSnowstorm(int Count, int Length);
     void RenderSpirals(int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D);
     void RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString, int dir);

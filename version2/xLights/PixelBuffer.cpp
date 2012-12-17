@@ -26,6 +26,29 @@
 
 PixelBufferClass::PixelBufferClass()
 {
+    // initialize FirePalette[]
+    wxImage::HSVValue hsv;
+    wxImage::RGBValue rgb;
+    wxColour color;
+    int i;
+    // calc 100 reds, black to bright red
+    hsv.hue=0.0;
+    hsv.saturation=1.0;
+    for (i=0; i<100; i++) {
+        hsv.value=double(i)/100.0;
+        rgb = wxImage::HSVtoRGB(hsv);
+        color.Set(rgb.red,rgb.green,rgb.blue);
+        FirePalette.push_back(color);
+    }
+
+    // gives 100 hues red to yellow
+    hsv.value=1.0;
+    for (i=0; i<100; i++) {
+        rgb = wxImage::HSVtoRGB(hsv);
+        color.Set(rgb.red,rgb.green,rgb.blue);
+        FirePalette.push_back(color);
+        hsv.hue+=0.00166666;
+    }
 }
 
 PixelBufferClass::~PixelBufferClass()
@@ -47,6 +70,8 @@ void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
     }
     for(i=0; i<2; i++) {
         state[i]=0;
+        snowflakes[i].resize(9 * BufferHt * BufferWi);
+        FireBuffer[i].resize(BufferHt * BufferWi);
     }
 }
 
@@ -301,9 +326,68 @@ void PixelBufferClass::RenderColorWash(bool HorizFade, bool VertFade, int Repeat
     }
 }
 
-void PixelBufferClass::RenderFire()
+// 0 <= x < BufferWi
+// 0 <= y < BufferHt
+void PixelBufferClass::SetFireBuffer(int x, int y, int PaletteIdx)
 {
+    if (x >= 0 && x < BufferWi && y >= 0 && y < BufferHt) {
+        FireBuffer[CurrentLayer][y*BufferWi+x] = PaletteIdx;
+    }
+}
 
+// 0 <= x < BufferWi
+// 0 <= y < BufferHt
+int PixelBufferClass::GetFireBuffer(int x, int y)
+{
+    if (x >= 0 && x < BufferWi && y >= 0 && y < BufferHt) {
+        return FireBuffer[CurrentLayer][y*BufferWi+x];
+    }
+    return -1;
+}
+
+// 10 <= HeightPct <= 100
+void PixelBufferClass::RenderFire(int HeightPct)
+{
+    int x,y,i,r,v1,v2,v3,v4,n,new_index;
+    if (state[CurrentLayer] == 0) {
+        for (i=0; i < FireBuffer[CurrentLayer].size(); i++) {
+            FireBuffer[CurrentLayer][i]=0;
+        }
+    }
+    // build fire
+    for (x=0; x<BufferWi; x++) {
+        r=x%2==0 ? 190+(rand() % 10) : 100+(rand() % 50);
+        SetFireBuffer(x,0,r);
+    }
+    int step=255*100/BufferHt/HeightPct;
+    int sum;
+    for (y=1; y<BufferHt; y++) {
+        for (x=0; x<BufferWi; x++) {
+            v1=GetFireBuffer(x-1,y-1);
+            v2=GetFireBuffer(x+1,y-1);
+            v3=GetFireBuffer(x,y-1);
+            v4=GetFireBuffer(x,y-1);
+            n=0;
+            sum=0;
+            if(v1>=0) { sum+=v1; n++; }
+            if(v2>=0) { sum+=v2; n++; }
+            if(v3>=0) { sum+=v3; n++; }
+            if(v4>=0) { sum+=v4; n++; }
+            new_index=n > 0 ? sum / n : 0;
+            if (new_index > 0) {
+                new_index+=(rand() % 100 < 20) ? step : -step;
+                if (new_index < 0) new_index=0;
+                if (new_index >= FirePalette.size()) new_index = FirePalette.size()-1;
+            }
+            SetFireBuffer(x,y,new_index);
+        }
+    }
+    for (y=0; y<BufferHt; y++) {
+        for (x=0; x<BufferWi; x++) {
+            //SetPixel(x,y,FirePalette[y]);
+            SetPixel(x,y,FirePalette[GetFireBuffer(x,y)]);
+        }
+    }
 }
 
 void PixelBufferClass::RenderGarlands(int GarlandType, int Spacing)
@@ -468,9 +552,153 @@ void PixelBufferClass::RenderPictures(int dir, const wxString& NewPictureName)
     }
 }
 
-void PixelBufferClass::RenderSnowflakes()
+// -BufferWi <= x < 2*BufferWi
+// -BufferHt <= y < 2*BufferHt
+void PixelBufferClass::SetSnowflake(int x, int y, wxColour &color)
 {
+    x+=BufferWi;
+    y+=BufferHt;
+    if (x >= 0 && x < 3*BufferWi && y >= 0 && y < 3*BufferHt) {
+        snowflakes[CurrentLayer][y*BufferWi*3+x] = color;
+    }
+}
 
+// -BufferWi <= x < 2*BufferWi
+// -BufferHt <= y < 2*BufferHt
+void PixelBufferClass::GetSnowflake(int x, int y, wxColour &color)
+{
+    x+=BufferWi;
+    y+=BufferHt;
+    if (x >= 0 && x < 3*BufferWi && y >= 0 && y < 3*BufferHt) {
+        color = snowflakes[CurrentLayer][y*BufferWi*3+x];
+    }
+}
+
+// -BufferWi <= x < 2*BufferWi
+// -BufferHt <= y < 2*BufferHt
+wxUint32 PixelBufferClass::GetSnowflakeRGB(int x, int y)
+{
+    x+=BufferWi;
+    y+=BufferHt;
+    if (x >= 0 && x < 3*BufferWi && y >= 0 && y < 3*BufferHt) {
+        return snowflakes[CurrentLayer][y*BufferWi*3+x].GetRGB();
+    }
+    return 0;
+}
+
+void PixelBufferClass::RenderSnowflakes(int Count, int SnowflakeType)
+{
+    int i,n,x,y0,y,check,delta_y;
+    wxColour color1,color2;
+    if (state[CurrentLayer] == 0 || Count != LastSnowflakeCount[CurrentLayer] || SnowflakeType != LastSnowflakeType[CurrentLayer]) {
+        // initialize
+        LastSnowflakeCount[CurrentLayer]=Count;
+        LastSnowflakeType[CurrentLayer]=SnowflakeType;
+        palette[CurrentLayer].GetColor(0,color1);
+        palette[CurrentLayer].GetColor(1,color2);
+        for (i=0; i < snowflakes[CurrentLayer].size(); i++) {
+            snowflakes[CurrentLayer][i]=*wxBLACK;
+        }
+        // place Count snowflakes
+        for (n=0; n < Count; n++) {
+            delta_y=BufferHt/4;
+            y0=(n % 4)*delta_y;
+            if (y0+delta_y > BufferHt) delta_y = BufferHt-y0;
+            // find unused space
+            for (check=0; check < 20; check++) {
+                x=rand() % BufferWi;
+                y=y0 + (rand() % delta_y);
+                if (GetSnowflakeRGB(x,y) == 0) break;
+            }
+            // draw flake, SnowflakeType=0 is random type
+            switch (SnowflakeType == 0 ? rand() % 5 : SnowflakeType-1) {
+                case 0:
+                    // single node
+                    SetSnowflake(x,y,color1);
+                    break;
+                case 1:
+                    // 5 nodes
+                    if (x < 1) x+=1;
+                    if (y < 1) y+=1;
+                    if (x > BufferWi-2) x-=1;
+                    if (y > BufferHt-2) y-=1;
+                    SetSnowflake(x,y,color1);
+                    SetSnowflake(x-1,y,color2);
+                    SetSnowflake(x+1,y,color2);
+                    SetSnowflake(x,y-1,color2);
+                    SetSnowflake(x,y+1,color2);
+                    break;
+                case 2:
+                    // 3 nodes
+                    if (x < 1) x+=1;
+                    if (y < 1) y+=1;
+                    if (x > BufferWi-2) x-=1;
+                    if (y > BufferHt-2) y-=1;
+                    SetSnowflake(x,y,color1);
+                    if (rand() % 100 > 50) {    // % 2 was not so random
+                        SetSnowflake(x-1,y,color2);
+                        SetSnowflake(x+1,y,color2);
+                    } else {
+                        SetSnowflake(x,y-1,color2);
+                        SetSnowflake(x,y+1,color2);
+                    }
+                    break;
+                case 3:
+                    // 9 nodes
+                    if (x < 2) x+=2;
+                    if (y < 2) y+=2;
+                    if (x > BufferWi-3) x-=2;
+                    if (y > BufferHt-3) y-=2;
+                    SetSnowflake(x,y,color1);
+                    for (i=1; i<=2; i++) {
+                        SetSnowflake(x-i,y,color2);
+                        SetSnowflake(x+i,y,color2);
+                        SetSnowflake(x,y-i,color2);
+                        SetSnowflake(x,y+i,color2);
+                    }
+                    break;
+                case 4:
+                    // 13 nodes
+                    if (x < 2) x+=2;
+                    if (y < 2) y+=2;
+                    if (x > BufferWi-3) x-=2;
+                    if (y > BufferHt-3) y-=2;
+                    SetSnowflake(x,y,color1);
+                    SetSnowflake(x-1,y,color2);
+                    SetSnowflake(x+1,y,color2);
+                    SetSnowflake(x,y-1,color2);
+                    SetSnowflake(x,y+1,color2);
+
+                    SetSnowflake(x-1,y+2,color2);
+                    SetSnowflake(x+1,y+2,color2);
+                    SetSnowflake(x-1,y-2,color2);
+                    SetSnowflake(x+1,y-2,color2);
+                    SetSnowflake(x+2,y-1,color2);
+                    SetSnowflake(x+2,y+1,color2);
+                    SetSnowflake(x-2,y-1,color2);
+                    SetSnowflake(x-2,y+1,color2);
+                    break;
+                case 5:
+                    // 45 nodes (not enabled)
+                    break;
+            }
+        }
+    }
+
+    // move snowflakes
+    int new_x,new_y,new_x2,new_y2;
+    for (x=0; x<BufferWi; x++) {
+        new_x = (x+state[CurrentLayer]/20) % BufferWi; // CW
+        new_x2 = (x-state[CurrentLayer]/20) % BufferWi; // CCW
+        if (new_x2 < 0) new_x2+=BufferWi;
+        for (y=0; y<BufferHt; y++) {
+            new_y = (y+state[CurrentLayer]/10) % BufferHt;
+            new_y2 = (new_y + BufferHt/2) % BufferHt;
+            GetSnowflake(new_x,new_y,color1);
+            if (color1.GetRGB() == 0) GetSnowflake(new_x2,new_y2,color1);
+            SetPixel(x,y,color1);
+        }
+    }
 }
 
 void PixelBufferClass::RenderSnowstorm(int Count, int Length)

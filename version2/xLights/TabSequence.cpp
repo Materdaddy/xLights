@@ -539,7 +539,7 @@ void xLightsFrame::RenderEffectFromString(int layer, int period, MapStringString
                                SettingsMap[wxT("ID_CHECKBOX_ColorWash")+LayerStr+wxT("_VFade")]==wxT("1"),
                                wxAtoi(SettingsMap[wxT("ID_SLIDER_ColorWash")+LayerStr+wxT("_Count")]));
     } else if (effect == wxT("Fire")) {
-        buffer.RenderFire();
+        buffer.RenderFire(wxAtoi(SettingsMap[wxT("ID_SLIDER_Fire")+LayerStr+wxT("_Height")]));
     } else if (effect == wxT("Garlands")) {
         buffer.RenderGarlands(wxAtoi(SettingsMap[wxT("ID_SLIDER_Garlands")+LayerStr+wxT("_Type")]),
                               wxAtoi(SettingsMap[wxT("ID_SLIDER_Garlands")+LayerStr+wxT("_Spacing")]));
@@ -552,6 +552,8 @@ void xLightsFrame::RenderEffectFromString(int layer, int period, MapStringString
         buffer.RenderPictures(EffectDirections.Index(SettingsMap[wxT("ID_CHOICE_Pictures")+LayerStr+wxT("_Direction")]),
                               SettingsMap[wxT("ID_TEXTCTRL_Pictures")+LayerStr+wxT("_Filename")]);
     } else if (effect == wxT("Snowflakes")) {
+        buffer.RenderSnowflakes(wxAtoi(SettingsMap[wxT("ID_SLIDER_Snowflakes")+LayerStr+wxT("_Count")]),
+                                wxAtoi(SettingsMap[wxT("ID_SLIDER_Snowflakes")+LayerStr+wxT("_Type")]));
     } else if (effect == wxT("Snowstorm")) {
     } else if (effect == wxT("Spirals")) {
         buffer.RenderSpirals(wxAtoi(SettingsMap[wxT("ID_SLIDER_Spirals")+LayerStr+wxT("_Count")]),
@@ -581,6 +583,7 @@ void xLightsFrame::PlayRgbEffect(int EffectPeriod)
 
     if (PaletteChanged) {
         UpdateBufferPalette();
+        ResetEffectStates();
         PaletteChanged=false;
     }
     if (MixTypeChanged) {
@@ -613,7 +616,7 @@ void xLightsFrame::PlayRgbEffect(int EffectPeriod)
                                    Slider_ColorWash1_Count->GetValue());
             break;
         case 4:
-            buffer.RenderFire();
+            buffer.RenderFire(Slider_Fire1_Height->GetValue());
             break;
         case 5:
             buffer.RenderGarlands(Slider_Garlands1_Type->GetValue(),
@@ -633,7 +636,8 @@ void xLightsFrame::PlayRgbEffect(int EffectPeriod)
                                   TextCtrl_Pictures1_Filename->GetValue());
             break;
         case 9:
-            buffer.RenderSnowflakes();
+            buffer.RenderSnowflakes(Slider_Snowflakes1_Count->GetValue(),
+                                    Slider_Snowflakes1_Type->GetValue());
             break;
         case 10:
             buffer.RenderSnowstorm(Slider_Snowstorm1_Count->GetValue(),
@@ -680,7 +684,7 @@ void xLightsFrame::PlayRgbEffect(int EffectPeriod)
                                    Slider_ColorWash2_Count->GetValue());
             break;
         case 4:
-            buffer.RenderFire();
+            buffer.RenderFire(Slider_Fire2_Height->GetValue());
             break;
         case 5:
             buffer.RenderGarlands(Slider_Garlands2_Type->GetValue(),
@@ -700,7 +704,8 @@ void xLightsFrame::PlayRgbEffect(int EffectPeriod)
                                   TextCtrl_Pictures2_Filename->GetValue());
             break;
         case 9:
-            buffer.RenderSnowflakes();
+            buffer.RenderSnowflakes(Slider_Snowflakes2_Count->GetValue(),
+                                    Slider_Snowflakes2_Type->GetValue());
             break;
         case 10:
             buffer.RenderSnowstorm(Slider_Snowstorm2_Count->GetValue(),
