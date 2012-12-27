@@ -60,6 +60,8 @@
 #include "PaletteMgmtDialog.h"
 #include "SeqParmsDialog.h"
 #include "ChannelMapDialog.h"
+#include "SeqOpenDialog.h"
+#include "SeqExportDialog.h"
 #include "SeqElementMismatchDialog.h"
 #include "PixelBuffer.h"
 #include "NetInfo.h"
@@ -249,6 +251,7 @@ class xLightsFrame: public wxFrame
         void OnGrid1CellLeftClick(wxGridEvent& event);
         void OnButton_ColorClick(wxCommandEvent& event);
         void OnChoicebookEffectPageChanged(wxChoicebookEvent& event);
+        void OnButtonSeqExportClick(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(xLightsFrame)
@@ -346,6 +349,7 @@ class xLightsFrame: public wxFrame
         static const long ID_PANEL_CONVERT;
         static const long ID_SCROLLEDWINDOW1;
         static const long ID_BUTTON13;
+        static const long ID_BUTTON3;
         static const long ID_BUTTON58;
         static const long ID_CHOICE7;
         static const long ID_BUTTON59;
@@ -359,6 +363,7 @@ class xLightsFrame: public wxFrame
         static const long ID_STATICTEXT4;
         static const long ID_BUTTON_PLAY_RGB_SEQ;
         static const long ID_BUTTON2;
+        static const long ID_BUTTON_SeqExport;
         static const long ID_BUTTON1;
         static const long ID_BITMAPBUTTON7;
         static const long ID_BITMAPBUTTON9;
@@ -797,6 +802,7 @@ class xLightsFrame: public wxFrame
         wxStaticText* StaticText54;
         wxCheckBox* CheckBox_Palette1_5;
         wxStaticText* StaticText7;
+        wxButton* Button_UpdateGrid;
         wxFlexGridSizer* FlexGridSizer_Palette2;
         wxBitmapButton* BitmapButtonMoveNetworkDown;
         wxButton* Button_Presets;
@@ -893,6 +899,7 @@ class xLightsFrame: public wxFrame
         wxButton* Button_PresetAdd;
         wxRadioButton* RadioButtonRgbChaseOff;
         wxStaticText* StaticText82;
+        wxButton* ButtonSeqExport;
         wxStaticText* StaticText51;
         wxStaticText* StaticText33;
         wxPanel* Panel2_Pictures;
@@ -993,9 +1000,10 @@ class xLightsFrame: public wxFrame
         void ReadConductorFile(const wxString& FileName);
         void SetMediaFilename(const wxString& filename);
         int GetLorTrack1Length(const char* filename);
-        void WriteVixenFile(const wxString& filename);
+        bool WriteVixenFile(const wxString& filename);
         void WriteXLightsFile(const wxString& filename);
         void WriteConductorFile(const wxString& filename);
+        void WriteLorFile(const wxString& filename);
         void ClearLastPeriod();
         void ConversionInit();
         void DoConversion(const wxString& FileName, const wxString& OutputFormat);
@@ -1103,6 +1111,8 @@ class xLightsFrame: public wxFrame
         void EnableSequenceControls(bool enable);
         void UpdateFont(wxTextCtrl* FontCtrl);
         void ResetEffectStates();
+        void SeqLoadXlightsFile(const wxString& filename);
+        void RenderGridToSeqData();
 
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;

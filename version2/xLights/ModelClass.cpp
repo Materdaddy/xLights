@@ -96,6 +96,7 @@ void ModelClass::InitVMatrix()
             idx=stringnum * parm2 + segmentnum * PixelsPerStrand + y;
             Nodes[idx].bufX=IsLtoR ? x : NumStrands-x-1;
             Nodes[idx].bufY=(segmentnum % 2 == 0) ? y : PixelsPerStrand-y-1;
+            Nodes[idx].StringNum=stringnum;
         }
     }
 }
@@ -150,6 +151,7 @@ void ModelClass::InitHMatrix()
             idx=stringnum * parm2 + segmentnum * PixelsPerStrand + x;
             Nodes[idx].bufX=IsLtoR != (segmentnum % 2 == 0) ? PixelsPerStrand-x-1 : x;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=stringnum;
         }
     }
 }
@@ -169,6 +171,7 @@ void ModelClass::InitLine()
         for(x=0; x<parm2; x++) {
             Nodes[idx].bufX=IsLtoR ? x : parm2-x-1;
             Nodes[idx].bufY=0;
+            Nodes[idx].StringNum=ns;
             idx++;
         }
     }
@@ -234,6 +237,7 @@ void ModelClass::InitFrame()
         for(y=0; y<parm2; y++) {
             Nodes[idx].bufX=x;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=0;
             idx++;
         }
         // across top
@@ -241,6 +245,7 @@ void ModelClass::InitFrame()
         for(x=0; x<parm1; x++) {
             Nodes[idx].bufX=IsLtoR ? x+1 : parm1-x;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=0;
             idx++;
         }
         // down side 2
@@ -248,6 +253,7 @@ void ModelClass::InitFrame()
         for(y=parm2-1; y>=0; y--) {
             Nodes[idx].bufX=x;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=0;
             idx++;
         }
         // across bottom
@@ -255,6 +261,7 @@ void ModelClass::InitFrame()
         for(x=0; x<parm3; x++) {
             Nodes[idx].bufX=IsLtoR ? parm1-x : x+1;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=0;
             idx++;
         }
     } else {
@@ -266,6 +273,7 @@ void ModelClass::InitFrame()
         for(y=parm2-1; y>=0; y--) {
             Nodes[idx].bufX=x;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=0;
             idx++;
         }
         // across bottom
@@ -273,6 +281,7 @@ void ModelClass::InitFrame()
         for(x=0; x<parm3; x++) {
             Nodes[idx].bufX=IsLtoR ? x+1: parm3-x;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=0;
             idx++;
         }
         // up side 2
@@ -280,6 +289,7 @@ void ModelClass::InitFrame()
         for(y=0; y<parm2; y++) {
             Nodes[idx].bufX=x;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=0;
             idx++;
         }
         // across top
@@ -287,6 +297,7 @@ void ModelClass::InitFrame()
         for(x=0; x<parm1; x++) {
             Nodes[idx].bufX=IsLtoR ? parm3-x : x+1;
             Nodes[idx].bufY=y;
+            Nodes[idx].StringNum=0;
             idx++;
         }
     }

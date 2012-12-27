@@ -28,6 +28,7 @@
 #include <wx/xml/xml.h>
 #include <wx/gdicmn.h>
 #include <wx/colour.h>
+#include <stdint.h>
 
 class RgbNodeClass
 {
@@ -39,6 +40,7 @@ public:
     wxCoord bufX, bufY, screenX, screenY;
     size_t bufIdx;
     int sparkle;
+    int StringNum; // node is part of this string # - used only for reporting purposes
 
     void SetColor(wxColour& color)
     {

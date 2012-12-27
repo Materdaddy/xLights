@@ -14,6 +14,8 @@ class PlayerFrame: public wxFrame
 		PlayerFrame(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
 		virtual ~PlayerFrame();
         wxMediaCtrl* MediaCtrl;
+        bool Load(const wxString& filename);
+        bool Play(const wxString& filename);
 
 		//(*Declarations(PlayerFrame)
 		//*)
@@ -30,6 +32,8 @@ class PlayerFrame: public wxFrame
 		//*)
 
 		static const long wxID_MEDIACTRL;
+		bool PlayAfterLoad;
+        void OnMediaLoaded(wxMediaEvent& event);
 
 		DECLARE_EVENT_TABLE()
 };

@@ -166,6 +166,7 @@ const long xLightsFrame::ID_TEXTCTRL_CONVERSION_STATUS = wxNewId();
 const long xLightsFrame::ID_PANEL_CONVERT = wxNewId();
 const long xLightsFrame::ID_SCROLLEDWINDOW1 = wxNewId();
 const long xLightsFrame::ID_BUTTON13 = wxNewId();
+const long xLightsFrame::ID_BUTTON3 = wxNewId();
 const long xLightsFrame::ID_BUTTON58 = wxNewId();
 const long xLightsFrame::ID_CHOICE7 = wxNewId();
 const long xLightsFrame::ID_BUTTON59 = wxNewId();
@@ -179,6 +180,7 @@ const long xLightsFrame::ID_SLIDER_SparkleFrequency = wxNewId();
 const long xLightsFrame::ID_STATICTEXT4 = wxNewId();
 const long xLightsFrame::ID_BUTTON_PLAY_RGB_SEQ = wxNewId();
 const long xLightsFrame::ID_BUTTON2 = wxNewId();
+const long xLightsFrame::ID_BUTTON_SeqExport = wxNewId();
 const long xLightsFrame::ID_BUTTON1 = wxNewId();
 const long xLightsFrame::ID_BITMAPBUTTON7 = wxNewId();
 const long xLightsFrame::ID_BITMAPBUTTON9 = wxNewId();
@@ -828,6 +830,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     ChoiceOutputFormat->SetSelection( ChoiceOutputFormat->Append(_("xLights Sequence")) );
     ChoiceOutputFormat->Append(_("Lynx Conductor"));
     ChoiceOutputFormat->Append(_("Vixen 2.1"));
+    ChoiceOutputFormat->Append(_("LOR Sequence"));
     FlexGridSizer26->Add(ChoiceOutputFormat, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText20 = new wxStaticText(PanelConvert, ID_STATICTEXT20, _("Save channel names:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT20"));
     StaticText20->Hide();
@@ -876,7 +879,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Button_PlayEffect->Disable();
     Button_PlayEffect->SetBackgroundColour(wxColour(0,255,0));
     FlexGridSizer33->Add(Button_PlayEffect, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer33->Add(-1,-1,1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Button_UpdateGrid = new wxButton(PanelSequence, ID_BUTTON3, _("Update Grid"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    Button_UpdateGrid->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer33->Add(Button_UpdateGrid, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Button_Models = new wxButton(PanelSequence, ID_BUTTON58, _("Models"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON58"));
     Button_Models->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer33->Add(Button_Models, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -890,7 +895,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Button_PresetAdd = new wxButton(PanelSequence, ID_BUTTON9, _("New Preset"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON9"));
     Button_PresetAdd->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer33->Add(Button_PresetAdd, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    Button_PresetUpdate = new wxButton(PanelSequence, ID_BUTTON8, _("Update"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
+    Button_PresetUpdate = new wxButton(PanelSequence, ID_BUTTON8, _("Update Preset"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     Button_PresetUpdate->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer33->Add(Button_PresetUpdate, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText21 = new wxStaticText(PanelSequence, ID_STATICTEXT23, _("Layer Method"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT23"));
@@ -927,6 +932,9 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     ButtonDisplayElements = new wxButton(PanelSequence, ID_BUTTON2, _("Display Elements"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     ButtonDisplayElements->SetBackgroundColour(wxColour(224,224,224));
     FlexGridSizer68->Add(ButtonDisplayElements, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    ButtonSeqExport = new wxButton(PanelSequence, ID_BUTTON_SeqExport, _("Export"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_SeqExport"));
+    ButtonSeqExport->SetBackgroundColour(wxColour(224,224,224));
+    FlexGridSizer68->Add(ButtonSeqExport, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_ChannelMap = new wxButton(PanelSequence, ID_BUTTON1, _("Channel Map"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     Button_ChannelMap->Disable();
     Button_ChannelMap->Hide();
@@ -1051,11 +1059,11 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer40 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticText35 = new wxStaticText(Panel1_Life, ID_STATICTEXT36, _("Cells to start"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT36"));
     FlexGridSizer40->Add(StaticText35, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Life1_Count = new wxSlider(Panel1_Life, ID_SLIDER_Life1_Count, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Life1_Count"));
+    Slider_Life1_Count = new wxSlider(Panel1_Life, ID_SLIDER_Life1_Count, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Life1_Count"));
     FlexGridSizer40->Add(Slider_Life1_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    StaticText37 = new wxStaticText(Panel1_Life, ID_STATICTEXT37, _("Seed"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT37"));
+    StaticText37 = new wxStaticText(Panel1_Life, ID_STATICTEXT37, _("Type"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT37"));
     FlexGridSizer40->Add(StaticText37, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Life1_Seed = new wxSlider(Panel1_Life, ID_SLIDER_Life1_Seed, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Life1_Seed"));
+    Slider_Life1_Seed = new wxSlider(Panel1_Life, ID_SLIDER_Life1_Seed, 0, 0, 4, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Life1_Seed"));
     FlexGridSizer40->Add(Slider_Life1_Seed, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Panel1_Life->SetSizer(FlexGridSizer40);
     FlexGridSizer40->Fit(Panel1_Life);
@@ -1111,11 +1119,11 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer44 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticText45 = new wxStaticText(Panel1_Snowstorm, ID_STATICTEXT45, _("Max flakes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT45"));
     FlexGridSizer44->Add(StaticText45, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Snowstorm1_Count = new wxSlider(Panel1_Snowstorm, ID_SLIDER_Snowstorm1_Count, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowstorm1_Count"));
+    Slider_Snowstorm1_Count = new wxSlider(Panel1_Snowstorm, ID_SLIDER_Snowstorm1_Count, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowstorm1_Count"));
     FlexGridSizer44->Add(Slider_Snowstorm1_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText51 = new wxStaticText(Panel1_Snowstorm, ID_STATICTEXT51, _("Trail Length"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT51"));
     FlexGridSizer44->Add(StaticText51, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Snowstorm1_Length = new wxSlider(Panel1_Snowstorm, ID_SLIDER_Snowstorm1_Length, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowstorm1_Length"));
+    Slider_Snowstorm1_Length = new wxSlider(Panel1_Snowstorm, ID_SLIDER_Snowstorm1_Length, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowstorm1_Length"));
     FlexGridSizer44->Add(Slider_Snowstorm1_Length, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Panel1_Snowstorm->SetSizer(FlexGridSizer44);
     FlexGridSizer44->Fit(Panel1_Snowstorm);
@@ -1335,11 +1343,11 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer55 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticText60 = new wxStaticText(Panel2_Life, ID_STATICTEXT62, _("Cells to start"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT62"));
     FlexGridSizer55->Add(StaticText60, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Life2_Count = new wxSlider(Panel2_Life, ID_SLIDER_Life2_Count, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Life2_Count"));
+    Slider_Life2_Count = new wxSlider(Panel2_Life, ID_SLIDER_Life2_Count, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Life2_Count"));
     FlexGridSizer55->Add(Slider_Life2_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    StaticText61 = new wxStaticText(Panel2_Life, ID_STATICTEXT63, _("Seed"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT63"));
+    StaticText61 = new wxStaticText(Panel2_Life, ID_STATICTEXT63, _("Type"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT63"));
     FlexGridSizer55->Add(StaticText61, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Life2_Seed = new wxSlider(Panel2_Life, ID_SLIDER_Life2_Seed, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Life2_Seed"));
+    Slider_Life2_Seed = new wxSlider(Panel2_Life, ID_SLIDER_Life2_Seed, 0, 0, 4, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Life2_Seed"));
     FlexGridSizer55->Add(Slider_Life2_Seed, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Panel2_Life->SetSizer(FlexGridSizer55);
     FlexGridSizer55->Fit(Panel2_Life);
@@ -1395,11 +1403,11 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer59 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticText66 = new wxStaticText(Panel2_Snowstorm, ID_STATICTEXT68, _("Max flakes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT68"));
     FlexGridSizer59->Add(StaticText66, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Snowstorm2_Count = new wxSlider(Panel2_Snowstorm, ID_SLIDER_Snowstorm2_Count, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowstorm2_Count"));
+    Slider_Snowstorm2_Count = new wxSlider(Panel2_Snowstorm, ID_SLIDER_Snowstorm2_Count, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowstorm2_Count"));
     FlexGridSizer59->Add(Slider_Snowstorm2_Count, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText67 = new wxStaticText(Panel2_Snowstorm, ID_STATICTEXT69, _("Trail Length"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT69"));
     FlexGridSizer59->Add(StaticText67, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Snowstorm2_Length = new wxSlider(Panel2_Snowstorm, ID_SLIDER_Snowstorm2_Length, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowstorm2_Length"));
+    Slider_Snowstorm2_Length = new wxSlider(Panel2_Snowstorm, ID_SLIDER_Snowstorm2_Length, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Snowstorm2_Length"));
     FlexGridSizer59->Add(Slider_Snowstorm2_Length, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     Panel2_Snowstorm->SetSizer(FlexGridSizer59);
     FlexGridSizer59->Fit(Panel2_Snowstorm);
@@ -1716,6 +1724,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_BUTTON_CHOOSE_FILE,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonChooseFileClick);
     Connect(ID_BUTTON_START_CONVERSION,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonStartConversionClick);
     Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayEffectClick);
+    Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_UpdateGridClick);
     Connect(ID_BUTTON58,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ModelsClick);
     Connect(ID_BUTTON59,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PresetsClick);
     Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_PresetsSelect);
@@ -1724,6 +1733,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_CHOICE_LayerMethod,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&xLightsFrame::OnChoice_LayerMethodSelect);
     Connect(ID_BUTTON_PLAY_RGB_SEQ,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_PlayAllClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonDisplayElementsClick);
+    Connect(ID_BUTTON_SeqExport,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButtonSeqExportClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnButton_ChannelMapClick);
     Connect(ID_BITMAPBUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonOpenSeqClick);
     Connect(ID_BITMAPBUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&xLightsFrame::OnBitmapButtonSaveSeqClick);
@@ -1811,7 +1821,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     itemCol.SetAlign(wxLIST_FORMAT_LEFT);
     GridNetwork->InsertColumn(4, itemCol);
 
-    itemCol.SetText(_T("Vixen Mapping"));
+    itemCol.SetText(_T("xLights/Vixen Mapping"));
     itemCol.SetAlign(wxLIST_FORMAT_LEFT);
     GridNetwork->InsertColumn(5, itemCol);
 

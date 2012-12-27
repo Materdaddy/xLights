@@ -19,7 +19,7 @@ distributions will vary.
 
   a) Using Software Manager, install these packages: g++, subversion
 
-  b) Using Software Manager, install libwxgtk2.8-dev (easier) OR download and compile wxWidgets 2.9.3 (more challenging)
+  b) Using Software Manager, install libwxgtk2.8-dev (easier) OR download and compile wxWidgets 2.9.4 (more challenging)
 
   c) Get the xLights source code by opening a terminal window and typing the following:
 

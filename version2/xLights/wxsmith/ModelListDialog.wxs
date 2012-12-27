@@ -60,7 +60,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxButton" name="ID_BUTTON_LAYOUT" variable="Button_Layout" member="yes">
-									<label>Channel Layout</label>
+									<label>Node Layout</label>
 									<handler function="OnButton_LayoutClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

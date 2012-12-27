@@ -22,33 +22,9 @@
 **************************************************************/
 
 #include "PixelBuffer.h"
-#include <cmath>
 
 PixelBufferClass::PixelBufferClass()
 {
-    // initialize FirePalette[]
-    wxImage::HSVValue hsv;
-    wxImage::RGBValue rgb;
-    wxColour color;
-    int i;
-    // calc 100 reds, black to bright red
-    hsv.hue=0.0;
-    hsv.saturation=1.0;
-    for (i=0; i<100; i++) {
-        hsv.value=double(i)/100.0;
-        rgb = wxImage::HSVtoRGB(hsv);
-        color.Set(rgb.red,rgb.green,rgb.blue);
-        FirePalette.push_back(color);
-    }
-
-    // gives 100 hues red to yellow
-    hsv.value=1.0;
-    for (i=0; i<100; i++) {
-        rgb = wxImage::HSVtoRGB(hsv);
-        color.Set(rgb.red,rgb.green,rgb.blue);
-        FirePalette.push_back(color);
-        hsv.hue+=0.00166666;
-    }
 }
 
 PixelBufferClass::~PixelBufferClass()
@@ -59,7 +35,6 @@ void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
 {
     size_t i;
     SetFromXml(ModelNode);
-    pixels.resize(BufferHt * BufferWi);
     size_t NodeCount=GetNodeCount();
     uint8_t offset_r=RGBorder.find(wxT("R"));
     uint8_t offset_g=RGBorder.find(wxT("G"));
@@ -69,65 +44,15 @@ void PixelBufferClass::InitBuffer(wxXmlNode* ModelNode)
         Nodes[i].sparkle = rand() % 10000;
     }
     for(i=0; i<2; i++) {
-        state[i]=0;
-        snowflakes[i].resize(9 * BufferHt * BufferWi);
-        FireBuffer[i].resize(BufferHt * BufferWi);
+        Effect[i].InitBuffer(BufferHt, BufferWi);
     }
-}
-
-// return a random number between 0 and 1 inclusive
-double PixelBufferClass::rand01()
-{
-    return (double)rand()/(double)RAND_MAX;
-}
-
-// generates a random number between num1 and num2 inclusive
-double PixelBufferClass::RandomRange(double num1, double num2)
-{
-    double hi,lo;
-    if (num1 < num2) {
-        lo = num1;
-        hi = num2;
-    } else {
-        lo = num2;
-        hi = num1;
-    }
-    return rand01()*(hi-lo)+ lo;
-}
-
-// sets newcolor to a random color between hsv1 and hsv2
-void PixelBufferClass::SetRangeColor(const wxImage::HSVValue& hsv1, const wxImage::HSVValue& hsv2, wxImage::HSVValue& newhsv)
-{
-    newhsv.hue=RandomRange(hsv1.hue,hsv2.hue);
-    newhsv.saturation=RandomRange(hsv1.saturation,hsv2.saturation);
-    newhsv.value=1.0;
-}
-
-void PixelBufferClass::Color2HSV(const wxColour& color, wxImage::HSVValue& hsv)
-{
-    wxImage::RGBValue rgb(color.Red(),color.Green(),color.Blue());
-    hsv=wxImage::RGBtoHSV(rgb);
-}
-
-// 0,0 is lower left
-void PixelBufferClass::SetPixel(int x, int y, wxColour &color)
-{
-    if (x >= 0 && x < BufferWi && y >= 0 && y < BufferHt) {
-        pixels[y*BufferWi+x].SetColor(CurrentLayer,color);
-    }
-}
-
-void PixelBufferClass::SetPixel(int x, int y, wxImage::HSVValue& hsv)
-{
-    wxImage::RGBValue rgb = wxImage::HSVtoRGB(hsv);
-    wxColour color(rgb.red,rgb.green,rgb.blue);
-    SetPixel(x,y,color);
 }
 
 void PixelBufferClass::Clear()
 {
-    for(size_t i=0; i<pixels.size(); i++) {
-        pixels[i].Clear();
+    wxColour bgColor=*wxBLACK;
+    for(size_t i=0; i<2; i++) {
+        Effect[i].Clear(bgColor);
     }
 }
 
@@ -153,47 +78,79 @@ void PixelBufferClass::SetMixType(const wxString& MixName)
     }
 }
 
+void PixelBufferClass::GetMixedColor(wxCoord x, wxCoord y, wxColour& c)
+{
+    wxColour c0,c1;
+    Effect[0].GetPixel(x,y,c0);
+    Effect[1].GetPixel(x,y,c1);
+    switch (MixType)
+    {
+        case Mix_Effect1:
+            c=c0;
+            break;
+        case Mix_Effect2:
+            c=c1;
+            break;
+        case Mix_Mask1:
+            // first masks second
+            if (c0.GetRGB() == 0) {
+                c=c1;
+            } else {
+                c.Set(0);
+            }
+            break;
+        case Mix_Mask2:
+            // second masks first
+            if (c1.GetRGB() == 0) {
+                c=c0;
+            } else {
+                c.Set(0);
+            }
+            break;
+        case Mix_Unmask1:
+            // first unmasks second
+            if (c0.GetRGB() != 0) {
+                c=c1;
+            } else {
+                c.Set(0);
+            }
+            break;
+        case Mix_Unmask2:
+            // second unmasks first
+            if (c1.GetRGB() != 0) {
+                c=c0;
+            } else {
+                c.Set(0);
+            }
+            break;
+        case Mix_Layered:
+            if (c1.GetRGB() == 0) {
+                c=c0;
+            } else {
+                c=c1;
+            }
+            break;
+        case Mix_Average:
+            // only average when both colors are non-black
+            if (c0.GetRGB() == 0) {
+                c=c1;
+            } else if (c1.GetRGB() == 0) {
+                c=c0;
+            } else {
+                c.Set( (c0.Red()+c1.Red())/2, (c0.Green()+c1.Green())/2, (c0.Blue()+c1.Blue())/2 );
+            }
+            break;
+    }
+}
+
 void PixelBufferClass::SetPalette(int layer, wxColourVector& newcolors)
 {
-    palette[layer].Set(newcolors);
+    Effect[layer].SetPalette(newcolors);
 }
 
 size_t PixelBufferClass::GetColorCount(int layer)
 {
-    size_t colorcnt=palette[layer].Size();
-    if (colorcnt < 1) colorcnt=1;
-    return colorcnt;
-}
-
-// return a value between c1 and c2
-wxByte PixelBufferClass::ChannelBlend(wxByte c1, wxByte c2, double ratio)
-{
-    return c1 + floor(ratio*(c2-c1)+0.5);
-}
-
-void PixelBufferClass::Get2ColorBlend(int coloridx1, int coloridx2, double ratio, wxColour &color)
-{
-    wxColour c1,c2;
-    palette[CurrentLayer].GetColor(coloridx1,c1);
-    palette[CurrentLayer].GetColor(coloridx2,c2);
-    color.Set(ChannelBlend(c1.Red(),c2.Red(),ratio), ChannelBlend(c1.Green(),c2.Green(),ratio), ChannelBlend(c1.Blue(),c2.Blue(),ratio));
-}
-
-// 0 <= n < 1
-void PixelBufferClass::GetMultiColorBlend(double n, bool circular, wxColour &color)
-{
-    size_t colorcnt=GetColorCount(CurrentLayer);
-    if (colorcnt <= 1) {
-        palette[CurrentLayer].GetColor(0,color);
-        return;
-    }
-    if (n >= 1.0) n=0.99999;
-    if (n < 0.0) n=0.0;
-    double realidx=circular ? n*colorcnt : n*(colorcnt-1);
-    int coloridx1=floor(realidx);
-    int coloridx2=(coloridx1+1) % colorcnt;
-    double ratio=realidx-double(coloridx1);
-    Get2ColorBlend(coloridx1,coloridx2,ratio,color);
+    return Effect[layer].GetColorCount();
 }
 
 // 10-200 or so, or 0 for no sparkle
@@ -207,593 +164,11 @@ void PixelBufferClass::SetLayer(int newlayer, int period, int speed, bool ResetS
     static int lastperiod = 0;
     CurrentLayer=newlayer & 1;  // only 0 or 1 is allowed
     if (ResetState) {
-        state[CurrentLayer]=0;
+        Effect[CurrentLayer].ResetState();
     } else {
-        state[CurrentLayer]+=(period-lastperiod) * speed;
+        Effect[CurrentLayer].AddState((period-lastperiod) * speed);
     }
     lastperiod=period;
-}
-
-void PixelBufferClass::RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D)
-{
-    int x,y,n,pixel_ratio,ColorIdx;
-    bool IsMovingDown,IsHighlightRow;
-    wxImage::HSVValue hsv;
-    size_t colorcnt=GetColorCount(CurrentLayer);
-    int BarCount = PaletteRepeat * colorcnt;
-    int BarHt = BufferHt/BarCount+1;
-    int HalfHt = BufferHt/2;
-    int BlockHt=colorcnt * BarHt;
-    int f_offset = state[CurrentLayer]/4 % BlockHt;
-    for (y=0; y<BufferHt; y++) {
-        switch (Direction) {
-            case 1: IsMovingDown=true; break;
-            case 2: IsMovingDown=(y <= HalfHt); break;
-            case 3: IsMovingDown=(y > HalfHt); break;
-            default: IsMovingDown=false; break;
-        }
-        if (IsMovingDown) {
-            n=y+f_offset;
-            pixel_ratio = BarHt - n%BarHt - 1;
-            IsHighlightRow=n % BarHt == 0;
-        } else {
-            n=y-f_offset+BlockHt;
-            pixel_ratio = n%BarHt;
-            IsHighlightRow=(n % BarHt == BarHt-1); // || (y == BufferHt-1);
-        }
-        ColorIdx=(n % BlockHt) / BarHt;
-        palette[CurrentLayer].GetHSV(ColorIdx, hsv);
-        if (Highlight && IsHighlightRow) hsv.saturation=0.0;
-        if (Show3D) hsv.value *= double(pixel_ratio) / BarHt;
-        for (x=0; x<BufferWi; x++) {
-            SetPixel(x,y,hsv);
-        }
-    }
-}
-
-void PixelBufferClass::RenderButterfly(int ColorScheme, int Style, int Chunks, int Skip)
-{
-    int x,y,d;
-    double n,x1,y1,f;
-    double h=0.0;
-    static const double pi2=6.283185307;
-    wxColour color;
-    wxImage::HSVValue hsv;
-    int maxframe=BufferHt*2;
-    int frame=(BufferHt * state[CurrentLayer] / 200)%maxframe;
-    double offset=double(state[CurrentLayer])/100.0;
-
-    for (x=0; x<BufferWi; x++) {
-        for (y=0; y<BufferHt; y++) {
-            switch (Style) {
-                case 1:
-                    n = abs((x*x - y*y) * sin (offset + ((x+y)*pi2 / (BufferHt+BufferWi))));
-                    d = x*x + y*y+1;
-                    h=n/d;
-                    break;
-                case 2:
-                    f=(frame < maxframe/2) ? frame+1 : maxframe - frame;
-                    x1=(double(x)-BufferWi/2.0)/f;
-                    y1=(double(y)-BufferHt/2.0)/f;
-                    h=sqrt(x1*x1+y1*y1);
-                    break;
-                case 3:
-                    f=(frame < maxframe/2) ? frame+1 : maxframe - frame;
-                    f=f*0.1+double(BufferHt)/60.0;
-                    x1 = (x-BufferWi/2.0)/f;
-                    y1 = (y-BufferHt/2.0)/f;
-                    h=sin(x1) * cos(y1);
-                    break;
-            }
-            hsv.saturation=1.0;
-            hsv.value=1.0;
-            if (Chunks <= 1 || int(h*Chunks) % Skip != 0) {
-                if (ColorScheme == 0) {
-                    hsv.hue=h;
-                    SetPixel(x,y,hsv);
-                } else {
-                    GetMultiColorBlend(h,false,color);
-                    SetPixel(x,y,color);
-                }
-            }
-        }
-    }
-}
-
-void PixelBufferClass::RenderColorWash(bool HorizFade, bool VertFade, int RepeatCount)
-{
-    static int SpeedFactor=200;
-    int x,y;
-    wxColour color;
-    wxImage::HSVValue hsv,hsv2;
-    size_t colorcnt=GetColorCount(CurrentLayer);
-    int CycleLen=colorcnt*SpeedFactor;
-    if (state[CurrentLayer] > (colorcnt-1)*SpeedFactor*RepeatCount && RepeatCount < 10) {
-        GetMultiColorBlend(double(RepeatCount%2), false, color);
-    } else {
-        GetMultiColorBlend(double(state[CurrentLayer] % CycleLen) / double(CycleLen), true, color);
-    }
-    Color2HSV(color,hsv);
-    double HalfHt=double(BufferHt-1)/2.0;
-    double HalfWi=double(BufferWi-1)/2.0;
-    for (x=0; x<BufferWi; x++) {
-        for (y=0; y<BufferHt; y++) {
-            hsv2=hsv;
-            if (HorizFade) hsv2.value*=1.0-abs(HalfWi-x)/HalfWi;
-            if (VertFade) hsv2.value*=1.0-abs(HalfHt-y)/HalfHt;
-            SetPixel(x,y,hsv2);
-        }
-    }
-}
-
-// 0 <= x < BufferWi
-// 0 <= y < BufferHt
-void PixelBufferClass::SetFireBuffer(int x, int y, int PaletteIdx)
-{
-    if (x >= 0 && x < BufferWi && y >= 0 && y < BufferHt) {
-        FireBuffer[CurrentLayer][y*BufferWi+x] = PaletteIdx;
-    }
-}
-
-// 0 <= x < BufferWi
-// 0 <= y < BufferHt
-int PixelBufferClass::GetFireBuffer(int x, int y)
-{
-    if (x >= 0 && x < BufferWi && y >= 0 && y < BufferHt) {
-        return FireBuffer[CurrentLayer][y*BufferWi+x];
-    }
-    return -1;
-}
-
-// 10 <= HeightPct <= 100
-void PixelBufferClass::RenderFire(int HeightPct)
-{
-    int x,y,i,r,v1,v2,v3,v4,n,new_index;
-    if (state[CurrentLayer] == 0) {
-        for (i=0; i < FireBuffer[CurrentLayer].size(); i++) {
-            FireBuffer[CurrentLayer][i]=0;
-        }
-    }
-    // build fire
-    for (x=0; x<BufferWi; x++) {
-        r=x%2==0 ? 190+(rand() % 10) : 100+(rand() % 50);
-        SetFireBuffer(x,0,r);
-    }
-    int step=255*100/BufferHt/HeightPct;
-    int sum;
-    for (y=1; y<BufferHt; y++) {
-        for (x=0; x<BufferWi; x++) {
-            v1=GetFireBuffer(x-1,y-1);
-            v2=GetFireBuffer(x+1,y-1);
-            v3=GetFireBuffer(x,y-1);
-            v4=GetFireBuffer(x,y-1);
-            n=0;
-            sum=0;
-            if(v1>=0) { sum+=v1; n++; }
-            if(v2>=0) { sum+=v2; n++; }
-            if(v3>=0) { sum+=v3; n++; }
-            if(v4>=0) { sum+=v4; n++; }
-            new_index=n > 0 ? sum / n : 0;
-            if (new_index > 0) {
-                new_index+=(rand() % 100 < 20) ? step : -step;
-                if (new_index < 0) new_index=0;
-                if (new_index >= FirePalette.size()) new_index = FirePalette.size()-1;
-            }
-            SetFireBuffer(x,y,new_index);
-        }
-    }
-    for (y=0; y<BufferHt; y++) {
-        for (x=0; x<BufferWi; x++) {
-            //SetPixel(x,y,FirePalette[y]);
-            SetPixel(x,y,FirePalette[GetFireBuffer(x,y)]);
-        }
-    }
-}
-
-void PixelBufferClass::RenderGarlands(int GarlandType, int Spacing)
-{
-    int x,y,yadj,ylimit,ring;
-    double ratio;
-    wxColour color;
-    int PixelSpacing=Spacing*BufferHt/100+3;
-    int limit=BufferHt*PixelSpacing*4;
-    int GarlandsState=(limit - (state[CurrentLayer] % limit))/4;
-    // ring=0 is the top ring
-    for (ring=0; ring<BufferHt; ring++) {
-        ratio=double(ring)/double(BufferHt);
-        GetMultiColorBlend(ratio, false, color);
-        y=GarlandsState - ring*PixelSpacing;
-        ylimit=BufferHt-ring-1;
-        for (x=0; x<BufferWi; x++) {
-            yadj=y;
-            switch (GarlandType) {
-                case 1:
-                    switch (x%5) {
-                        case 2: yadj-=2; break;
-                        case 1:
-                        case 3: yadj-=1; break;
-                    }
-                    break;
-                case 2:
-                    switch (x%5) {
-                        case 2: yadj-=4; break;
-                        case 1:
-                        case 3: yadj-=2; break;
-                    }
-                    break;
-                case 3:
-                    switch (x%6) {
-                        case 3: yadj-=6; break;
-                        case 2:
-                        case 4: yadj-=4; break;
-                        case 1:
-                        case 5: yadj-=2; break;
-                    }
-                    break;
-                case 4:
-                    switch (x%5) {
-                        case 1:
-                        case 3: yadj-=2; break;
-                    }
-                    break;
-            }
-            if (yadj < ylimit) yadj=ylimit;
-            if (yadj < BufferHt) SetPixel(x,yadj,color);
-        }
-    }
-}
-
-void PixelBufferClass::RenderLife(int Count, int Seed)
-{
-
-}
-
-void PixelBufferClass::RenderMeteors(int MeteorType, int Count, int Length)
-{
-    int mspeed=state[CurrentLayer]/4;
-    state[CurrentLayer]-=mspeed*4;
-
-    // create new meteors
-    MeteorClass m;
-    wxImage::HSVValue hsv,hsv0,hsv1;
-    palette[CurrentLayer].GetHSV(0,hsv0);
-    palette[CurrentLayer].GetHSV(1,hsv1);
-    size_t colorcnt=GetColorCount(CurrentLayer);
-    Count=BufferWi * Count / 100;
-    int TailLength=(BufferHt < 10) ? Length / 10 : BufferHt * Length / 100;
-    if (TailLength < 1) TailLength=1;
-    int TailStart=BufferHt - TailLength;
-    if (TailStart < 1) TailStart=1;
-    for(int i=0; i<Count; i++) {
-        m.x=rand() % BufferWi;
-        m.y=BufferHt - 1 - rand() % TailStart;
-        switch (MeteorType) {
-            case 1:
-                SetRangeColor(hsv0,hsv1,m.hsv);
-                break;
-            case 2:
-                palette[CurrentLayer].GetHSV(rand()%colorcnt, m.hsv);
-                break;
-        }
-        meteors[CurrentLayer].push_back(m);
-    }
-
-    // render meteors
-    for (MeteorList::iterator it=meteors[CurrentLayer].begin(); it!=meteors[CurrentLayer].end(); ++it) {
-        for(int ph=0; ph<TailLength; ph++) {
-            switch (MeteorType) {
-                case 0:
-                    hsv.hue=double(rand() % 1000) / 1000.0;
-                    hsv.saturation=1.0;
-                    hsv.value=1.0;
-                    break;
-                default:
-                    hsv=it->hsv;
-                    break;
-            }
-            hsv.value*=1.0 - double(ph)/TailLength;
-            SetPixel(it->x,it->y+ph,hsv);
-        }
-        it->y -= mspeed;
-    }
-
-    // delete old meteors
-    meteors[CurrentLayer].remove_if(MeteorHasExpired(TailLength));
-}
-
-void PixelBufferClass::RenderPictures(int dir, const wxString& NewPictureName)
-{
-    const int speedfactor=4;
-    if (NewPictureName != PictureName[CurrentLayer]) {
-        if (!image[CurrentLayer].LoadFile(NewPictureName)) {
-            //wxMessageBox("Error loading image file: "+NewPictureName);
-            image[CurrentLayer].Clear();
-        }
-        PictureName[CurrentLayer]=NewPictureName;
-    }
-    if (!image[CurrentLayer].IsOk()) return;
-    int imgwidth=image[CurrentLayer].GetWidth();
-    int imght=image[CurrentLayer].GetHeight();
-    int yoffset=(BufferHt+imght)/2;
-    int xoffset=(imgwidth-BufferWi)/2;
-    int limit=(dir < 2) ? imgwidth+BufferWi : imght+BufferHt;
-    int movement=(state[CurrentLayer] % (limit*speedfactor)) / speedfactor;
-
-    // copy image to buffer
-    wxColour c;
-    for(int x=0; x<imgwidth; x++) {
-        for(int y=0; y<imght; y++) {
-            if (!image[CurrentLayer].IsTransparent(x,y)) {
-                c.Set(image[CurrentLayer].GetRed(x,y),image[CurrentLayer].GetGreen(x,y),image[CurrentLayer].GetBlue(x,y));
-                switch (dir) {
-                    case 0:
-                        // left
-                        SetPixel(x+BufferWi-movement,yoffset-y,c);
-                        break;
-                    case 1:
-                        // right
-                        SetPixel(x+movement-imgwidth,yoffset-y,c);
-                        break;
-                    case 2:
-                        // up
-                        SetPixel(x-xoffset,movement-y,c);
-                        break;
-                    case 3:
-                        // down
-                        SetPixel(x-xoffset,BufferHt+imght-y-movement,c);
-                        break;
-                    default:
-                        // no movement - centered
-                        SetPixel(x-xoffset,yoffset-y,c);
-                        break;
-                }
-            }
-        }
-    }
-}
-
-// -BufferWi <= x < 2*BufferWi
-// -BufferHt <= y < 2*BufferHt
-void PixelBufferClass::SetSnowflake(int x, int y, wxColour &color)
-{
-    x+=BufferWi;
-    y+=BufferHt;
-    if (x >= 0 && x < 3*BufferWi && y >= 0 && y < 3*BufferHt) {
-        snowflakes[CurrentLayer][y*BufferWi*3+x] = color;
-    }
-}
-
-// -BufferWi <= x < 2*BufferWi
-// -BufferHt <= y < 2*BufferHt
-void PixelBufferClass::GetSnowflake(int x, int y, wxColour &color)
-{
-    x+=BufferWi;
-    y+=BufferHt;
-    if (x >= 0 && x < 3*BufferWi && y >= 0 && y < 3*BufferHt) {
-        color = snowflakes[CurrentLayer][y*BufferWi*3+x];
-    }
-}
-
-// -BufferWi <= x < 2*BufferWi
-// -BufferHt <= y < 2*BufferHt
-wxUint32 PixelBufferClass::GetSnowflakeRGB(int x, int y)
-{
-    x+=BufferWi;
-    y+=BufferHt;
-    if (x >= 0 && x < 3*BufferWi && y >= 0 && y < 3*BufferHt) {
-        return snowflakes[CurrentLayer][y*BufferWi*3+x].GetRGB();
-    }
-    return 0;
-}
-
-void PixelBufferClass::RenderSnowflakes(int Count, int SnowflakeType)
-{
-    int i,n,x,y0,y,check,delta_y;
-    wxColour color1,color2;
-    if (state[CurrentLayer] == 0 || Count != LastSnowflakeCount[CurrentLayer] || SnowflakeType != LastSnowflakeType[CurrentLayer]) {
-        // initialize
-        LastSnowflakeCount[CurrentLayer]=Count;
-        LastSnowflakeType[CurrentLayer]=SnowflakeType;
-        palette[CurrentLayer].GetColor(0,color1);
-        palette[CurrentLayer].GetColor(1,color2);
-        for (i=0; i < snowflakes[CurrentLayer].size(); i++) {
-            snowflakes[CurrentLayer][i]=*wxBLACK;
-        }
-        // place Count snowflakes
-        for (n=0; n < Count; n++) {
-            delta_y=BufferHt/4;
-            y0=(n % 4)*delta_y;
-            if (y0+delta_y > BufferHt) delta_y = BufferHt-y0;
-            // find unused space
-            for (check=0; check < 20; check++) {
-                x=rand() % BufferWi;
-                y=y0 + (rand() % delta_y);
-                if (GetSnowflakeRGB(x,y) == 0) break;
-            }
-            // draw flake, SnowflakeType=0 is random type
-            switch (SnowflakeType == 0 ? rand() % 5 : SnowflakeType-1) {
-                case 0:
-                    // single node
-                    SetSnowflake(x,y,color1);
-                    break;
-                case 1:
-                    // 5 nodes
-                    if (x < 1) x+=1;
-                    if (y < 1) y+=1;
-                    if (x > BufferWi-2) x-=1;
-                    if (y > BufferHt-2) y-=1;
-                    SetSnowflake(x,y,color1);
-                    SetSnowflake(x-1,y,color2);
-                    SetSnowflake(x+1,y,color2);
-                    SetSnowflake(x,y-1,color2);
-                    SetSnowflake(x,y+1,color2);
-                    break;
-                case 2:
-                    // 3 nodes
-                    if (x < 1) x+=1;
-                    if (y < 1) y+=1;
-                    if (x > BufferWi-2) x-=1;
-                    if (y > BufferHt-2) y-=1;
-                    SetSnowflake(x,y,color1);
-                    if (rand() % 100 > 50) {    // % 2 was not so random
-                        SetSnowflake(x-1,y,color2);
-                        SetSnowflake(x+1,y,color2);
-                    } else {
-                        SetSnowflake(x,y-1,color2);
-                        SetSnowflake(x,y+1,color2);
-                    }
-                    break;
-                case 3:
-                    // 9 nodes
-                    if (x < 2) x+=2;
-                    if (y < 2) y+=2;
-                    if (x > BufferWi-3) x-=2;
-                    if (y > BufferHt-3) y-=2;
-                    SetSnowflake(x,y,color1);
-                    for (i=1; i<=2; i++) {
-                        SetSnowflake(x-i,y,color2);
-                        SetSnowflake(x+i,y,color2);
-                        SetSnowflake(x,y-i,color2);
-                        SetSnowflake(x,y+i,color2);
-                    }
-                    break;
-                case 4:
-                    // 13 nodes
-                    if (x < 2) x+=2;
-                    if (y < 2) y+=2;
-                    if (x > BufferWi-3) x-=2;
-                    if (y > BufferHt-3) y-=2;
-                    SetSnowflake(x,y,color1);
-                    SetSnowflake(x-1,y,color2);
-                    SetSnowflake(x+1,y,color2);
-                    SetSnowflake(x,y-1,color2);
-                    SetSnowflake(x,y+1,color2);
-
-                    SetSnowflake(x-1,y+2,color2);
-                    SetSnowflake(x+1,y+2,color2);
-                    SetSnowflake(x-1,y-2,color2);
-                    SetSnowflake(x+1,y-2,color2);
-                    SetSnowflake(x+2,y-1,color2);
-                    SetSnowflake(x+2,y+1,color2);
-                    SetSnowflake(x-2,y-1,color2);
-                    SetSnowflake(x-2,y+1,color2);
-                    break;
-                case 5:
-                    // 45 nodes (not enabled)
-                    break;
-            }
-        }
-    }
-
-    // move snowflakes
-    int new_x,new_y,new_x2,new_y2;
-    for (x=0; x<BufferWi; x++) {
-        new_x = (x+state[CurrentLayer]/20) % BufferWi; // CW
-        new_x2 = (x-state[CurrentLayer]/20) % BufferWi; // CCW
-        if (new_x2 < 0) new_x2+=BufferWi;
-        for (y=0; y<BufferHt; y++) {
-            new_y = (y+state[CurrentLayer]/10) % BufferHt;
-            new_y2 = (new_y + BufferHt/2) % BufferHt;
-            GetSnowflake(new_x,new_y,color1);
-            if (color1.GetRGB() == 0) GetSnowflake(new_x2,new_y2,color1);
-            SetPixel(x,y,color1);
-        }
-    }
-}
-
-void PixelBufferClass::RenderSnowstorm(int Count, int Length)
-{
-
-}
-
-void PixelBufferClass::RenderSpirals(int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D)
-{
-    int strand_base,strand,thick,x,y,ColorIdx;
-    size_t colorcnt=GetColorCount(CurrentLayer);
-    int SpiralCount=colorcnt * PaletteRepeat;
-    int deltaStrands=BufferWi / SpiralCount;
-    int SpiralThickness=(deltaStrands * Thickness / 100) + 1;
-    long SpiralState=state[CurrentLayer]*Direction;
-    wxImage::HSVValue hsv;
-    wxColour color;
-    for(int ns=0; ns < SpiralCount; ns++) {
-        strand_base=ns * deltaStrands;
-        ColorIdx=ns % colorcnt;
-        palette[CurrentLayer].GetColor(ColorIdx,color);
-        for(thick=0; thick < SpiralThickness; thick++) {
-            strand = (strand_base + thick) % BufferWi;
-            for(y=0; y < BufferHt; y++) {
-                x=(strand + SpiralState/10 + y*Rotation/BufferHt) % BufferWi;
-                if (x < 0) x += BufferWi;
-                if (Blend) {
-                    GetMultiColorBlend(double(BufferHt-y-1)/double(BufferHt), false, color);
-                }
-                if (Show3D) {
-                    Color2HSV(color,hsv);
-                    if (Rotation < 0)  {
-                        hsv.value*=double(thick+1)/SpiralThickness;
-                    } else {
-                        hsv.value*=double(SpiralThickness-thick)/SpiralThickness;
-                    }
-                    SetPixel(x,y,hsv);
-                } else {
-                    SetPixel(x,y,color);
-                }
-            }
-        }
-    }
-}
-
-void PixelBufferClass::RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString, int dir)
-{
-    wxColour c;
-    wxBitmap bitmap(BufferWi,BufferHt);
-    wxMemoryDC dc(bitmap);
-    wxFont font;
-    font.SetNativeFontInfoUserDesc(FontString);
-    dc.SetFont(font);
-    palette[CurrentLayer].GetColor(0,c);
-    dc.SetTextForeground(c);
-    wxString msg = Line1;
-    if (!Line2.IsEmpty()) msg+=wxT("\n")+Line2;
-    wxSize sz1 = dc.GetTextExtent(Line1);
-    wxSize sz2 = dc.GetTextExtent(Line2);
-    int maxwidth=sz1.GetWidth() > sz2.GetWidth() ? sz1.GetWidth() : sz2.GetWidth();
-    int maxht=sz1.GetHeight() > sz2.GetHeight() ? sz1.GetHeight() : sz2.GetHeight();
-    int dctop=Top * BufferHt / 50 - BufferHt/2;
-    int xlimit=(BufferWi+maxwidth)*8 + 1;
-    int ylimit=(BufferHt+maxht)*8 + 1;
-    int xcentered=(BufferWi-maxwidth)/2;
-    switch (dir) {
-        case 0:
-            // left
-            dc.DrawText(msg,BufferWi-state[CurrentLayer] % xlimit/8,dctop);
-            break;
-        case 1:
-            // right
-            dc.DrawText(msg,state[CurrentLayer] % xlimit/8-BufferWi,dctop);
-            break;
-        case 2:
-            // up
-            dc.DrawText(msg,xcentered,BufferHt-state[CurrentLayer] % ylimit/8);
-            break;
-        case 3:
-            // down
-            dc.DrawText(msg,xcentered,state[CurrentLayer] % ylimit / 8 - BufferHt);
-            break;
-        default:
-            // no movement - centered
-            dc.DrawText(msg,xcentered,dctop);
-            break;
-    }
-
-    // copy dc to buffer
-    for(wxCoord x=0; x<BufferWi; x++) {
-        for(wxCoord y=0; y<BufferHt; y++) {
-            dc.GetPixel(x,BufferHt-y-1,&c);
-            SetPixel(x,y,c);
-        }
-    }
 }
 
 void PixelBufferClass::CalcOutput()
@@ -807,7 +182,7 @@ void PixelBufferClass::CalcOutput()
             Nodes[i].SetColor(0,0,0);
         } else {
             // get blend of two effects
-            pixels[Nodes[i].bufY*BufferWi+Nodes[i].bufX].MixColors(MixType,color);
+            GetMixedColor(Nodes[i].bufX, Nodes[i].bufY, color);
             // add sparkles
             if (sparkle_count > 0 && color.GetRGB()!=0) {
                 switch (Nodes[i].sparkle%sparkle_count) {
@@ -835,3 +210,64 @@ void PixelBufferClass::CalcOutput()
         }
     }
 }
+
+void PixelBufferClass::RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D)
+{
+    Effect[CurrentLayer].RenderBars(PaletteRepeat,Direction,Highlight,Show3D);
+}
+
+void PixelBufferClass::RenderButterfly(int ColorScheme, int Style, int Chunks, int Skip)
+{
+    Effect[CurrentLayer].RenderButterfly(ColorScheme,Style,Chunks,Skip);
+}
+
+void PixelBufferClass::RenderColorWash(bool HorizFade, bool VertFade, int RepeatCount)
+{
+    Effect[CurrentLayer].RenderColorWash(HorizFade,VertFade,RepeatCount);
+}
+
+void PixelBufferClass::RenderFire(int HeightPct)
+{
+    Effect[CurrentLayer].RenderFire(HeightPct);
+}
+
+void PixelBufferClass::RenderGarlands(int GarlandType, int Spacing)
+{
+    Effect[CurrentLayer].RenderGarlands(GarlandType,Spacing);
+}
+
+void PixelBufferClass::RenderLife(int Count, int Seed)
+{
+    Effect[CurrentLayer].RenderLife(Count,Seed);
+}
+
+void PixelBufferClass::RenderMeteors(int MeteorType, int Count, int Length)
+{
+    Effect[CurrentLayer].RenderMeteors(MeteorType,Count,Length);
+}
+
+void PixelBufferClass::RenderPictures(int dir, const wxString& NewPictureName)
+{
+    Effect[CurrentLayer].RenderPictures(dir,NewPictureName);
+}
+
+void PixelBufferClass::RenderSnowflakes(int Count, int SnowflakeType)
+{
+    Effect[CurrentLayer].RenderSnowflakes(Count,SnowflakeType);
+}
+
+void PixelBufferClass::RenderSnowstorm(int Count, int Length)
+{
+    Effect[CurrentLayer].RenderSnowstorm(Count,Length);
+}
+
+void PixelBufferClass::RenderSpirals(int PaletteRepeat, int Direction, int Rotation, int Thickness, bool Blend, bool Show3D)
+{
+    Effect[CurrentLayer].RenderSpirals(PaletteRepeat,Direction,Rotation,Thickness,Blend,Show3D);
+}
+
+void PixelBufferClass::RenderText(int Top, const wxString& Line1, const wxString& Line2, const wxString& FontString, int dir)
+{
+    Effect[CurrentLayer].RenderText(Top,Line1,Line2,FontString,dir);
+}
+

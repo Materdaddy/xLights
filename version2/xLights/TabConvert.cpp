@@ -150,12 +150,11 @@ void xLightsFrame::OnButtonChooseFileClick(wxCommandEvent& event)
     }
 }
 
-void xLightsFrame::WriteVixenFile(const wxString& filename)
+bool xLightsFrame::WriteVixenFile(const wxString& filename)
 {
-    wxString ChannelName;
+    wxString ChannelName,TestName;
     int32_t ChannelColor;
-    long TotalTime=SeqNumPeriods * 50;
-    TextCtrlConversionStatus->AppendText(_("Writing Vixen sequence\n"));
+    long TotalTime=SeqNumPeriods * Timer1.GetInterval();
     wxXmlNode *node,*chparent,*textnode;
     wxXmlDocument doc;
     wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("Program") );
@@ -178,18 +177,29 @@ void xLightsFrame::WriteVixenFile(const wxString& filename)
         node->AddAttribute( wxT("id"), wxT("0"));
         node->AddAttribute( wxT("enabled"), wxT("True"));
         chparent->AddChild( node );
+        if (ch < CheckListBoxTestChannels->GetCount()) {
+            TestName=CheckListBoxTestChannels->GetString(ch);
+        } else {
+            TestName=wxString::Format(wxT("Ch: %d"),ch);
+        }
         if (ch < ChannelNames.size() && !ChannelNames[ch].IsEmpty()) {
             ChannelName = ChannelNames[ch];
         } else {
-            ChannelName = wxString::Format(wxT("Channel %d"),ch+1);
+            ChannelName = TestName;
         }
         // LOR is BGR with high bits=0
         // Vix is RGB with high bits=1
         if (ch < ChannelColors.size() && ChannelColors[ch] > 0) {
             ChannelColor = 0xff000000 | (ChannelColors[ch] >> 16 & 0x0000ff) | (ChannelColors[ch] & 0x00ff00) | (ChannelColors[ch] << 16 & 0xff0000);
+        } else if (TestName.Last() == 'R') {
+            ChannelColor = 0xffff0000;
+        } else if (TestName.Last() == 'G') {
+            ChannelColor = 0xff00ff00;
+        } else if (TestName.Last() == 'B') {
+            ChannelColor = 0xff0000ff;
         } else {
             // default to white
-            ChannelColor = -1;
+            ChannelColor = 0xffffffff;
         }
         node->AddAttribute( wxT("color"), wxString::Format(wxT("%d"),ChannelColor));
         textnode = new wxXmlNode( node, wxXML_TEXT_NODE, wxEmptyString, ChannelName );
@@ -209,12 +219,7 @@ void xLightsFrame::WriteVixenFile(const wxString& filename)
 
     node = new wxXmlNode( root, wxXML_ELEMENT_NODE, wxT("Time") );
     textnode = new wxXmlNode( node, wxXML_TEXT_NODE, wxEmptyString, wxString::Format(wxT("%ld"),TotalTime) );
-
-    if (doc.Save( filename )) {
-        TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+filename+_("\n"));
-    } else {
-        ConversionError(_("Unable to save Vixen file"));
-    }
+    return doc.Save( filename );
 }
 
 void xLightsFrame::WriteXLightsFile(const wxString& filename)
@@ -238,9 +243,91 @@ void xLightsFrame::WriteXLightsFile(const wxString& filename)
     f.Close();
 }
 
+void xLightsFrame::WriteLorFile(const wxString& filename)
+{
+    wxString ChannelName,TestName;
+    int32_t ChannelColor;
+    int ch,p,csec,StartCSec;
+    int seqidx=0;
+    int intensity,LastIntensity;
+    wxFile f;
+    if (!f.Create(filename,true)) {
+        ConversionError(_("Unable to create file: ")+filename);
+        return;
+    }
+	int interval=Timer1.GetInterval() / 10;  // in centiseconds
+    long centiseconds=SeqNumPeriods * interval;
+    f.Write(wxT("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"));
+    f.Write(wxT("<sequence saveFileVersion=\"3\""));
+    if (!mediaFilename.IsEmpty()) {
+        f.Write(wxT(" musicFilename=\"")+mediaFilename+wxT("\""));
+    }
+    f.Write(wxT(">\n"));
+    f.Write(wxT("\t<channels>\n"));
+    for (ch=0; ch < SeqNumChannels; ch++ ) {
+        if (ch < CheckListBoxTestChannels->GetCount()) {
+            TestName=CheckListBoxTestChannels->GetString(ch);
+        } else {
+            TestName=wxString::Format(wxT("Ch: %d"),ch);
+        }
+        if (ch < ChannelNames.size() && !ChannelNames[ch].IsEmpty()) {
+            ChannelName = ChannelNames[ch];
+        } else {
+            ChannelName = TestName;
+        }
+        // LOR is BGR with high bits=0
+        // Vix is RGB with high bits=1
+        if (ch < ChannelColors.size() && ChannelColors[ch] > 0) {
+            ChannelColor = ChannelColors[ch];
+        } else if (TestName.Last() == 'R') {
+            ChannelColor = 0x000000ff;
+        } else if (TestName.Last() == 'G') {
+            ChannelColor = 0x0000ff00;
+        } else if (TestName.Last() == 'B') {
+            ChannelColor = 0x00ff0000;
+        } else {
+            // default to white
+            ChannelColor = 0x00ffffff;
+        }
+        f.Write(wxT("\t\t<channel name=\"")+ChannelName+wxString::Format(wxT("\" color=\"%d\" centiseconds=\"%ld\" savedIndex=\"%d\">\n"),ChannelColor,centiseconds,ch));
+        // write intensity values for this channel
+        LastIntensity=0;
+        for (p=0,csec=0; p < SeqNumPeriods; p++, csec+=interval, seqidx++) {
+            intensity=SeqData[seqidx] * 100 / 255;
+            if (intensity != LastIntensity) {
+                if (LastIntensity != 0) {
+                    f.Write(wxString::Format(wxT("\t\t\t<effect type=\"intensity\" startCentisecond=\"%d\" endCentisecond=\"%d\" intensity=\"%d\"/>\n"),StartCSec,csec,LastIntensity));
+                }
+                StartCSec=csec;
+            }
+            LastIntensity=intensity;
+        }
+        if (LastIntensity != 0) {
+            f.Write(wxString::Format(wxT("\t\t\t<effect type=\"intensity\" startCentisecond=\"%d\" endCentisecond=\"%d\" intensity=\"%d\"/>\n"),StartCSec,csec,LastIntensity));
+        }
+        f.Write(wxT("\t\t</channel>\n"));
+    }
+    f.Write(wxT("\t</channels>\n"));
+	f.Write(wxT("\t<tracks>\n"));
+    f.Write(wxString::Format(wxT("\t\t<track totalCentiseconds=\"%ld\">\n"),centiseconds));
+	f.Write(wxT("\t\t\t<channels>\n"));
+    for (ch=0; ch < SeqNumChannels; ch++ ) {
+        f.Write(wxString::Format(wxT("\t\t\t\t<channel savedIndex=\"%d\"/>\n"),ch));
+    }
+	f.Write(wxT("\t\t\t</channels>\n"));
+	f.Write(wxT("\t\t\t<timings>\n"));
+	for (p=0,csec=0; p < SeqNumPeriods; p++, csec+=interval) {
+        f.Write(wxString::Format(wxT("\t\t\t\t<timing centisecond=\"%d\"/>\n"),csec));
+	}
+	f.Write(wxT("\t\t\t</timings>\n"));
+	f.Write(wxT("\t\t</track>\n"));
+	f.Write(wxT("\t</tracks>\n"));
+    f.Write(wxT("</sequence>\n"));
+    f.Close();
+}
+
 void xLightsFrame::WriteConductorFile(const wxString& filename)
 {
-    TextCtrlConversionStatus->AppendText(_("Writing Lynx Conductor sequence\n"));
     wxFile f;
     wxUint8 buf[16384];
     size_t ch,i,j;
@@ -264,7 +351,6 @@ void xLightsFrame::WriteConductorFile(const wxString& filename)
     memset(buf,0,512);
     f.Write(buf,512);
     f.Close();
-    TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+filename+_("\n"));
 }
 
 // return true on success
@@ -696,13 +782,8 @@ void xLightsFrame::ClearLastPeriod()
 
 void xLightsFrame::DoConversion(const wxString& Filename, const wxString& OutputFormat)
 {
-    char c;
     wxString fullpath;
-#if wxCHECK_VERSION(2,9,1)
-    OutputFormat[0].GetAsChar(&c);
-#else
-    c=OutputFormat[0];
-#endif
+    wxString Out3=OutputFormat.Left(3);
 
     // read sequence file
     TextCtrlConversionStatus->AppendText(_("\nReading: ") + Filename + wxT("\n"));
@@ -710,24 +791,28 @@ void xLightsFrame::DoConversion(const wxString& Filename, const wxString& Output
     wxFileName oName(Filename);
     wxString ext = oName.GetExt();
     if (ext == _("vix")) {
-        if (c == 'V') {
+        if (Out3 == wxT("Vix")) {
             ConversionError(_("Cannot convert from Vixen to Vixen!"));
             return;
         }
         ReadVixFile(Filename.char_str());
     } else if (ext == _(XLIGHTS_SEQUENCE_EXT)) {
-        if (c == 'x') {
+        if (Out3 == wxT("xLi")) {
             ConversionError(_("Cannot convert from xLights to xLights!"));
             return;
         }
         ReadXlightsFile(Filename);
     } else if (ext == _("seq")) {
-        if (c == 'L') {
+        if (Out3 == wxT("Lyn")) {
             ConversionError(_("Cannot convert from Conductor file to Conductor file!"));
             return;
         }
         ReadConductorFile(Filename);
     } else if (ext == _("lms") || ext == _("las")) {
+        if (Out3 == wxT("LOR")) {
+            ConversionError(_("Cannot convert from LOR to LOR!"));
+            return;
+        }
         ReadLorFile(Filename.char_str());
     } else {
         ConversionError(_("Unknown sequence file extension"));
@@ -752,26 +837,39 @@ void xLightsFrame::DoConversion(const wxString& Filename, const wxString& Output
     // write converted file to xLights directory
     oName.SetPath( CurrentDir );
 
-    switch (c)
-    {
-        case 'x':
-            oName.SetExt(_(XLIGHTS_SEQUENCE_EXT));
-            fullpath=oName.GetFullPath();
-            TextCtrlConversionStatus->AppendText(_("Writing xLights sequence\n"));
-            WriteXLightsFile(fullpath);
+    if (Out3 == wxT("xLi")) {
+        oName.SetExt(_(XLIGHTS_SEQUENCE_EXT));
+        fullpath=oName.GetFullPath();
+        TextCtrlConversionStatus->AppendText(_("Writing xLights sequence\n"));
+        WriteXLightsFile(fullpath);
+        TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+fullpath+_("\n"));
+    } else if (Out3 == wxT("Lyn")) {
+        oName.SetExt(_("seq"));
+        fullpath=oName.GetFullPath();
+        TextCtrlConversionStatus->AppendText(_("Writing Lynx Conductor sequence\n"));
+        WriteConductorFile(fullpath);
+        TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+fullpath+_("\n"));
+    } else if (Out3 == wxT("Vix")) {
+        oName.SetExt(_("vix"));
+        fullpath=oName.GetFullPath();
+        TextCtrlConversionStatus->AppendText(_("Writing Vixen sequence\n"));
+        if (WriteVixenFile(fullpath)) {
             TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+fullpath+_("\n"));
-            break;
-        case 'L':
-            oName.SetExt(_("seq"));
-            WriteConductorFile(oName.GetFullPath());
-            break;
-        case 'V':
-            oName.SetExt(_("vix"));
-            WriteVixenFile(oName.GetFullPath());
-            break;
-        default:
-            TextCtrlConversionStatus->AppendText(_("Nothing to write - invalid output format\n"));
-            break;
+        } else {
+            ConversionError(_("Unable to save: ")+fullpath+_("\n"));
+        }
+    } else if (Out3 == wxT("LOR")) {
+        if (mediaFilename.IsEmpty()) {
+            oName.SetExt(_("las"));
+        } else {
+            oName.SetExt(_("lms"));
+        }
+        fullpath=oName.GetFullPath();
+        TextCtrlConversionStatus->AppendText(_("Writing LOR sequence\n"));
+        WriteLorFile(fullpath);
+        TextCtrlConversionStatus->AppendText(_("Finished writing new file: ")+fullpath+_("\n"));
+    } else {
+        TextCtrlConversionStatus->AppendText(_("Nothing to write - invalid output format\n"));
     }
 }
 
@@ -796,5 +894,4 @@ void xLightsFrame::OnButtonStartConversionClick(wxCommandEvent& event)
 
     ButtonStartConversion->Enable(true);
 }
-
 

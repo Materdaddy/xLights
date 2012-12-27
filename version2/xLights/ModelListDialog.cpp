@@ -49,7 +49,7 @@ ModelListDialog::ModelListDialog(wxWindow* parent,wxWindowID id,const wxPoint& p
 	FlexGridSizer3->Add(Button_Delete, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Button_Rename = new wxButton(this, ID_BUTTON2, _("Rename"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(Button_Rename, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Button_Layout = new wxButton(this, ID_BUTTON_LAYOUT, _("Channel Layout"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_LAYOUT"));
+	Button_Layout = new wxButton(this, ID_BUTTON_LAYOUT, _("Node Layout"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_LAYOUT"));
 	FlexGridSizer3->Add(Button_Layout, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer3, 1, wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -228,7 +228,8 @@ void ModelListDialog::OnButton_RenameClick(wxCommandEvent& event)
 void ModelListDialog::OnButton_LayoutClick(wxCommandEvent& event)
 {
     size_t i,idx;
-    int n,x,y;
+    int n,x,y,s;
+    wxString bgcolor;
     int sel=ListBox1->GetSelection();
     std::vector<int> chmap;
     if (sel == wxNOT_FOUND) {
@@ -248,13 +249,15 @@ void ModelListDialog::OnButton_LayoutClick(wxCommandEvent& event)
     html+=wxT("<tr><td>Direction:</td><td>")+direction+wxT("</td></tr>");
     html+=wxString::Format(wxT("<tr><td>Total nodes:</td><td>%d</td></tr>"),NodeCount);
     html+=wxString::Format(wxT("<tr><td>Height:</td><td>%d</td></tr>"),model.BufferHt);
-    html+=wxT("</table><p>Node numbers starting with 1:</p><table border=1>");
+    html+=wxT("</table><p>Node numbers starting with 1 followed by string number:</p><table border=1>");
     if (model.BufferHt == 1) {
         // single line or arch
         html+=wxT("<tr>");
         for(i=1; i<=NodeCount; i++) {
             n=model.IsLtoR ? i : NodeCount-i+1;
-            html+=wxString::Format(wxT("<td>%d</td>"),n);
+            s=model.Nodes[n-1].StringNum+1;
+            bgcolor=s%2 == 1 ? wxT("#ADD8E6") : wxT("#90EE90");
+            html+=wxString::Format(wxT("<td bgcolor='")+bgcolor+wxT("'>n%ds%d</td>"),n,s);
         }
         html+=wxT("</tr>");
     } else if (model.BufferHt > 1) {
@@ -272,7 +275,9 @@ void ModelListDialog::OnButton_LayoutClick(wxCommandEvent& event)
                 if (n==0) {
                     html+=wxT("<td></td>");
                 } else {
-                    html+=wxString::Format(wxT("<td>%d</td>"),n);
+                    s=model.Nodes[n-1].StringNum+1;
+                    bgcolor=s%2 == 1 ? wxT("#ADD8E6") : wxT("#90EE90");
+                    html+=wxString::Format(wxT("<td bgcolor='")+bgcolor+wxT("'>n%ds%d</td>"),n,s);
                 }
             }
             html+=wxT("</tr>");

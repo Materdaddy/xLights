@@ -17,7 +17,7 @@ wxXmlNode* xLightsFrame::GetModelNode(const wxString& name)
 
 void xLightsFrame::OnButton_PlayAllClick(wxCommandEvent& event)
 {
-    if (xlightsFilename.IsEmpty()) {
+    if (SeqData.size() == 0) {
         wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
         return;
     }
@@ -77,6 +77,7 @@ void xLightsFrame::EnableSequenceControls(bool enable)
     TextCtrl_Pictures1_Filename->Enable(enable);
     Button_Pictures2_Filename->Enable(enable);
     TextCtrl_Pictures2_Filename->Enable(enable);
+    ButtonSeqExport->Enable(enable);
     BitmapButtonOpenSeq->Enable(enable);
     BitmapButtonSaveSeq->Enable(enable);
     BitmapButtonInsertRow->Enable(enable);
@@ -180,7 +181,7 @@ void xLightsFrame::SetTextColor(wxWindow* w)
 void xLightsFrame::PresetsSelect()
 {
     int NameIdx=Choice_Presets->GetSelection();
-    if (NameIdx != wxNOT_FOUND && NameIdx > 0) {
+    if (NameIdx != wxNOT_FOUND) {
         wxXmlNode* x=(wxXmlNode*)Choice_Presets->GetClientData(NameIdx);
         SetEffectControls(x->GetAttribute("settings"));
     }
@@ -250,47 +251,49 @@ wxString xLightsFrame::CreateEffectString()
     return s;
 }
 
+void xLightsFrame::OnButton_UpdateGridClick(wxCommandEvent& event)
+{
+    int r,c;
+    wxString v=CreateEffectString();
+    if ( Grid1->IsSelection() ) {
+        // iterate over entire grid looking for selected cells
+        int nRows = Grid1->GetNumberRows();
+        int nCols = Grid1->GetNumberCols();
+        for (r=0; r<nRows; r++) {
+            for (c=2; c<nCols; c++) {
+                if (Grid1->IsInSelection(r,c)) {
+                    Grid1->SetCellValue(r,c,v);
+                }
+            }
+        }
+    } else {
+        // copy to current cell
+        r=Grid1->GetGridCursorRow();
+        c=Grid1->GetGridCursorCol();
+        if (c >=2) {
+            Grid1->SetCellValue(r,c,v);
+        }
+    }
+}
+
 void xLightsFrame::OnButton_PresetUpdateClick(wxCommandEvent& event)
 {
     int NameIdx=Choice_Presets->GetSelection();
     if (NameIdx == wxNOT_FOUND) {
         wxMessageBox(_("No preset name is selected"), _("ERROR"));
-    } else if (NameIdx == 0) {
-        // update grid
-        int r,c;
-        wxString v=CreateEffectString();
-        if ( Grid1->IsSelection() ) {
-            // iterate over entire grid looking for selected cells
-            int nRows = Grid1->GetNumberRows();
-            int nCols = Grid1->GetNumberCols();
-            for (r=0; r<nRows; r++) {
-                for (c=2; c<nCols; c++) {
-                    if (Grid1->IsInSelection(r,c)) {
-                        Grid1->SetCellValue(r,c,v);
-                    }
-                }
-            }
-        } else {
-            // copy to current cell
-            r=Grid1->GetGridCursorRow();
-            c=Grid1->GetGridCursorCol();
-            if (c >=2) {
-                Grid1->SetCellValue(r,c,v);
-            }
-        }
-    } else {
-        // update preset
-        // delete old xml entry
-        wxXmlNode* OldXml=(wxXmlNode*)Choice_Presets->GetClientData(NameIdx);
-        EffectsNode->RemoveChild(OldXml);
-        delete OldXml;
-
-        wxString name=Choice_Presets->GetString(NameIdx);
-        EffectsNode->AddChild(CreateEffectNode(name));
-        UpdateEffectsList();
-        Choice_Presets->SetStringSelection(name);
-        SaveEffectsFile();
+        return;
     }
+    // update preset
+    // delete old xml entry
+    wxXmlNode* OldXml=(wxXmlNode*)Choice_Presets->GetClientData(NameIdx);
+    EffectsNode->RemoveChild(OldXml);
+    delete OldXml;
+
+    wxString name=Choice_Presets->GetString(NameIdx);
+    EffectsNode->AddChild(CreateEffectNode(name));
+    UpdateEffectsList();
+    Choice_Presets->SetStringSelection(name);
+    SaveEffectsFile();
 }
 
 void xLightsFrame::OnChoice_LayerMethodSelect(wxCommandEvent& event)
@@ -336,7 +339,6 @@ void xLightsFrame::UpdateEffectsList()
     wxString name;
     wxString SelectedStr=Choice_Presets->GetStringSelection();
     Choice_Presets->Clear();
-    Choice_Presets->Append(wxT(" <grid>"));
     for(wxXmlNode* e=EffectsNode->GetChildren(); e!=NULL; e=e->GetNext() ) {
         if (e->GetName() == wxT("effect")) {
             name=e->GetAttribute(wxT("name"));
@@ -347,10 +349,9 @@ void xLightsFrame::UpdateEffectsList()
     }
 
     // select a preset if one exists
-    if (Choice_Presets->GetCount() > 0) {
-        if (SelectedStr.IsEmpty() || !Choice_Presets->SetStringSelection(SelectedStr)) {
-            Choice_Presets->SetSelection(0);
-        }
+    Choice_Presets->SetSelection(-1);
+    if (Choice_Presets->GetCount() > 0 && !SelectedStr.IsEmpty()) {
+        Choice_Presets->SetStringSelection(SelectedStr);
     }
 }
 
@@ -906,7 +907,7 @@ void xLightsFrame::GetGridColumnLabels(wxArrayString& a)
 
 void xLightsFrame::ChooseModelsForSequence()
 {
-    if (xlightsFilename.IsEmpty()) {
+    if (SeqData.size() == 0) {
         wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
         return;
     }
@@ -966,11 +967,12 @@ void xLightsFrame::ChooseModelsForSequence()
             Grid1->DeleteCols(idx+2);
         }
     }
+    EnableSequenceControls(true);
 }
 
 void xLightsFrame::OnButton_ChannelMapClick(wxCommandEvent& event)
 {
-    if (xlightsFilename.IsEmpty()) {
+    if (SeqData.size() == 0) {
         wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
         return;
     }
@@ -985,20 +987,8 @@ void xLightsFrame::OnButton_ChannelMapClick(wxCommandEvent& event)
     SeqChanCtrlColor=dialog.CheckBox_EnableColor->GetValue();
 }
 
-void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
+void xLightsFrame::SeqLoadXlightsFile(const wxString& filename)
 {
-    wxArrayString files;
-    wxDir::GetAllFiles(CurrentDir,&files,"*.xseq");
-    wxString filename = wxGetSingleChoice("Select xLights sequence to open","Open Sequence",files,this);
-    if (filename.IsEmpty()) return;  // user pressed cancel
-
-    // reset grid
-    int n;
-    n=Grid1->GetNumberCols();
-    if (n > 2) Grid1->DeleteCols(2, n-2);
-    n=Grid1->GetNumberRows();
-    if (n > 0) Grid1->DeleteRows(0, n);
-
     // read xlights file
     ReadXlightsFile(filename);
     DisplayXlightsFilename(filename);
@@ -1080,63 +1070,122 @@ void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
     EnableSequenceControls(true);
 }
 
-void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
+void xLightsFrame::OnBitmapButtonOpenSeqClick(wxCommandEvent& event)
 {
-    if (xlightsFilename.IsEmpty()) {
-        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+    wxArrayString SeqFiles,MediaFiles;
+    wxDir::GetAllFiles(CurrentDir,&SeqFiles,"*.xseq");
+
+    // get list of media files
+    wxFileName oName;
+    wxString filename;
+    char filetype;
+    oName.AssignDir( CurrentDir );
+    wxDir dir(CurrentDir);
+    bool cont = dir.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
+    while ( cont ) {
+        oName.SetFullName(filename);
+        filetype=ExtType(oName.GetExt());
+        if (filetype=='a' || filetype=='v') MediaFiles.Add(oName.GetFullPath());
+        cont = dir.GetNext(&filename);
+    }
+
+    // populate dialog
+    SeqOpenDialog dialog(this);
+    if (SeqFiles.Count() > 0) {
+        dialog.ChoiceSeqFiles->Set(SeqFiles);
+        dialog.ChoiceSeqFiles->SetSelection(0);
+    } else {
+        dialog.RadioButtonXlights->Enable(false);
+        dialog.ChoiceSeqFiles->Enable(false);
+        dialog.RadioButtonNewMusic->SetValue(true);
+    }
+    if (MediaFiles.Count() > 0) {
+        dialog.ChoiceMediaFiles->Set(MediaFiles);
+        dialog.ChoiceMediaFiles->SetSelection(0);
+    } else {
+        dialog.RadioButtonNewMusic->Enable(false);
+        dialog.ChoiceMediaFiles->Enable(false);
+        dialog.RadioButtonNewAnim->SetValue(true);
+    }
+    dialog.Fit();
+    if (dialog.ShowModal() != wxID_OK) return;  // user pressed cancel
+
+    // reset grid
+    int n;
+    n=Grid1->GetNumberCols();
+    if (n > 2) Grid1->DeleteCols(2, n-2);
+    n=Grid1->GetNumberRows();
+    if (n > 0) Grid1->DeleteRows(0, n);
+    mediaFilename.Clear();
+
+    long duration;
+    if (dialog.RadioButtonXlights->GetValue()) {
+        SeqLoadXlightsFile(dialog.ChoiceSeqFiles->GetStringSelection());
         return;
-    }
-
-    // save Grid1 to xml
-    int rowcnt=Grid1->GetNumberRows();
-    int colcnt=Grid1->GetNumberCols();
-    int r,c;
-    wxXmlDocument doc;
-    wxXmlNode *tr, *td;
-    wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("xsequence") );
-    doc.SetRoot( root );
-    root->AddAttribute(wxT("BaseChannel"), wxString::Format(wxT("%ld"),SeqBaseChannel));
-    root->AddAttribute(wxT("ChanCtrlBasic"), SeqChanCtrlBasic ? wxT("1") : wxT("0"));
-    root->AddAttribute(wxT("ChanCtrlColor"), SeqChanCtrlColor ? wxT("1") : wxT("0"));
-
-    // new items get added to the TOP of the xml structure, so add everything in reverse order
-
-    // save data rows
-    for (r=rowcnt-1; r>=0; r--) {
-        tr=new wxXmlNode(root, wxXML_ELEMENT_NODE, wxT("tr"));
-        for (c=colcnt-1; c>=0; c--) {
-            td=new wxXmlNode(tr, wxXML_ELEMENT_NODE, wxT("td"));
-            td->AddChild(new wxXmlNode(td, wxXML_TEXT_NODE, wxEmptyString, Grid1->GetCellValue(r,c)));
+    } else if (dialog.RadioButtonNewMusic->GetValue()) {
+        // determine media file length
+        mediaFilename=dialog.ChoiceMediaFiles->GetStringSelection();
+        if (!PlayerDlg->Play(mediaFilename)) {
+            wxMessageBox(wxT("Unable to load:\n")+mediaFilename,wxT("ERROR"));
+            return;
         }
+        for (int cnt=0; cnt < 50; cnt++) {
+            duration=PlayerDlg->MediaCtrl->Length();  // milliseconds
+            if (duration > 0) break;
+            wxYield();
+            wxMilliSleep(100);
+        }
+        PlayerDlg->MediaCtrl->Stop();
+        if (duration <= 0) {
+            wxMessageBox(wxT("Unable to determine the length of:\n")+mediaFilename,wxT("ERROR"));
+            return;
+        }
+    } else if (dialog.RadioButtonNewAnim->GetValue()) {
+        duration=dialog.SpinCtrlDuration->GetValue();  // seconds
+        if (duration <= 0) {
+            wxMessageBox(wxT("Invalid value for duration"),wxT("ERROR"));
+            return;
+        }
+        duration*=1000;  // convert to milliseconds
     }
+    SeqData.clear();
+    SeqNumChannels=NetInfo.GetTotChannels();
+    int interval=Timer1.GetInterval();
+    SeqNumPeriods=duration / interval;
+    SeqDataLen=SeqNumPeriods * SeqNumChannels;
+    SeqData.resize(SeqDataLen,0);
+    int nSeconds=duration/1000;
+    int nMinutes=nSeconds/60;
+    nSeconds%=60;
+    wxMessageBox(wxString::Format(wxT("Created empty sequence:\nChannels: %ld\nPeriods: %ld\nEach period is: %d msec\nTotal time: %d:%02d"),
+                                  SeqNumChannels,SeqNumPeriods,interval,nMinutes,nSeconds));
+}
 
-    // save labels to first row
-    tr=new wxXmlNode(root, wxXML_ELEMENT_NODE, wxT("tr"));
-    for (c=colcnt-1; c>=0; c--) {
-        td=new wxXmlNode(tr, wxXML_ELEMENT_NODE, wxT("td"));
-        td->AddChild(new wxXmlNode(td, wxXML_TEXT_NODE, wxEmptyString, Grid1->GetColLabelValue(c)));
-    }
-
-    doc.Save(SeqXmlFileName);
-
-    // incorporate effects into xseq file
-
+void xLightsFrame::RenderGridToSeqData()
+{
     MapStringString SettingsMap;
-    wxString ColName;
+    wxString ColName,msg;
     long msec;
     size_t ChannelNum, NodeCnt;
+    int rowcnt=Grid1->GetNumberRows();
+    int colcnt=Grid1->GetNumberCols();
+    wxXmlNode *ModelNode;
     LoadEffectFromString(wxT("None,None,Effect 1"), SettingsMap);
-    for (c=2; c<colcnt; c++) {
+    for (int c=2; c<colcnt; c++) {
         ColName=Grid1->GetColLabelValue(c);
-        td=GetModelNode(ColName);
-        if (!td) continue;
-        buffer.InitBuffer(td);
+        ModelNode=GetModelNode(ColName);
+        if (!ModelNode) continue;
+        buffer.InitBuffer(ModelNode);
         if (!buffer.MyDisplay) continue;
         NodeCnt=buffer.GetNodeCount();
         ChannelNum=buffer.StartChannel-1+NodeCnt*3; // last channel
         if (ChannelNum > SeqNumChannels) {
             // need to add more channels to existing sequence
-            wxMessageBox(wxString::Format(wxT("Increasing sequence channel count from %ld to %d"),SeqNumChannels,ChannelNum));
+            msg=wxString::Format(wxT("Increasing sequence channel count from %ld to %d"),SeqNumChannels,ChannelNum);
+            if (ChannelNum > NetInfo.GetTotChannels()) {
+                msg+=wxT("\n\nEither your model is incorrect or the networks you have defined on the Setup Tab are incorrect.\n\nYou should fix this before doing any more exports!");
+            }
+            wxMessageBox(msg);
             SeqNumChannels=ChannelNum;
             SeqDataLen=SeqNumChannels*SeqNumPeriods;
             SeqData.resize(SeqDataLen,0);
@@ -1175,6 +1224,79 @@ void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
             }
         }
     }
+}
+
+void xLightsFrame::OnBitmapButtonSaveSeqClick(wxCommandEvent& event)
+{
+    wxString NewFilename;
+    bool ok;
+    if (SeqData.size() == 0) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+
+    // save Grid1 to xml
+    int rowcnt=Grid1->GetNumberRows();
+    int colcnt=Grid1->GetNumberCols();
+    if (colcnt <= 2) {
+        wxMessageBox(wxT("No models in the grid!"), wxT("Warning"));
+    }
+    if (rowcnt == 0) {
+        wxMessageBox(wxT("No grid rows to save!"), wxT("Warning"));
+    }
+    if (xlightsFilename.IsEmpty()) {
+        wxTextEntryDialog dialog(this,wxT("Enter a name for the sequence:"),wxT("Save As"));
+        do
+        {
+            if (dialog.ShowModal() != wxID_OK) return;
+            // validate inputs
+            NewFilename=dialog.GetValue();
+            NewFilename.Trim();
+            ok=true;
+            if (NewFilename.IsEmpty()) {
+                ok=false;
+                wxMessageBox(_("File name cannot be empty"), _("ERROR"));
+            }
+        }
+        while (!ok);
+        wxFileName oName(NewFilename);
+        oName.SetPath( CurrentDir );
+        oName.SetExt(_(XLIGHTS_SEQUENCE_EXT));
+        xlightsFilename=oName.GetFullPath();
+        oName.SetExt("xml");
+        SeqXmlFileName=oName.GetFullPath();
+    }
+
+    StatusBar1->SetStatusText(_("Saving ")+xlightsFilename);
+    int r,c;
+    wxXmlDocument doc;
+    wxXmlNode *tr, *td;
+    wxXmlNode* root = new wxXmlNode( wxXML_ELEMENT_NODE, wxT("xsequence") );
+    doc.SetRoot( root );
+    root->AddAttribute(wxT("BaseChannel"), wxString::Format(wxT("%ld"),SeqBaseChannel));
+    root->AddAttribute(wxT("ChanCtrlBasic"), SeqChanCtrlBasic ? wxT("1") : wxT("0"));
+    root->AddAttribute(wxT("ChanCtrlColor"), SeqChanCtrlColor ? wxT("1") : wxT("0"));
+
+    // new items get added to the TOP of the xml structure, so add everything in reverse order
+
+    // save data rows
+    for (r=rowcnt-1; r>=0; r--) {
+        tr=new wxXmlNode(root, wxXML_ELEMENT_NODE, wxT("tr"));
+        for (c=colcnt-1; c>=0; c--) {
+            td=new wxXmlNode(tr, wxXML_ELEMENT_NODE, wxT("td"));
+            td->AddChild(new wxXmlNode(td, wxXML_TEXT_NODE, wxEmptyString, Grid1->GetCellValue(r,c)));
+        }
+    }
+
+    // save labels to first row
+    tr=new wxXmlNode(root, wxXML_ELEMENT_NODE, wxT("tr"));
+    for (c=colcnt-1; c>=0; c--) {
+        td=new wxXmlNode(tr, wxXML_ELEMENT_NODE, wxT("td"));
+        td->AddChild(new wxXmlNode(td, wxXML_TEXT_NODE, wxEmptyString, Grid1->GetColLabelValue(c)));
+    }
+    doc.Save(SeqXmlFileName);
+
+    RenderGridToSeqData();  // incorporate effects into xseq file
     WriteXLightsFile(xlightsFilename);
     StatusBar1->SetStatusText(_("Updated ")+xlightsFilename);
 }
@@ -1210,7 +1332,7 @@ void xLightsFrame::LoadEffectFromString(wxString settings, MapStringString& Sett
 
 void xLightsFrame::OnBitmapButtonInsertRowClick(wxCommandEvent& event)
 {
-    if (xlightsFilename.IsEmpty()) {
+    if (SeqData.size() == 0) {
         wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
         return;
     }
@@ -1225,7 +1347,7 @@ void xLightsFrame::OnBitmapButtonInsertRowClick(wxCommandEvent& event)
 
 void xLightsFrame::OnBitmapButtonDeleteRowClick(wxCommandEvent& event)
 {
-    if (xlightsFilename.IsEmpty()) {
+    if (SeqData.size() == 0) {
         wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
         return;
     }
@@ -1244,7 +1366,7 @@ void xLightsFrame::OnBitmapButtonDeleteRowClick(wxCommandEvent& event)
 
 void xLightsFrame::OnButtonDisplayElementsClick(wxCommandEvent& event)
 {
-    if (xlightsFilename.IsEmpty()) {
+    if (SeqData.size() == 0) {
         wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
         return;
     }
@@ -1389,4 +1511,72 @@ void xLightsFrame::DisplayEffectOnWindow()
 void xLightsFrame::OnChoicebookEffectPageChanged(wxChoicebookEvent& event)
 {
     ResetEffectStates();
+}
+
+void xLightsFrame::OnButtonSeqExportClick(wxCommandEvent& event)
+{
+    if (SeqData.size() == 0) {
+        wxMessageBox(wxT("You must open a sequence first!"), wxT("Error"));
+        return;
+    }
+    if (Grid1->GetNumberCols() <= 2) {
+        wxMessageBox(wxT("No models in the grid!"), wxT("Error"));
+        return;
+    }
+    if (Grid1->GetNumberRows() == 0) {
+        wxMessageBox(wxT("No grid rows to save!"), wxT("Error"));
+        return;
+    }
+    int DlgResult;
+    bool ok;
+    wxString filename;
+    SeqExportDialog dialog(this);
+    do
+    {
+        ok=true;
+        DlgResult=dialog.ShowModal();
+        if (DlgResult == wxID_OK)
+        {
+            // validate inputs
+            filename=dialog.TextCtrlFilename->GetValue();
+            filename.Trim();
+            if (filename.IsEmpty()) {
+                ok=false;
+                wxMessageBox(_("The file name cannot be empty"), _("ERROR"));
+            }
+        }
+    }
+    while (DlgResult == wxID_OK && !ok);
+    if (DlgResult != wxID_OK) return;
+
+    RenderGridToSeqData();
+
+    wxFileName oName(filename);
+    oName.SetPath( CurrentDir );
+    wxString fullpath;
+    wxString format=dialog.ChoiceFormat->GetStringSelection();
+    if (format == wxT("LOR")) {
+        if (mediaFilename.IsEmpty()) {
+            oName.SetExt(_("las"));
+        } else {
+            oName.SetExt(_("lms"));
+        }
+        fullpath=oName.GetFullPath();
+        WriteLorFile(fullpath);
+    } else if (format == wxT("Vixen")) {
+        oName.SetExt(_("vix"));
+        fullpath=oName.GetFullPath();
+        WriteVixenFile(fullpath);
+    } else if (format == wxT("Light Show Pro")) {
+        wxMessageBox(wxT("Light Show Pro export not implemented yet"));
+        return;
+    } else if (format == wxT("HLS")) {
+        wxMessageBox(wxT("HLS export not implemented yet"));
+        return;
+    } else if (format == wxT("xLights")) {
+        oName.SetExt(_(XLIGHTS_SEQUENCE_EXT));
+        fullpath=oName.GetFullPath();
+        WriteXLightsFile(fullpath);
+    }
+    StatusBar1->SetStatusText(_("Finished writing: " )+fullpath);
 }

@@ -70,8 +70,8 @@
 					<Add option="-g" />
 					<Add option="`wx-config --cflags`" />
 					<Add option="-Winvalid-pch" />
-					<Add option="-include wx_pch.h" />
 					<Add option="-DWX_PRECOMP" />
+					<Add option="-D__WXDEBUG__" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs`" />
@@ -88,8 +88,8 @@
 					<Add option="-Wall" />
 					<Add option="`wx-config --cflags`" />
 					<Add option="-Winvalid-pch" />
-					<Add option="-include wx_pch.h" />
 					<Add option="-DWX_PRECOMP" />
+					<Add option="-DNDEBUG" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -126,8 +126,14 @@
 		<Unit filename="PlaybackOptionsDialog.h" />
 		<Unit filename="PlayerFrame.cpp" />
 		<Unit filename="PlayerFrame.h" />
+		<Unit filename="RgbEffects.cpp" />
+		<Unit filename="RgbEffects.h" />
 		<Unit filename="SeqElementMismatchDialog.cpp" />
 		<Unit filename="SeqElementMismatchDialog.h" />
+		<Unit filename="SeqExportDialog.cpp" />
+		<Unit filename="SeqExportDialog.h" />
+		<Unit filename="SeqOpenDialog.cpp" />
+		<Unit filename="SeqOpenDialog.h" />
 		<Unit filename="SeqParmsDialog.cpp" />
 		<Unit filename="SeqParmsDialog.h" />
 		<Unit filename="SerialPortWithRate.cpp" />
@@ -179,6 +185,8 @@
 		<Unit filename="wxsmith/PlaybackOptionsDialog.wxs" />
 		<Unit filename="wxsmith/PlayerFrame.wxs" />
 		<Unit filename="wxsmith/SeqElementMismatchDialog.wxs" />
+		<Unit filename="wxsmith/SeqExportDialog.wxs" />
+		<Unit filename="wxsmith/SeqOpenDialog.wxs" />
 		<Unit filename="wxsmith/SeqParmsDialog.wxs" />
 		<Unit filename="wxsmith/xLightsframe.wxs" />
 		<Unit filename="xLightsApp.cpp" />
@@ -212,6 +220,8 @@
 					<wxDialog wxs="wxsmith/SeqParmsDialog.wxs" src="SeqParmsDialog.cpp" hdr="SeqParmsDialog.h" fwddecl="0" i18n="1" name="SeqParmsDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChannelMapDialog.wxs" src="ChannelMapDialog.cpp" hdr="ChannelMapDialog.h" fwddecl="0" i18n="1" name="ChannelMapDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/SeqElementMismatchDialog.wxs" src="SeqElementMismatchDialog.cpp" hdr="SeqElementMismatchDialog.h" fwddecl="0" i18n="1" name="SeqElementMismatchDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/SeqExportDialog.wxs" src="SeqExportDialog.cpp" hdr="SeqExportDialog.h" fwddecl="0" i18n="1" name="SeqExportDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/SeqOpenDialog.wxs" src="SeqOpenDialog.cpp" hdr="SeqOpenDialog.h" fwddecl="0" i18n="1" name="SeqOpenDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

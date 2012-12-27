@@ -1061,6 +1061,7 @@
 																				<item>xLights Sequence</item>
 																				<item>Lynx Conductor</item>
 																				<item>Vixen 2.1</item>
+																				<item>LOR Sequence</item>
 																			</content>
 																			<selection>0</selection>
 																		</object>
@@ -1199,8 +1200,13 @@
 																		<border>5</border>
 																		<option>1</option>
 																	</object>
-																	<object class="spacer">
-																		<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<object class="sizeritem">
+																		<object class="wxButton" name="ID_BUTTON3" variable="Button_UpdateGrid" member="yes">
+																			<label>Update Grid</label>
+																			<bg>#E0E0E0</bg>
+																			<handler function="OnButton_UpdateGridClick" entry="EVT_BUTTON" />
+																		</object>
+																		<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 																		<border>5</border>
 																		<option>1</option>
 																	</object>
@@ -1255,7 +1261,7 @@
 																	</object>
 																	<object class="sizeritem">
 																		<object class="wxButton" name="ID_BUTTON8" variable="Button_PresetUpdate" member="yes">
-																			<label>Update</label>
+																			<label>Update Preset</label>
 																			<bg>#E0E0E0</bg>
 																			<handler function="OnButton_PresetUpdateClick" entry="EVT_BUTTON" />
 																		</object>
@@ -1362,6 +1368,16 @@
 																					<label>Display Elements</label>
 																					<bg>#E0E0E0</bg>
 																					<handler function="OnButtonDisplayElementsClick" entry="EVT_BUTTON" />
+																				</object>
+																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																				<border>5</border>
+																				<option>1</option>
+																			</object>
+																			<object class="sizeritem">
+																				<object class="wxButton" name="ID_BUTTON_SeqExport" variable="ButtonSeqExport" member="yes">
+																					<label>Export</label>
+																					<bg>#E0E0E0</bg>
+																					<handler function="OnButtonSeqExportClick" entry="EVT_BUTTON" />
 																				</object>
 																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																				<border>5</border>
@@ -1747,21 +1763,25 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxSlider" name="ID_SLIDER_Life1_Count" variable="Slider_Life1_Count" member="yes" />
-																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																									<border>2</border>
-																									<option>1</option>
-																								</object>
-																								<object class="sizeritem">
-																									<object class="wxStaticText" name="ID_STATICTEXT37" variable="StaticText37" member="yes">
-																										<label>Seed</label>
+																									<object class="wxSlider" name="ID_SLIDER_Life1_Count" variable="Slider_Life1_Count" member="yes">
+																										<value>50</value>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxSlider" name="ID_SLIDER_Life1_Seed" variable="Slider_Life1_Seed" member="yes" />
+																									<object class="wxStaticText" name="ID_STATICTEXT37" variable="StaticText37" member="yes">
+																										<label>Type</label>
+																									</object>
+																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																									<border>2</border>
+																									<option>1</option>
+																								</object>
+																								<object class="sizeritem">
+																									<object class="wxSlider" name="ID_SLIDER_Life1_Seed" variable="Slider_Life1_Seed" member="yes">
+																										<max>4</max>
+																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
 																									<option>1</option>
@@ -1939,7 +1959,9 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxSlider" name="ID_SLIDER_Snowstorm1_Count" variable="Slider_Snowstorm1_Count" member="yes" />
+																									<object class="wxSlider" name="ID_SLIDER_Snowstorm1_Count" variable="Slider_Snowstorm1_Count" member="yes">
+																										<value>50</value>
+																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
 																									<option>1</option>
@@ -1953,7 +1975,9 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxSlider" name="ID_SLIDER_Snowstorm1_Length" variable="Slider_Snowstorm1_Length" member="yes" />
+																									<object class="wxSlider" name="ID_SLIDER_Snowstorm1_Length" variable="Slider_Snowstorm1_Length" member="yes">
+																										<value>50</value>
+																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
 																									<option>1</option>
@@ -2630,21 +2654,25 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxSlider" name="ID_SLIDER_Life2_Count" variable="Slider_Life2_Count" member="yes" />
-																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-																									<border>2</border>
-																									<option>1</option>
-																								</object>
-																								<object class="sizeritem">
-																									<object class="wxStaticText" name="ID_STATICTEXT63" variable="StaticText61" member="yes">
-																										<label>Seed</label>
+																									<object class="wxSlider" name="ID_SLIDER_Life2_Count" variable="Slider_Life2_Count" member="yes">
+																										<value>50</value>
 																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxSlider" name="ID_SLIDER_Life2_Seed" variable="Slider_Life2_Seed" member="yes" />
+																									<object class="wxStaticText" name="ID_STATICTEXT63" variable="StaticText61" member="yes">
+																										<label>Type</label>
+																									</object>
+																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																									<border>2</border>
+																									<option>1</option>
+																								</object>
+																								<object class="sizeritem">
+																									<object class="wxSlider" name="ID_SLIDER_Life2_Seed" variable="Slider_Life2_Seed" member="yes">
+																										<max>4</max>
+																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
 																									<option>1</option>
@@ -2822,7 +2850,9 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxSlider" name="ID_SLIDER_Snowstorm2_Count" variable="Slider_Snowstorm2_Count" member="yes" />
+																									<object class="wxSlider" name="ID_SLIDER_Snowstorm2_Count" variable="Slider_Snowstorm2_Count" member="yes">
+																										<value>50</value>
+																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
 																									<option>1</option>
@@ -2836,7 +2866,9 @@
 																									<option>1</option>
 																								</object>
 																								<object class="sizeritem">
-																									<object class="wxSlider" name="ID_SLIDER_Snowstorm2_Length" variable="Slider_Snowstorm2_Length" member="yes" />
+																									<object class="wxSlider" name="ID_SLIDER_Snowstorm2_Length" variable="Slider_Snowstorm2_Length" member="yes">
+																										<value>50</value>
+																									</object>
 																									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																									<border>2</border>
 																									<option>1</option>

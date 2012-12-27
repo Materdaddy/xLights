@@ -24,17 +24,10 @@
 #ifndef PIXELBUFFER_H
 #define PIXELBUFFER_H
 
-#include <stdint.h>
-#include <list>
-#include <vector>
-#include <wx/colour.h>
-#include <wx/scrolwin.h>
-#include <wx/dcclient.h>
-#include <wx/dcmemory.h>
-#include <wx/pen.h>
 #include <wx/xml/xml.h>
 
 #include "ModelClass.h"
+#include "RgbEffects.h"
 
 enum MixTypes {
     Mix_Effect1,
@@ -48,206 +41,15 @@ enum MixTypes {
 };
 
 
-// for meteor effect
-class MeteorClass
-{
-public:
-
-    int x,y;
-    wxImage::HSVValue hsv;
-};
-
-
-class MeteorHasExpired
-{
-    int TailLength;
-public:
-    MeteorHasExpired(int t)
-    : TailLength(t)
-    {}
-
-    // operator() is what's called when you do MeteorHasExpired()
-    bool operator()(const MeteorClass& obj)
-    {
-        return obj.y + TailLength < 0;
-    }
-};
-
-typedef std::vector<wxColour> wxColourVector;
-typedef std::vector<wxImage::HSVValue> hsvVector;
-
-class PaletteClass
-{
-private:
-    wxColourVector color;
-    hsvVector hsv;
-public:
-
-    void Set(wxColourVector& newcolors)
-    {
-        color=newcolors;
-        hsv.clear();
-        wxImage::RGBValue newrgb;
-        wxImage::HSVValue newhsv;
-        for(size_t i=0; i<newcolors.size(); i++) {
-            newrgb.red=newcolors[i].Red();
-            newrgb.green=newcolors[i].Green();
-            newrgb.blue=newcolors[i].Blue();
-            newhsv=wxImage::RGBtoHSV(newrgb);
-            hsv.push_back(newhsv);
-        }
-    }
-
-    size_t Size()
-    {
-        return color.size();
-    }
-
-    void GetColor(size_t idx, wxColour& c)
-    {
-        if (idx >= color.size()) {
-            c.Set(255,255,255);
-        } else {
-            c=color[idx];
-        }
-    }
-
-    void GetHSV(size_t idx, wxImage::HSVValue& c)
-    {
-        if (idx >= hsv.size()) {
-            // white
-            c.hue=0.0;
-            c.saturation=0.0;
-            c.value=1.0;
-        } else {
-            c=hsv[idx];
-        }
-    }
-};
-
-
-// for pixels in the pixel buffer
-class PixelClass
-{
-    wxColour color[2];
-    //int sparklecnt;
-
-public:
-
-    void SetColor(int Layer,wxColour& c)
-    {
-        color[Layer & 1]=c;
-    }
-
-    void Clear()
-    {
-        color[0].SetRGB(0);
-        color[1].SetRGB(0);
-    }
-
-    void MixColors(MixTypes MixType, wxColour& c)
-    {
-        switch (MixType)
-        {
-            case Mix_Effect1:
-                c=color[0];
-                break;
-            case Mix_Effect2:
-                c=color[1];
-                break;
-            case Mix_Mask1:
-                // first masks second
-                if (color[0].GetRGB() == 0) {
-                    c=color[1];
-                } else {
-                    c.Set(0);
-                }
-                break;
-            case Mix_Mask2:
-                // second masks first
-                if (color[1].GetRGB() == 0) {
-                    c=color[0];
-                } else {
-                    c.Set(0);
-                }
-                break;
-            case Mix_Unmask1:
-                // first unmasks second
-                if (color[0].GetRGB() != 0) {
-                    c=color[1];
-                } else {
-                    c.Set(0);
-                }
-                break;
-            case Mix_Unmask2:
-                // second unmasks first
-                if (color[1].GetRGB() != 0) {
-                    c=color[0];
-                } else {
-                    c.Set(0);
-                }
-                break;
-            case Mix_Layered:
-                if (color[1].GetRGB() == 0) {
-                    c=color[0];
-                } else {
-                    c=color[1];
-                }
-                break;
-                break;
-            case Mix_Average:
-                // only average when both colors are non-black
-                if (color[0].GetRGB() == 0) {
-                    c=color[1];
-                } else if (color[1].GetRGB() == 0) {
-                    c=color[0];
-                } else {
-                    c.Set( (color[0].Red()+color[1].Red())/2, (color[0].Green()+color[1].Green())/2, (color[0].Blue()+color[1].Blue())/2 );
-                }
-                break;
-        }
-    }
-};
-
-
-typedef std::vector<PixelClass> PixelVector;
-typedef std::list<MeteorClass> MeteorList;
-typedef std::vector<int> FireVector;
-
-
 class PixelBufferClass : public ModelClass
 {
 private:
-    PixelVector pixels; // this is the calculation buffer
-    wxColourVector snowflakes[2];
-    wxColourVector FirePalette;
-    FireVector FireBuffer[2];
 
     int sparkle_count;
     int CurrentLayer;  // 0 or 1
     MixTypes MixType;
-    MeteorList meteors[2];
-    PaletteClass palette[2];
-    wxImage image[2];
-    wxString PictureName[2];
-    int LastSnowflakeCount[2];
-    int LastSnowflakeType[2];
-    long state[2];
-
-    void SetPixel(int x, int y, wxColour &color);
-    void SetPixel(int x, int y, wxImage::HSVValue& hsv);
-    void SetRangeColor(const wxImage::HSVValue& hsv1, const wxImage::HSVValue& hsv2, wxImage::HSVValue& newhsv);
-    double RandomRange(double num1, double num2);
-    void Color2HSV(const wxColour& color, wxImage::HSVValue& hsv);
-    double rand01();
-    wxByte ChannelBlend(wxByte c1, wxByte c2, double ratio);
-    void Get2ColorBlend(int coloridx1, int coloridx2, double ratio, wxColour &color);
-    void GetMultiColorBlend(double n, bool circular, wxColour &color);
-    void SetSnowflake(int x, int y, wxColour &color);
-    void GetSnowflake(int x, int y, wxColour &color);
-    wxUint32 GetSnowflakeRGB(int x, int y);
-    void SetFireBuffer(int x, int y, int PaletteIdx);
-    int GetFireBuffer(int x, int y);
+    RgbEffects Effect[2];
+    void GetMixedColor(wxCoord x, wxCoord y, wxColour& c);
 
 public:
     PixelBufferClass();

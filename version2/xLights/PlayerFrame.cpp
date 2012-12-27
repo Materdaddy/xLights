@@ -65,6 +65,9 @@ PlayerFrame::PlayerFrame(wxWindow* parent,wxWindowID id,const wxPoint& pos,const
     wxUnusedVar(bOK);
 
     sizer->Add(MediaCtrl, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxEXPAND, 0);
+    PlayAfterLoad=false;
+    Connect(wxID_MEDIACTRL, wxEVT_MEDIA_LOADED,
+                  wxMediaEventHandler(PlayerFrame::OnMediaLoaded));
 }
 
 
@@ -72,6 +75,25 @@ PlayerFrame::~PlayerFrame()
 {
 	//(*Destroy(PlayerFrame)
 	//*)
+}
+
+bool PlayerFrame::Load(const wxString& filename)
+{
+    PlayAfterLoad=false;
+    return MediaCtrl->Load(filename);
+}
+
+bool PlayerFrame::Play(const wxString& filename)
+{
+    bool result = MediaCtrl->Load(filename);
+    if (result) PlayAfterLoad=true;
+    return result;
+}
+
+void PlayerFrame::OnMediaLoaded(wxMediaEvent& WXUNUSED(evt))
+{
+    if (PlayAfterLoad) MediaCtrl->Play();
+    PlayAfterLoad=false;
 }
 
 void PlayerFrame::OnClose(wxCloseEvent& event)
