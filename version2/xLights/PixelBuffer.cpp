@@ -161,14 +161,8 @@ void PixelBufferClass::SetSparkle(int freq)
 
 void PixelBufferClass::SetLayer(int newlayer, int period, int speed, bool ResetState)
 {
-    static int lastperiod = 0;
     CurrentLayer=newlayer & 1;  // only 0 or 1 is allowed
-    if (ResetState) {
-        Effect[CurrentLayer].ResetState();
-    } else {
-        Effect[CurrentLayer].AddState((period-lastperiod) * speed);
-    }
-    lastperiod=period;
+    Effect[CurrentLayer].SetState(period,speed,ResetState);
 }
 
 void PixelBufferClass::CalcOutput()

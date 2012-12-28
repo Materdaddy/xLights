@@ -200,16 +200,15 @@ wxUint32 RgbEffects::GetTempPixelRGB(int x, int y)
     return 0;
 }
 
-void RgbEffects::ResetState()
+void RgbEffects::SetState(int period, int NewSpeed, bool ResetState)
 {
-    state=0;
-    speed=0;
-}
-
-void RgbEffects::AddState(int incr)
-{
-    state+=incr;
-    speed=incr;
+    if (ResetState) {
+        state=0;
+    } else {
+        state+=(period-lastperiod) * NewSpeed;
+    }
+    speed=NewSpeed;
+    lastperiod=period;
 }
 
 void RgbEffects::RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D)
@@ -479,11 +478,11 @@ void RgbEffects::RenderLife(int Count, int Type)
         }
     }
     long TempState=state % 400 / 20;
-    if (TempState == LastState) {
+    if (TempState == LastLifeState) {
         pixels=tempbuf;
         return;
     } else {
-        LastState=TempState;
+        LastLifeState=TempState;
     }
     for (x=0; x < BufferWi; x++) {
         for (y=0; y < BufferHt; y++) {

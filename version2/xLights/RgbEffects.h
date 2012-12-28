@@ -138,8 +138,7 @@ class RgbEffects
         void Clear(const wxColour& bgColor);
         void SetPalette(wxColourVector& newcolors);
         size_t GetColorCount();
-        void ResetState();
-        void AddState(int incr);
+        void SetState(int period, int NewSpeed, bool ResetState);
         void GetPixel(int x, int y, wxColour &color);
         void RenderBars(int PaletteRepeat, int Direction, bool Highlight, bool Show3D);
         void RenderButterfly(int ColorScheme, int Style, int Chunks, int Skip);
@@ -190,8 +189,9 @@ class RgbEffects
         int LastLifeCount;
         int LastLifeType;
         long state;
-        long LastState;
+        long LastLifeState;
         int speed;
+        int lastperiod;
 
     private:
 };
