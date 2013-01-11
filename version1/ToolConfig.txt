@@ -1,3 +1,5 @@
+VERSION 1 BUILD INSTRUCTIONS (VERSIONS 2012B AND EARLIER)
+
 xLights can be built and run on Linux, Mac OS/X, or Windows. This document
 describes how **developers** should set up their tool chain to build xLights.
 If you are a user, installation packages are available on the xLights
@@ -7,7 +9,7 @@ Linux users will need to follow the instructions below to compile there own copy
 
 xLights is written in C++ and uses the wxWidgets library as a compatibility layer across operating systems.
 xLights versions 2012a and EARLIER are compatible with wxWidgets 2.8.10, 2.8.11, and 2.8.12
-xLights versions 2012b and LATER are compatible with wxWidgets 2.8.11, 2.8.12, 2.9.3, and 2.9.4
+xLights version 2012b is compatible with wxWidgets 2.8.11, 2.8.12, 2.9.3, and 2.9.4
 wxWidgets versions 2.8.x are available as precompiled downloads from various locations on the internet.
 wxWidgets versions 2.9.x are not considered stable and must be compiled yourself.
 
@@ -19,7 +21,7 @@ distributions will vary.
 
   a) Using Software Manager, install these packages: g++, subversion
 
-  b) Using Software Manager, install libwxgtk2.8-dev (easier) OR download and compile wxWidgets 2.9.4 (more challenging)
+  b) Using Software Manager, install libwxgtk2.8-dev (easier) OR download and compile wxWidgets 2.9.3 (more challenging)
 
   c) Get the xLights source code by opening a terminal window and typing the following:
 

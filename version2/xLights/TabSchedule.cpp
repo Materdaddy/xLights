@@ -1338,7 +1338,7 @@ bool xLightsFrame::DisplayAddShowDialog(AddShowDialog& dialog)
 void xLightsFrame::OnButtonAddShowClick(wxCommandEvent& event)
 {
     size_t cnt = Notebook1->GetPageCount();
-    if (cnt < FixedPages) {
+    if (cnt <= FixedPages) {
         wxMessageBox(_("You must create at least one playlist before scheduling your show."), _("Error"));
         return;
     }

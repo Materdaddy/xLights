@@ -360,6 +360,7 @@ class xLightsFrame: public wxFrame
         static const long ID_CHOICE_LayerMethod;
         static const long ID_STATICTEXT24;
         static const long ID_SLIDER_SparkleFrequency;
+        static const long ID_PANEL31;
         static const long ID_STATICTEXT4;
         static const long ID_BUTTON_PLAY_RGB_SEQ;
         static const long ID_BUTTON2;
@@ -564,7 +565,9 @@ class xLightsFrame: public wxFrame
         static const long ID_BUTTON_Palette2_6;
         static const long ID_STATICTEXT77;
         static const long ID_SLIDER_Speed2;
-        static const long ID_PANEL_SEQUENCE;
+        static const long ID_PANEL32;
+        static const long ID_SPLITTERWINDOW2;
+        static const long ID_PANEL30;
         static const long ID_TREECTRL1;
         static const long ID_CHECKBOX_RUN_SCHEDULE;
         static const long ID_BUTTON_SAVE_SCHEDULE;
@@ -627,12 +630,14 @@ class xLightsFrame: public wxFrame
         wxPanel* Panel1_Life;
         wxStaticText* StaticText42;
         wxSlider* Slider_Meteors1_Count;
+        wxPanel* PanelSequence2;
         wxRadioButton* RadioButtonDim;
         wxSlider* Slider_Spirals1_Rotation;
         wxButton* ButtonLightsOff;
         wxCheckBox* CheckBox_Bars1_3D;
         wxSlider* Slider_Butterfly1_Chunks;
         wxRadioButton* RadioButtonRgbDim;
+        wxSplitterWindow* SplitterWindow2;
         wxBitmapButton* BitmapButtonOpenSeq;
         wxCheckBox* CheckBox_Palette1_2;
         wxRadioButton* RadioButtonRgbChase4;
@@ -666,8 +671,8 @@ class xLightsFrame: public wxFrame
         wxCheckBox* CheckBox_ColorWash2_VFade;
         wxStaticText* StaticTextShowEnd;
         wxStaticText* StaticText52;
-        wxRadioButton* RadioButtonChase4;
         wxPanel* Panel2;
+        wxRadioButton* RadioButtonChase4;
         wxStaticText* StaticText10;
         wxSlider* Slider_Spirals1_Direction;
         wxPanel* Panel2_Text;
@@ -708,6 +713,7 @@ class xLightsFrame: public wxFrame
         wxStaticText* StaticText36;
         wxStaticText* StaticText75;
         wxChoice* Choice_Bars2_Direction;
+        wxPanel* Panel5;
         wxRadioButton* RadioButtonRgbChase5;
         wxStaticText* StaticText56;
         wxCheckBox* CheckBoxOffAtEnd;
@@ -759,7 +765,6 @@ class xLightsFrame: public wxFrame
         wxTimer Timer1;
         wxRadioButton* RadioButtonRgbChase;
         wxButton* ButtonUpdateShow;
-        wxPanel* PanelSequence;
         wxStaticText* StaticText70;
         wxStaticText* StaticText35;
         wxButton* ButtonShowDatesChange;
@@ -776,6 +781,7 @@ class xLightsFrame: public wxFrame
         wxStaticText* StaticText72;
         wxRadioButton* RadioButtonChase;
         wxRadioButton* RadioButtonRgbChase3;
+        wxPanel* Panel4;
         wxStaticText* StaticText53;
         wxMenuItem* MenuItemSavePlaylists;
         wxButton* ButtonAddE131;
@@ -1113,6 +1119,7 @@ class xLightsFrame: public wxFrame
         void ResetEffectStates();
         void SeqLoadXlightsFile(const wxString& filename);
         void RenderGridToSeqData();
+        void ResetEffectsXml();
 
         wxXmlDocument EffectsXml;
         wxXmlNode* EffectsNode;

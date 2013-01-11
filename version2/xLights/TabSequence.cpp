@@ -70,19 +70,21 @@ void xLightsFrame::EnableSequenceControls(bool enable)
 {
     Button_PlayEffect->Enable(enable && Choice_Models->GetCount() > 0);
     Button_PlayRgbSeq->Enable(enable && Grid1->GetNumberCols() > 2);
-    Button_Models->Enable(enable);
-    Button_Presets->Enable(enable);
+    Button_Models->Enable(enable && ModelsNode);
+    Button_Presets->Enable(enable && EffectsNode);
+    Button_PresetAdd->Enable(enable && EffectsNode);
+    Button_PresetUpdate->Enable(enable && EffectsNode);
     Choice_Models->Enable(enable);
     Button_Pictures1_Filename->Enable(enable);
     TextCtrl_Pictures1_Filename->Enable(enable);
     Button_Pictures2_Filename->Enable(enable);
     TextCtrl_Pictures2_Filename->Enable(enable);
-    ButtonSeqExport->Enable(enable);
+    ButtonSeqExport->Enable(enable && Grid1->GetNumberCols() > 2);
     BitmapButtonOpenSeq->Enable(enable);
     BitmapButtonSaveSeq->Enable(enable);
     BitmapButtonInsertRow->Enable(enable);
     BitmapButtonDeleteRow->Enable(enable);
-    ButtonDisplayElements->Enable(enable);
+    ButtonDisplayElements->Enable(enable && ModelsNode);
 }
 
 void xLightsFrame::OnButton_PresetsClick(wxCommandEvent& event)
@@ -426,15 +428,19 @@ wxString xLightsFrame::SizerControlsToString(wxSizer* sizer)
     return s;
 }
 
-// returns true on success
-void xLightsFrame::LoadEffectsFile()
+void xLightsFrame::ResetEffectsXml()
 {
-    wxFileName effectsFile;
-    effectsFile.AssignDir( CurrentDir );
-    effectsFile.SetFullName(_(XLIGHTS_RGBEFFECTS_FILE));
     ModelsNode=0;
     EffectsNode=0;
     PalettesNode=0;
+}
+
+void xLightsFrame::LoadEffectsFile()
+{
+    ResetEffectsXml();
+    wxFileName effectsFile;
+    effectsFile.AssignDir( CurrentDir );
+    effectsFile.SetFullName(_(XLIGHTS_RGBEFFECTS_FILE));
     if (!effectsFile.FileExists()) {
         // file does not exist, so create an empty xml doc
         CreateDefaultEffectsXml();
@@ -1405,7 +1411,7 @@ void xLightsFrame::NumericSort()
     //sort the table
     int i, iHole;
     double d;
-    int SortCol=0;
+    const int SortCol=0;
 
     Grid1->BeginBatch();
     int rowcnt = Grid1->GetNumberRows();

@@ -89,7 +89,7 @@ void PaletteMgmtDialog::initialize(const wxString& id1, const wxString& id2, wxX
 {
     ButtonSavePalette->SetLabel(_("Save palette ")+id1+_(" as..."));
     ButtonLoadPalette1->SetLabel(_("Load saved palette to effect ")+id1);
-    ButtonCopy->SetLabel(_("Copy palette for effect ")+id1+(" to effect ")+id2);
+    ButtonCopy->SetLabel(_("Copy palette for effect ")+id1+_(" to effect ")+id2);
     ButtonChangeOrder->SetLabel(_("Change palette ")+id1+_(" order"));
     PrimarySizer=PriSizer;
     SecondarySizer=SecSizer;

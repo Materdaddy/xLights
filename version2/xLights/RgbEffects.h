@@ -30,6 +30,7 @@
 #include <wx/colour.h>
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
+#include <wx/image.h>
 
 
 typedef std::vector<wxColour> wxColourVector;

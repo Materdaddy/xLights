@@ -41,7 +41,7 @@ int NetInfoClass::CalcAbsChannel(int NetNum, int NetCh)
 int NetInfoClass::GetTotChannels()
 {
     int tot=0;
-    for(int NetNum=0; NetNum < NetMaxChannel.size(); NetNum++) {
+    for(size_t NetNum=0; NetNum < NetMaxChannel.size(); NetNum++) {
         tot+=NetMaxChannel[NetNum];
     }
     return tot;
@@ -62,7 +62,7 @@ void NetInfoClass::GetAllChannelNames(wxArrayString& names)
 wxString NetInfoClass::GetChannelName(int ChNum)
 {
     int NetCh=ChNum;
-    for (int NetNum=0; NetNum < NetMaxChannel.size(); NetNum++) {
+    for (size_t NetNum=0; NetNum < NetMaxChannel.size(); NetNum++) {
         if (NetCh < NetMaxChannel[NetNum]) {
             return wxString::Format(wxT("Ch %d: Net %d #%d"),int(ChNum+1),int(NetNum+1),int(NetCh+1));
         }
