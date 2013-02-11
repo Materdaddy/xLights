@@ -2143,7 +2143,9 @@
 																													<option>1</option>
 																												</object>
 																												<object class="sizeritem">
-																													<object class="wxSlider" name="ID_SLIDER_Text1_Top" variable="Slider_Text1_Top" member="yes" />
+																													<object class="wxSlider" name="ID_SLIDER_Text1_Top" variable="Slider_Text1_Top" member="yes">
+																														<value>50</value>
+																													</object>
 																													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 																													<border>2</border>
 																													<option>1</option>
@@ -3045,7 +3047,9 @@
 																													<option>1</option>
 																												</object>
 																												<object class="sizeritem">
-																													<object class="wxSlider" name="ID_SLIDER_Text2_Top" variable="Slider_Text2_Top" member="yes" />
+																													<object class="wxSlider" name="ID_SLIDER_Text2_Top" variable="Slider_Text2_Top" member="yes">
+																														<value>50</value>
+																													</object>
 																													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 																													<border>2</border>
 																													<option>1</option>

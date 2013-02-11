@@ -1193,7 +1193,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer65->Add(TextCtrl_Text1_Line2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText57 = new wxStaticText(Panel1_Text, ID_STATICTEXT57, _("Top"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT57"));
     FlexGridSizer65->Add(StaticText57, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Text1_Top = new wxSlider(Panel1_Text, ID_SLIDER_Text1_Top, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Text1_Top"));
+    Slider_Text1_Top = new wxSlider(Panel1_Text, ID_SLIDER_Text1_Top, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Text1_Top"));
     FlexGridSizer65->Add(Slider_Text1_Top, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
     FlexGridSizer46->Add(FlexGridSizer65, 1, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Text1_Font = new wxButton(Panel1_Text, ID_BUTTON_TEXT1_FONT, _("Font"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEXT1_FONT"));
@@ -1487,7 +1487,7 @@ xLightsFrame::xLightsFrame(wxWindow* parent,wxWindowID id)
     FlexGridSizer66->Add(TextCtrl_Text2_Line2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
     StaticText74 = new wxStaticText(Panel2_Text, ID_STATICTEXT76, _("Top"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT76"));
     FlexGridSizer66->Add(StaticText74, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
-    Slider_Text2_Top = new wxSlider(Panel2_Text, ID_SLIDER_Text2_Top, 0, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Text2_Top"));
+    Slider_Text2_Top = new wxSlider(Panel2_Text, ID_SLIDER_Text2_Top, 50, 0, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SLIDER_Text2_Top"));
     FlexGridSizer66->Add(Slider_Text2_Top, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
     FlexGridSizer61->Add(FlexGridSizer66, 1, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button_Text2_Font = new wxButton(Panel2_Text, ID_BUTTON_TEXT2_FONT, _("Font"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON_TEXT2_FONT"));
